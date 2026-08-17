@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sed -i '/badge:/d' shot5.mjs)",
+      "Bash(node shot5.mjs)"
+    ]
+  }
+}

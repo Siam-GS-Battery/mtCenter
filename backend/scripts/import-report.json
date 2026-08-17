@@ -1,0 +1,260 @@
+{
+  "generatedAt": "2026-08-14T02:45:08.400Z",
+  "dryRun": false,
+  "only": null,
+  "summaries": [
+    {
+      "table": "machines",
+      "rowsRead": 973,
+      "upserted": 973,
+      "rejectedRows": 3,
+      "skipped": 0
+    },
+    {
+      "table": "spare_parts",
+      "rowsRead": 8588,
+      "upserted": 8588,
+      "rejectedRows": 15,
+      "skipped": 0
+    },
+    {
+      "table": "work_orders",
+      "rowsRead": 8589,
+      "upserted": 8589,
+      "rejectedRows": 0,
+      "skipped": 0
+    },
+    {
+      "table": "work_order_parts",
+      "rowsRead": 5553,
+      "upserted": 5553,
+      "rejectedRows": 0,
+      "skipped": 0
+    },
+    {
+      "table": "pm_plans",
+      "rowsRead": 2820,
+      "upserted": 2820,
+      "rejectedRows": 0,
+      "skipped": 0
+    },
+    {
+      "table": "part_withdrawals",
+      "rowsRead": 9764,
+      "upserted": 9764,
+      "rejectedRows": 0,
+      "skipped": 0
+    }
+  ],
+  "rejectCount": 26,
+  "rejects": [
+    {
+      "file": "Machine_Database.xlsx",
+      "sheet": "Machine_Clean",
+      "row": 837,
+      "column": "Machine_Desc_Clean",
+      "rawValue": ".",
+      "reason": "blank machine name (not-null column); falling back to code/id"
+    },
+    {
+      "file": "Machine_Database.xlsx",
+      "sheet": "Machine_Clean",
+      "row": 966,
+      "column": "Machine_Desc_Clean",
+      "rawValue": "",
+      "reason": "blank machine name (not-null column); falling back to code/id"
+    },
+    {
+      "file": "Machine_Database.xlsx",
+      "sheet": "Machine_Clean",
+      "row": 972,
+      "column": "Machine_Desc_Clean",
+      "rawValue": "",
+      "reason": "blank machine name (not-null column); falling back to code/id"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 569,
+      "column": "Part_Name",
+      "rawValue": "",
+      "reason": "blank part name (not-null column); falling back to code"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 813,
+      "column": "Part_Name",
+      "rawValue": "",
+      "reason": "blank part name (not-null column); falling back to code"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 841,
+      "column": "Part_Name",
+      "rawValue": "",
+      "reason": "blank part name (not-null column); falling back to code"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 1344,
+      "column": "Part_Name",
+      "rawValue": "DELETE***",
+      "reason": "blank part name (not-null column); falling back to code"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 3727,
+      "column": "Part_Name",
+      "rawValue": "-",
+      "reason": "blank part name (not-null column); falling back to code"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 5375,
+      "column": "Part_Name",
+      "rawValue": "",
+      "reason": "blank part name (not-null column); falling back to code"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 5376,
+      "column": "Part_Name",
+      "rawValue": "",
+      "reason": "blank part name (not-null column); falling back to code"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 8329,
+      "column": "Code_Number",
+      "rawValue": "",
+      "reason": "blank code (unique not-null column); falling back to id"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 8329,
+      "column": "Part_Name",
+      "rawValue": "",
+      "reason": "blank part name (not-null column); falling back to code"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 8341,
+      "column": "Code_Number",
+      "rawValue": "",
+      "reason": "blank code (unique not-null column); falling back to id"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 8341,
+      "column": "Part_Name",
+      "rawValue": "",
+      "reason": "blank part name (not-null column); falling back to code"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 8342,
+      "column": "Code_Number",
+      "rawValue": "",
+      "reason": "blank code (unique not-null column); falling back to id"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 8342,
+      "column": "Part_Name",
+      "rawValue": "",
+      "reason": "blank part name (not-null column); falling back to code"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 8343,
+      "column": "Code_Number",
+      "rawValue": "",
+      "reason": "blank code (unique not-null column); falling back to id"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 8343,
+      "column": "Part_Name",
+      "rawValue": "",
+      "reason": "blank part name (not-null column); falling back to code"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 8345,
+      "column": "Code_Number",
+      "rawValue": "",
+      "reason": "blank code (unique not-null column); falling back to id"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 8345,
+      "column": "Part_Name",
+      "rawValue": "",
+      "reason": "blank part name (not-null column); falling back to code"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 8368,
+      "column": "Code_Number",
+      "rawValue": "",
+      "reason": "blank code (unique not-null column); falling back to id"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 8368,
+      "column": "Part_Name",
+      "rawValue": "",
+      "reason": "blank part name (not-null column); falling back to code"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 8378,
+      "column": "Code_Number",
+      "rawValue": "",
+      "reason": "blank code (unique not-null column); falling back to id"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 8378,
+      "column": "Part_Name",
+      "rawValue": "",
+      "reason": "blank part name (not-null column); falling back to code"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 8407,
+      "column": "Code_Number",
+      "rawValue": "",
+      "reason": "blank code (unique not-null column); falling back to id"
+    },
+    {
+      "file": "Inventory_Spare_Items.xlsx",
+      "sheet": "Data_Clean",
+      "row": 8407,
+      "column": "Part_Name",
+      "rawValue": "",
+      "reason": "blank part name (not-null column); falling back to code"
+    }
+  ]
+}

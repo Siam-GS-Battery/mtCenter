@@ -1,0 +1,6 @@
+{
+  "name": "MT Center",
+  "description": "Industrial AI Machine Maintenance Assistant for Technicians, Engineers, and Supervisors",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

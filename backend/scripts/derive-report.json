@@ -1,0 +1,848 @@
+{
+  "ranAt": "2026-08-17T02:13:46.637Z",
+  "today": "2026-08-17",
+  "dryRun": false,
+  "only": null,
+  "steps": {
+    "1-profiles": {
+      "step": "profiles",
+      "selected": true,
+      "existingBefore": 43,
+      "derivedPeople": 40,
+      "toCreate": 0,
+      "alreadyPresent": 40,
+      "expectedTotalAfter": 43,
+      "byRole": {
+        "supervisor": 8,
+        "engineer": 7,
+        "technician": 25
+      },
+      "honorificStripped": [
+        {
+          "from": [
+            "นายสายธาร บุพชาติ"
+          ],
+          "to": "สายธาร บุพชาติ"
+        }
+      ],
+      "peopleWithNoDepartment": [],
+      "emailColumnExists": false,
+      "realEmailsAvailableForFutureMigration": {
+        "note": "profiles has no email column and this script does not alter the schema. 9 of the 40 people have a real @nsk.com address available via the modal pm_plans.responsible_email for their pm_plans.responsible value. responsible_email is NOT 1:1 with responsible in the raw data (a PM row's email is sometimes the planner's, not the responsible person's), so the modal value is used.",
+        "emails": [
+          {
+            "name": "คุณานนต์ ปารวัณวงศ์",
+            "email": "parawanwong-k-3161@nsk.com"
+          },
+          {
+            "name": "จักรภัทร โคตรสมบัติ",
+            "email": "jakkapat@nsk.com"
+          },
+          {
+            "name": "ณัฐดนัย จุฑาเทพ",
+            "email": "juthathep-n-4697@nsk.com"
+          },
+          {
+            "name": "ปิยะพงษ์ ทองแสน",
+            "email": "thongsan-p-3769@nsk.com"
+          },
+          {
+            "name": "ผะหลา สีแดง",
+            "email": "pahla@nsk.com"
+          },
+          {
+            "name": "พงษ์พิทักษ์ ศรไชย",
+            "email": "sonchai-p-6240@nsk.com"
+          },
+          {
+            "name": "ภูชิต กุลเสรี",
+            "email": "puchit@nsk.com"
+          },
+          {
+            "name": "อัมรินทร์ รักษาพล",
+            "email": "pahla@nsk.com"
+          },
+          {
+            "name": "เจษฎา ผิวบาง",
+            "email": "chetsada@nsk.com"
+          }
+        ]
+      },
+      "people": [
+        {
+          "id": "usr-f468c6125a",
+          "employee_id": "SUP-0001",
+          "name": "สมชาย ใจดี",
+          "role": "supervisor",
+          "department": "Breakdown Maintenance",
+          "initials": "ข.อ.",
+          "email_available": null
+        },
+        {
+          "id": "usr-7862a1bde5",
+          "employee_id": "SUP-0002",
+          "name": "คมกฤช วิลัยลอย",
+          "role": "supervisor",
+          "department": "Breakdown Maintenance",
+          "initials": "ค.ว.",
+          "email_available": null
+        },
+        {
+          "id": "usr-53fcd2fe67",
+          "employee_id": "ENG-0001",
+          "name": "คุณานนต์ ปารวัณวงศ์",
+          "role": "engineer",
+          "department": "Breakdown Maintenance",
+          "initials": "ค.ป.",
+          "email_available": "parawanwong-k-3161@nsk.com"
+        },
+        {
+          "id": "usr-652736eabc",
+          "employee_id": "EMP-0001",
+          "name": "จักพันธ์ อาจสมัย",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "จ.อ.",
+          "email_available": null
+        },
+        {
+          "id": "usr-abe40b4490",
+          "employee_id": "ENG-0002",
+          "name": "จักรภัทร โคตรสมบัติ",
+          "role": "engineer",
+          "department": "Preventive Maintenance",
+          "initials": "จ.โ.",
+          "email_available": "jakkapat@nsk.com"
+        },
+        {
+          "id": "usr-205d8df8a9",
+          "employee_id": "SUP-0003",
+          "name": "ชลันธร ทำนุ",
+          "role": "supervisor",
+          "department": "Pre-process",
+          "initials": "ช.ท.",
+          "email_available": null
+        },
+        {
+          "id": "usr-f1716b1cc6",
+          "employee_id": "EMP-0002",
+          "name": "ชูชาติ บุหรี่ทอง",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "ช.บ.",
+          "email_available": null
+        },
+        {
+          "id": "usr-64ea7e86ac",
+          "employee_id": "SUP-0004",
+          "name": "ชูชาติ พัลวัน",
+          "role": "supervisor",
+          "department": "Breakdown Maintenance",
+          "initials": "ช.พ.",
+          "email_available": null
+        },
+        {
+          "id": "usr-935bb90a9a",
+          "employee_id": "ENG-0003",
+          "name": "ณัฐดนัย จุฑาเทพ",
+          "role": "engineer",
+          "department": "Breakdown Maintenance",
+          "initials": "ณ.จ.",
+          "email_available": "juthathep-n-4697@nsk.com"
+        },
+        {
+          "id": "usr-be454b9e1d",
+          "employee_id": "EMP-0003",
+          "name": "ณัฐนันท์ พวงพันธ์",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "ณ.พ.",
+          "email_available": null
+        },
+        {
+          "id": "usr-956efd2555",
+          "employee_id": "EMP-0004",
+          "name": "ธนกฤต ทาระคำ",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "ธ.ท.",
+          "email_available": null
+        },
+        {
+          "id": "usr-ebbfb9988e",
+          "employee_id": "EMP-0005",
+          "name": "วิชัย มั่นคง",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "ธ.ท.",
+          "email_available": null
+        },
+        {
+          "id": "usr-295026a642",
+          "employee_id": "EMP-0006",
+          "name": "ธนากานต์ รัตนะ",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "ธ.ร.",
+          "email_available": null
+        },
+        {
+          "id": "usr-b8632c72a4",
+          "employee_id": "EMP-0007",
+          "name": "บุญรักษ์ กานต์ไกรศรี",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "บ.ก.",
+          "email_available": null
+        },
+        {
+          "id": "usr-fc89543f16",
+          "employee_id": "EMP-0008",
+          "name": "บุญเลิศ สาระสุข",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "บ.ส.",
+          "email_available": null
+        },
+        {
+          "id": "usr-2be5d052b0",
+          "employee_id": "EMP-0009",
+          "name": "ปริญญา เต็นตารัมย์",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "ป.เ.",
+          "email_available": null
+        },
+        {
+          "id": "usr-e9d6493820",
+          "employee_id": "SUP-0005",
+          "name": "ปัญญา คำเสมอ",
+          "role": "supervisor",
+          "department": "Breakdown Maintenance",
+          "initials": "ป.ค.",
+          "email_available": null
+        },
+        {
+          "id": "usr-83c8b7b23c",
+          "employee_id": "SUP-0006",
+          "name": "ปิยะพงษ์ ทองแสน",
+          "role": "supervisor",
+          "department": "Breakdown Maintenance",
+          "initials": "ป.ท.",
+          "email_available": "thongsan-p-3769@nsk.com"
+        },
+        {
+          "id": "usr-a15b3e8699",
+          "employee_id": "SUP-0007",
+          "name": "ผะหลา สีแดง",
+          "role": "supervisor",
+          "department": "Preventive Maintenance",
+          "initials": "ผ.ส.",
+          "email_available": "pahla@nsk.com"
+        },
+        {
+          "id": "usr-ff7d2bf8dc",
+          "employee_id": "EMP-0010",
+          "name": "พงศธร เนื่องสายยศ",
+          "role": "technician",
+          "department": "Pre-process",
+          "initials": "พ.เ.",
+          "email_available": null
+        },
+        {
+          "id": "usr-513776ed39",
+          "employee_id": "ENG-0004",
+          "name": "พงษ์พิทักษ์ ศรไชย",
+          "role": "engineer",
+          "department": "Breakdown Maintenance",
+          "initials": "พ.ศ.",
+          "email_available": "sonchai-p-6240@nsk.com"
+        },
+        {
+          "id": "usr-e9aae020f1",
+          "employee_id": "ENG-0005",
+          "name": "ภูชิต กุลเสรี",
+          "role": "engineer",
+          "department": "Breakdown Maintenance",
+          "initials": "ภ.ก.",
+          "email_available": "puchit@nsk.com"
+        },
+        {
+          "id": "usr-05a20d84c7",
+          "employee_id": "EMP-0011",
+          "name": "ยศวรรธน์ บูรณวนิช",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "ย.บ.",
+          "email_available": null
+        },
+        {
+          "id": "usr-473da2928a",
+          "employee_id": "EMP-0012",
+          "name": "วันชัย กองแก้ว",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "ว.ก.",
+          "email_available": null
+        },
+        {
+          "id": "usr-ba3f14a34e",
+          "employee_id": "EMP-0013",
+          "name": "วีระชัย ฤทธ์สิงห์",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "ว.ฤ.",
+          "email_available": null
+        },
+        {
+          "id": "usr-679e9398e5",
+          "employee_id": "EMP-0014",
+          "name": "ศุภชัย สิงห์คำโม",
+          "role": "technician",
+          "department": "Pre-process",
+          "initials": "ศ.ส.",
+          "email_available": null
+        },
+        {
+          "id": "usr-0d774a6308",
+          "employee_id": "SUP-0008",
+          "name": "ธีระ ตั้งใจ",
+          "role": "supervisor",
+          "department": "Breakdown Maintenance",
+          "initials": "ส.อ.",
+          "email_available": null
+        },
+        {
+          "id": "usr-b60e85cf66",
+          "employee_id": "EMP-0015",
+          "name": "สายธาร บุพชาติ",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "ส.บ.",
+          "email_available": null
+        },
+        {
+          "id": "usr-5133d69c03",
+          "employee_id": "EMP-0016",
+          "name": "สิทธิกร กล่อมกมล",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "ส.ก.",
+          "email_available": null
+        },
+        {
+          "id": "usr-29e9f8d210",
+          "employee_id": "EMP-0017",
+          "name": "อนันต์ สุขสันต์",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "ส.ม.",
+          "email_available": null
+        },
+        {
+          "id": "usr-897e8e101c",
+          "employee_id": "EMP-0018",
+          "name": "สุชาติ วิหารจงห์",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "ส.ว.",
+          "email_available": null
+        },
+        {
+          "id": "usr-8c4ee45191",
+          "employee_id": "EMP-0019",
+          "name": "สุรการ ดำดอน",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "ส.ด.",
+          "email_available": null
+        },
+        {
+          "id": "usr-ca147bd8d6",
+          "employee_id": "EMP-0020",
+          "name": "อดิศักดิ์ นาดี",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "อ.น.",
+          "email_available": null
+        },
+        {
+          "id": "usr-c15fd53917",
+          "employee_id": "EMP-0021",
+          "name": "อนุชา พิมพ์ตา",
+          "role": "technician",
+          "department": "Pre-process",
+          "initials": "อ.พ.",
+          "email_available": null
+        },
+        {
+          "id": "usr-d78a19e533",
+          "employee_id": "EMP-0022",
+          "name": "อรรถพล ถะเกิงผล",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "อ.ถ.",
+          "email_available": null
+        },
+        {
+          "id": "usr-055fbbaa99",
+          "employee_id": "EMP-0023",
+          "name": "อัมพล เส้งสุย",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "อ.เ.",
+          "email_available": null
+        },
+        {
+          "id": "usr-e79bab1855",
+          "employee_id": "ENG-0006",
+          "name": "อัมรินทร์ รักษาพล",
+          "role": "engineer",
+          "department": "Breakdown Maintenance",
+          "initials": "อ.ร.",
+          "email_available": "pahla@nsk.com"
+        },
+        {
+          "id": "usr-d3b8f76b1c",
+          "employee_id": "ENG-0007",
+          "name": "เจษฎา ผิวบาง",
+          "role": "engineer",
+          "department": "Breakdown Maintenance",
+          "initials": "เ.ผ.",
+          "email_available": "chetsada@nsk.com"
+        },
+        {
+          "id": "usr-5c0618b90d",
+          "employee_id": "EMP-0024",
+          "name": "สมศักดิ์ พากเพียร",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "เ.แ.",
+          "email_available": null
+        },
+        {
+          "id": "usr-a4285ae5a7",
+          "employee_id": "EMP-0025",
+          "name": "เสฐียรพงษ์ ทองแสวง",
+          "role": "technician",
+          "department": "Breakdown Maintenance",
+          "initials": "เ.ท.",
+          "email_available": null
+        }
+      ],
+      "actualTotalAfter": 43
+    },
+    "2-assigned_to": {
+      "step": "assigned_to",
+      "selected": true,
+      "totalWorkOrders": 8589,
+      "coverage": 8589,
+      "coveragePct": 100,
+      "distinctAssignees": 26,
+      "rowsWithNoTechnician": 0,
+      "rowsWithUnresolvableTechnician": 0,
+      "primaryTechnicianMismatch": 0,
+      "engineerReviewer": {
+        "field": "work_orders.engineer_reviewer",
+        "decision": "NOT populated",
+        "reasons": [
+          "The column is not empty. 3,322 of 8,589 rows already carry a value, written by scripts/import-excel.ts:391 from the source column PD_Responsible_Name — i.e. the PRODUCTION-side responsible person, a different real field with a different meaning. Filling the remaining 5,267 rows from mt_leader_name would leave one column holding two incompatible semantics with no way to tell which row means which.",
+          "mt_leader_name is a maintenance TEAM LEADER, not an engineer reviewer. All 8 distinct leaders are classified role='supervisor' by Step 1 of this same script; writing them into a field the app labels 'engineer reviewer' would contradict that.",
+          "The existing 3,322 values are only 122 rows equal to mt_leader_name, and 116 distinct values include free text that is not a person at all ('รอการซ่อม', 'Line HUB3 B1', and several full Thai sentences). Appending leader names to that would deepen a pre-existing data-quality problem in someone else's column, not fix it.",
+          "work_orders review semantics are unreachable anyway: all 8,589 rows are status='completed' with no review workflow state to attach a reviewer to."
+        ],
+        "mtLeaderNameAvailableOn": 8589
+      },
+      "rowsWritten": 8589
+    },
+    "3-last_maintenance": {
+      "step": "last_maintenance",
+      "selected": true,
+      "totalMachines": 973,
+      "coverage": 777,
+      "fromWorkOrderFinish": 531,
+      "fromPmActualDate": 246,
+      "range": {
+        "min": "2023-06-09",
+        "max": "2026-08-09"
+      },
+      "futureDatesRejected": [],
+      "excludedSource": {
+        "column": "pm_plans.last_pm_date",
+        "reason": "71 values are in the future (max 2029-04-29) and the column carries 119 DATE_OUTLIER flags; using it would set last_maintenance to a date that has not happened yet."
+      }
+    },
+    "4-next_maintenance": {
+      "step": "next_maintenance",
+      "selected": true,
+      "totalMachines": 973,
+      "coverage": 580,
+      "fromPmNextDate": 475,
+      "fromLastPlusPeriod": 105,
+      "genuinelyFuture": 492,
+      "alreadyOverdue": 88,
+      "range": {
+        "min": "2023-09-14",
+        "max": "2031-04-07"
+      },
+      "clipHorizonDays": 1825,
+      "clipHorizonDate": "2031-08-16",
+      "outliersRejected": [
+        {
+          "machine": "AS-290#0318",
+          "code": "AS-290",
+          "date": "2033-08-27",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "AS-327#0343",
+          "code": "AS-327",
+          "date": "2033-08-09",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "AS-812#0412",
+          "code": "AS-812",
+          "date": "2033-09-19",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "AS-813#0413",
+          "code": "AS-813",
+          "date": "2033-08-14",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "AS-892#0462",
+          "code": "AS-892",
+          "date": "2033-08-13",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "AS-985#0356",
+          "code": "AS-985",
+          "date": "2033-08-27",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "DE-1173#0841",
+          "code": "DE-1173",
+          "date": "2045-12-22",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-100#0265",
+          "code": "GR-100",
+          "date": "2055-12-10",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-212#0286",
+          "code": "GR-212",
+          "date": "2033-08-31",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-214#0287",
+          "code": "GR-214",
+          "date": "2033-08-31",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-221#0290",
+          "code": "GR-221",
+          "date": "2033-08-31",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-240#0531",
+          "code": "GR-240",
+          "date": "2032-03-29",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-250#0067",
+          "code": "GR-250",
+          "date": "2050-06-12",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-253#0074",
+          "code": "GR-253",
+          "date": "2050-05-04",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-339#0079",
+          "code": "GR-339",
+          "date": "2050-05-05",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-461#0075",
+          "code": "GR-461",
+          "date": "2050-05-06",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-578#0076",
+          "code": "GR-578",
+          "date": "2050-06-10",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-690#0077",
+          "code": "GR-690",
+          "date": "2050-05-12",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-732#0654",
+          "code": "GR-732",
+          "date": "2055-09-02",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-783#0385",
+          "code": "GR-783",
+          "date": "2033-08-27",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-785#0387",
+          "code": "GR-785",
+          "date": "2040-11-27",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-801#0405",
+          "code": "GR-801",
+          "date": "2033-09-19",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-802#0406",
+          "code": "GR-802",
+          "date": "2033-09-19",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-804#0408",
+          "code": "GR-804",
+          "date": "2033-09-19",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-809#0411",
+          "code": "GR-809",
+          "date": "2033-09-19",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "GR-828#0050",
+          "code": "GR-828",
+          "date": "2086-05-21",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "MA-729#0328",
+          "code": "MA-729",
+          "date": "2033-08-08",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "MA-766#0352",
+          "code": "MA-766",
+          "date": "2033-08-09",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "WA-224#0293",
+          "code": "WA-224",
+          "date": "2041-01-21",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "WA-322#0342",
+          "code": "WA-322",
+          "date": "2040-12-30",
+          "source": "pm_plans.next_pm_date"
+        },
+        {
+          "machine": "WA-328#0344",
+          "code": "WA-328",
+          "date": "2040-12-30",
+          "source": "pm_plans.next_pm_date"
+        }
+      ],
+      "invalidPeriodDaysIgnored": 6
+    },
+    "5-health_score": {
+      "step": "health_score",
+      "selected": true,
+      "totalMachines": 973,
+      "scored": 741,
+      "leftNullNoWorkOrderHistory": 232,
+      "distribution": {
+        "n": 741,
+        "min": 3,
+        "p10": 43,
+        "p25": 55,
+        "median": 71,
+        "p75": 88,
+        "p90": 95,
+        "max": 98,
+        "mean": 69.69
+      },
+      "histogramByDecade": {
+        "000-009": 1,
+        "010-019": 5,
+        "020-029": 16,
+        "030-039": 30,
+        "040-049": 80,
+        "050-059": 100,
+        "060-069": 113,
+        "070-079": 129,
+        "080-089": 95,
+        "090-099": 172,
+        "100-100": 0
+      },
+      "expectedDistribution": {
+        "min": 3,
+        "p10": 43,
+        "p25": 55,
+        "median": 71,
+        "p75": 88,
+        "p90": 95,
+        "max": 98,
+        "mean": 69.7
+      },
+      "driftedMetrics": [],
+      "formula": {
+        "shape": "100 - Σ weight·ln(1+x)/ln(1+ref) - recency, clamped to 0…100",
+        "weights": {
+          "failure": {
+            "weight": 26,
+            "ref": 12
+          },
+          "downtime": {
+            "weight": 24,
+            "ref": 10
+          },
+          "overduePm": {
+            "weight": 6,
+            "ref": 3
+          },
+          "lifetime": {
+            "weight": 12,
+            "ref": 40
+          },
+          "recency": {
+            "weight": 5,
+            "tauDays": 60
+          }
+        },
+        "terms": {
+          "failure": "work orders in the last 365 days",
+          "downtime": "mtloss_min in the last 365 days, in hours",
+          "overduePm": "pm_plans rows with is_overdue = true",
+          "lifetime": "all-time work-order count + all-time mtloss hours",
+          "recency": "weight·exp(-days_since_last_repair / tau); 0 when there is no repair history"
+        }
+      },
+      "monotonicity": {
+        "pairsChecked": 548340,
+        "violations": 5913,
+        "severe": 340,
+        "recentDamageViolations": 0,
+        "maxMagnitude": 14,
+        "attribution": {
+          "recentDamage": 0,
+          "overduePm": 4018,
+          "lifetime": 1750,
+          "recency": 145,
+          "rounding": 0
+        },
+        "worst": [
+          {
+            "a": "AS-411",
+            "b": "GR-389",
+            "delta": 14,
+            "cause": "overduePm"
+          },
+          {
+            "a": "AS-411",
+            "b": "GR-339",
+            "delta": 13,
+            "cause": "overduePm"
+          },
+          {
+            "a": "AS-1183",
+            "b": "GR-249",
+            "delta": 11,
+            "cause": "lifetime"
+          },
+          {
+            "a": "AS-1047",
+            "b": "CH-711",
+            "delta": 10,
+            "cause": "overduePm"
+          },
+          {
+            "a": "AR-900",
+            "b": "CH-705",
+            "delta": 9,
+            "cause": "overduePm"
+          }
+        ]
+      },
+      "notes": [
+        "No min() caps: every damage term keeps growing, so extra damage is never free.",
+        "No floor at 30 — clamped to 0…100 only, so the worst machines stay distinguishable.",
+        "repair_duration_min is not used in this score at all (it has negative values, min -12,900).",
+        "The breakdown-vs-planned ratio is not used: 99.4% of work orders are Breakdown Maintenance.",
+        "mtloss_min is floored at 0 defensively even though it is clean.",
+        "Machines with no work orders are left NULL rather than defaulted to 100.",
+        "monotonicity.recentDamageViolations must be 0; the remaining `violations` are pairs where another signal (overdue PM backlog, lifetime history, recency) legitimately disagrees with the last-365-day damage ordering — see monotonicity.attribution."
+      ]
+    },
+    "6-status": {
+      "step": "status",
+      "selected": true,
+      "totalMachines": 973,
+      "counts": {
+        "normal": 603,
+        "warning": 167,
+        "maintenance": 203,
+        "error": 0
+      },
+      "nonNormal": 370,
+      "triggerCounts": {
+        "pmInProgress": 203,
+        "pmOverdue": 90,
+        "lowHealth": 117,
+        "lowHealthOnly": 77
+      },
+      "changedFromStoredValue": 0,
+      "changes": [],
+      "errorNeverAssigned": "All 8,589 work orders are status='completed'; there are zero open work orders, so no machine has an active fault to justify 'error'."
+    },
+    "machines-meta": {
+      "machinesWithNullCode": 3
+    }
+  },
+  "refusals": [
+    {
+      "field": "work_orders.engineer_reviewer",
+      "decision": "NOT populated",
+      "reasons": [
+        "The column is not empty. 3,322 of 8,589 rows already carry a value, written by scripts/import-excel.ts:391 from the source column PD_Responsible_Name — i.e. the PRODUCTION-side responsible person, a different real field with a different meaning. Filling the remaining 5,267 rows from mt_leader_name would leave one column holding two incompatible semantics with no way to tell which row means which.",
+        "mt_leader_name is a maintenance TEAM LEADER, not an engineer reviewer. All 8 distinct leaders are classified role='supervisor' by Step 1 of this same script; writing them into a field the app labels 'engineer reviewer' would contradict that.",
+        "The existing 3,322 values are only 122 rows equal to mt_leader_name, and 116 distinct values include free text that is not a person at all ('รอการซ่อม', 'Line HUB3 B1', and several full Thai sentences). Appending leader names to that would deepen a pre-existing data-quality problem in someone else's column, not fix it.",
+        "work_orders review semantics are unreachable anyway: all 8,589 rows are status='completed' with no review workflow state to attach a reviewer to."
+      ],
+      "mtLeaderNameAvailableOn": 8589
+    }
+  ],
+  "warnings": []
+}

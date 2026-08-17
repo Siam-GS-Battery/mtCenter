@@ -1,0 +1,1084 @@
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  TrendingUp,
+  CheckCircle2,
+  AlertTriangle,
+  Sparkles,
+  ChevronRight,
+  ShieldAlert,
+  FileText,
+  History,
+  Cpu,
+  MapPin,
+  X,
+  Loader2,
+  CalendarClock,
+} from "lucide-react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { Machine, WorkOrder, MachineStats, WorkOrderStats } from "../../types";
+import { Modal, ModalHeader, ModalBody, ModalFooter } from "../ui/Modal";
+import { Pagination } from "../ui/Pagination";
+import { MachineSelect } from "../MachineSelect";
+import { TelemetryTrendCard } from "./TelemetryTrendCard";
+import { getWorkOrders, toUserMessage } from "../../services/apiService";
+import {
+  machineStatusLabel,
+  machineStatusBadgeClass,
+} from "../../lib/pillStyles";
+import { workOrderDisplayDate } from "../../lib/workOrderStatus";
+import {
+  SPINDLE_TEMP_WARNING,
+  VIBRATION_WARNING,
+  HEALTH_SCORE_WARNING,
+  HEALTH_SCORE_ERROR,
+  spindleTempLevel,
+  vibrationLevel,
+  healthScoreLevel,
+  readingAvailability,
+  evaluateMachine,
+  type ReadingAvailability,
+} from "../../lib/thresholds";
+import {
+  NO_DATA,
+  NO_REPAIR_HISTORY_TH,
+  isMissing,
+  orDash,
+  formatDate,
+  isOverdueDate,
+  overdueLabel,
+} from "../../lib/format";
+
+// จำนวนรายการประวัติซ่อมต่อหน้า (ต่อเครื่อง)
+const MACHINE_HISTORY_PAGE_SIZE = 50;
+
+/** Tailwind needs whole class names — no template literals for column counts. */
+const METRIC_GRID_COLS: Record<number, string> = {
+  1: "grid-cols-1",
+  2: "grid-cols-2",
+  3: "grid-cols-3",
+};
+
+/** Same idea for the machine-detail modal, whose card count is 2–5. */
+const MODAL_GRID_COLS: Record<number, string> = {
+  2: "sm:grid-cols-2",
+  3: "sm:grid-cols-3",
+  4: "sm:grid-cols-4",
+  5: "sm:grid-cols-3 lg:grid-cols-5",
+};
+
+/**
+ * Health score colour.
+ *
+ * A `null` score means the machine has never been repaired (232 of 973), so it
+ * must never borrow the critical ramp — a grey dash is the truth, red would be
+ * an accusation. Present scores follow the same emerald/amber/rose ramp as
+ * every other condition indicator in the app.
+ */
+function healthScoreTextClass(healthScore: number | null): string {
+  if (healthScore == null) return "text-ink-faint";
+  const level = healthScoreLevel(healthScore);
+  return level === "error"
+    ? "text-rose-600"
+    : level === "warning"
+      ? "text-amber-700"
+      : "text-emerald-700";
+}
+
+interface SupervisorDashboardViewProps {
+  machines: Machine[];
+  workOrders: WorkOrder[];
+  /**
+   * Aggregate machine counts from GET /api/machines/stats. `machines` is now a
+   * paginated list (max 1000 rows) and can no longer be trusted for exact
+   * totals — the KPI tiles and the status pie chart read from here instead.
+   * `null` while stats are still loading / failed to load, in which case the
+   * tiles fall back to the local array so the page doesn't come up blank.
+   */
+  machineStats: MachineStats | null;
+  /** Same idea as `machineStats`, for GET /api/work-orders/stats. */
+  workOrderStats: WorkOrderStats | null;
+  onAskAI: (prompt: string) => void;
+}
+
+/**
+ * `attention` is the combined warning+error filter behind the "เครื่องเตือน/ขัดข้อง"
+ * tile. The tile counts both, so filtering to `warning` alone (as it used to)
+ * showed fewer machines than the number the supervisor had just clicked on —
+ * invisible while every machine was `normal`, wrong the moment the derivation
+ * job starts returning `warning`.
+ */
+type MachineStatusFilter = Machine["status"] | "all" | "attention";
+
+const STATUS_DOT_COLORS: Record<Machine["status"], string> = {
+  normal: "#10B981",
+  warning: "#F59E0B",
+  error: "#F43F5E",
+  maintenance: "#3B82F6",
+};
+
+interface MachineCardProps {
+  machine: Machine;
+  fleetReadings: ReadingAvailability;
+  metricCellCount: number;
+  onSelect: (machine: Machine) => void;
+}
+
+/**
+ * One registry card. Extracted and memoized so that a filter click or a
+ * modal open/close — which changes state on the parent — doesn't force React
+ * to re-render every card in a registry that can hold up to 1000 machines;
+ * only the cards whose own props actually changed re-render. Visual output is
+ * unchanged from the inline version this replaces.
+ */
+const MachineCard = React.memo(function MachineCard({
+  machine: m,
+  fleetReadings,
+  metricCellCount,
+  onSelect,
+}: MachineCardProps) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(m)}
+      className="text-left p-5 rounded-[18px] border border-hairline bg-white hover:border-primary transition-all cursor-pointer group relative overflow-hidden focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+    >
+      {/* Top Row: Code, Name, Status Badge */}
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="flex items-center gap-2">
+          <div className="w-10 h-10 rounded-[11px] bg-primary/10 text-primary flex items-center justify-center font-semibold text-sm shrink-0 border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
+            <Cpu className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="font-semibold text-ink text-base leading-tight group-hover:text-primary transition-colors">
+              {orDash(m.code)}
+            </div>
+            <div className="text-xs text-ink-faint font-normal">{m.name}</div>
+          </div>
+        </div>
+
+        <span className={machineStatusBadgeClass(m.status)}>
+          {machineStatusLabel(m.status)}
+        </span>
+      </div>
+
+      {/* Location & Active Error Alert */}
+      <div className="text-xs text-ink-faint mb-3 flex items-center gap-1">
+        <MapPin className="w-3.5 h-3.5 shrink-0" />
+        <span>{orDash(m.location)}</span>
+      </div>
+
+      {m.activeErrorCode && (
+        <div className="mb-3 p-2.5 rounded-[18px] bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2 font-normal">
+          <ShieldAlert className="w-4 h-4 shrink-0 text-rose-600" />
+          <span className="truncate">
+            {m.activeErrorCode}: {m.activeErrorDesc}
+          </span>
+        </div>
+      )}
+
+      {/* PM ที่เลยกำหนดมาแล้ว — a past nextMaintenance date is the one
+          thing on this card that needs acting on today, so it gets a
+          badge of its own instead of sitting in the footer as plain grey
+          text indistinguishable from a date next month. */}
+      {isOverdueDate(m.nextMaintenance) && (
+        <div className="mb-3 p-2.5 rounded-[18px] bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2 font-normal">
+          <CalendarClock className="w-4 h-4 shrink-0 text-amber-700" />
+          <span className="truncate">
+            PM {overdueLabel(m.nextMaintenance)} (กำหนด {formatDate(m.nextMaintenance)})
+          </span>
+        </div>
+      )}
+
+      {/* Metrics Grid — sensor cells appear only when real readings exist */}
+      <div
+        className={`grid ${METRIC_GRID_COLS[metricCellCount]} gap-2 bg-parchment p-3 rounded-[11px] border border-divider text-xs mb-3`}
+      >
+        {fleetReadings.spindleTemp && (
+          <div>
+            <span className="text-xs text-ink-faint font-normal block">อุณหภูมิ Spindle</span>
+            <span
+              className={`font-semibold ${
+                spindleTempLevel(m.spindleTemp) !== "normal" ? "text-rose-600" : "text-ink"
+              }`}
+            >
+              {isMissing(m.spindleTemp) ? NO_DATA : `${m.spindleTemp}°C`}
+            </span>
+          </div>
+        )}
+        {fleetReadings.vibrationMms && (
+          <div>
+            <span className="text-xs text-ink-faint font-normal block">ความสั่นสะเทือน</span>
+            <span
+              className={`font-semibold ${
+                vibrationLevel(m.vibrationMms) !== "normal" ? "text-rose-600" : "text-ink"
+              }`}
+            >
+              {isMissing(m.vibrationMms) ? NO_DATA : `${m.vibrationMms} mm/s`}
+            </span>
+          </div>
+        )}
+        <div>
+          <span className="text-xs text-ink-faint font-normal block">คะแนนสุขภาพเครื่อง</span>
+          {/* Never blue-on-null: a machine with no repair history has no
+              score to show, and that is not a low score. */}
+          <span className={`font-semibold ${healthScoreTextClass(m.healthScore)}`}>
+            {m.healthScore == null ? NO_REPAIR_HISTORY_TH : `${m.healthScore}%`}
+          </span>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between text-xs pt-1">
+        <span className="text-ink-faint text-xs">
+          ซ่อมล่าสุด: {formatDate(m.lastMaintenance)}
+        </span>
+        <span className="text-primary font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          <span>ดูรายละเอียดและประวัติ</span>
+          <ChevronRight className="w-3.5 h-3.5" />
+        </span>
+      </div>
+    </button>
+  );
+});
+
+export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = ({
+  machines,
+  workOrders,
+  machineStats,
+  workOrderStats,
+  onAskAI,
+}) => {
+  const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
+  // Displayed value of the MachineSelect dropdown — deliberately separate from
+  // `selectedMachine` (which doubles as "which machine's modal is open").
+  // Closing the modal (setSelectedMachine(null)) must not blank the dropdown.
+  const [pickedMachine, setPickedMachine] = useState<Machine | null>(null);
+  const [statusFilter, setStatusFilter] = useState<MachineStatusFilter>("all");
+
+  // The registry can hold up to 1000 machines (App.tsx fetches
+  // getMachines({limit:1000})) — rendering every ~90-line card at once locked up
+  // the browser. Render only the first `visibleCount` and let "แสดงเพิ่ม" grow it
+  // in pages of 24, resetting whenever the filter or the underlying data changes
+  // so a previously-expanded list doesn't stay expanded across an unrelated filter.
+  const [visibleCount, setVisibleCount] = useState(24);
+  useEffect(() => {
+    setVisibleCount(24);
+  }, [statusFilter, machines]);
+
+  // Prefer /api/machines/stats and /api/work-orders/stats for every KPI tile
+  // and the pie chart below — `machines`/`workOrders` are now paginated (max
+  // 1000 rows each) and no longer guaranteed to hold the whole table (973
+  // machines / 8,589 work orders), so counting over those arrays directly
+  // would silently under-report once the real dataset exceeds a page. Fall
+  // back to the local array only while stats haven't loaded yet (or failed),
+  // so the page still shows something rather than going blank.
+  // KPI tiles fall back to counting the local (paginated, up to 1000-row)
+  // `machines`/`workOrders` arrays when the aggregate stats endpoints haven't
+  // loaded yet. Those fallback `.filter()` passes re-scanned every row on
+  // every render (each a KPI-tile render, a status-filter click, a modal
+  // open/close...); memoizing keeps them to once per actual data change.
+  const {
+    totalMachines,
+    normalMachines,
+    warningMachines,
+    errorMachines,
+    maintenanceMachines,
+    readyRate,
+    totalWorkOrders,
+    completedWorkOrders,
+    pendingWorkOrders,
+    reviewWorkOrders,
+    completionRate,
+  } = useMemo(() => {
+    const totalMachines = machineStats?.total ?? machines.length;
+    const normalMachines =
+      machineStats?.byStatus?.normal ?? machines.filter((m) => m.status === "normal").length;
+    const warningMachines =
+      machineStats?.byStatus?.warning ?? machines.filter((m) => m.status === "warning").length;
+    const errorMachines =
+      machineStats?.byStatus?.error ?? machines.filter((m) => m.status === "error").length;
+    const maintenanceMachines =
+      machineStats?.byStatus?.maintenance ?? machines.filter((m) => m.status === "maintenance").length;
+
+    const readyRate =
+      totalMachines > 0
+        ? ((normalMachines + warningMachines) / totalMachines) * 100
+        : null;
+
+    const totalWorkOrders = workOrderStats?.total ?? workOrders.length;
+    const completedWorkOrders =
+      workOrderStats?.byStatus?.completed ?? workOrders.filter((wo) => wo.status === "completed").length;
+    const pendingWorkOrders =
+      workOrderStats?.byStatus?.pending ?? workOrders.filter((wo) => wo.status === "pending").length;
+    const reviewWorkOrders =
+      workOrderStats?.byStatus?.review ?? workOrders.filter((wo) => wo.status === "review").length;
+    const completionRate =
+      totalWorkOrders > 0 ? Math.round((completedWorkOrders / totalWorkOrders) * 100) : null;
+
+    return {
+      totalMachines,
+      normalMachines,
+      warningMachines,
+      errorMachines,
+      maintenanceMachines,
+      readyRate,
+      totalWorkOrders,
+      completedWorkOrders,
+      pendingWorkOrders,
+      reviewWorkOrders,
+      completionRate,
+    };
+  }, [machines, workOrders, machineStats, workOrderStats]);
+
+  const handleAskDailySummary = () => {
+    const errorList = machines.filter((m) => m.status === "error");
+    const warningList = machines.filter((m) => m.status === "warning");
+
+    const overdueList = machines.filter((m) => isOverdueDate(m.nextMaintenance));
+
+    const parts: string[] = ["ช่วยสรุปสถานะโรงงานประจำวันจากข้อมูลต่อไปนี้:"];
+    parts.push(
+      errorList.length > 0
+        ? `เครื่องจักรขัดข้อง ${errorList.length} เครื่อง (${errorList.map((m) => orDash(m.code)).join(", ")})`
+        : "ไม่มีเครื่องจักรขัดข้องในขณะนี้"
+    );
+    parts.push(
+      warningList.length > 0
+        ? `เครื่องจักรต้องเฝ้าระวัง ${warningList.length} เครื่อง (${warningList.map((m) => orDash(m.code)).join(", ")})`
+        : "ไม่มีเครื่องจักรในสถานะเฝ้าระวัง"
+    );
+    parts.push(
+      overdueList.length > 0
+        ? `เครื่องจักรที่เลยกำหนด PM แล้ว ${overdueList.length} เครื่อง`
+        : "ไม่มีเครื่องจักรที่เลยกำหนด PM"
+    );
+    parts.push(
+      `ใบงานรอดำเนินการ ${pendingWorkOrders} งาน และรอตรวจสอบอนุมัติ ${reviewWorkOrders} งาน จากทั้งหมด ${totalWorkOrders} งาน`
+    );
+    parts.push("ช่วยแนะนำลำดับความสำคัญที่ควรจัดการก่อนสำหรับหัวหน้างานวันนี้");
+
+    onAskAI(parts.join(" "));
+  };
+
+  // Status distribution — one representation of counts, driven by real machine.status.
+  const statusDistribution: { key: Machine["status"]; name: string; value: number; color: string }[] = useMemo(
+    () => [
+      { key: "normal", name: "ทำงานปกติ", value: normalMachines, color: STATUS_DOT_COLORS.normal },
+      { key: "warning", name: "ต้องเฝ้าระวัง", value: warningMachines, color: STATUS_DOT_COLORS.warning },
+      { key: "error", name: "ขัดข้อง", value: errorMachines, color: STATUS_DOT_COLORS.error },
+      { key: "maintenance", name: "กำลังซ่อมบำรุง", value: maintenanceMachines, color: STATUS_DOT_COLORS.maintenance },
+    ],
+    [normalMachines, warningMachines, errorMachines, maintenanceMachines]
+  );
+  const statusDistributionNonZero = useMemo(
+    () => statusDistribution.filter((item) => item.value > 0),
+    [statusDistribution]
+  );
+
+  const filteredMachines = useMemo(() => {
+    if (statusFilter === "all") return machines;
+    if (statusFilter === "attention") {
+      return machines.filter((m) => m.status === "warning" || m.status === "error");
+    }
+    return machines.filter((m) => m.status === statusFilter);
+  }, [machines, statusFilter]);
+
+  // Which readings actually exist across the fleet. The repeated metric cells in
+  // the registry below must all agree — gating them per machine would leave a
+  // ragged grid of half-empty boxes — so the gate is fleet-wide here.
+  const fleetReadings = useMemo(() => readingAvailability(machines), [machines]);
+
+  // The trend card plots telemetry_readings — a table with zero rows, fed by
+  // sensors the plant has not installed. Show it only once a real sensor reading
+  // exists on a machine, which is also what guarantees the card has at least one
+  // metric tab to draw and never renders itself away inside a live grid slot.
+  const showTelemetryTrend = fleetReadings.spindleTemp || fleetReadings.vibrationMms;
+
+  // Cells inside the registry / detail metric grids, gated on real data. Health
+  // score stays permanently: it is derived from repair history, not measured, and
+  // its absence is itself information a supervisor needs ("never repaired").
+  const metricCellCount =
+    1 + (fleetReadings.spindleTemp ? 1 : 0) + (fleetReadings.vibrationMms ? 1 : 0);
+
+  // เดิม machineHistory กรอง `wo.machineId === selectedMachine.id` จาก
+  // workOrders ที่โหลดมาแล้ว — ใช้ไม่ได้กับข้อมูลจริงเลย เพราะใบงานที่นำเข้าจาก
+  // Excel ทั้ง 8,589 แถวไม่มี machine_id (ดู docs/data-import-spec.md) มีแต่
+  // machine_code จึงต้องดึงจาก server ด้วย ?machineCode= โดยตรง ซึ่งแก้ทั้งบั๊กนี้
+  // และปัญหาการแบ่งหน้า (workOrders ที่ใช้ร่วมกันตอนนี้มีแค่ ~100 แถว) พร้อมกัน
+  const [machineHistory, setMachineHistory] = useState<WorkOrder[]>([]);
+  const [machineHistoryTotal, setMachineHistoryTotal] = useState(0);
+  const [machineHistoryOffset, setMachineHistoryOffset] = useState(0);
+  const [machineHistoryLoading, setMachineHistoryLoading] = useState(false);
+  const [machineHistoryError, setMachineHistoryError] = useState<string | null>(null);
+
+  // เปิดเครื่องใหม่ -> กลับไปหน้าแรกของประวัติซ่อมเสมอ
+  useEffect(() => {
+    setMachineHistoryOffset(0);
+  }, [selectedMachine?.id]);
+
+  // `machineCode` is the ONLY thing narrowing this query, and `buildQuery` drops
+  // params that are undefined (see services/apiService.ts). Passing
+  // `selectedMachine.code ?? undefined` for one of the 3 machines with no code on
+  // record therefore sent `GET /api/work-orders?limit=50&offset=0` — no filter at
+  // all — and the modal filled with the 50 most recent work orders belonging to
+  // *other* machines, counted as ~8,589 repairs on a machine that has none.
+  // A missing filter value must mean "no results", never "no filter": skip the
+  // request entirely, exactly as ScanMachineView already does.
+  const selectedMachineCode = selectedMachine?.code ?? null;
+
+  useEffect(() => {
+    if (!selectedMachine || !selectedMachineCode) {
+      setMachineHistory([]);
+      setMachineHistoryTotal(0);
+      setMachineHistoryLoading(false);
+      setMachineHistoryError(null);
+      return;
+    }
+    let cancelled = false;
+    setMachineHistoryLoading(true);
+    setMachineHistoryError(null);
+
+    getWorkOrders({
+      machineCode: selectedMachineCode,
+      limit: MACHINE_HISTORY_PAGE_SIZE,
+      offset: machineHistoryOffset,
+    })
+      .then((res) => {
+        if (cancelled) return;
+        // ผลลัพธ์จาก server เรียงตาม assigned_date ล่าสุดก่อนอยู่แล้ว (ดู
+        // backend/src/routes/workOrders.ts) — ตรงกับที่ต้องการพอดี ไม่ต้องเรียงซ้ำ
+        setMachineHistory(res.data);
+        setMachineHistoryTotal(res.meta?.total ?? res.data.length);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setMachineHistoryError(toUserMessage(err, "ไม่สามารถโหลดประวัติการซ่อมได้"));
+      })
+      .finally(() => {
+        if (!cancelled) setMachineHistoryLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedMachine?.id, selectedMachineCode, machineHistoryOffset]);
+
+  const selectedEvaluation = selectedMachine ? evaluateMachine(selectedMachine) : null;
+
+  // Cards in the detail modal: health score and the maintenance dates always
+  // render (both derived from real repair history); the three sensor cards join
+  // only when that machine reports a real reading. Drives the column count so the
+  // row stays flush instead of trailing empty grid cells.
+  const detailCardCount =
+    2 +
+    (selectedMachine?.spindleTemp != null ? 1 : 0) +
+    (selectedMachine?.vibrationMms != null ? 1 : 0) +
+    (selectedMachine?.operatingHours != null ? 1 : 0);
+
+  // Opening a machine's modal via its card must also update what the dropdown
+  // shows. A stable callback (not a fresh inline arrow) so MachineCard's
+  // React.memo isn't defeated on every parent render.
+  const handleCardSelect = useCallback((m: Machine) => {
+    setPickedMachine(m);
+    setSelectedMachine(m);
+  }, []);
+
+  return (
+    <div className="p-4 md:p-8 max-w-[1600px] mx-auto space-y-6">
+      {/* Header action */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4 pb-2 border-b border-hairline">
+        <button
+          onClick={handleAskDailySummary}
+          className="min-h-[44px] px-4 py-2.5 rounded-full bg-primary hover:bg-primary-focus text-white text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+        >
+          <Sparkles className="w-4 h-4" />
+          <span>ให้ AI สรุปรายงานประจำวัน</span>
+        </button>
+      </div>
+
+      {/* Key Metric KPI Cards — clickable to filter the registry below */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* Machines ready to run (not a filter — composite metric) */}
+        <div className="bg-white p-5 rounded-[18px] border border-hairline">
+          <div className="flex items-center justify-between text-ink-faint mb-2">
+            <span className="text-xs font-normal">เครื่องพร้อมเดินงาน</span>
+            <TrendingUp className="w-4 h-4 text-emerald-500" />
+          </div>
+          <div className="text-2xl font-semibold tracking-[-0.02em] text-ink">
+            {readyRate !== null ? `${readyRate.toFixed(1)}%` : "—"}
+          </div>
+          <span className="text-xs text-ink-faint block mt-1">
+            ปกติ {normalMachines} · เฝ้าระวัง {warningMachines} จาก {totalMachines} เครื่อง
+          </span>
+        </div>
+
+        {/* Normal Machines Count — filter toggle */}
+        <button
+          type="button"
+          onClick={() => setStatusFilter((f) => (f === "normal" ? "all" : "normal"))}
+          aria-pressed={statusFilter === "normal"}
+          className={`text-left min-h-[44px] p-5 rounded-[18px] border transition-colors ${
+            statusFilter === "normal"
+              ? "border-emerald-400 bg-emerald-50"
+              : "border-hairline bg-white hover:border-emerald-300"
+          }`}
+        >
+          <div className="flex items-center justify-between text-ink-faint mb-2">
+            <span className="text-xs font-normal">เครื่องจักรปกติ</span>
+            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+          </div>
+          <div className="text-2xl font-semibold tracking-[-0.02em] text-ink">
+            {normalMachines} / {totalMachines} <span className="text-xs font-normal">เครื่อง</span>
+          </div>
+          <span className="text-xs text-ink-faint block mt-1">
+            พร้อมเดินสายการผลิตเต็มรูปแบบ
+          </span>
+        </button>
+
+        {/* Warning / Error — filter toggle (defaults to warning) */}
+        <button
+          type="button"
+          onClick={() =>
+            setStatusFilter((f) =>
+              f === "attention" || f === "warning" || f === "error" ? "all" : "attention"
+            )
+          }
+          aria-pressed={statusFilter === "attention"}
+          className={`text-left min-h-[44px] p-5 rounded-[18px] border transition-colors ${
+            statusFilter === "attention"
+              ? "border-amber-400 bg-amber-50"
+              : "border-hairline bg-white hover:border-amber-300"
+          }`}
+        >
+          <div className="flex items-center justify-between text-ink-faint mb-2">
+            <span className="text-xs font-normal">เครื่องเตือน/ขัดข้อง</span>
+            <AlertTriangle className="w-4 h-4 text-amber-500" />
+          </div>
+          <div className="text-2xl font-semibold tracking-[-0.02em] text-amber-700">
+            {warningMachines + errorMachines} <span className="text-xs font-normal">เครื่อง</span>
+          </div>
+          <span className="text-xs text-amber-700 font-semibold block mt-1">
+            เฝ้าระวัง {warningMachines} · ขัดข้อง {errorMachines}
+          </span>
+        </button>
+
+        {/* Work order completion (not a machine-status filter) */}
+        <div className="bg-white p-5 rounded-[18px] border border-hairline">
+          <div className="flex items-center justify-between text-ink-faint mb-2">
+            <span className="text-xs font-normal">ใบงานปิดแล้ว</span>
+            <FileText className="w-4 h-4 text-primary" />
+          </div>
+          <div className="text-2xl font-semibold tracking-[-0.02em] text-ink">
+            {completedWorkOrders} / {totalWorkOrders} <span className="text-xs font-normal">งาน</span>
+          </div>
+          <span className="text-xs text-ink-faint block mt-1">
+            {completionRate !== null
+              ? `อัตราปิดงาน ${completionRate}% · รอดำเนินการ ${pendingWorkOrders} งาน`
+              : "ยังไม่มีใบงานในระบบ"}
+          </span>
+        </div>
+      </div>
+
+      {/* GRAPHICAL SECTION */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Historical trend chart for one machine at a time, picked via the dropdown
+            inside the card, spanning 2 of the 3 columns beside the status donut.
+            The plant has no sensors wired up and telemetry_readings is empty, so the
+            card renders nothing today — mounting it anyway would leave a two-column
+            hole beside the donut, hence the gate here as well as inside the card.
+            Both come back automatically once any real reading arrives. */}
+        {showTelemetryTrend && (
+          <TelemetryTrendCard machines={machines} className="lg:col-span-2" />
+        )}
+
+        {/* Machine Status Breakdown — single chart representation, clickable slices.
+            Takes the full row when the trend card has nothing to show, so the grid
+            never renders an empty two-column gap. */}
+        <div
+          className={`bg-white rounded-[18px] border border-hairline p-5 md:p-6 space-y-4 flex flex-col h-full ${
+            showTelemetryTrend
+              ? ""
+              : // Full-width: put the legend beside the donut instead of under it,
+                // so the row reads as one deliberate card rather than a chart
+                // marooned in empty space where the trend card used to be.
+                "lg:col-span-3 lg:flex-row lg:items-stretch lg:gap-6 lg:space-y-0"
+          }`}
+        >
+          <div className="flex-1 flex flex-col min-h-0">
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="text-base font-semibold text-ink">
+                สัดส่วนสถานะเครื่องจักร
+              </h3>
+              {statusFilter !== "all" && (
+                <button
+                  onClick={() => setStatusFilter("all")}
+                  className="text-xs font-semibold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <X className="w-3 h-3" />
+                  <span>ล้างตัวกรอง</span>
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-ink-faint mb-3">
+              คลิกที่รายการเพื่อกรองรายการเครื่องจักรด้านล่าง
+            </p>
+
+            <div className="flex-1 min-h-60 w-full flex items-center justify-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={statusDistributionNonZero}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius="55%"
+                    outerRadius="80%"
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {statusDistributionNonZero.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#ffffff",
+                      borderRadius: "8px",
+                      fontSize: "12px",
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div
+            className={`space-y-1.5 pt-2 border-t border-divider ${
+              showTelemetryTrend
+                ? ""
+                : "lg:w-80 lg:shrink-0 lg:self-center lg:pt-0 lg:border-t-0 lg:border-l lg:pl-6"
+            }`}
+            role="group"
+            aria-label="กรองตามสถานะเครื่องจักร"
+          >
+            {statusDistribution.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                aria-pressed={statusFilter === item.key}
+                onClick={() => setStatusFilter((f) => (f === item.key ? "all" : item.key))}
+                disabled={item.value === 0}
+                className={`w-full min-h-[36px] flex items-center justify-between text-xs px-2 py-1.5 rounded-[11px] transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 ${
+                  statusFilter === item.key ? "bg-parchment" : "hover:bg-parchment"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                  <span className="text-ink-muted font-normal">{item.name}</span>
+                </div>
+                <span className="font-semibold text-ink">{item.value} เครื่อง</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ALL MACHINES HEALTH REGISTRY (Clickable to view modal) */}
+      <div className="bg-white rounded-[18px] border border-hairline p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-divider pb-3">
+          <div>
+            <h3 className="text-base font-semibold text-ink">
+              สถานะเครื่องจักรทุกเครื่อง
+            </h3>
+            <p className="text-xs text-ink-faint">
+              คลิกที่การ์ดเครื่องจักรเพื่อดูรายละเอียดและประวัติการซ่อม
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {statusFilter !== "all" && (
+              <button
+                onClick={() => setStatusFilter("all")}
+                className="text-xs font-semibold text-ink-muted bg-pearl hover:bg-parchment px-3 py-1.5 rounded-full border border-divider cursor-pointer"
+              >
+                ล้างตัวกรอง
+              </button>
+            )}
+            <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20">
+              แสดง {Math.min(visibleCount, filteredMachines.length)} จาก{" "}
+              {statusFilter !== "all" ? filteredMachines.length : totalMachines} เครื่อง
+            </span>
+          </div>
+        </div>
+
+        {/* Machine dropdown — same picker as the technician (ScanMachineView) page.
+            Jumping to a machine here opens the same detail modal the cards below
+            open, without needing to scroll/paginate through the registry. Fed the
+            full `machines` list (not `filteredMachines`) because MachineSelect has
+            its own status filter chips + search box — feeding it a pre-filtered
+            list would make its own chip counts wrongly show "(0)". */}
+        {machines.length > 0 && (
+          <div className="max-w-md mb-4">
+            <MachineSelect
+              machines={machines}
+              activeMachine={pickedMachine}
+              onSelectMachine={(m) => {
+                setPickedMachine(m);
+                setSelectedMachine(m);
+              }}
+              label="ค้นหา / เลือกเครื่องจักร"
+            />
+          </div>
+        )}
+
+        {filteredMachines.length === 0 ? (
+          <p className="text-sm text-ink-faint text-center py-8">ไม่มีเครื่องจักรในสถานะนี้</p>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+              {filteredMachines.slice(0, visibleCount).map((m) => (
+                <MachineCard
+                  key={m.id}
+                  machine={m}
+                  fleetReadings={fleetReadings}
+                  metricCellCount={metricCellCount}
+                  onSelect={handleCardSelect}
+                />
+              ))}
+            </div>
+
+            {filteredMachines.length > visibleCount && (
+              <div className="flex justify-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount((c) => c + 24)}
+                  className="text-xs font-semibold text-ink-muted bg-pearl hover:bg-parchment px-3 py-1.5 rounded-full border border-divider cursor-pointer"
+                >
+                  แสดงเพิ่ม
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* MACHINE DETAIL & HISTORY MODAL */}
+      {selectedMachine && selectedEvaluation && (
+        <Modal size="xl" onClose={() => setSelectedMachine(null)}>
+          <ModalHeader onClose={() => setSelectedMachine(null)}>
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-[11px] bg-primary/10 text-primary flex items-center justify-center font-semibold text-xl shrink-0 border border-primary/20">
+                <Cpu className="w-8 h-8" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-xl font-semibold text-ink">
+                    {orDash(selectedMachine.code)} · {selectedMachine.name}
+                  </h3>
+                  <span className={machineStatusBadgeClass(selectedMachine.status)}>
+                    {machineStatusLabel(selectedMachine.status)}
+                  </span>
+                </div>
+                <p className="text-xs text-ink-faint">
+                  รุ่น: {orDash(selectedMachine.model)} · ตำแหน่ง: {orDash(selectedMachine.location)}
+                </p>
+              </div>
+            </div>
+          </ModalHeader>
+
+          <ModalBody className="space-y-6">
+            {/* Active Alert Banner if exists */}
+            {selectedMachine.activeErrorCode && (
+              <div className="p-4 rounded-[18px] bg-rose-50 border border-rose-200 text-rose-900 space-y-1">
+                <div className="flex items-center gap-2 font-semibold text-sm text-rose-700">
+                  <ShieldAlert className="w-5 h-5 text-rose-600" />
+                  <span>การแจ้งเตือนความผิดปกติ ({selectedMachine.activeErrorCode})</span>
+                </div>
+                <p className="text-xs text-rose-800 leading-relaxed pl-7">
+                  {selectedMachine.activeErrorDesc}
+                </p>
+              </div>
+            )}
+
+            {/* Why this status — real reasons from evaluateMachine */}
+            <div className="space-y-1.5">
+              <h4 className="text-xs font-semibold text-ink-faint">เหตุผลของสถานะปัจจุบัน</h4>
+              <ul className="text-xs text-ink-muted space-y-1 list-disc pl-5">
+                {selectedEvaluation.reasons.map((reason, idx) => (
+                  <li key={idx}>{reason}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Condition cards. The two sensor cards and the operating-hours card
+                render only when a real reading exists — with no sensors installed
+                they were three boxes of dashes, and a technician cannot tell a box
+                of dashes from an instrument reading zero. The maintenance-dates
+                card always renders (it is derived from repair history), so the row
+                is never empty and the grid never leaves a hole. */}
+            <div className="space-y-2">
+              <div className={`grid grid-cols-2 gap-3 ${MODAL_GRID_COLS[detailCardCount]}`}>
+                {selectedMachine.spindleTemp != null && (
+                  <div className="p-3.5 rounded-[18px] bg-parchment border border-hairline">
+                    <span className="text-xs font-semibold text-ink-faint block mb-1">
+                      อุณหภูมิ Spindle
+                    </span>
+                    <span
+                      className={`text-xl font-semibold tracking-[-0.02em] ${
+                        spindleTempLevel(selectedMachine.spindleTemp) !== "normal" ? "text-rose-600" : "text-ink"
+                      }`}
+                    >
+                      {isMissing(selectedMachine.spindleTemp) ? NO_DATA : `${selectedMachine.spindleTemp}°C`}
+                    </span>
+                    <span className="text-xs text-ink-faint block mt-1">
+                      เกณฑ์เฝ้าระวัง: ≥ {SPINDLE_TEMP_WARNING}°C
+                    </span>
+                  </div>
+                )}
+
+                {selectedMachine.vibrationMms != null && (
+                  <div className="p-3.5 rounded-[18px] bg-parchment border border-hairline">
+                    <span className="text-xs font-semibold text-ink-faint block mb-1">
+                      ความสั่นสะเทือน
+                    </span>
+                    <span
+                      className={`text-xl font-semibold tracking-[-0.02em] ${
+                        vibrationLevel(selectedMachine.vibrationMms) !== "normal" ? "text-rose-600" : "text-ink"
+                      }`}
+                    >
+                      {isMissing(selectedMachine.vibrationMms) ? NO_DATA : `${selectedMachine.vibrationMms} mm/s`}
+                    </span>
+                    <span className="text-xs text-ink-faint block mt-1">
+                      เกณฑ์เฝ้าระวัง: ≥ {VIBRATION_WARNING} mm/s
+                    </span>
+                  </div>
+                )}
+
+                <div className="p-3.5 rounded-[18px] bg-parchment border border-hairline">
+                  <span className="text-xs font-semibold text-ink-faint block mb-1">
+                    คะแนนสุขภาพเครื่อง
+                  </span>
+                  <span
+                    className={`text-xl font-semibold tracking-[-0.02em] ${healthScoreTextClass(
+                      selectedMachine.healthScore
+                    )}`}
+                  >
+                    {selectedMachine.healthScore == null
+                      ? NO_REPAIR_HISTORY_TH
+                      : `${selectedMachine.healthScore}%`}
+                  </span>
+                  <span className="text-xs text-ink-faint block mt-1">
+                    {selectedMachine.healthScore == null
+                      ? "คำนวณจากประวัติซ่อมของเครื่อง — เครื่องนี้ยังไม่มีประวัติ"
+                      : `เกณฑ์เฝ้าระวัง: < ${HEALTH_SCORE_WARNING}% · หยุดเครื่อง: < ${HEALTH_SCORE_ERROR}%`}
+                  </span>
+                </div>
+
+                {selectedMachine.operatingHours != null && (
+                  <div className="p-3.5 rounded-[18px] bg-parchment border border-hairline">
+                    <span className="text-xs font-semibold text-ink-faint block mb-1">
+                      ชั่วโมงการทำงาน
+                    </span>
+                    <span className="text-xl font-semibold tracking-[-0.02em] text-ink">
+                      {selectedMachine.operatingHours.toLocaleString("th-TH")} ชม.
+                    </span>
+                  </div>
+                )}
+
+                {/* Maintenance dates used to be a footnote under the operating-hours
+                    card and would have disappeared with it. An overdue PM is the
+                    most actionable fact on this modal, so it gets its own card and
+                    the amber treatment. */}
+                <div
+                  className={`p-3.5 rounded-[18px] border ${
+                    isOverdueDate(selectedMachine.nextMaintenance)
+                      ? "bg-amber-50 border-amber-200"
+                      : "bg-parchment border-hairline"
+                  }`}
+                >
+                  <span className="text-xs font-semibold text-ink-faint block mb-1">
+                    รอบบำรุงรักษา
+                  </span>
+                  <span
+                    className={`text-xl font-semibold tracking-[-0.02em] ${
+                      isOverdueDate(selectedMachine.nextMaintenance) ? "text-amber-800" : "text-ink"
+                    }`}
+                  >
+                    {formatDate(selectedMachine.nextMaintenance)}
+                  </span>
+                  {isOverdueDate(selectedMachine.nextMaintenance) && (
+                    <span className="text-xs font-semibold text-amber-800 flex items-center gap-1 mt-1">
+                      <CalendarClock className="w-3.5 h-3.5 shrink-0" />
+                      {overdueLabel(selectedMachine.nextMaintenance)}
+                    </span>
+                  )}
+                  <span className="text-xs text-ink-faint block mt-1">
+                    ซ่อมล่าสุด: {formatDate(selectedMachine.lastMaintenance)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* HISTORICAL RECORD LOGS */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between border-b border-divider pb-2">
+                <h4 className="font-semibold text-sm text-ink flex items-center gap-2">
+                  <History className="w-4 h-4 text-primary" />
+                  <span>ประวัติการซ่อมบำรุงย้อนหลัง</span>
+                  {machineHistoryLoading && (
+                    <Loader2 className="w-3.5 h-3.5 text-ink-faint animate-spin" aria-label="กำลังโหลด" />
+                  )}
+                </h4>
+                <span className="text-xs text-ink-faint">{machineHistoryTotal} รายการ</span>
+              </div>
+
+              {machineHistoryError && (
+                <div className="p-3.5 rounded-[11px] bg-rose-50 border border-rose-200 text-xs text-rose-900 flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-rose-700 shrink-0 mt-0.5" />
+                  <span>{machineHistoryError}</span>
+                </div>
+              )}
+
+              {machineHistoryLoading && machineHistory.length === 0 && !machineHistoryError ? (
+                <div className="p-6 text-center rounded-[11px] border border-hairline space-y-2">
+                  <Loader2 className="w-6 h-6 text-primary mx-auto animate-spin" />
+                  <p className="text-xs text-ink-faint">กำลังโหลดประวัติการซ่อม...</p>
+                </div>
+              ) : machineHistory.length === 0 && !machineHistoryError ? (
+                // Distinguish "this machine has no repairs" from "we cannot look
+                // its repairs up" — the second is a data-quality problem on the
+                // machine record, not a fact about how often it has been fixed.
+                <p className="p-6 text-center text-ink-faint text-xs rounded-[11px] border border-hairline">
+                  {selectedMachineCode
+                    ? "ยังไม่มีประวัติการซ่อม"
+                    : "เครื่องนี้ไม่มีรหัสเครื่องในระบบ จึงยังค้นประวัติซ่อมย้อนหลังให้ไม่ได้"}
+                </p>
+              ) : machineHistory.length > 0 ? (
+                <>
+                  {/* Table for desktop */}
+                  <div className="hidden md:block overflow-x-auto rounded-[11px] border border-hairline">
+                    <table className="w-full min-w-[640px] text-left text-xs">
+                      <thead className="bg-parchment text-ink-faint font-semibold border-b border-hairline">
+                        <tr>
+                          <th className="p-3">วันที่</th>
+                          <th className="p-3">รหัสใบงาน</th>
+                          <th className="p-3">รายการที่ดำเนินการ</th>
+                          <th className="p-3">ช่างผู้รับผิดชอบ</th>
+                          <th className="p-3">ผลการตรวจ AI</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-divider">
+                        {machineHistory.map((wo) => (
+                          <tr key={wo.id} className="hover:bg-parchment">
+                            {/* The repair date, not the import timestamp — see
+                                workOrderDisplayDate. Also the field the server
+                                sorts these rows by, so date and order agree. */}
+                            <td className="p-3 font-mono text-ink-muted">
+                              {orDash(workOrderDisplayDate(wo))}
+                            </td>
+                            <td className="p-3 font-mono font-semibold text-primary">{wo.code}</td>
+                            <td className="p-3 font-normal text-ink">{wo.title}</td>
+                            <td className="p-3 text-ink-muted">{wo.technicianName || "—"}</td>
+                            <td className="p-3">
+                              {typeof wo.aiVerificationScore === "number" ? (
+                                <span className="font-semibold text-emerald-600">
+                                  {wo.aiVerificationScore}%
+                                </span>
+                              ) : (
+                                <span className="text-ink-faint">ยังไม่ประเมิน</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Card list for mobile */}
+                  <div className="md:hidden divide-y divide-divider rounded-[11px] border border-hairline overflow-hidden">
+                    {machineHistory.map((wo) => (
+                      <div key={wo.id} className="p-3.5 space-y-1.5 bg-white">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-mono text-xs font-semibold text-primary">{wo.code}</span>
+                          <span className="font-mono text-xs text-ink-faint">
+                            {orDash(workOrderDisplayDate(wo))}
+                          </span>
+                        </div>
+                        <p className="text-sm text-ink font-normal">{wo.title}</p>
+                        <div className="flex items-center justify-between text-xs text-ink-muted">
+                          <span>ช่าง: {wo.technicianName || "—"}</span>
+                          {typeof wo.aiVerificationScore === "number" ? (
+                            <span className="font-semibold text-emerald-600">
+                              ตรวจ AI {wo.aiVerificationScore}%
+                            </span>
+                          ) : (
+                            <span className="text-ink-faint">ยังไม่ประเมิน</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : null}
+
+              {/* แบ่งหน้าประวัติซ่อมของเครื่องนี้ — ใช้ total จริงจาก server
+                  (เครื่องที่ซ่อมบ่อยอาจมีประวัติเกิน 50 รายการต่อหน้า) */}
+              {machineHistoryTotal > 0 && (
+                <Pagination
+                  offset={machineHistoryOffset}
+                  limit={MACHINE_HISTORY_PAGE_SIZE}
+                  total={machineHistoryTotal}
+                  onOffsetChange={setMachineHistoryOffset}
+                  isLoading={machineHistoryLoading}
+                  itemLabel="รายการ"
+                />
+              )}
+            </div>
+          </ModalBody>
+
+          {/* Action Footer */}
+          <ModalFooter className="sm:justify-between">
+            <button
+              onClick={() => {
+                // Only send readings that exist. "อุณหภูมิ ไม่มีข้อมูล ค่าสั่นสะเทือน
+                // ไม่มีข้อมูล" told the model nothing and invited it to invent the
+                // numbers back; the facts we do have (condition index, overdue PM)
+                // are what the analysis should be built on.
+                const m = selectedMachine;
+                const facts: string[] = [];
+                if (!isMissing(m.spindleTemp)) facts.push(`อุณหภูมิ Spindle ${m.spindleTemp}°C`);
+                if (!isMissing(m.vibrationMms)) facts.push(`ค่าสั่นสะเทือน ${m.vibrationMms} mm/s`);
+                facts.push(
+                  m.healthScore == null
+                    ? `คะแนนสุขภาพเครื่อง: ${NO_REPAIR_HISTORY_TH}`
+                    : `คะแนนสุขภาพเครื่อง ${m.healthScore}%`
+                );
+                if (isOverdueDate(m.nextMaintenance)) {
+                  facts.push(`PM ${overdueLabel(m.nextMaintenance)} (กำหนด ${m.nextMaintenance})`);
+                }
+                onAskAI(
+                  `ขอรายงานวิเคราะห์สถานะเชิงลึกสำหรับเครื่อง ${orDash(m.code)} (${m.name}) — ${facts.join(" · ")} โดยอ้างอิงจากประวัติการซ่อมของเครื่องนี้`
+                );
+              }}
+              className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-full bg-primary hover:bg-primary-focus text-white text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>ให้ MT Center AI วิเคราะห์เครื่องนี้</span>
+            </button>
+
+            <button
+              onClick={() => setSelectedMachine(null)}
+              className="w-full sm:w-auto min-h-[44px] px-4 py-2.5 rounded-[11px] bg-pearl hover:bg-parchment text-ink-muted text-xs font-semibold border border-divider cursor-pointer active:scale-95"
+            >
+              ปิดหน้าต่าง
+            </button>
+          </ModalFooter>
+        </Modal>
+      )}
+    </div>
+  );
+};

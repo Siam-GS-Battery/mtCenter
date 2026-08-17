@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
+    // Without this, the `| null` on Machine.healthScore / SparePart.unitPriceTHB /
+    // etc. is erased and TypeScript silently allows `null < 50` (JS coerces null
+    // to 0), which is exactly how every machine with no telemetry ended up
+    // displaying a false critical-health alarm. Keep it on.
+    "strictNullChecks": true,
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  }
+}

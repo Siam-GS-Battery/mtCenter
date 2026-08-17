@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans Thai", "IBM Plex Sans", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  /* MT Center design tokens — colors */
+  --color-primary: #0066cc;
+  --color-primary-focus: #0071e3;
+  --color-primary-on-dark: #2997ff;
+  --color-ink: #1d1d1f;
+  --color-ink-muted: #333333;
+  --color-ink-faint: #7a7a7a;
+  --color-hairline: #e0e0e0;
+  --color-divider: #f0f0f0;
+  --color-canvas: #ffffff;
+  --color-parchment: #f5f5f7;
+  --color-pearl: #fafafc;
+  --color-nav-black: #000000;
+  --color-chip-translucent: #d2d2d7;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-canvas);
+}
+
+/* SweetAlert2 (frontend/src/lib/swal.ts) ships its own font-family — override
+   it everywhere so Thai text in dialogs/toasts renders in the app's typeface
+   instead of falling back to a generic sans face. */
+.swal2-popup,
+.swal2-title,
+.swal2-html-container,
+.swal2-actions,
+.swal2-toast,
+.swal2-validation-message {
+  font-family: var(--font-sans) !important;
+}

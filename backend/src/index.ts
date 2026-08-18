@@ -1,5 +1,7 @@
 import cors from "cors";
 import express from "express";
+import fs from "node:fs";
+import path from "node:path";
 import { config } from "./config.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import usersRouter from "./routes/users.js";
@@ -35,12 +37,27 @@ app.use("/api/pm-plans", pmPlansRouter);
 app.use("/api/part-withdrawals", partWithdrawalsRouter);
 app.use("/api/knowledge", knowledgeRouter);
 
+const staticDir = process.env.STATIC_DIR || path.resolve(process.cwd(), "public");
+const staticDirExists = fs.existsSync(staticDir);
+
+if (staticDirExists) {
+  app.use(express.static(staticDir));
+
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api/")) {
+      next();
+      return;
+    }
+    res.sendFile(path.join(staticDir, "index.html"));
+  });
+}
+
 app.use((_req, res) => {
   res.status(404).json({ success: false, error: { message: "Route not found" } });
 });
 
 app.use(errorHandler);
 
-app.listen(config.port, () => {
-  console.log(`mtcenter-backend listening on http://localhost:${config.port}`);
+app.listen(config.port, "0.0.0.0", () => {
+  console.log(`mtcenter-backend listening on http://0.0.0.0:${config.port}`);
 });

@@ -17,6 +17,15 @@ export default defineConfig(() => {
       hmr: process.env.DISABLE_HMR !== 'true',
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
+      // Dev-only proxy: apiService.ts now builds relative "/api/..." URLs
+      // (same-origin, matching the single-service production deployment),
+      // so in dev we forward those to the backend Express server directly.
+      proxy: {
+        '/api': {
+          target: process.env.VITE_API_URL || 'http://localhost:4000',
+          changeOrigin: true,
+        },
+      },
     },
   };
 });

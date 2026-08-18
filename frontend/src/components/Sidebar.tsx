@@ -88,6 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           { id: "machine_admin", label: "จัดการเครื่องจักร", icon: Factory, badgeKey: "" },
           { id: "chat", label: "ผู้ช่วย AI", icon: Bot, badgeKey: "" },
           { id: "manuals", label: "คู่มือ", icon: BookOpen, badgeKey: "" },
+          { id: "upload_manual", label: "อัปโหลดคู่มือ", icon: Upload, badgeKey: "" },
           { id: "all_work_orders", label: "ใบงานทั้งหมด", icon: FileText, badgeKey: "" },
           { id: "reports", label: "รายงาน", icon: FileBarChart, badgeKey: "" },
         ];

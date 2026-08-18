@@ -21,7 +21,11 @@ import {
   PartWithdrawalStats,
 } from "../types";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
+// Empty by default: production is single-origin (backend serves the static
+// frontend build + /api/* from the same host), so relative "/api/..." paths
+// are correct there. In dev, the Vite proxy (see vite.config.ts) forwards
+// "/api/*" to the backend at VITE_API_URL / http://localhost:4000.
+const API_BASE = import.meta.env.VITE_API_URL ?? "";
 
 // เก็บ id ของผู้ใช้ที่ login อยู่ในหน่วยความจำของโมดูลนี้ — ให้เรียก setCurrentUserId()
 // ครั้งเดียวตอนได้ currentUser (ดู App.tsx) แล้วฟังก์ชันที่ต้องแนบ x-user-id ด้านล่าง
@@ -585,25 +589,28 @@ export function getManuals(): Promise<ManualDoc[]> {
   return request<ManualDoc[]>("/api/manuals");
 }
 
-// createManual/updateManual/deleteManual go through this app's own server
-// (base "") instead of API_BASE, so the server can inject the manual admin
-// secret without ever shipping it to the browser. See server.ts.
-export function createManual(payload: Partial<ManualDoc>): Promise<ManualDoc> {
+// createManual/updateManual/deleteManual hit the backend directly (base "",
+// same-origin relative path — see API_BASE above). The backend now guards
+// these routes the same way as every other admin route: x-user-id resolved
+// to profiles.role (engineer/supervisor) — see withActor() below.
+export function createManual(payload: Partial<ManualDoc>, actorId?: string): Promise<ManualDoc> {
   return request<ManualDoc>(
     "/api/manuals",
     {
       method: "POST",
+      headers: withActor(actorId),
       body: JSON.stringify(payload),
     },
     ""
   );
 }
 
-export function deleteManual(id: string): Promise<{ id: string }> {
+export function deleteManual(id: string, actorId?: string): Promise<{ id: string }> {
   return request<{ id: string }>(
     `/api/manuals/${encodeURIComponent(id)}`,
     {
       method: "DELETE",
+      headers: withActor(actorId),
     },
     ""
   );
@@ -616,12 +623,14 @@ export function deleteManual(id: string): Promise<{ id: string }> {
  */
 export function updateManual(
   id: string,
-  payload: { title?: string; machineModel?: string; category?: string; tags?: string[] }
+  payload: { title?: string; machineModel?: string; category?: string; tags?: string[] },
+  actorId?: string
 ): Promise<ManualDoc> {
   return request<ManualDoc>(
     `/api/manuals/${encodeURIComponent(id)}`,
     {
       method: "PATCH",
+      headers: withActor(actorId),
       body: JSON.stringify(payload),
     },
     ""
@@ -634,12 +643,16 @@ export interface ManualUploadTicket {
   token: string;
 }
 
-export function requestManualUploadUrl(payload: {
-  fileName: string;
-  fileSize: number;
-}): Promise<ManualUploadTicket> {
+export function requestManualUploadUrl(
+  payload: {
+    fileName: string;
+    fileSize: number;
+  },
+  actorId?: string
+): Promise<ManualUploadTicket> {
   return request<ManualUploadTicket>("/api/manuals/upload-url", {
     method: "POST",
+    headers: withActor(actorId),
     body: JSON.stringify(payload),
   });
 }

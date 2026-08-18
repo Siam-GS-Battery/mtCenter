@@ -1,0 +1,17 @@
+**/node_modules
+**/dist
+**/.env
+**/.env.*
+!**/.env.example
+.git
+.gitignore
+docs
+.claude
+.agents
+.impeccable
+**/*.log
+backend/scripts/*-report.json
+backend/scripts/_tmp-*
+README.md
+backend/README.md
+frontend/README.md

@@ -865,9 +865,13 @@ export default function App() {
               manuals={manuals}
               activeMachine={activeMachine ?? undefined}
               onAskAI={handleAskAIWithPrompt}
-              // เฉพาะวิศวกรที่มีสิทธิ์อัปโหลดคู่มือ (มีเมนู "อัปโหลดคู่มือ" ในแถบด้านข้าง) เท่านั้นที่เห็น
+              // เฉพาะวิศวกร/หัวหน้างานที่มีสิทธิ์อัปโหลดคู่มือ (มีเมนู "อัปโหลดคู่มือ" ในแถบด้านข้าง) เท่านั้นที่เห็น
               // ปุ่มพาไปหน้าอัปโหลด — ช่างเทคนิคยังไม่มีเมนูนี้ในแถบด้านข้าง จึงไม่ควรมีทางเดียวที่ไม่มีทางกลับ
-              onGoToUpload={currentRole === "engineer" ? () => setActiveTab("upload_manual") : undefined}
+              onGoToUpload={
+                currentRole === "engineer" || currentRole === "supervisor"
+                  ? () => setActiveTab("upload_manual")
+                  : undefined
+              }
               machineModels={machineModels}
               // แก้ไข/ลบคู่มือเป็นการกระทำทำลาย (destructive) — เฉพาะวิศวกรและหัวหน้างานเท่านั้นที่มีสิทธิ์
               // ช่างเทคนิคใช้คู่มือร่วมกันทั้งทีม จึงไม่ควรแก้ไขหรือลบคู่มือของทีมได้

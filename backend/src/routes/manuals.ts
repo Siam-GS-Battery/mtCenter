@@ -3,12 +3,16 @@ import { Router } from "express";
 import { supabase } from "../lib/supabase.js";
 import { mapManual, type ManualRow } from "../lib/mappers.js";
 import { ApiError, asyncHandler, sendSuccess } from "../middleware/errorHandler.js";
-import { requireAdminSecret } from "../middleware/requireAdminSecret.js";
+import { requireRole } from "../middleware/requireRole.js";
 import { fetchManualSummary, indexManual } from "../lib/manualIndexer.js";
 
 const router = Router();
 
 const MAX_FILE_BYTES = 50 * 1024 * 1024;
+
+const MANUAL_ADMIN_ROLES = ["engineer", "supervisor"] as const;
+const MANUAL_ADMIN_MESSAGE = "เฉพาะวิศวกรและหัวหน้างานเท่านั้นที่สามารถจัดการคลังคู่มือได้";
+const requireManualAdmin = requireRole([...MANUAL_ADMIN_ROLES], MANUAL_ADMIN_MESSAGE);
 
 // รายชื่อคอลัมน์ที่ใช้กับ endpoint ที่คืนเป็น "รายการ/สรุป" ของคู่มือ (list, create,
 // update) โดยตั้งใจ "ไม่" รวม markdown_content เพราะคู่มือแต่ละเล่มอาจมีเนื้อหา
@@ -46,6 +50,7 @@ router.get(
 // นี้เสมอ ไม่เช่นนั้น "/:id" จะจับ path "/upload-url" ไปโดยไม่ตั้งใจ (shadowing)
 router.post(
   "/upload-url",
+  requireManualAdmin,
   asyncHandler(async (req, res) => {
     const body = req.body ?? {};
     const { fileName, fileSize } = body;
@@ -71,14 +76,12 @@ router.post(
   })
 );
 
-// จุดนี้เป็นต้นไป (POST "/", DELETE "/:id", PATCH "/:id") ต้องส่ง header
-// "x-manual-admin-secret" ให้ตรงกับ MANUAL_ADMIN_SECRET เพราะเป็น route ที่แก้ไข/
-// ลบข้อมูลถาวร ส่วน GET "/", GET "/:id/file" และ POST "/upload-url" ด้านบนไม่ถูก
-// ป้องกัน (การอ่าน/เปิดไฟล์ต้องใช้งานได้กับทุกคน และ /upload-url แค่ออก URL สำหรับ
-// อัปโหลดเข้าบัคเก็ตส่วนตัว ยังไม่ใช่การเขียนข้อมูลจริง)
+// จุดนี้เป็นต้นไป (POST "/", DELETE "/:id", PATCH "/:id") ต้องผ่าน requireManualAdmin
+// (เฉพาะ engineer/supervisor) เพราะเป็น route ที่แก้ไข/ลบข้อมูลถาวร ส่วน GET "/" และ
+// GET "/:id/file" ด้านบนไม่ถูกป้องกัน (การอ่าน/เปิดไฟล์ต้องใช้งานได้กับทุกคน)
 router.post(
   "/",
-  requireAdminSecret,
+  requireManualAdmin,
   asyncHandler(async (req, res) => {
     const body = req.body ?? {};
 
@@ -168,7 +171,7 @@ router.post(
 
 router.delete(
   "/:id",
-  requireAdminSecret,
+  requireManualAdmin,
   asyncHandler(async (req, res) => {
     const { data, error } = await supabase
       .from("manuals")
@@ -209,7 +212,7 @@ router.delete(
 
 router.patch(
   "/:id",
-  requireAdminSecret,
+  requireManualAdmin,
   asyncHandler(async (req, res) => {
     const { data: existingData, error: fetchError } = await supabase
       .from("manuals")
@@ -341,12 +344,12 @@ router.get(
 // (ตรรกะการ index อยู่ใน lib/manualIndexer.ts ใช้ร่วมกับ `npm run index:manuals`
 // ซึ่งเป็นวิธี index ทั้งคลังในคราวเดียว)
 //
-// ป้องกันด้วย requireAdminSecret เช่นเดียวกับ POST/PATCH/DELETE ด้านบน เพราะ endpoint
+// ป้องกันด้วย requireManualAdmin เช่นเดียวกับ POST/PATCH/DELETE ด้านบน เพราะ endpoint
 // นี้ทั้งเขียนข้อมูลถาวรและใช้โควตา embedding API จริง — เล่มขนาดหลายล้านตัวอักษรอาจกิน
 // เวลาหลายนาทีและหลายพันคำขอ ปล่อยให้เรียกได้อิสระเท่ากับเปิดช่องให้ถล่มโควตาได้
 router.post(
   "/:id/index",
-  requireAdminSecret,
+  requireManualAdmin,
   asyncHandler(async (req, res) => {
     const id = typeof req.params.id === "string" ? req.params.id.trim() : "";
     if (id.length === 0) throw new ApiError(400, "กรุณาระบุ id ของคู่มือ");

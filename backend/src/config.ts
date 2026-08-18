@@ -44,7 +44,6 @@ export interface AppConfig {
   supabaseUrl: string;
   supabaseServiceRoleKey: string;
   geminiApiKey: string | undefined;
-  manualAdminSecret: string | undefined;
   corsOrigins: string[];
   aiMode: AiMode;
 }
@@ -54,7 +53,6 @@ export const config: AppConfig = {
   supabaseUrl: required("SUPABASE_URL"),
   supabaseServiceRoleKey: required("SUPABASE_SERVICE_ROLE_KEY"),
   geminiApiKey: process.env.GEMINI_API_KEY,
-  manualAdminSecret: process.env.MANUAL_ADMIN_SECRET,
   corsOrigins: (process.env.CORS_ORIGIN || "http://localhost:3000")
     .split(",")
     .map((origin) => origin.trim())

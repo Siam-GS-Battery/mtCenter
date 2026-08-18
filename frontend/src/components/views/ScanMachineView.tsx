@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   QrCode,
   Thermometer,
@@ -7,7 +7,6 @@ import {
   Clock,
   ArrowRight,
   Sparkles,
-  Camera,
   CameraOff,
   CheckCircle2,
   Package,
@@ -28,6 +27,8 @@ import {
   FilePlus,
   CalendarClock,
   Loader2,
+  RefreshCw,
+  SwitchCamera,
 } from "lucide-react";
 import { Machine, WorkOrder } from "../../types";
 import { MachineSelect } from "../MachineSelect";
@@ -45,6 +46,8 @@ import {
 import { getWorkOrders, toUserMessage } from "../../services/apiService";
 import { GloveFriendlyCTA } from "../GloveFriendlyCTA";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "../ui/Modal";
+import { useQrScanner } from "../../hooks/useQrScanner";
+import { resolveMachineFromQr } from "../../lib/qrPayload";
 import {
   machineStatusLabel,
   machineStatusDotClass,
@@ -78,11 +81,6 @@ import {
  * are not shown and where to read the rest.
  */
 const MACHINE_HISTORY_LIMIT = 100;
-
-// POC: hardcoded machine code the QR scan simulator always resolves to on mount,
-// so the scan-machine view can be demoed without a real camera/QR code. Remove
-// this constant and the effect/badge that use it once the POC is done.
-export const POC_DEFAULT_MACHINE_CODE = "GR-1141";
 
 /**
  * Column counts for the condition grid. The number of cards varies with how many
@@ -118,20 +116,111 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
   onViewSpareParts,
   onOpenCreateWorkOrder,
 }) => {
-  // The scan simulator only exists in development builds; production shows an
-  // honest machine picker until real camera scanning ships.
-  const isDevBuild = import.meta.env.DEV;
-
   // State for Floating QR Scanner Modal
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
-  const [isScanning, setIsScanning] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(false);
   const [flashLight, setFlashLight] = useState(false);
   const [soundBeep, setSoundBeep] = useState(true);
+  // Fallback manual picker — only surfaced when the camera itself can't run
+  // (insecure-context / unsupported browser), the same purpose the old
+  // placeholder screen served.
   const [selectedMachineToScan, setSelectedMachineToScan] = useState<string>(
     activeMachine.id
   );
+  // Distinct-failure copy for "not-found": replaced on each new mismatched
+  // code, never appended, so repeated mis-scans don't spam the modal.
+  const [scanNotFoundText, setScanNotFoundText] = useState<string | null>(null);
   const [customPromptText, setCustomPromptText] = useState("");
+
+  // Play a short beep via WebAudio — no audio asset file to ship or load.
+  const playBeep = () => {
+    try {
+      const AudioCtx =
+        window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioCtx();
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+      oscillator.type = "sine";
+      oscillator.frequency.value = 880;
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+      oscillator.start();
+      oscillator.stop(ctx.currentTime + 0.12);
+      oscillator.onended = () => ctx.close();
+    } catch {
+      // Some browsers block audio without a prior user gesture — a missing
+      // beep is not worth failing the scan over.
+    }
+  };
+
+  // Timer id for the success → onSelectMachine hand-off below. Tracked in a ref
+  // so it can be cancelled if the modal is closed (or the component unmounts)
+  // during the 600ms window — otherwise onSelectMachine/setIsQrModalOpen(true)
+  // could fire after the user already dismissed the scanner.
+  const scanSuccessTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (scanSuccessTimeoutRef.current) {
+        clearTimeout(scanSuccessTimeoutRef.current);
+        scanSuccessTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  // Real camera QR decode → machine match. Only runs while the modal is open,
+  // so the camera never stays on in the background.
+  const handleQrDecode = (text: string) => {
+    if (scanSuccess) return; // already matched — ignore further frames until modal closes
+    const { machine, normalized } = resolveMachineFromQr(text, machines);
+    if (!machine) {
+      setScanNotFoundText(normalized);
+      return;
+    }
+    setScanNotFoundText(null);
+    setScanSuccess(true);
+    if (soundBeep) playBeep();
+    navigator.vibrate?.(80);
+    if (scanSuccessTimeoutRef.current) clearTimeout(scanSuccessTimeoutRef.current);
+    scanSuccessTimeoutRef.current = setTimeout(() => {
+      scanSuccessTimeoutRef.current = null;
+      onSelectMachine?.(machine);
+      setScanSuccess(false);
+      setIsQrModalOpen(false);
+    }, 600);
+  };
+
+  const {
+    videoRef,
+    status: scanStatus,
+    error: scanError,
+    torchSupported,
+    cameras,
+    activeCameraId,
+    selectCamera,
+    retry: retryScan,
+  } = useQrScanner({
+    enabled: isQrModalOpen && !scanSuccess,
+    onDecode: handleQrDecode,
+    torch: flashLight,
+  });
+
+  // Close the scanner modal from a user action (X button, footer button, or the
+  // Modal's own onClose). Also cancels any pending success hand-off timer so a
+  // scan matched just before closing never fires onSelectMachine afterwards.
+  const closeQrModal = () => {
+    if (scanSuccessTimeoutRef.current) {
+      clearTimeout(scanSuccessTimeoutRef.current);
+      scanSuccessTimeoutRef.current = null;
+    }
+    setIsQrModalOpen(false);
+  };
+
+  // Manual-fallback copy per error code — only 'insecure-context' and
+  // 'unsupported' also offer the machine-picker fallback below.
+  const canUseManualFallback =
+    scanError?.code === "insecure-context" || scanError?.code === "unsupported";
 
   // In-page tab: overview (identity, alerts, actions) vs sensors & timeline
   const [activeTab, setActiveTab] = useState<"overview" | "detail">("overview");
@@ -196,43 +285,15 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
   /** Rows fetched but not shown, because the machine has more than one page. */
   const machineHistoryHidden = Math.max(0, machineHistoryTotal - machineHistory.length);
 
-  // Handle simulated QR Code scan (development builds only)
-  const handleSimulateScan = (targetMachineId?: string) => {
-    setIsScanning(true);
-    setScanSuccess(false);
-
-    setTimeout(() => {
-      setIsScanning(false);
-      setScanSuccess(true);
-
-      const targetMachine = machines.find(
-        (m) => m.id === (targetMachineId || selectedMachineToScan)
-      );
-
-      if (targetMachine && onSelectMachine) {
-        onSelectMachine(targetMachine);
-      }
-
-      setTimeout(() => {
-        setScanSuccess(false);
-        setIsQrModalOpen(false);
-      }, 1600);
-    }, 1200);
-  };
-
-  // POC: on mount, simulate a successful scan of POC_DEFAULT_MACHINE_CODE by
-  // reusing the exact same handler a real scan result would call — no
-  // duplicated selection logic. Only fires once machines have loaded and only
-  // if the code is actually found (nothing to select otherwise).
-  const pocAutoScanRanRef = useRef(false);
-  useEffect(() => {
-    if (pocAutoScanRanRef.current) return;
-    const pocMachine = machines.find((m) => m.code === POC_DEFAULT_MACHINE_CODE);
-    if (pocMachine) {
-      pocAutoScanRanRef.current = true;
-      handleSimulateScan(pocMachine.id);
+  // Manual fallback confirm: pick a machine from the dropdown and select it
+  // directly, used only when the real camera can't run on this device.
+  const handleManualConfirm = () => {
+    const targetMachine = machines.find((m) => m.id === selectedMachineToScan);
+    if (targetMachine) {
+      onSelectMachine?.(targetMachine);
+      setIsQrModalOpen(false);
     }
-  }, [machines]);
+  };
 
   // Real machines may have no code on record (3/973) — never render the
   // literal "null" for it; every interpolation below reuses this one label.
@@ -376,15 +437,6 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
               onSelectMachine={(m) => onSelectMachine?.(m)}
             />
           </div>
-          {/* POC: no real camera/QR scan yet — this badge makes it visually obvious
-              that GR-1141 was auto-selected to simulate "having just scanned" it.
-              Manual entry (MachineSelect above) and re-scan (FAB below) both still
-              override this freely. Remove together with POC_DEFAULT_MACHINE_CODE
-              and the mount effect below once the POC is done. */}
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold px-2.5 py-1 w-fit">
-            <QrCode className="w-3.5 h-3.5" />
-            โหมดจำลอง (POC): สแกนเป็นเครื่อง {POC_DEFAULT_MACHINE_CODE}
-          </span>
         </div>
 
         {/* Machine Identity Info Card */}
@@ -1362,19 +1414,17 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
       {isQrModalOpen && (
         <Modal
           size="md"
-          onClose={() => setIsQrModalOpen(false)}
+          onClose={closeQrModal}
           panelClassName="bg-white text-ink border-hairline"
         >
-          {/* Scan-beam sweep keyframes (dev simulator only) */}
-          {isDevBuild && (
-            <style>{`
-              @keyframes qr-beam-sweep {
-                0% { top: 8%; }
-                50% { top: 88%; }
-                100% { top: 8%; }
-              }
-            `}</style>
-          )}
+          {/* Scan-beam sweep keyframes for the live viewfinder overlay */}
+          <style>{`
+            @keyframes qr-beam-sweep {
+              0% { top: 8%; }
+              50% { top: 88%; }
+              100% { top: 8%; }
+            }
+          `}</style>
 
           {/* Modal Header */}
           <ModalHeader className="bg-parchment border-hairline">
@@ -1385,20 +1435,16 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
                 </div>
                 <div>
                   <h3 className="font-semibold text-sm text-ink">
-                    {isDevBuild
-                      ? "สแกน QR Code ประจำเครื่อง (โหมดพัฒนา)"
-                      : "สแกน QR Code ประจำเครื่อง"}
+                    สแกน QR Code ประจำเครื่อง
                   </h3>
                   <p className="text-xs text-ink-faint">
-                    {isDevBuild
-                      ? "จำลองการสแกนป้าย QR บนตัวเครื่องเพื่อสลับเครื่อง"
-                      : "กล้องสแกน QR Code ยังไม่พร้อมใช้งานบนอุปกรณ์นี้"}
+                    วางป้าย QR Code บนตัวเครื่องให้อยู่ในกรอบกล้อง
                   </p>
                 </div>
               </div>
 
               <button
-                onClick={() => setIsQrModalOpen(false)}
+                onClick={closeQrModal}
                 aria-label="ปิดหน้าต่าง"
                 className="p-2 rounded-full text-ink-faint hover:text-ink-muted hover:bg-parchment transition-colors cursor-pointer shrink-0"
               >
@@ -1408,139 +1454,179 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
           </ModalHeader>
 
           <ModalBody className="flex flex-col items-center space-y-5">
-            {isDevBuild ? (
-              <div className="relative w-full aspect-square max-w-[280px] sm:max-w-[340px] bg-black rounded-[18px] overflow-hidden border-2 border-hairline flex flex-col items-center justify-center">
-                {/* Simulated Camera Feed Grid background */}
-                <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:16px_16px] opacity-40" />
+            <div className="relative w-full aspect-square max-w-[280px] sm:max-w-[340px] rounded-2xl overflow-hidden bg-black border-2 border-hairline">
+              {/* Live camera feed — only mounted while the modal is open (enabled
+                  in useQrScanner), so the camera never runs in the background. */}
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="absolute inset-0 w-full h-full object-cover"
+              />
 
-                {/* Simulated scan beam — full-height ease-in-out sweep */}
-                {isScanning && (
-                  <div
-                    className="absolute left-4 right-4 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent"
-                    style={{ animation: "qr-beam-sweep 2s ease-in-out infinite" }}
-                  />
-                )}
+              {/* Scan-beam sweep overlay while actively scanning */}
+              {scanStatus === "scanning" && !scanSuccess && (
+                <div
+                  className="absolute left-4 right-4 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent"
+                  style={{ animation: "qr-beam-sweep 2s ease-in-out infinite" }}
+                />
+              )}
 
-                {/* Viewfinder State Content */}
-                {isScanning ? (
-                  <div className="relative z-10 flex flex-col items-center space-y-3 text-white">
-                    <Camera className="w-10 h-10 text-primary-on-dark" />
-                    <span className="text-xs font-semibold text-primary-on-dark">
-                      กำลังสแกนโค้ดรหัสเครื่อง...
-                    </span>
-                  </div>
-                ) : scanSuccess ? (
-                  <div className="relative z-10 flex flex-col items-center space-y-2 text-emerald-400 animate-in zoom-in-95">
-                    <CheckCircle2 className="w-14 h-14" />
-                    <span className="text-sm font-semibold text-white">
-                      สแกนสำเร็จ
-                    </span>
-                    <span className="text-xs text-emerald-300 font-mono">
-                      {machineCodeLabel}: {activeMachine.name}
-                    </span>
-                  </div>
-                ) : (
-                  <div className="relative z-10 flex flex-col items-center text-center space-y-3 p-4">
-                    <QrCode className="w-16 h-16 text-primary-on-dark/80" />
-                    <div>
-                      <span className="text-xs font-semibold text-white/80 block">
-                        วางป้าย QR Code ให้อยู่ในกรอบ
-                      </span>
-                      <span className="text-xs text-white/50 mt-1 block">
-                        เครื่องเป้าหมาย:{" "}
-                        <strong className="text-primary-on-dark">
-                          {orDash(
-                            machines.find((m) => m.id === selectedMachineToScan)
-                              ?.code ?? activeMachine.code
-                          )}
-                        </strong>
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Viewfinder Target Corner Brackets */}
-                <div className="absolute top-4 left-4 w-6 h-6 border-t-4 border-l-4 border-primary-on-dark rounded-tl" />
-                <div className="absolute top-4 right-4 w-6 h-6 border-t-4 border-r-4 border-primary-on-dark rounded-tr" />
-                <div className="absolute bottom-4 left-4 w-6 h-6 border-b-4 border-l-4 border-primary-on-dark rounded-bl" />
-                <div className="absolute bottom-4 right-4 w-6 h-6 border-b-4 border-r-4 border-primary-on-dark rounded-br" />
-              </div>
-            ) : (
-              <div className="w-full rounded-[18px] bg-parchment border border-hairline p-5 flex items-start gap-3">
-                <div className="p-2.5 rounded-full bg-white text-ink-faint border border-divider shrink-0">
-                  <CameraOff className="w-5 h-5" />
+              {/* Success overlay */}
+              {scanSuccess && (
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center space-y-2 text-emerald-400 bg-black/60 animate-in zoom-in-95">
+                  <CheckCircle2 className="w-14 h-14" />
+                  <span className="text-sm font-semibold text-white">สแกนสำเร็จ</span>
                 </div>
-                <div className="text-xs text-ink-muted leading-relaxed">
-                  <span className="font-semibold text-ink block mb-0.5">
-                    การสแกนด้วยกล้องยังไม่พร้อมใช้งานบนอุปกรณ์นี้
+              )}
+
+              {/* Helper copy while scanning normally (no error, no success yet) */}
+              {scanStatus === "scanning" && !scanSuccess && (
+                <div className="absolute bottom-3 left-0 right-0 z-10 text-center px-4">
+                  <span className="text-xs font-semibold text-white/90 bg-black/40 rounded-full px-3 py-1">
+                    วางป้าย QR Code ให้อยู่ในกรอบ
                   </span>
-                  เลือกเครื่องจักรได้จากช่อง "เครื่องจักรที่กำลังตรวจสอบ" ด้านบนของหน้านี้
                 </div>
+              )}
+
+              {/* Starting state */}
+              {scanStatus === "starting" && !scanSuccess && (
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 text-white/80 bg-black/40">
+                  <Loader2 className="w-8 h-8 animate-spin" />
+                  <span className="text-xs font-semibold">กำลังเปิดกล้อง...</span>
+                </div>
+              )}
+
+              {/* Error state — distinct Thai copy per error.code, plus retry and,
+                  for insecure-context/unsupported, a manual machine-picker fallback */}
+              {scanStatus === "error" && scanError && (
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 text-center px-5 bg-black/85">
+                  <CameraOff className="w-9 h-9 text-white/70" />
+                  <p className="text-xs text-white/90 leading-relaxed">
+                    {scanError.message}
+                  </p>
+                  <button
+                    onClick={retryScan}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-3.5 py-2 min-h-9 cursor-pointer active:scale-95 transition-all"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>ลองอีกครั้ง</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Inline not-found message — replaced on each new distinct mismatch,
+                  scanning keeps running underneath */}
+              {scanNotFoundText && scanStatus === "scanning" && !scanSuccess && (
+                <div className="absolute top-3 left-3 right-3 z-10 rounded-xl bg-rose-600/90 text-white text-xs font-semibold px-3 py-2 flex items-center justify-between gap-2">
+                  <span>ไม่พบเครื่องจักรที่ตรงกับรหัส {scanNotFoundText}</span>
+                  <button
+                    onClick={() => setScanNotFoundText(null)}
+                    aria-label="สแกนอีกครั้ง"
+                    className="shrink-0 rounded-full p-1 hover:bg-white/20 cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
+              {/* Viewfinder Target Corner Brackets */}
+              <div className="absolute top-4 left-4 w-6 h-6 border-t-4 border-l-4 border-primary-on-dark rounded-tl pointer-events-none" />
+              <div className="absolute top-4 right-4 w-6 h-6 border-t-4 border-r-4 border-primary-on-dark rounded-tr pointer-events-none" />
+              <div className="absolute bottom-4 left-4 w-6 h-6 border-b-4 border-l-4 border-primary-on-dark rounded-bl pointer-events-none" />
+              <div className="absolute bottom-4 right-4 w-6 h-6 border-b-4 border-r-4 border-primary-on-dark rounded-br pointer-events-none" />
+            </div>
+
+            {/* Manual fallback — only when the camera genuinely cannot run on this device */}
+            {scanStatus === "error" && scanError && canUseManualFallback && (
+              <div className="w-full rounded-[18px] bg-parchment border border-hairline p-4 space-y-2.5">
+                <span className="text-xs font-semibold text-ink block">
+                  เลือกเครื่องจักรด้วยตนเองแทน
+                </span>
+                <select
+                  value={selectedMachineToScan}
+                  onChange={(e) => setSelectedMachineToScan(e.target.value)}
+                  className="w-full min-h-11 rounded-full border border-hairline bg-white px-3.5 text-sm text-ink"
+                >
+                  {machines.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {orDash(m.code)}: {m.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={handleManualConfirm}
+                  className="w-full py-2.5 rounded-full bg-primary hover:bg-primary-focus text-white font-semibold text-xs cursor-pointer active:scale-95 transition-all"
+                >
+                  ยืนยันเครื่องจักร
+                </button>
               </div>
             )}
 
-            {/* Dev-only simulator controls */}
-            {isDevBuild && (
-              <div className="w-full">
-                <div className="flex items-center justify-between text-xs text-ink-faint px-1">
-                  <span>จำลองสแกน QR ของเครื่องที่กำลังเปิดอยู่ (โหมดพัฒนา):</span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setFlashLight(!flashLight)}
-                      className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-                        flashLight
-                          ? "bg-amber-50 text-amber-700 border-amber-200"
-                          : "bg-white text-ink-faint border-hairline"
-                      }`}
-                      title="เปิด/ปิด แฟลช"
-                      aria-label="เปิดหรือปิดแฟลช"
-                    >
-                      <Sun className="w-4 h-4" />
-                    </button>
+            {/* Camera controls: torch (only when supported), sound toggle, and
+                camera switch (only when more than one camera is available) */}
+            <div className="w-full flex items-center justify-between text-xs text-ink-faint px-1">
+              <span>{scanStatus === "scanning" ? "กำลังสแกน..." : "ตัวควบคุมกล้อง"}</span>
+              <div className="flex items-center gap-2">
+                {torchSupported && (
+                  <button
+                    onClick={() => setFlashLight(!flashLight)}
+                    className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
+                      flashLight
+                        ? "bg-amber-50 text-amber-700 border-amber-200"
+                        : "bg-white text-ink-faint border-hairline"
+                    }`}
+                    title="เปิด/ปิด แฟลช"
+                    aria-label="เปิดหรือปิดแฟลช"
+                  >
+                    <Sun className="w-4 h-4" />
+                  </button>
+                )}
 
-                    <button
-                      onClick={() => setSoundBeep(!soundBeep)}
-                      className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-                        soundBeep
-                          ? "bg-primary/10 text-primary border-primary/20"
-                          : "bg-white text-ink-faint border-hairline"
-                      }`}
-                      title="เปิด/ปิด เสียง"
-                      aria-label="เปิดหรือปิดเสียง"
-                    >
-                      {soundBeep ? (
-                        <Volume2 className="w-4 h-4" />
-                      ) : (
-                        <VolumeX className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
+                {cameras.length > 1 && (
+                  <button
+                    onClick={() => {
+                      const idx = cameras.findIndex((c) => c.deviceId === activeCameraId);
+                      const next = cameras[(idx + 1) % cameras.length];
+                      selectCamera(next.deviceId);
+                    }}
+                    className="p-1.5 rounded-lg border border-hairline bg-white text-ink-faint hover:text-ink-muted transition-colors cursor-pointer"
+                    title="สลับกล้อง"
+                    aria-label="สลับกล้อง"
+                  >
+                    <SwitchCamera className="w-4 h-4" />
+                  </button>
+                )}
+
+                <button
+                  onClick={() => setSoundBeep(!soundBeep)}
+                  className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
+                    soundBeep
+                      ? "bg-primary/10 text-primary border-primary/20"
+                      : "bg-white text-ink-faint border-hairline"
+                  }`}
+                  title="เปิด/ปิด เสียง"
+                  aria-label="เปิดหรือปิดเสียง"
+                >
+                  {soundBeep ? (
+                    <Volume2 className="w-4 h-4" />
+                  ) : (
+                    <VolumeX className="w-4 h-4" />
+                  )}
+                </button>
               </div>
-            )}
+            </div>
           </ModalBody>
 
           <ModalFooter className="border-divider">
-            {isDevBuild ? (
-              <button
-                onClick={() => handleSimulateScan()}
-                disabled={isScanning}
-                className="w-full py-3.5 rounded-full bg-primary hover:bg-primary-focus text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all disabled:opacity-50"
-              >
-                <Camera className="w-4 h-4" />
-                <span>
-                  {isScanning ? "กำลังประมวลผล..." : "จำลองสแกน QR Code"}
-                </span>
-              </button>
-            ) : (
-              <button
-                onClick={() => setIsQrModalOpen(false)}
-                className="w-full py-3.5 rounded-full border border-hairline bg-white hover:bg-parchment text-ink-muted font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
-              >
-                <X className="w-4 h-4" />
-                <span>ปิดหน้าต่าง</span>
-              </button>
-            )}
+            <button
+              onClick={closeQrModal}
+              className="w-full py-3.5 rounded-full border border-hairline bg-white hover:bg-parchment text-ink-muted font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+            >
+              <X className="w-4 h-4" />
+              <span>ปิดหน้าต่าง</span>
+            </button>
           </ModalFooter>
         </Modal>
       )}

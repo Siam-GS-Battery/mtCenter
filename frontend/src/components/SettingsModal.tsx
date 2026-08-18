@@ -1,20 +1,18 @@
 import React from "react";
 import { Bot } from "lucide-react";
-import { UserProfile, UserRole } from "../types";
+import { UserProfile } from "../types";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "./ui/Modal";
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentUser: UserProfile;
-  onRoleChange: (newRole: UserRole) => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
   currentUser,
-  onRoleChange,
 }) => {
   if (!isOpen) return null;
 
@@ -40,40 +38,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
         </div>
 
-        {/* Role Selector — โหมดพัฒนาเท่านั้น เช่นเดียวกับแถบสลับบทบาทในเมนูข้าง */}
-        {import.meta.env.DEV && (
-          <div className="space-y-2">
-            <span className="text-[13px] font-semibold text-ink-muted block">
-              สลับบทบาทผู้ใช้งาน (โหมดพัฒนา)
-            </span>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              {[
-                { id: "technician", label: "ช่างเทคนิค", sub: "ปฏิบัติงานซ่อมหน้าเครื่อง" },
-                { id: "engineer", label: "วิศวกร", sub: "ตรวจสอบและอนุมัติใบงาน" },
-                { id: "supervisor", label: "หัวหน้างาน", sub: "ติดตามภาพรวมและรายงาน" },
-              ].map((r) => {
-                const isSelected = currentUser.role === r.id;
-                return (
-                  <button
-                    key={r.id}
-                    onClick={() => onRoleChange(r.id as UserRole)}
-                    aria-pressed={isSelected}
-                    className={`p-3 min-h-11 rounded-[11px] border text-left transition-all cursor-pointer active:scale-95 ${
-                      isSelected
-                        ? "bg-primary/10 border-primary text-primary font-semibold"
-                        : "bg-white border-hairline text-ink-muted hover:bg-parchment"
-                    }`}
-                  >
-                    <div className="text-[13px]">{r.label}</div>
-                    <div className="text-xs text-ink-muted font-normal">{r.sub}</div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-        
         {/* AI Engine Status */}
         <div className="p-3 bg-emerald-50 rounded-[11px] border-0 text-xs text-emerald-900 flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2">

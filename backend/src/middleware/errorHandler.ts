@@ -3,9 +3,16 @@ import type { NextFunction, Request, Response } from "express";
 export class ApiError extends Error {
   status: number;
 
-  constructor(status: number, message: string) {
+  /**
+   * รหัสข้อผิดพลาดแบบ machine-readable (optional) สำหรับให้ client แยกแยะกรณีพิเศษได้
+   * โดยไม่ต้อง parse ข้อความภาษาไทย เช่น "PASSWORD_CHANGE_REQUIRED"
+   */
+  code?: string;
+
+  constructor(status: number, message: string, code?: string) {
     super(message);
     this.status = status;
+    this.code = code;
   }
 }
 
@@ -25,8 +32,16 @@ export function sendPaginated<T>(res: Response, data: T[], meta: PageMeta, statu
   return res.status(status).json({ success: true, data, meta });
 }
 
-export function sendError(res: Response, status: number, message: string): Response {
-  return res.status(status).json({ success: false, error: { message } });
+export function sendError(
+  res: Response,
+  status: number,
+  message: string,
+  code?: string
+): Response {
+  return res.status(status).json({
+    success: false,
+    error: code ? { message, code } : { message },
+  });
 }
 
 // Wraps async route handlers so thrown/rejected errors reach errorHandler.
@@ -43,7 +58,7 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
   console.error(err);
 
   if (err instanceof ApiError) {
-    sendError(res, err.status, err.message);
+    sendError(res, err.status, err.message, err.code);
     return;
   }
 

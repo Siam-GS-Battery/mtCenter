@@ -18,6 +18,26 @@ function required(name: string): string {
 }
 
 /**
+ * JWT_SECRET ต้องผ่าน required() เหมือน env var อื่นทุกตัว (เดิม lib/auth.ts อ่าน
+ * process.env เองจึงข้ามการตรวจของ required() ไป) และต้องยาวพอที่จะ brute-force ไม่ได้
+ * — HS256 ที่ secret สั้นเดาได้เท่ากับไม่มี auth เลย จึงบังคับอย่างน้อย 32 ตัวอักษร
+ * fail closed: ถ้าไม่ผ่านให้ throw ตอน startup ทันที
+ */
+const MIN_JWT_SECRET_LENGTH = 32;
+
+function requiredSecret(name: string): string {
+  const value = required(name).trim();
+  if (value.length < MIN_JWT_SECRET_LENGTH) {
+    throw new Error(
+      `ค่า "${name}" สั้นเกินไป (${value.length} ตัวอักษร) ต้องมีอย่างน้อย ${MIN_JWT_SECRET_LENGTH} ตัวอักษร / ` +
+        `Env var "${name}" is too short (${value.length} chars); it must be at least ${MIN_JWT_SECRET_LENGTH} characters. ` +
+        `Generate one with: openssl rand -base64 48`
+    );
+  }
+  return value;
+}
+
+/**
  * โหมดการทำงานของผู้ช่วย AI
  *
  * - "mock": ตอบด้วยกฎ + ข้อมูลจริงจากฐานข้อมูล (src/lib/mockAssistant.ts) ไม่เรียก
@@ -43,6 +63,7 @@ export interface AppConfig {
   port: number;
   supabaseUrl: string;
   supabaseServiceRoleKey: string;
+  jwtSecret: string;
   geminiApiKey: string | undefined;
   corsOrigins: string[];
   aiMode: AiMode;
@@ -52,6 +73,7 @@ export const config: AppConfig = {
   port: Number(process.env.PORT) || 4000,
   supabaseUrl: required("SUPABASE_URL"),
   supabaseServiceRoleKey: required("SUPABASE_SERVICE_ROLE_KEY"),
+  jwtSecret: requiredSecret("JWT_SECRET"),
   geminiApiKey: process.env.GEMINI_API_KEY,
   corsOrigins: (process.env.CORS_ORIGIN || "http://localhost:3000")
     .split(",")

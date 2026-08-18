@@ -16,8 +16,8 @@ import {
   HelpCircle,
   ChevronLeft,
   ChevronRight,
-  UserCheck,
   Factory,
+  LogOut,
 } from "lucide-react";
 import { UserProfile, UserRole } from "../types";
 
@@ -31,7 +31,6 @@ interface SidebarProps {
   currentUser: UserProfile;
   activeTab: string;
   setActiveTab: (tabId: string) => void;
-  onRoleChange: (newRole: UserRole) => void;
   isCollapsed: boolean;
   setIsCollapsed: (collapsed: boolean) => void;
   isMobileDrawerOpen: boolean;
@@ -39,13 +38,13 @@ interface SidebarProps {
   pendingBadges: Record<string, number>;
   onOpenSettings: () => void;
   onOpenHelp: () => void;
+  onLogout: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   currentUser,
   activeTab,
   setActiveTab,
-  onRoleChange,
   isCollapsed,
   setIsCollapsed,
   isMobileDrawerOpen,
@@ -53,6 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   pendingBadges,
   onOpenSettings,
   onOpenHelp,
+  onLogout,
 }) => {
   // Define nav items for each role
   const getRoleNavItems = (role: UserRole) => {
@@ -165,31 +165,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             )}
           </div>
-
-          {/* Quick Role Toggle Bar — development preview only */}
-          {import.meta.env.DEV && (!isCollapsed || isMobileDrawerOpen) && (
-            <div className="mt-2.5 pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/60">
-              <span className="flex items-center gap-1 text-[10px] font-semibold text-white/50">
-                <UserCheck className="w-3 h-3 text-primary-on-dark" /> บทบาท:
-              </span>
-              <div className="flex gap-1 bg-white/10 p-0.5 rounded-full border-0">
-                {(["technician", "engineer", "supervisor"] as UserRole[]).map((r) => (
-                  <button
-                    key={r}
-                    onClick={() => onRoleChange(r)}
-                    aria-pressed={currentUser.role === r}
-                    className={`px-3 py-2 rounded-full text-xs font-semibold transition-colors cursor-pointer ${
-                      currentUser.role === r
-                        ? "bg-white text-ink"
-                        : "text-white/70 hover:bg-white/10"
-                    }`}
-                  >
-                    {r === "technician" ? "ช่าง" : r === "engineer" ? "วิศวกร" : "หัวหน้า"}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* 3. Primary Nav */}
@@ -291,7 +266,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
           </button>
 
-          {/* ไม่มีเมนู "ออกจากระบบ" เพราะแอปนี้ยังไม่มีระบบเข้าสู่ระบบหรือ session ให้ล้าง */}
+          <button
+            onClick={onLogout}
+            aria-label="ออกจากระบบ"
+            className={`
+              w-full flex items-center px-3 min-h-11 text-white/60 rounded-lg hover:bg-white/5 hover:text-white cursor-pointer transition-colors
+              ${isCollapsed && !isMobileDrawerOpen ? "justify-center px-0" : ""}
+            `}
+            title={isCollapsed && !isMobileDrawerOpen ? "ออกจากระบบ" : undefined}
+          >
+            <LogOut
+              className={`w-[18px] h-[18px] shrink-0 text-white/50 ${
+                isCollapsed && !isMobileDrawerOpen ? "" : "mr-3"
+              }`}
+            />
+            {(!isCollapsed || isMobileDrawerOpen) && (
+              <span className="text-[13px]">ออกจากระบบ</span>
+            )}
+          </button>
 
           <div className="pt-2 justify-center text-white/50 hidden md:flex">
             <button

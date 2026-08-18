@@ -37,7 +37,7 @@ import type { WorkOrderListParams } from "../../services/apiService";
 import { Pagination } from "../ui/Pagination";
 
 interface MyWorkOrdersViewProps {
-  currentUserRole?: UserRole;
+  currentUserRole: UserRole;
   /**
    * profiles.id ของผู้ใช้ปัจจุบัน (`usr-...`) — ใช้กรองใบงาน "ของฉัน" จาก
    * server ด้วย ?assignedTo= เพราะ work_orders.assigned_to เก็บ profiles.id
@@ -183,7 +183,7 @@ const EMPTY_STATES: Record<
 };
 
 export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
-  currentUserRole = "technician",
+  currentUserRole,
   currentAssigneeKey,
   currentUserName,
   activeMachine,

@@ -4,3 +4,5 @@ dist
 .env.*
 !.env.example
 backups/
+scripts/*-report.json
+scripts/_tmp-*

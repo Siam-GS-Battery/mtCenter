@@ -8,8 +8,8 @@ interface CreateWorkOrderViewProps {
   activeMachine: Machine;
   currentUser: UserProfile;
   spareParts: SparePart[];
-  /** Real technician names to assign to. Omitted: the field is free text. */
-  technicians?: string[];
+  /** Real technicians to assign to (id + name). Omitted: the field is free text. */
+  technicians?: Pick<UserProfile, "id" | "name">[];
   onCreateWorkOrder: (newWorkOrder: Partial<WorkOrder>) => void | Promise<void>;
   onAskAI: (prompt: string) => void;
   onNavigateToMyOrders: () => void;

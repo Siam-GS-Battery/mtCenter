@@ -128,6 +128,18 @@ export interface WorkOrderStep {
   addedAt?: string;
 }
 
+export interface WorkOrderAttachment {
+  id: string;
+  workOrderId: string;
+  fileName: string;
+  filePath: string;
+  fileSize?: number;
+  contentType?: string;
+  note?: string;
+  uploadedBy?: string;
+  uploadedAt?: string;
+}
+
 export interface WorkOrder {
   id: string;
   code: string;
@@ -181,8 +193,8 @@ export interface WorkOrder {
   technicianNote?: string;
   /** เหตุผลที่วิศวกรส่งงานกลับให้แก้ไข */
   revisionNote?: string;
-  /** บทวิเคราะห์เชิงวิศวกรรมเฉพาะใบงาน (แสดงเมื่อมีข้อมูลจริงเท่านั้น) */
-  engineeringAnalysis?: string;
+  /** ไฟล์แนบของใบงาน (เอกสาร/รูปภาพ) — ดึงแยกผ่าน getWorkOrderAttachments(id) */
+  attachments?: WorkOrderAttachment[];
   // --- Fields added by the Excel import (see docs/data-import-spec.md Section 5) ---
   // (machineCode is already declared above)
   fy?: number | null;
@@ -246,6 +258,20 @@ export interface SparePart {
   sourceModifiedDate?: string | null;
   stockStatusLabel?: string | null;
   qualityFlags?: string[];
+}
+
+/** อะไหล่ที่เกี่ยวข้องกับเครื่องจักรเครื่องหนึ่ง (จาก GET /api/spare-parts/for-machine) */
+export interface MachineSparePart extends SparePart {
+  usageCount: number;
+  totalQtyUsed: number;
+  lastUsedDate: string | null;
+  suggestedQuantity: number;
+  matchReason: "history" | "work_order" | "compatible";
+}
+
+export interface MachineSparePartsResult {
+  machineCode: string;
+  items: MachineSparePart[];
 }
 
 export interface SparePartInput {
@@ -370,6 +396,16 @@ export interface PartWithdrawal {
   department: string | null;
   isAggregate: boolean | null;
   qualityFlags: string[];
+  workOrderId: string | null;
+  sparePartId: string | null;
+  note: string | null;
+}
+
+export interface PartWithdrawalInput {
+  workOrderId?: string | null;
+  partId: string;
+  qty: number;
+  note?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -407,6 +443,10 @@ export interface WorkOrderStats {
   totalMtlossMin: number;
   avgRepairDurationMin: number;
   byMonth: WorkOrderStatsByMonth[];
+  /** Count matching the "เลยกำหนด" predicate (due_date < today, not completed) —
+   * date-based, so it can't live in `byStatus`. Scoped by the same
+   * assignedTo/machineCode params as the rest of this response. */
+  overdue: number;
 }
 
 export interface PmPlanStats {

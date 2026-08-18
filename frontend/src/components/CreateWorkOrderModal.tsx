@@ -16,8 +16,8 @@ interface CreateWorkOrderModalProps {
   spareParts: SparePart[];
   /** The person filling the form in. Without it the caller supplies ผู้แจ้ง. */
   currentUser?: UserProfile;
-  /** Real technician names to assign to. Omitted: the field is free text. */
-  technicians?: string[];
+  /** Real technicians to assign to (id + name). Omitted: the field is free text. */
+  technicians?: Pick<UserProfile, "id" | "name">[];
   onCreateWorkOrder: (newWorkOrder: Partial<WorkOrder>) => void | Promise<void>;
   prefilledData?: PrefilledWorkOrderData | null;
 }

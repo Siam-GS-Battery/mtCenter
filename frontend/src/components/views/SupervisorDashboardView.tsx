@@ -13,6 +13,8 @@ import {
   X,
   Loader2,
   CalendarClock,
+  LayoutGrid,
+  Boxes,
 } from "lucide-react";
 import {
   PieChart,
@@ -21,11 +23,12 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Machine, WorkOrder, MachineStats, WorkOrderStats } from "../../types";
+import { Machine, WorkOrder, MachineStats, WorkOrderStats, UserProfile } from "../../types";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "../ui/Modal";
 import { Pagination } from "../ui/Pagination";
 import { MachineSelect } from "../MachineSelect";
 import { TelemetryTrendCard } from "./TelemetryTrendCard";
+import LiveFloorView from "./liveFloor/LiveFloorView";
 import { getWorkOrders, toUserMessage } from "../../services/apiService";
 import {
   machineStatusLabel,
@@ -104,6 +107,14 @@ interface SupervisorDashboardViewProps {
   /** Same idea as `machineStats`, for GET /api/work-orders/stats. */
   workOrderStats: WorkOrderStats | null;
   onAskAI: (prompt: string) => void;
+  /**
+   * Optional — this view has no work-order detail modal of its own today
+   * (the machine-detail modal above only lists repair history rows), so
+   * these are accepted purely to satisfy App.tsx's prop contract and are
+   * currently unused here. Kept optional so existing callers are unaffected.
+   */
+  onDeleteWorkOrder?: (id: string) => Promise<void>;
+  currentUser?: UserProfile | null;
 }
 
 /**
@@ -253,7 +264,16 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
   machineStats,
   workOrderStats,
   onAskAI,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onDeleteWorkOrder,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  currentUser,
 }) => {
+  // Live Floor 4D is a separate rendering mode for the same data — switching
+  // to it swaps out the KPI/graphical/registry sections below for the 3D
+  // scene, but the machine-detail modal (driven by `selectedMachine`) stays
+  // shared so opening a machine from either mode behaves identically.
+  const [viewMode, setViewMode] = useState<"classic" | "floor4d">("classic");
   const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
   // Displayed value of the MachineSelect dropdown — deliberately separate from
   // `selectedMachine` (which doubles as "which machine's modal is open").
@@ -492,7 +512,42 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
   return (
     <div className="p-4 md:p-8 max-w-[1600px] mx-auto space-y-6">
       {/* Header action */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4 pb-2 border-b border-hairline">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-hairline">
+        {/* Mode switch — classic dashboard vs. the 3D Live Floor. Kept as a
+            segmented pill so both options read as views of the same data,
+            not a navigation away from this page. */}
+        <div className="inline-flex items-center gap-1 p-1 rounded-full bg-pearl border border-divider self-start">
+          <button
+            type="button"
+            onClick={() => setViewMode("classic")}
+            aria-pressed={viewMode === "classic"}
+            className={`min-h-9 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all ${
+              viewMode === "classic"
+                ? "bg-primary text-white"
+                : "text-ink-muted hover:text-ink"
+            }`}
+          >
+            <LayoutGrid className="w-3.5 h-3.5" />
+            <span>มุมมองปกติ</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("floor4d")}
+            aria-pressed={viewMode === "floor4d"}
+            className={`min-h-9 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all relative ${
+              viewMode === "floor4d"
+                ? "bg-linear-to-r from-cyan-500 to-blue-600 text-white shadow-sm"
+                : "text-ink-muted hover:text-ink"
+            }`}
+          >
+            <Boxes className="w-3.5 h-3.5" />
+            <span>MT Center Live Floor · 4D</span>
+            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white/20 text-[10px] font-bold leading-none">
+              ใหม่
+            </span>
+          </button>
+        </div>
+
         <button
           onClick={handleAskDailySummary}
           className="min-h-[44px] px-4 py-2.5 rounded-full bg-primary hover:bg-primary-focus text-white text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
@@ -502,6 +557,18 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
         </button>
       </div>
 
+      {viewMode === "floor4d" && (
+        <LiveFloorView
+          machines={machines}
+          workOrders={workOrders}
+          onOpenMachineDetail={handleCardSelect}
+          onExit={() => setViewMode("classic")}
+          onAskAI={onAskAI}
+        />
+      )}
+
+      {viewMode === "classic" && (
+        <>
       {/* Key Metric KPI Cards — clickable to filter the registry below */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Machines ready to run (not a filter — composite metric) */}
@@ -765,6 +832,8 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
           </>
         )}
       </div>
+        </>
+      )}
 
       {/* MACHINE DETAIL & HISTORY MODAL */}
       {selectedMachine && selectedEvaluation && (

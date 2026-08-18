@@ -12,7 +12,8 @@ import { formatWithUnit, orDash } from "../lib/format";
 interface AIAssistantDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  activeMachine: Machine;
+  /** null = ไม่มีเครื่องจักรเลือกอยู่ — แชทจะตอบแบบภาพรวมทั้งฟลีตแทน */
+  activeMachine: Machine | null;
   currentUserRole: UserRole;
   /** ชื่อผู้ใช้ปัจจุบัน — แสดงในแผงยืนยันก่อนสร้างใบงาน */
   currentUserName?: string;
@@ -133,13 +134,19 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
                 installed this banner read "Spindle — · แรงสั่นสะเทือน —", which is
                 two dangling labels claiming instruments that aren't there. */}
             <span className="truncate">
-              เครื่อง: {orDash(activeMachine.code)} ({activeMachine.name})
-              {activeMachine.spindleTemp != null
-                ? ` · Spindle ${formatWithUnit(activeMachine.spindleTemp, "°C", 1)}`
-                : ""}
-              {activeMachine.vibrationMms != null
-                ? ` · แรงสั่นสะเทือน ${formatWithUnit(activeMachine.vibrationMms, "mm/s", 2)}`
-                : ""}
+              {activeMachine ? (
+                <>
+                  เครื่อง: {orDash(activeMachine.code)} ({activeMachine.name})
+                  {activeMachine.spindleTemp != null
+                    ? ` · Spindle ${formatWithUnit(activeMachine.spindleTemp, "°C", 1)}`
+                    : ""}
+                  {activeMachine.vibrationMms != null
+                    ? ` · แรงสั่นสะเทือน ${formatWithUnit(activeMachine.vibrationMms, "mm/s", 2)}`
+                    : ""}
+                </>
+              ) : (
+                "ภาพรวมเครื่องจักรทั้งหมด"
+              )}
             </span>
           </span>
           <span className="text-xs font-semibold text-primary bg-white px-2 py-0.5 rounded-full border border-primary/20 shrink-0">

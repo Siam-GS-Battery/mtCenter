@@ -14,6 +14,30 @@ export type AppRole = "technician" | "engineer" | "supervisor";
 // จึงจะเข้าถึงทรัพยากรได้ ไม่เช่นนั้นปฏิเสธ request
 
 /**
+ * อ่าน header x-user-id แล้วดึง profile (id, role) จาก Supabase — ใช้ร่วมกันโดย
+ * requireRole/requireAuthenticated/requireSupervisor เพื่อไม่ให้ logic การ lookup
+ * ซ้ำกันหลายที่ fail closed เสมอ: ไม่มี header หรือไม่พบ profile → throw ApiError
+ */
+export async function lookupProfileFromHeader(
+  req: { header(name: string): string | undefined }
+): Promise<{ id: string; role: string }> {
+  const userId = req.header(USER_HEADER);
+  if (!userId || userId.trim().length === 0) {
+    throw new ApiError(401, "ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่");
+  }
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, role")
+    .eq("id", userId)
+    .maybeSingle();
+  if (error) throw new ApiError(500, error.message);
+  if (!data) throw new ApiError(403, "ไม่พบสิทธิ์ผู้ใช้งานนี้");
+
+  return { id: data.id, role: data.role };
+}
+
+/**
  * สร้าง middleware ตรวจสิทธิ์ตามบทบาทผู้ใช้ (อ่านจาก header x-user-id)
  *
  * @param allowedRoles รายการบทบาทที่อนุญาตให้เข้าถึง
@@ -21,25 +45,26 @@ export type AppRole = "technician" | "engineer" | "supervisor";
  */
 export function requireRole(allowedRoles: AppRole[], forbiddenMessage: string) {
   return asyncHandler(async (req, _res, next) => {
-    const userId = req.header(USER_HEADER);
-    if (!userId || userId.trim().length === 0) {
-      throw new ApiError(401, "ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่");
-    }
+    const profile = await lookupProfileFromHeader(req);
 
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("id, role")
-      .eq("id", userId)
-      .maybeSingle();
-    if (error) throw new ApiError(500, error.message);
-    if (!data) throw new ApiError(403, "ไม่พบสิทธิ์ผู้ใช้งานนี้");
-
-    if (!allowedRoles.includes(data.role as AppRole)) {
+    if (!allowedRoles.includes(profile.role as AppRole)) {
       throw new ApiError(403, forbiddenMessage);
     }
 
-    (req as RequestWithProfile).profile = { id: data.id, role: data.role };
+    (req as RequestWithProfile).profile = profile;
 
     next();
   });
 }
+
+/**
+ * Middleware ที่อนุญาตผู้ใช้ที่ login แล้ว "ทุก role" (technician/engineer/supervisor)
+ * ต่างจาก requireRole ที่จำกัดเฉพาะ role ที่กำหนด — ใช้กับ endpoint ที่ทุกคนที่มีสิทธิ์
+ * เข้าระบบใช้ได้ (เช่น AI chat, สร้าง/แก้ใบงาน) แต่ยังต้อง fail closed เหมือนกันทุกอย่าง
+ * (ไม่มี/ไม่ตรง x-user-id → 401/403)
+ */
+export const requireAuthenticated = asyncHandler(async (req, _res, next) => {
+  const profile = await lookupProfileFromHeader(req);
+  (req as RequestWithProfile).profile = profile;
+  next();
+});

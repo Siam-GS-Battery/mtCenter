@@ -69,6 +69,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       case "engineer":
         return [
           { id: "review", label: "รอตรวจสอบ", icon: ClipboardCheck, badgeKey: "review" },
+          // UX Storyboard Scenario C Frame 1+2 — แยกจาก "รอตรวจสอบ" (อนุมัติใบงาน)
+          // เพราะเป้าหมายต่างกัน: หน้านี้คือสกัดความรู้จากใบงานที่ปิดแล้วเข้าคลัง
+          { id: "knowledge_review", label: "รีวิวความรู้", icon: BookMarked, badgeKey: "" },
           { id: "create_work_order", label: "แจ้งงานซ่อม", icon: FilePlus, badgeKey: "" },
           { id: "chat", label: "ผู้ช่วย AI", icon: Bot, badgeKey: "" },
           { id: "manuals", label: "คู่มือ", icon: BookOpen, badgeKey: "" },

@@ -17,6 +17,28 @@ function required(name: string): string {
   return value;
 }
 
+/**
+ * โหมดการทำงานของผู้ช่วย AI
+ *
+ * - "mock": ตอบด้วยกฎ + ข้อมูลจริงจากฐานข้อมูล (src/lib/mockAssistant.ts) ไม่เรียก
+ *   โมเดลภาษาเลย ตรงตาม UX Storyboard Frame 1 ที่ระบุว่า "ยังไม่ใช้ AI — query DB +
+ *   rule" เหมาะกับการสาธิต POC เพราะคำตอบคงที่ ตรวจสอบย้อนกลับได้ทุกตัวเลข และไม่
+ *   ผูกกับโควตา/คีย์ของผู้ให้บริการภายนอก
+ * - "live": เรียก Gemini จริงพร้อมบล็อกข้อมูลจากฐานข้อมูลและคู่มือ (เส้นทางเดิม)
+ *
+ * ค่าเริ่มต้นเป็น "mock" โดยเจตนา: การสาธิตต้องทำงานได้ทันทีบนเครื่องที่ยังไม่ได้ตั้ง
+ * GEMINI_API_KEY และต้องไม่มีวันล้มเพราะโควตาภายนอกหมด ตั้ง AI_MODE=live เมื่อพร้อม
+ * ใช้โมเดลจริง
+ */
+export type AiMode = "mock" | "live";
+
+function parseAiMode(raw: string | undefined): AiMode {
+  const value = (raw ?? "").trim().toLowerCase();
+  if (value === "live") return "live";
+  if (value === "mock" || value === "") return "mock";
+  throw new Error(`ค่า AI_MODE ไม่ถูกต้อง: "${raw}" รองรับเฉพาะ "mock" หรือ "live"`);
+}
+
 export interface AppConfig {
   port: number;
   supabaseUrl: string;
@@ -24,6 +46,7 @@ export interface AppConfig {
   geminiApiKey: string | undefined;
   manualAdminSecret: string | undefined;
   corsOrigins: string[];
+  aiMode: AiMode;
 }
 
 export const config: AppConfig = {
@@ -36,4 +59,5 @@ export const config: AppConfig = {
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean),
+  aiMode: parseAiMode(process.env.AI_MODE),
 };

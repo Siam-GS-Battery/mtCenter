@@ -3,14 +3,17 @@ import {
   Machine,
   MachineInput,
   WorkOrder,
+  WorkOrderAttachment,
   SparePart,
   SparePartInput,
+  MachineSparePartsResult,
   ManualDoc,
   UserRole,
   TelemetryMetric,
   TelemetryReading,
   PmPlan,
   PartWithdrawal,
+  PartWithdrawalInput,
   MachineStats,
   SparePartStats,
   WorkOrderStats,
@@ -19,6 +22,20 @@ import {
 } from "../types";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
+// เก็บ id ของผู้ใช้ที่ login อยู่ในหน่วยความจำของโมดูลนี้ — ให้เรียก setCurrentUserId()
+// ครั้งเดียวตอนได้ currentUser (ดู App.tsx) แล้วฟังก์ชันที่ต้องแนบ x-user-id ด้านล่าง
+// (aiChat/aiDiagnose/createWorkOrder/updateWorkOrder) จะหยิบไปแนบให้เองโดยไม่ต้องแก้
+// signature ของทุก call site ที่มีอยู่แล้ว
+let currentUserId: string | null = null;
+
+export function setCurrentUserId(id: string | null | undefined): void {
+  currentUserId = id ?? null;
+}
+
+export function getCurrentUserId(): string | null {
+  return currentUserId;
+}
 
 /** Pagination envelope carried alongside `data` on paginated list responses. */
 export interface ApiListMeta {
@@ -232,45 +249,193 @@ export interface WorkOrderListParams {
   priority?: string;
   from?: string;
   to?: string;
-  /** Exact match against work_orders.assigned_to (a name, not a user id — see
-   * WorkOrderForm/App.tsx, which populate it from the assignee's display name). */
+  /** Exact match against work_orders.assigned_to, which stores profiles.id
+   * (`usr-...`) — see App.tsx's currentAssigneeKey (currentUser.id), which
+   * WorkOrderForm/App.tsx now populate it with when creating a work order. */
   assignedTo?: string;
   /** Free-text search across id/code/title/description/machine_code/machine_name_std.
    * Does NOT cover technician_name — see backend/src/routes/workOrders.ts. */
   search?: string;
+  /** "เลยกำหนด" — date-based, so it isn't a plain `status` value. Server applies
+   * due_date < today (Bangkok time) AND status != completed; see
+   * isOverdueRow in backend/src/routes/workOrders.ts. */
+  overdue?: boolean;
 }
 
 export function getWorkOrders(params: WorkOrderListParams = {}): Promise<PaginatedResult<WorkOrder>> {
   return requestPaginated<WorkOrder>(`/api/work-orders${buildQuery(params)}`);
 }
 
-/** Aggregate counts for the whole `work_orders` table — use for
- * dashboards/KPIs/reports instead of aggregating over a (now paginated) list. */
-export function getWorkOrderStats(): Promise<WorkOrderStats> {
-  return request<WorkOrderStats>("/api/work-orders/stats");
+export interface WorkOrderStatsParams {
+  assignedTo?: string;
+  machineCode?: string;
 }
 
-export function createWorkOrder(payload: Partial<WorkOrder>): Promise<WorkOrder> {
+/** Aggregate counts for the whole `work_orders` table — use for
+ * dashboards/KPIs/reports instead of aggregating over a (now paginated) list.
+ * Pass `assignedTo`/`machineCode` to scope the counts the same way
+ * `getWorkOrders` scopes its list (e.g. for a "my work orders" badge). */
+export function getWorkOrderStats(params: WorkOrderStatsParams = {}): Promise<WorkOrderStats> {
+  return request<WorkOrderStats>(`/api/work-orders/stats${buildQuery(params)}`);
+}
+
+// ต้อง login แล้ว (ตรวจสอบผ่านเฮดเดอร์ x-user-id ฝั่ง backend) — actorId เป็น optional
+// เพื่อไม่ต้องแก้ signature ของ call site เดิมทุกที่ ถ้าไม่ส่งมาจะใช้ id ที่ set ไว้ล่าสุด
+// ผ่าน setCurrentUserId() แทน
+export function createWorkOrder(payload: Partial<WorkOrder>, actorId?: string): Promise<WorkOrder> {
   return request<WorkOrder>("/api/work-orders", {
     method: "POST",
+    headers: { "x-user-id": actorId ?? currentUserId ?? "" },
     body: JSON.stringify(payload),
   });
 }
 
-export function updateWorkOrder(id: string, payload: Partial<WorkOrder>): Promise<WorkOrder> {
+export function updateWorkOrder(
+  id: string,
+  payload: Partial<WorkOrder>,
+  actorId?: string
+): Promise<WorkOrder> {
   return request<WorkOrder>(`/api/work-orders/${id}`, {
     method: "PATCH",
+    headers: { "x-user-id": actorId ?? currentUserId ?? "" },
     body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteWorkOrder(id: string, actorId?: string): Promise<void> {
+  await request<{ id: string }>(`/api/work-orders/${id}`, {
+    method: "DELETE",
+    headers: { "x-user-id": actorId ?? currentUserId ?? "" },
   });
 }
 
 export function approveWorkOrder(
   id: string,
-  payload?: { engineerReviewer?: string }
+  payload?: { engineerReviewer?: string },
+  actorId?: string
 ): Promise<WorkOrder> {
   return request<WorkOrder>(`/api/work-orders/${id}/approve`, {
     method: "POST",
+    headers: { "x-user-id": actorId ?? currentUserId ?? "" },
     body: JSON.stringify(payload || {}),
+  });
+}
+
+// ---- Work Order Attachments ----
+export function getWorkOrderAttachments(workOrderId: string): Promise<WorkOrderAttachment[]> {
+  return request<{ items: WorkOrderAttachment[] }>(
+    `/api/work-orders/${encodeURIComponent(workOrderId)}/attachments`
+  ).then((res) => res.items);
+}
+
+export interface WorkOrderAttachmentUploadTicket {
+  path: string;
+  signedUrl: string;
+  token: string;
+}
+
+export function requestWorkOrderAttachmentUploadUrl(
+  workOrderId: string,
+  input: { fileName: string; fileSize: number; contentType?: string }
+): Promise<WorkOrderAttachmentUploadTicket> {
+  return request<WorkOrderAttachmentUploadTicket>(
+    `/api/work-orders/${encodeURIComponent(workOrderId)}/attachments/upload-url`,
+    {
+      method: "POST",
+      headers: { "x-user-id": currentUserId ?? "" },
+      body: JSON.stringify(input),
+    }
+  );
+}
+
+export function createWorkOrderAttachment(
+  workOrderId: string,
+  payload: {
+    fileName: string;
+    filePath: string;
+    fileSize?: number;
+    contentType?: string;
+    note?: string;
+  }
+): Promise<WorkOrderAttachment> {
+  return request<WorkOrderAttachment>(
+    `/api/work-orders/${encodeURIComponent(workOrderId)}/attachments`,
+    {
+      method: "POST",
+      headers: { "x-user-id": currentUserId ?? "" },
+      body: JSON.stringify(payload),
+    }
+  );
+}
+
+export function getWorkOrderAttachmentUrl(
+  workOrderId: string,
+  attachmentId: string
+): Promise<string> {
+  return request<{ url: string }>(
+    `/api/work-orders/${encodeURIComponent(workOrderId)}/attachments/${encodeURIComponent(
+      attachmentId
+    )}/file`
+  ).then((res) => res.url);
+}
+
+export function deleteWorkOrderAttachment(
+  workOrderId: string,
+  attachmentId: string
+): Promise<{ id: string }> {
+  return request<{ id: string }>(
+    `/api/work-orders/${encodeURIComponent(workOrderId)}/attachments/${encodeURIComponent(
+      attachmentId
+    )}`,
+    {
+      method: "DELETE",
+      headers: { "x-user-id": currentUserId ?? "" },
+    }
+  );
+}
+
+/** นามสกุลไฟล์ที่อนุญาตให้แนบกับใบงาน — ใช้ตรวจฝั่ง UI ก่อนอัปโหลด */
+export const WORK_ORDER_ATTACHMENT_EXTENSIONS = [
+  ".pdf",
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".webp",
+  ".doc",
+  ".docx",
+  ".xls",
+  ".xlsx",
+];
+
+export const WORK_ORDER_ATTACHMENT_MAX_BYTES = 50 * 1024 * 1024;
+
+export function uploadWorkOrderAttachmentFile(
+  signedUrl: string,
+  file: File,
+  onProgress?: (percent: number) => void
+): Promise<void> {
+  return uploadFileToSignedUrl(signedUrl, file, file.type || "application/octet-stream", onProgress);
+}
+
+/** ทางลัด: ขอ signed URL → อัปโหลดไฟล์ → บันทึกเมทาดาทาไฟล์แนบ ในคำเรียกเดียว */
+export async function uploadWorkOrderAttachment(
+  workOrderId: string,
+  file: File,
+  note?: string,
+  onProgress?: (percent: number) => void
+): Promise<WorkOrderAttachment> {
+  const ticket = await requestWorkOrderAttachmentUploadUrl(workOrderId, {
+    fileName: file.name,
+    fileSize: file.size,
+    contentType: file.type || undefined,
+  });
+  await uploadFileToSignedUrl(ticket.signedUrl, file, file.type || "application/octet-stream", onProgress);
+  return createWorkOrderAttachment(workOrderId, {
+    fileName: file.name,
+    filePath: ticket.path,
+    fileSize: file.size,
+    contentType: file.type || undefined,
+    note,
   });
 }
 
@@ -290,6 +455,23 @@ export function getSpareParts(params: SparePartListParams = {}): Promise<Paginat
 /** Aggregate counts/value for the whole `spare_parts` table — use for
  * dashboards/KPIs instead of computing `.filter()/.reduce()` over a (now
  * paginated) list. */
+export interface MachineSparePartsParams {
+  machineCode: string;
+  workOrderId?: string;
+  limit?: number;
+}
+
+/**
+ * อะไหล่ที่เกี่ยวข้องกับเครื่องจักรเครื่องหนึ่ง (ประวัติการเบิก/เข้ากันได้)
+ * — ผู้เรียกควรใช้ `toUserMessage(err, "ไม่สามารถโหลดรายการอะไหล่ของเครื่องจักรได้")`
+ * เมื่อ catch ข้อผิดพลาดจากฟังก์ชันนี้
+ */
+export function getSparePartsForMachine(
+  params: MachineSparePartsParams
+): Promise<MachineSparePartsResult> {
+  return request<MachineSparePartsResult>(`/api/spare-parts/for-machine${buildQuery(params)}`);
+}
+
 export function getSparePartStats(): Promise<SparePartStats> {
   return request<SparePartStats>("/api/spare-parts/stats");
 }
@@ -374,6 +556,7 @@ export interface PartWithdrawalListParams {
   department?: string;
   dateFrom?: string;
   dateTo?: string;
+  workOrderId?: string;
 }
 
 export function getPartWithdrawals(
@@ -384,6 +567,17 @@ export function getPartWithdrawals(
 
 export function getPartWithdrawalStats(): Promise<PartWithdrawalStats> {
   return request<PartWithdrawalStats>("/api/part-withdrawals/stats");
+}
+
+export function createPartWithdrawal(
+  input: PartWithdrawalInput,
+  actorId: string
+): Promise<PartWithdrawal> {
+  return request<PartWithdrawal>("/api/part-withdrawals", {
+    method: "POST",
+    headers: { "x-user-id": actorId },
+    body: JSON.stringify(input),
+  });
 }
 
 // ---- Manuals ----
@@ -461,10 +655,25 @@ export function uploadManualFile(
   file: File,
   onProgress?: (percent: number) => void
 ): Promise<void> {
+  return uploadFileToSignedUrl(signedUrl, file, "application/pdf", onProgress);
+}
+
+/**
+ * ตัวช่วยกลางสำหรับอัปโหลดไฟล์ไปยัง signed URL ของ Supabase Storage โดยตรง
+ * ใช้ XMLHttpRequest แทน request()/fetch เพราะ (1) ต้องรายงานความคืบหน้าการอัปโหลด
+ * ผ่าน upload.onprogress ซึ่ง fetch ทำไม่ได้ และ (2) ปลายทางนี้ไม่ใช่ API ของเรา
+ * และไม่ได้ตอบกลับด้วย envelope {success, data}
+ */
+function uploadFileToSignedUrl(
+  signedUrl: string,
+  file: File,
+  contentType: string,
+  onProgress?: (percent: number) => void
+): Promise<void> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("PUT", signedUrl, true);
-    xhr.setRequestHeader("Content-Type", "application/pdf");
+    xhr.setRequestHeader("Content-Type", contentType);
     // ไฟล์ 50MB บนไวไฟโรงงานอาจใช้เวลานาน จึงตั้ง timeout ไว้นานพอ (10 นาที)
     // เพื่อไม่ให้ผู้ใช้ค้างอยู่ที่ "กำลังส่งไฟล์ขึ้นคลัง..." ตลอดไปเมื่อการอัปโหลดสะดุด
     xhr.timeout = 10 * 60 * 1000;
@@ -533,6 +742,14 @@ export interface AiChatPayload {
   history: AiChatHistoryItem[];
 }
 
+/**
+ * โหมดที่เซิร์ฟเวอร์ใช้ตอบคำถามนี้ (ดู AiMode ใน backend/src/config.ts)
+ * - "mock"     ตอบด้วยกฎ + ข้อมูลจริงจากฐานข้อมูล ไม่เรียกโมเดลภาษา
+ * - "live"     ตอบด้วยโมเดลภาษาจริง
+ * - "fallback" โมเดลเรียกไม่สำเร็จ ตกไปใช้คำตอบสำรองแบบออฟไลน์
+ */
+export type AiMode = "mock" | "live" | "fallback";
+
 export interface AiChatResponse {
   success: boolean;
   reply: string;
@@ -540,14 +757,42 @@ export interface AiChatResponse {
   error?: string;
   /** true = ทุกโมเดล AI เรียกไม่สำเร็จ คำตอบนี้เป็นข้อความสำรองแบบออฟไลน์ ไม่ได้อ้างอิงข้อมูลเครื่องจักรจริง */
   fallback?: boolean;
+  /** โหมดที่ใช้ตอบ — undefined ได้ถ้าเซิร์ฟเวอร์เป็นเวอร์ชันก่อนที่จะมีฟิลด์นี้ */
+  mode?: AiMode;
+  /** เจตนาที่ระบบตีความได้ (โหมด mock) — "unknown" = ตอบไม่ได้ จึงเสนอเมนูแทน */
+  intent?: string;
+  /** id ของแถว log สำหรับผูกปุ่มให้ผลตอบรับ — null เมื่อบันทึก log ไม่สำเร็จ */
+  logId?: number | null;
 }
 
-export async function aiChat(payload: AiChatPayload): Promise<AiChatResponse> {
+/**
+ * โหมดที่เซิร์ฟเวอร์ตั้งไว้ ใช้แสดงป้ายบอกผู้ใช้ก่อนเริ่มถาม
+ * (ไม่ใช่โหมดของคำตอบข้อใดข้อหนึ่ง — ค่านั้นอยู่ที่ AiChatResponse.mode)
+ */
+export function getAiMode(): Promise<{ mode: "mock" | "live" }> {
+  return request<{ mode: "mock" | "live" }>("/api/ai/mode");
+}
+
+/**
+ * ส่งผลตอบรับของผู้ใช้ต่อคำตอบหนึ่งข้อ (Frame 4 ของ UX Storyboard)
+ * `logId` ต้องมาจาก AiChatResponse.logId ของคำตอบนั้นเท่านั้น
+ */
+export function aiFeedback(logId: number, feedback: 1 | -1): Promise<{ logId: number; feedback: number }> {
+  return request<{ logId: number; feedback: number }>("/api/ai/feedback", {
+    method: "POST",
+    body: JSON.stringify({ logId, feedback }),
+  });
+}
+
+export async function aiChat(payload: AiChatPayload, actorId?: string): Promise<AiChatResponse> {
   let res: Response;
   try {
     res = await fetch(`${API_BASE}/api/ai/chat`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-user-id": actorId ?? currentUserId ?? "",
+      },
       body: JSON.stringify(payload),
     });
   } catch {
@@ -581,12 +826,18 @@ export interface AiDiagnoseResponse {
   result: unknown;
 }
 
-export async function aiDiagnose(payload: AiDiagnosePayload): Promise<AiDiagnoseResponse> {
+export async function aiDiagnose(
+  payload: AiDiagnosePayload,
+  actorId?: string
+): Promise<AiDiagnoseResponse> {
   let res: Response;
   try {
     res = await fetch(`${API_BASE}/api/ai/diagnose`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-user-id": actorId ?? currentUserId ?? "",
+      },
       body: JSON.stringify(payload),
     });
   } catch {
@@ -607,4 +858,145 @@ export async function aiDiagnose(payload: AiDiagnosePayload): Promise<AiDiagnose
   }
 
   return json as AiDiagnoseResponse;
+}
+
+// ---- Knowledge (UX Storyboard Scenario C: ดูแลคลังความรู้หลังปิดงาน) ----
+//
+// ทุก endpoint ต้องแนบ x-user-id เพราะฝั่ง backend ใช้ requireAuthenticated/requireRole
+// (ดู backend/src/routes/knowledge.ts) — ตัว request() ไม่ได้แนบให้เองเหมือน aiChat()
+// จึงต้องส่ง actorId เข้ามาทุกครั้ง ค่าเริ่มต้นดึงจาก currentUserId ที่ตั้งไว้ตอน login
+
+function withActor(actorId?: string): Record<string, string> {
+  return { "x-user-id": actorId ?? currentUserId ?? "" };
+}
+
+/** Frame 1 — ใบงานรอรีวิว จัดลำดับด้วยกฎ (พร้อมเหตุผลที่อธิบายได้) */
+export interface ReviewQueueItem {
+  workOrderId: string;
+  workOrderCode: string;
+  title: string;
+  machineId: string | null;
+  machineCode: string | null;
+  machineName: string | null;
+  technicianName: string | null;
+  priority: string | null;
+  assignedDate: string | null;
+  closedAt: string | null;
+  downtimeMinutes: number | null;
+  machineLevel: "normal" | "warning" | "critical" | null;
+  daysWaiting: number | null;
+  rankScore: number;
+  rankReasons: string[];
+  hasKnowledge: boolean;
+}
+
+export interface ReviewQueueResponse {
+  items: ReviewQueueItem[];
+  pendingCount: number;
+  totalCount: number;
+}
+
+export function getReviewQueue(actorId?: string): Promise<ReviewQueueResponse> {
+  return request<ReviewQueueResponse>("/api/knowledge/review-queue", { headers: withActor(actorId) });
+}
+
+/** Frame 2 — ร่างองค์ความรู้จากสิ่งที่ช่างบันทึกไว้ (ยังไม่เข้าคลัง) */
+export interface KnowledgeDraft {
+  title: string;
+  category: string;
+  machineModel: string | null;
+  machineCode: string | null;
+  tags: string[];
+  summary: string;
+  content: string;
+  technicianReport: {
+    symptoms: string;
+    cause: string;
+    repairAction: string;
+    solutionSteps: string | null;
+    technicianNote: string;
+    partsUsed: string | null;
+    downtimeMinutes: number | null;
+  };
+  gaps: string[];
+}
+
+export function getKnowledgeDraft(
+  workOrderId: string,
+  actorId?: string
+): Promise<{ draft: KnowledgeDraft; saved: boolean }> {
+  return request<{ draft: KnowledgeDraft; saved: boolean }>(
+    `/api/knowledge/draft/${encodeURIComponent(workOrderId)}`,
+    { headers: withActor(actorId) }
+  );
+}
+
+export interface ConfirmKnowledgePayload {
+  workOrderId: string;
+  title: string;
+  category?: string | null;
+  machineModel?: string | null;
+  machineCode?: string | null;
+  tags?: string[];
+  summary?: string | null;
+  content: string;
+  /** ร่างเดิมที่ระบบสร้าง ส่งไปเก็บคู่กันเพื่อให้รู้ว่า Engineer แก้อะไร */
+  draftContent?: string | null;
+  confirmedByName?: string | null;
+}
+
+/** Frame 2 — ยืนยันความรู้เข้าคลัง (เฉพาะ engineer/supervisor) */
+export function confirmKnowledge(
+  payload: ConfirmKnowledgePayload,
+  actorId?: string
+): Promise<{ id: string }> {
+  return request<{ id: string }>("/api/knowledge/confirm", {
+    method: "POST",
+    headers: withActor(actorId),
+    body: JSON.stringify(payload),
+  });
+}
+
+/** Frame 4 — ภาพรวมคลังความรู้ พร้อมสถิติการถูกนำไปใช้จริง */
+export interface KnowledgeUsageRow {
+  id: string;
+  title: string;
+  category: string | null;
+  machineCode: string | null;
+  sourceWorkOrderCode: string | null;
+  confirmedByName: string | null;
+  confirmedAt: string;
+  citedCount: number;
+  helpfulCount: number;
+  notHelpfulCount: number;
+  editedFromDraft: boolean;
+}
+
+export interface KnowledgeOverview {
+  totalArticles: number;
+  neverCitedCount: number;
+  totalCitations: number;
+  totalHelpful: number;
+  totalNotHelpful: number;
+  pendingReviewCount: number;
+  articles: KnowledgeUsageRow[];
+}
+
+export function getKnowledgeOverview(actorId?: string): Promise<KnowledgeOverview> {
+  return request<KnowledgeOverview>("/api/knowledge/overview", { headers: withActor(actorId) });
+}
+
+export function getKnowledgeContent(
+  id: string,
+  actorId?: string
+): Promise<{
+  id: string;
+  title: string;
+  content: string;
+  draft_content: string | null;
+  confirmed_by_name: string | null;
+  confirmed_at: string;
+  source_work_order_code: string | null;
+}> {
+  return request(`/api/knowledge/${encodeURIComponent(id)}/content`, { headers: withActor(actorId) });
 }

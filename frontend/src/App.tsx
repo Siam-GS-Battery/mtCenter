@@ -25,8 +25,10 @@ import {
   getManuals,
   createWorkOrder,
   updateWorkOrder,
+  deleteWorkOrder,
   approveWorkOrder,
   toUserMessage,
+  setCurrentUserId,
 } from "./services/apiService";
 import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
@@ -36,6 +38,8 @@ import { MyWorkOrdersView } from "./components/views/MyWorkOrdersView";
 import { SparePartsView } from "./components/views/SparePartsView";
 import { ManualsView } from "./components/views/ManualsView";
 import { PendingReviewView } from "./components/views/PendingReviewView";
+import { KnowledgeReviewView } from "./components/views/KnowledgeReviewView";
+import { KnowledgeOverviewPanel } from "./components/views/KnowledgeOverviewPanel";
 import { UploadManualView } from "./components/views/UploadManualView";
 import { KnowledgeBaseView } from "./components/views/KnowledgeBaseView";
 import { AllWorkOrdersView } from "./components/views/AllWorkOrdersView";
@@ -50,18 +54,30 @@ import { AIAssistantDrawer } from "./components/AIAssistantDrawer";
 import { CreateWorkOrderModal, PrefilledWorkOrderData } from "./components/CreateWorkOrderModal";
 import type { NotificationTarget } from "./components/TopBar";
 import { defaultDueDate } from "./lib/workOrderStatus";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Menu } from "lucide-react";
 import { notifyToast, notifySaving, dismissSaving, notifySaved, notifyFailed } from "./lib/swal";
 
 export default function App() {
   // 1. Role & Profile State
   const [currentRole, setCurrentRole] = useState<UserRole>("technician");
   const [users, setUsers] = useState<Record<string, UserProfile>>({});
+  // Full technician roster (id + name) for WorkOrderForm's assignee select —
+  // `users` above only keeps the last profile per role (for the role
+  // switcher), so it cannot list every technician.
+  const [technicians, setTechnicians] = useState<Pick<UserProfile, "id" | "name">[]>([]);
   // No mock fallback: until the real profiles load, there is no "current
   // user" — every place that needs one must handle the null case (see the
   // loading/error gate below, right before the main render).
   const currentUser: UserProfile | null =
     users[currentRole] ?? Object.values(users)[0] ?? null;
+  // Single source of truth for the "assignee" identity used to scope
+  // "ใบงานของฉัน" (my work orders) — both the stats badge count and the
+  // list (MyWorkOrdersView) must filter on this exact same value.
+  // work_orders.assigned_to stores profiles.id (`usr-...`), not a display
+  // name — 8,589/8,606 real rows already use that id; only 17 legacy rows
+  // hold a Thai name from before this fix. Filtering by display name here
+  // would silently match almost nothing, so this must stay the user's id.
+  const currentAssigneeKey: string | undefined = currentUser?.id;
 
   // 2. Active View Tab State
   const [activeTab, setActiveTab] = useState<string>("scan");
@@ -86,6 +102,10 @@ export default function App() {
   const [machineStats, setMachineStats] = useState<MachineStats | null>(null);
   const [workOrderStats, setWorkOrderStats] = useState<WorkOrderStats | null>(null);
   const [sparePartStats, setSparePartStats] = useState<SparePartStats | null>(null);
+  // Scoped to the current user (assignedTo=currentAssigneeKey) — used only for
+  // the "ใบงานของฉัน" sidebar badge. `workOrderStats` above stays factory-wide
+  // (it also feeds SupervisorDashboardView's KPIs) so it must not be scoped.
+  const [myWorkOrderStats, setMyWorkOrderStats] = useState<WorkOrderStats | null>(null);
   // Knowledge base has no backend table/Excel source — see the import note
   // at the top of this file. This is the one deliberate mock exception.
   const [kbArticles] = useState<KnowledgeArticle[]>(MOCK_KB_ARTICLES);
@@ -125,6 +145,13 @@ export default function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Keep apiService's module-level actor id in sync with the resolved
+  // current user, so createWorkOrder/updateWorkOrder/aiChat/aiDiagnose send
+  // a valid x-user-id header instead of an empty one.
+  useEffect(() => {
+    setCurrentUserId(currentUser?.id ?? null);
+  }, [currentUser?.id]);
+
   // Load live data from the backend on mount. No mock fallback of any kind:
   // `users` and `machines` are the two things the rest of the app cannot
   // render sensibly without (currentUser / activeMachine), so they gate a
@@ -159,6 +186,11 @@ export default function App() {
           usersByRole[u.role] = u;
         });
         setUsers(usersByRole);
+        setTechnicians(
+          usersRes
+            .filter((u) => u.role === "technician")
+            .map((u) => ({ id: u.id, name: u.name }))
+        );
 
         setMachines(machinesRes.data);
         if (machinesRes.data.length > 0) {
@@ -230,6 +262,28 @@ export default function App() {
       cancelled = true;
     };
   }, [reloadToken]);
+
+  // Refetch the current user's own work-order stats whenever the assignee
+  // identity changes (initial load once users/currentUser resolve, or a role
+  // switch afterwards) — keeps the "ใบงานของฉัน" badge scoped to this user
+  // instead of the factory-wide count from `workOrderStats`.
+  useEffect(() => {
+    if (!currentAssigneeKey) {
+      setMyWorkOrderStats(null);
+      return;
+    }
+    let cancelled = false;
+    getWorkOrderStats({ assignedTo: currentAssigneeKey })
+      .then((stats) => {
+        if (!cancelled) setMyWorkOrderStats(stats);
+      })
+      .catch(() => {
+        /* stale/no scoped stats is fine for a background badge fetch */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [currentAssigneeKey, reloadToken]);
 
   // Handle Role Change
   const handleRoleChange = (newRole: UserRole) => {
@@ -306,7 +360,11 @@ export default function App() {
       assignedDate: new Date().toISOString().slice(0, 10),
       dueDate: defaultDueDate(),
       requestedBy: currentUser.name,
-      assignedTo: newWOData.assignedTo || newWOData.technicianName || currentUser.name,
+      // assigned_to stores profiles.id (`usr-...`), not a display name — see
+      // currentAssigneeKey above. newWOData.assignedTo may already carry a
+      // name typed into the form's free-text assignee field (no id lookup
+      // exists for it there); fall back to the current user's id, never name.
+      assignedTo: newWOData.assignedTo || currentUser.id,
       updatedAt: new Date().toISOString().slice(0, 10),
       estimatedHours: newWOData.estimatedHours,
       requestedParts: newWOData.requestedParts,
@@ -318,6 +376,7 @@ export default function App() {
     try {
       const newWorkOrder = await createWorkOrder(payload);
       setWorkOrders((prev) => [newWorkOrder, ...prev]);
+      refreshWorkOrderStats();
       setIsCreateWOModalOpen(false);
       dismissSaving();
       notifySaved("บันทึกใบงานสำเร็จ");
@@ -370,7 +429,9 @@ export default function App() {
       assignedDate: new Date().toISOString().slice(0, 10),
       dueDate: defaultDueDate(),
       requestedBy: `${currentUser.name} (ยืนยันจากคำแนะนำของผู้ช่วย AI)`,
-      assignedTo: currentUser.name,
+      // assigned_to stores profiles.id (`usr-...`), not a display name — see
+      // currentAssigneeKey above.
+      assignedTo: currentUser.id,
       updatedAt: new Date().toISOString().slice(0, 10),
       partsRequested: suggestedPartNames.length > 0 ? suggestedPartNames : undefined,
       actionPlan: confirmedSteps.length > 0 ? confirmedSteps : undefined,
@@ -380,6 +441,7 @@ export default function App() {
     try {
       const autoWO = await createWorkOrder(payload);
       setWorkOrders((prev) => [autoWO, ...prev]);
+      refreshWorkOrderStats();
       dismissSaving();
       notifySaved("บันทึกใบงานสำเร็จ");
       setIsAiDrawerOpen(false); // Close slide-over AI Assistant drawer immediately
@@ -400,6 +462,13 @@ export default function App() {
       .catch(() => {
         /* stale stats are better than a surprise toast for a background refresh */
       });
+    if (currentAssigneeKey) {
+      getWorkOrderStats({ assignedTo: currentAssigneeKey })
+        .then(setMyWorkOrderStats)
+        .catch(() => {
+          /* stale scoped stats are better than a surprise toast for a background refresh */
+        });
+    }
   };
 
   const handleUpdateWorkOrder = async (updatedWO: WorkOrder) => {
@@ -412,9 +481,19 @@ export default function App() {
     }
   };
 
+  const handleDeleteWorkOrder = async (id: string) => {
+    try {
+      await deleteWorkOrder(id, currentUser?.id);
+      setWorkOrders((prev) => prev.filter((wo) => wo.id !== id));
+      refreshWorkOrderStats();
+    } catch (err) {
+      throw err;
+    }
+  };
+
   const handleApproveWorkOrder = async (woId: string) => {
     try {
-      const approved = await approveWorkOrder(woId);
+      const approved = await approveWorkOrder(woId, undefined, currentUser?.id);
       setWorkOrders((prev) => prev.map((wo) => (wo.id === approved.id ? approved : wo)));
       refreshWorkOrderStats();
     } catch (err) {
@@ -426,9 +505,16 @@ export default function App() {
   // `workOrders` is now a smaller page (see the data-loading effect above)
   // and would silently under-count once the real table exceeds that page.
   const pendingBadges: Record<string, number> = {
-    my_work_orders: workOrderStats
-      ? (workOrderStats.byStatus?.in_progress ?? 0) + (workOrderStats.byStatus?.pending ?? 0)
-      : workOrders.filter((wo) => wo.status === "in_progress" || wo.status === "pending").length,
+    // Scoped to the current user (myWorkOrderStats), not the factory-wide
+    // workOrderStats, so this badge matches what MyWorkOrdersView actually
+    // lists (?assignedTo=currentAssigneeKey).
+    my_work_orders: myWorkOrderStats
+      ? (myWorkOrderStats.byStatus?.in_progress ?? 0) + (myWorkOrderStats.byStatus?.pending ?? 0)
+      : workOrders.filter(
+          (wo) =>
+            wo.assignedTo === currentAssigneeKey &&
+            (wo.status === "in_progress" || wo.status === "pending")
+        ).length,
     review: workOrderStats?.byStatus?.review ?? workOrders.filter((wo) => wo.status === "review").length,
   };
 
@@ -444,6 +530,7 @@ export default function App() {
     review: "ใบงานรอตรวจสอบอนุมัติ",
     upload_manual: "อัปโหลดคู่มือเครื่องจักร",
     knowledge_base: "คลังความรู้และวิธีแก้ไขปัญหา",
+    knowledge_review: "รีวิวใบงานเพื่อเก็บเป็นความรู้",
     all_work_orders: "ใบงานซ่อมบำรุงทั้งหมด",
     dashboard: "ภาพรวมการซ่อมบำรุงโรงงาน",
     reports: "รายงานสรุปการซ่อมบำรุงประจำเดือน",
@@ -605,16 +692,19 @@ export default function App() {
     );
   }
 
-  if (!currentUser || !activeMachine) {
+  // เดิม gate นี้บล็อกทั้งแอปเมื่อไม่มี activeMachine ด้วย ทำให้แชท AI แบบภาพรวมทั้งฟลีต
+  // (ซึ่งรองรับ machine เป็น null อยู่แล้วทั้ง backend และ aiActions.ts) เข้าไม่ถึงเลย
+  // ทั้งที่ activeMachine เป็น null ได้จริงในทางปฏิบัติ (ยังไม่มีเครื่องจักรในระบบ หรือ
+  // ลบเครื่องจักรสุดท้ายไปแล้ว — ดู handleMachineDeleted) จึงบล็อกเฉพาะกรณีไม่มีผู้ใช้งาน
+  // เท่านั้น ส่วนแท็บ/วิวที่ยังต้องมีเครื่องจักรจริงจะมี guard ของตัวเองด้านล่าง
+  if (!currentUser) {
     return (
       <div className="flex h-screen items-center justify-center bg-parchment px-4">
         <div className="max-w-md w-full bg-white rounded-[18px] border border-hairline p-8 text-center space-y-4">
           <AlertCircle className="w-10 h-10 text-amber-500 mx-auto" />
           <h1 className="text-base font-semibold text-ink">ยังไม่มีข้อมูลพร้อมใช้งาน</h1>
           <p className="text-sm text-ink-faint">
-            {!currentUser
-              ? "ไม่พบข้อมูลผู้ใช้งานในระบบ กรุณาติดต่อผู้ดูแลระบบ"
-              : "ไม่พบข้อมูลเครื่องจักรในระบบ กรุณาติดต่อผู้ดูแลระบบ"}
+            ไม่พบข้อมูลผู้ใช้งานในระบบ กรุณาติดต่อผู้ดูแลระบบ
           </p>
         </div>
       </div>
@@ -640,21 +730,43 @@ export default function App() {
 
       {/* 2. MAIN CONTENT WRAPPER */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-parchment">
-        {/* Top Header Bar */}
-        <TopBar
-          pageTitle={getPageTitle(activeTab)}
-          activeMachine={activeMachine}
-          allMachines={machines}
-          onSelectMachine={(m) => setActiveMachine(m)}
-          onOpenMobileSidebar={() => setIsMobileDrawerOpen(true)}
-          workOrders={workOrders}
-          onNavigate={handleNotificationNavigate}
-        />
+        {/* Top Header Bar — TopBar ต้องมี activeMachine จริงเสมอ (ใช้ .code/.name/.status
+            แสดงชิปเครื่องจักรที่กำลังตรวจสอบ) จึงแสดงแถบสำรองแทนเมื่อยังไม่มีเครื่องจักรในระบบ */}
+        {activeMachine ? (
+          <TopBar
+            pageTitle={getPageTitle(activeTab)}
+            activeMachine={activeMachine}
+            allMachines={machines}
+            onSelectMachine={(m) => setActiveMachine(m)}
+            onOpenMobileSidebar={() => setIsMobileDrawerOpen(true)}
+            workOrders={workOrders}
+            onNavigate={handleNotificationNavigate}
+          />
+        ) : (
+          <header className="h-14 bg-parchment/80 backdrop-blur-xl border-b border-hairline flex items-center justify-between px-2.5 sm:px-4 md:px-6 shrink-0 sticky top-0 z-30 select-none w-full max-w-full">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <button
+                onClick={() => setIsMobileDrawerOpen(true)}
+                className="lg:hidden min-w-11 min-h-11 -ml-1.5 flex items-center justify-center rounded-lg text-ink-muted hover:bg-parchment active:scale-95 transition-all cursor-pointer shrink-0"
+                title="เปิดเมนูด้านข้าง"
+                id="mobile-hamburger-btn"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              <h1 className="text-sm sm:text-base md:text-lg font-semibold text-ink tracking-[-0.01em] truncate">
+                {getPageTitle(activeTab)}
+              </h1>
+            </div>
+            <span className="text-xs text-ink-faint shrink-0">ไม่พบเครื่องจักรในระบบ</span>
+          </header>
+        )}
 
         {/* Scrollable Content Views Container */}
         <main className="flex-1 overflow-y-auto relative">
           {/* Technician / Create Work Order Views */}
-          {activeTab === "scan" && (
+          {/* ScanMachineView ต้องมีเครื่องจักรจริงเสมอ (แสดงรายละเอียด/สถานะของเครื่องเดียว)
+              จึงแสดงข้อความว่างสำรองแทนเมื่อยังไม่มีเครื่องจักรในระบบ */}
+          {activeTab === "scan" && (activeMachine ? (
             <ScanMachineView
               machines={machines}
               activeMachine={activeMachine}
@@ -664,14 +776,20 @@ export default function App() {
               onViewSpareParts={() => setActiveTab("parts")}
               onOpenCreateWorkOrder={handleOpenCreateWorkOrderModal}
             />
-          )}
+          ) : (
+            <div className="flex items-center justify-center h-full text-sm text-ink-faint">
+              ไม่พบเครื่องจักรในระบบ
+            </div>
+          ))}
 
-          {activeTab === "create_work_order" && (
+          {/* CreateWorkOrderView ต้องมีเครื่องจักรจริงเสมอเช่นกัน (ใบงานต้องผูกกับเครื่องจักร) */}
+          {activeTab === "create_work_order" && (activeMachine ? (
             <CreateWorkOrderView
               machines={machines}
               activeMachine={activeMachine}
               currentUser={currentUser}
               spareParts={spareParts}
+              technicians={technicians}
               onCreateWorkOrder={async (newWO) => {
                 notifySaving("กำลังบันทึกใบงาน...");
                 try {
@@ -694,8 +812,14 @@ export default function App() {
               onAskAI={handleAskAIWithPrompt}
               onNavigateToMyOrders={() => setActiveTab("my_work_orders")}
             />
-          )}
+          ) : (
+            <div className="flex items-center justify-center h-full text-sm text-ink-faint">
+              ไม่พบเครื่องจักรในระบบ
+            </div>
+          ))}
 
+          {/* AIChatView รองรับ activeMachine เป็น null อยู่แล้ว (ถามภาพรวมทั้งฟลีตได้แม้ไม่มี
+              เครื่องจักรเลือกอยู่) — ไม่ guard ตรงนี้เหมือนแท็บอื่น */}
           {activeTab === "chat" && (
             <AIChatView
               activeMachine={activeMachine}
@@ -712,12 +836,19 @@ export default function App() {
             // server (?assignedTo=) now — see the component.
             <MyWorkOrdersView
               currentUserRole={currentRole}
+              currentAssigneeKey={currentAssigneeKey}
               currentUserName={currentUser.name}
-              activeMachine={activeMachine}
+              activeMachine={activeMachine ?? undefined}
               machines={machines}
               onSelectMachine={(m) => setActiveMachine(m)}
+              myWorkOrderStats={myWorkOrderStats}
               onUpdateWorkOrder={handleUpdateWorkOrder}
+              onDeleteWorkOrder={handleDeleteWorkOrder}
               onAskAI={handleAskAIWithPrompt}
+              spareParts={spareParts}
+              technicians={technicians}
+              currentUser={currentUser}
+              onStockChanged={() => setReloadToken((t) => t + 1)}
             />
           )}
 
@@ -726,13 +857,13 @@ export default function App() {
             // the API now (8,588 rows won't fit in the shared `spareParts` slice
             // below, which WorkOrderForm/CreateWorkOrderModal still use) — see the
             // component for why.
-            <SparePartsView activeMachine={activeMachine} onAskAI={handleAskAIWithPrompt} />
+            <SparePartsView activeMachine={activeMachine ?? undefined} onAskAI={handleAskAIWithPrompt} />
           )}
 
           {activeTab === "manuals" && (
             <ManualsView
               manuals={manuals}
-              activeMachine={activeMachine}
+              activeMachine={activeMachine ?? undefined}
               onAskAI={handleAskAIWithPrompt}
               // เฉพาะวิศวกรที่มีสิทธิ์อัปโหลดคู่มือ (มีเมนู "อัปโหลดคู่มือ" ในแถบด้านข้าง) เท่านั้นที่เห็น
               // ปุ่มพาไปหน้าอัปโหลด — ช่างเทคนิคยังไม่มีเมนูนี้ในแถบด้านข้าง จึงไม่ควรมีทางเดียวที่ไม่มีทางกลับ
@@ -764,6 +895,7 @@ export default function App() {
               onApproveWorkOrder={handleApproveWorkOrder}
               onUpdateWorkOrder={handleUpdateWorkOrder}
               onAskAI={handleAskAIWithPrompt}
+              onStockChanged={() => setReloadToken((t) => t + 1)}
             />
           )}
 
@@ -774,6 +906,16 @@ export default function App() {
               uploadedBy={currentUser.name}
               onUploaded={handleManualUploaded}
             />
+          )}
+
+          {activeTab === "knowledge_review" && (
+            <KnowledgeReviewView currentUserName={currentUser?.name} />
+          )}
+
+          {activeTab === "knowledge_base" && (
+            <div className="p-4 md:p-6 space-y-6">
+              <KnowledgeOverviewPanel />
+            </div>
           )}
 
           {activeTab === "knowledge_base" && (
@@ -791,6 +933,7 @@ export default function App() {
               onUpdateWorkOrder={handleUpdateWorkOrder}
               onApproveWorkOrder={handleApproveWorkOrder}
               onAskAI={handleAskAIWithPrompt}
+              onStockChanged={() => setReloadToken((t) => t + 1)}
             />
           )}
 
@@ -801,6 +944,8 @@ export default function App() {
               machineStats={machineStats}
               workOrderStats={workOrderStats}
               onAskAI={handleAskAIWithPrompt}
+              onDeleteWorkOrder={handleDeleteWorkOrder}
+              currentUser={currentUser}
             />
           )}
 
@@ -850,9 +995,10 @@ export default function App() {
         isOpen={isCreateWOModalOpen}
         onClose={() => setIsCreateWOModalOpen(false)}
         machines={machines}
-        activeMachine={activeMachine}
+        activeMachine={activeMachine ?? undefined}
         spareParts={spareParts}
         currentUser={currentUser}
+        technicians={technicians}
         prefilledData={prefilledWOData}
         onCreateWorkOrder={handleCreateWorkOrderSubmit}
       />

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   QrCode,
   Thermometer,
@@ -78,6 +78,11 @@ import {
  * are not shown and where to read the rest.
  */
 const MACHINE_HISTORY_LIMIT = 100;
+
+// POC: hardcoded machine code the QR scan simulator always resolves to on mount,
+// so the scan-machine view can be demoed without a real camera/QR code. Remove
+// this constant and the effect/badge that use it once the POC is done.
+export const POC_DEFAULT_MACHINE_CODE = "GR-1141";
 
 /**
  * Column counts for the condition grid. The number of cards varies with how many
@@ -215,6 +220,20 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
     }, 1200);
   };
 
+  // POC: on mount, simulate a successful scan of POC_DEFAULT_MACHINE_CODE by
+  // reusing the exact same handler a real scan result would call — no
+  // duplicated selection logic. Only fires once machines have loaded and only
+  // if the code is actually found (nothing to select otherwise).
+  const pocAutoScanRanRef = useRef(false);
+  useEffect(() => {
+    if (pocAutoScanRanRef.current) return;
+    const pocMachine = machines.find((m) => m.code === POC_DEFAULT_MACHINE_CODE);
+    if (pocMachine) {
+      pocAutoScanRanRef.current = true;
+      handleSimulateScan(pocMachine.id);
+    }
+  }, [machines]);
+
   // Real machines may have no code on record (3/973) — never render the
   // literal "null" for it; every interpolation below reuses this one label.
   const machineCodeLabel = orDash(activeMachine.code);
@@ -349,7 +368,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
     <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 relative pb-28">
       {/* 1. TOP HEADER & MACHINE SWITCHER BANNER */}
       <div className="bg-white rounded-[18px] border border-hairline p-5 md:p-6 flex flex-col space-y-4">
-        <div className="border-b border-divider pb-4">
+        <div className="border-b border-divider pb-4 space-y-2.5">
           <div className="max-w-md">
             <MachineSelect
               machines={machines}
@@ -357,6 +376,15 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
               onSelectMachine={(m) => onSelectMachine?.(m)}
             />
           </div>
+          {/* POC: no real camera/QR scan yet — this badge makes it visually obvious
+              that GR-1141 was auto-selected to simulate "having just scanned" it.
+              Manual entry (MachineSelect above) and re-scan (FAB below) both still
+              override this freely. Remove together with POC_DEFAULT_MACHINE_CODE
+              and the mount effect below once the POC is done. */}
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold px-2.5 py-1 w-fit">
+            <QrCode className="w-3.5 h-3.5" />
+            โหมดจำลอง (POC): สแกนเป็นเครื่อง {POC_DEFAULT_MACHINE_CODE}
+          </span>
         </div>
 
         {/* Machine Identity Info Card */}

@@ -10,6 +10,7 @@ import manualsRouter from "./routes/manuals.js";
 import aiRouter from "./routes/ai.js";
 import pmPlansRouter from "./routes/pmPlans.js";
 import partWithdrawalsRouter from "./routes/partWithdrawals.js";
+import knowledgeRouter from "./routes/knowledge.js";
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use("/api/manuals", manualsRouter);
 app.use("/api/ai", aiRouter);
 app.use("/api/pm-plans", pmPlansRouter);
 app.use("/api/part-withdrawals", partWithdrawalsRouter);
+app.use("/api/knowledge", knowledgeRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ success: false, error: { message: "Route not found" } });

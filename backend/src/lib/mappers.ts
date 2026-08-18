@@ -88,6 +88,7 @@ export interface WorkOrder {
   requestedParts?: RequestedPart[];
   actionPlan?: string[];
   actionPlanSteps?: { text: string; addedBy?: string; addedAt?: string }[];
+  attachments?: WorkOrderAttachment[];
   partsRequested?: string[];
   solutionSteps?: string[];
   technicianNote?: string;
@@ -290,6 +291,30 @@ export interface WorkOrderPartRow {
   part_model_raw?: string | null;
 }
 
+export interface WorkOrderAttachmentRow {
+  id: string;
+  work_order_id: string;
+  file_name: string;
+  file_path: string;
+  file_size: number | string | null;
+  content_type: string | null;
+  note: string | null;
+  uploaded_by: string | null;
+  uploaded_at: string;
+}
+
+export interface WorkOrderAttachment {
+  id: string;
+  workOrderId: string;
+  fileName: string;
+  filePath: string;
+  fileSize?: number;
+  contentType?: string;
+  note?: string;
+  uploadedBy?: string;
+  uploadedAt?: string;
+}
+
 export interface SparePartRow {
   id: string;
   code: string;
@@ -426,13 +451,31 @@ export function mapWorkOrderPart(row: WorkOrderPartRow): RequestedPart {
   };
 }
 
+export function mapWorkOrderAttachment(row: WorkOrderAttachmentRow): WorkOrderAttachment {
+  return {
+    id: row.id,
+    workOrderId: row.work_order_id,
+    fileName: row.file_name,
+    filePath: row.file_path,
+    fileSize: toNullableNumber(row.file_size),
+    contentType: row.content_type ?? undefined,
+    note: row.note ?? undefined,
+    uploadedBy: row.uploaded_by ?? undefined,
+    uploadedAt: row.uploaded_at ?? undefined,
+  };
+}
+
 function toNullableNumber(value: number | string | null | undefined): number | undefined {
   if (value === null || value === undefined) return undefined;
   const n = Number(value);
   return Number.isFinite(n) ? n : undefined;
 }
 
-export function mapWorkOrder(row: WorkOrderRow, parts: WorkOrderPartRow[] = []): WorkOrder {
+export function mapWorkOrder(
+  row: WorkOrderRow,
+  parts: WorkOrderPartRow[] = [],
+  attachments?: WorkOrderAttachmentRow[]
+): WorkOrder {
   return {
     id: row.id,
     code: row.code,
@@ -471,6 +514,7 @@ export function mapWorkOrder(row: WorkOrderRow, parts: WorkOrderPartRow[] = []):
     technicianNote: row.technician_note ?? undefined,
     revisionNote: row.revision_note ?? undefined,
     actionPlanSteps: row.action_plan_steps ?? undefined,
+    attachments: attachments ? attachments.map(mapWorkOrderAttachment) : undefined,
     machineCode: row.machine_code ?? row.machines?.code ?? undefined,
     fy: row.fy ?? undefined,
     shift: row.shift ?? undefined,
@@ -728,6 +772,10 @@ export interface PartWithdrawalRow {
   department: string | null;
   is_aggregate: boolean | null;
   quality_flags: string[] | null;
+  work_order_id: string | null;
+  spare_part_id: string | null;
+  note: string | null;
+  withdrawn_by: string | null;
   created_at?: string;
 }
 
@@ -761,6 +809,10 @@ export interface PartWithdrawal {
   department: string | null;
   isAggregate: boolean | null;
   qualityFlags: string[];
+  workOrderId: string | null;
+  sparePartId: string | null;
+  note: string | null;
+  withdrawnBy: string | null;
 }
 
 export function mapPartWithdrawal(row: PartWithdrawalRow): PartWithdrawal {
@@ -794,5 +846,9 @@ export function mapPartWithdrawal(row: PartWithdrawalRow): PartWithdrawal {
     department: row.department,
     isAggregate: row.is_aggregate,
     qualityFlags: row.quality_flags ?? [],
+    workOrderId: row.work_order_id,
+    sparePartId: row.spare_part_id,
+    note: row.note,
+    withdrawnBy: row.withdrawn_by ?? null,
   };
 }

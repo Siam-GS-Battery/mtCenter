@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabase.js";
 import { mapManual, type ManualRow } from "../lib/mappers.js";
 import { ApiError, asyncHandler, sendSuccess } from "../middleware/errorHandler.js";
 import { requireAdminSecret } from "../middleware/requireAdminSecret.js";
+import { fetchManualSummary, indexManual } from "../lib/manualIndexer.js";
 
 const router = Router();
 
@@ -333,6 +334,33 @@ router.get(
     res.setHeader("Cache-Control", "private, max-age=300");
 
     sendSuccess(res, { markdownContent: data.markdown_content ?? null });
+  })
+);
+
+// สร้าง/อัปเดตดัชนีความหมายของคู่มือเล่มเดียว เพื่อให้ AI ค้นเนื้อหาเล่มนี้เจอ
+// (ตรรกะการ index อยู่ใน lib/manualIndexer.ts ใช้ร่วมกับ `npm run index:manuals`
+// ซึ่งเป็นวิธี index ทั้งคลังในคราวเดียว)
+//
+// ป้องกันด้วย requireAdminSecret เช่นเดียวกับ POST/PATCH/DELETE ด้านบน เพราะ endpoint
+// นี้ทั้งเขียนข้อมูลถาวรและใช้โควตา embedding API จริง — เล่มขนาดหลายล้านตัวอักษรอาจกิน
+// เวลาหลายนาทีและหลายพันคำขอ ปล่อยให้เรียกได้อิสระเท่ากับเปิดช่องให้ถล่มโควตาได้
+router.post(
+  "/:id/index",
+  requireAdminSecret,
+  asyncHandler(async (req, res) => {
+    const id = typeof req.params.id === "string" ? req.params.id.trim() : "";
+    if (id.length === 0) throw new ApiError(400, "กรุณาระบุ id ของคู่มือ");
+
+    const force = req.body?.force === true;
+
+    const manual = await fetchManualSummary(id);
+    if (!manual) throw new ApiError(404, "ไม่พบคู่มือที่ระบุ");
+
+    // indexManual โยน error เมื่อทำไม่สำเร็จโดยตั้งใจ (ต่างจากเส้นทางตอบแชตที่ต้องไม่ล่ม)
+    // ปล่อยให้ asyncHandler/errorHandler จัดการเป็น 500 พร้อมข้อความจริง
+    const result = await indexManual(manual, { force });
+
+    sendSuccess(res, result);
   })
 );
 

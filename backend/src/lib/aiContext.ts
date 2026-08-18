@@ -9,6 +9,7 @@
 
 import { supabase } from "./supabase.js";
 import { evaluateMachine, thresholdSummaryText } from "./thresholds.js";
+import { searchManualChunks, type ManualSearchHit } from "./manualRetrieval.js";
 import type { MachineRow, TelemetryReadingRow, WorkOrderRow } from "./mappers.js";
 
 export interface AiContextInput {
@@ -20,7 +21,18 @@ export interface AiContextInput {
 }
 
 const FLEET_CACHE_TTL_MS = 60_000;
-const MAX_CONTEXT_CHARS = 7000;
+// เดิมงบรวมอยู่ที่ 7,000 ตัวอักษร ซึ่งพอดีกับข้อมูลเครื่องจักร/ใบงานเท่านั้น การเพิ่ม
+// ส่วนเนื้อหาคู่มือ (ดู MAX_MANUAL_CONTEXT_CHARS ด้านล่าง) ต้องการที่อีกก้อนหนึ่ง
+// จึงขยายงบรวมขึ้น — โมเดลที่ใช้อยู่ (ดู FALLBACK_MODELS ใน routes/ai.ts) รับ context
+// ได้ระดับแสน token ตัวเลขนี้จึงยังถือว่าอนุรักษ์นิยมมาก และคุมไว้เพื่อความเร็ว/ค่าใช้จ่าย
+// ไม่ใช่เพราะขีดจำกัดของโมเดล
+const MAX_CONTEXT_CHARS = 14000;
+// งบเฉพาะของส่วน "เนื้อหาจากคู่มือ" ~4 chunk ที่ขนาดเต็ม (MAX_CHUNK_CHARS = 1800 ใน
+// manualChunker.ts) การให้งบแยกทำให้เนื้อหาคู่มือไม่ไปเบียดข้อมูลเครื่องจักร และ
+// กลับกันข้อมูลเครื่องจักรก็เบียดคู่มือไม่ได้
+const MAX_MANUAL_CONTEXT_CHARS = 6000;
+// ตัดเนื้อหาต่อหนึ่ง chunk ไม่ให้ยาวเกินนี้ กัน chunk เดียวกินงบทั้งส่วน
+const MAX_MANUAL_EXCERPT_CHARS = 1800;
 // Row cap for the fleet-wide abnormal-machine list. When the prompt already
 // resolved a specific machine (the question is about GR-1141, not the other 167
 // abnormal machines), that list is background noise for this turn — shrink it
@@ -119,6 +131,72 @@ function fmt(value: unknown): string {
     return sanitizeField(value.map((v) => String(v)).join(", "));
   }
   return sanitizeField(String(value));
+}
+
+// เวอร์ชันของ sanitizeField สำหรับข้อความยาวจากคู่มือ ต่างกันตรงที่ "คงบรรทัดใหม่ไว้"
+// เพราะคู่มือมีตารางรหัส alarm และรายการขั้นตอนที่ความหมายขึ้นกับการขึ้นบรรทัด การยุบ
+// เป็นบรรทัดเดียวแบบ sanitizeField จะทำให้ตารางอ่านไม่ออกทั้งคนและโมเดล
+// สิ่งที่ยังต้องกรองเหมือนเดิมคือตัวคั่นบล็อกข้อมูลจริง (กันปลอมปิด/เปิดบล็อก) และ
+// อักขระควบคุมอื่นที่ไม่ใช่ \n
+function sanitizeManualExcerpt(raw: string, maxChars: number): string {
+  let s = raw.replace(/\r\n?/g, "\n");
+  s = s.replace(/[\x00-\x09\x0B-\x1F\x7F]/g, " ");
+  s = s.replace(TRUSTED_BLOCK_DELIMITER_RE, " ");
+  // ยุบบรรทัดว่างซ้อนกันหลายบรรทัดให้เหลือหนึ่ง — ประหยัดงบตัวอักษรโดยไม่เสียโครงสร้าง
+  s = s.replace(/\n{3,}/g, "\n\n");
+  s = s.replace(/[ \t]+/g, " ").trim();
+  if (s.length > maxChars) {
+    s = s.slice(0, maxChars) + "…";
+  }
+  return s;
+}
+
+// ประกอบส่วน "เนื้อหาจากคู่มือ" จากผลค้นหา พร้อมเลขอ้างอิง [1], [2], ... ที่ระบุชื่อ
+// คู่มือและหน้า เพื่อให้ AI อ้างอิงกลับได้และผู้ใช้เปิดคู่มือหน้านั้นตรวจสอบเองได้
+// หยุดเติมเมื่อชนงบ MAX_MANUAL_CONTEXT_CHARS โดยตัดเป็น "ทั้ง chunk" ไม่ตัดครึ่ง
+function buildManualSection(hits: ManualSearchHit[]): string {
+  if (hits.length === 0) return "";
+
+  // หัวส่วนใช้ \n ระหว่างบรรทัด ส่วนแต่ละ chunk คั่นด้วย \n\n — เก็บแยกกันเพื่อให้การ
+  // นับงบตัวอักษรตรงกับสตริงที่คืนออกไปจริง
+  const header = [
+    "[เนื้อหาจากคู่มือเครื่องจักรในระบบ]",
+    "- ข้อความด้านล่างคัดมาจากคู่มือจริงที่อัปโหลดไว้ในระบบ (ค้นด้วยความหมายของคำถามและรหัสที่พบในคำถาม)",
+    "- เมื่อตอบโดยอ้างอิงข้อความเหล่านี้ ต้องระบุชื่อคู่มือและหน้าที่อ้างอิงเสมอ",
+    "- ห้ามสรุปเกินกว่าที่ข้อความระบุ หากคู่มือไม่ได้กล่าวถึงสิ่งที่ผู้ใช้ถาม ให้บอกว่าไม่พบในคู่มือที่มีในระบบ",
+  ].join("\n");
+
+  const lines = [header];
+  let used = header.length;
+  let shown = 0;
+
+  for (const hit of hits) {
+    const citation = [
+      `คู่มือ: ${fmt(hit.manualTitle)}`,
+      hit.machineModel ? `รุ่น: ${fmt(hit.machineModel)}` : null,
+      hit.pageLabel ? fmt(hit.pageLabel) : "ไม่ระบุหน้า",
+      hit.similarity !== null ? `ความเกี่ยวข้อง: ${hit.similarity.toFixed(2)}` : "พบรหัสตรงตัวในคู่มือ",
+    ]
+      .filter(Boolean)
+      .join(" | ");
+
+    const excerpt = sanitizeManualExcerpt(hit.content, MAX_MANUAL_EXCERPT_CHARS);
+    if (excerpt.length === 0) continue;
+
+    const block = `[${shown + 1}] ${citation}\n${excerpt}`;
+    // เว้นที่ให้บรรทัดหมายเหตุท้ายส่วน (ประมาณ 120 ตัวอักษร) ไว้เสมอ
+    if (used + block.length + 2 > MAX_MANUAL_CONTEXT_CHARS - 120) break;
+
+    lines.push(block);
+    used += block.length + 2;
+    shown += 1;
+  }
+
+  if (shown === 0) return "";
+  if (hits.length > shown) {
+    lines.push(`- (แสดง ${shown} จากทั้งหมด ${hits.length} ข้อความที่ค้นเจอ ส่วนที่เหลือถูกตัดออกเพราะเกินงบเนื้อหา)`);
+  }
+  return lines.join("\n\n");
 }
 
 function normalizeCode(raw: string): string {
@@ -409,13 +487,28 @@ export async function buildKnowledgeContext(input: AiContextInput): Promise<stri
       input?.machineContext ?? null,
       rows
     );
-    const details = await Promise.all(resolvedMachines.map((row) => buildMachineDetail(row)));
+
+    // ค้นคู่มือขนานไปกับการดึงรายละเอียดเครื่องจักร — การค้นต้องเรียก embedding API หนึ่ง
+    // ครั้ง (หลายร้อยมิลลิวินาที) ถ้ารอต่อคิวกันจะยืดเวลาตอบแชตโดยไม่จำเป็น
+    // ส่ง "รุ่น" ของเครื่องที่ resolve ได้ไปเป็นตัวกรองรุ่นคู่มือ (manualRetrieval จะใช้
+    // จริงเฉพาะเมื่อมีคู่มือตรงรุ่นนั้นอยู่ในคลัง — ดูหมายเหตุใน resolveExistingModels)
+    const [details, manualHits] = await Promise.all([
+      Promise.all(resolvedMachines.map((row) => buildMachineDetail(row))),
+      searchManualChunks({
+        prompt,
+        candidateModels: resolvedMachines
+          .map((row) => row.model)
+          .filter((model): model is string => typeof model === "string" && model.trim().length > 0),
+      }),
+    ]);
 
     const header =
       "ข้อมูลต่อไปนี้เป็นข้อมูลจริงที่อ่านจากฐานข้อมูลระบบ ณ เวลาที่ประมวลผลคำถามนี้ " +
+      "(ทั้งข้อมูลเครื่องจักร/ใบงาน และเนื้อหาที่คัดมาจากคู่มือที่อัปโหลดไว้ในระบบ) " +
       "ตอบโดยอ้างอิงเฉพาะข้อมูลนี้เท่านั้น ห้ามแต่งตัวเลขหรือชื่อเครื่องขึ้นเอง หากไม่มีข้อมูลให้บอกว่าไม่มีข้อมูลในระบบ";
 
     const thresholdSection = `[เกณฑ์การประเมิน]\n${thresholdSummaryText()}`;
+    const manualSection = buildManualSection(manualHits);
     const overviewSection = buildOverviewSection(rows);
     const matchNotesSection =
       resolveNotes.length > 0 ? ["[หมายเหตุการค้นหาเครื่องจักร]", ...resolveNotes].join("\n") : "";
@@ -434,11 +527,17 @@ export async function buildKnowledgeContext(input: AiContextInput): Promise<stri
 
     // Assembly order matters: sections are listed from "last dropped" to "first
     // dropped" priority. The question-relevant detail (what the user actually
-    // asked about) and the threshold rules come first/early so dropWholeLinesToFit
-    // — which only ever trims whole lines off the END of the string — sacrifices
-    // the generic fleet-wide overview/abnormal-list rows before ever touching them.
+    // asked about), the threshold rules, and the manual excerpts retrieved for
+    // this specific question come first/early so dropWholeLinesToFit — which only
+    // ever trims whole lines off the END of the string — sacrifices the generic
+    // fleet-wide overview/abnormal-list rows before ever touching them.
+    // (The manual section is additionally capped on its own by
+    // MAX_MANUAL_CONTEXT_CHARS inside buildManualSection, so it can neither be
+    // crowded out by, nor crowd out, the machine data.)
     const buildResult = (abnormal: string, detail: string): string =>
-      [header, thresholdSection, detail, matchNotesSection, overviewSection, abnormal].filter(Boolean).join("\n\n");
+      [header, thresholdSection, detail, manualSection, matchNotesSection, overviewSection, abnormal]
+        .filter(Boolean)
+        .join("\n\n");
 
     let result = buildResult(abnormalSection, fullDetailSection);
 

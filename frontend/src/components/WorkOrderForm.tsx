@@ -15,11 +15,13 @@ import {
 import { Machine, SparePart, UserProfile, WorkOrder, WorkOrderStep } from "../types";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "./ui/Modal";
 import { MachineSelect } from "./MachineSelect";
+import { MicDictationButton } from "./MicDictationButton";
 import {
   PRIORITY_LABELS,
   machineStatusBadgeClass,
   machineStatusLabel,
   priorityChoiceClass,
+  sparePartStatusPillClass,
 } from "../lib/pillStyles";
 import {
   evaluateMachine,
@@ -27,7 +29,12 @@ import {
   vibrationLevel,
   healthScoreLevel,
 } from "../lib/thresholds";
-import { getSpareParts, toUserMessage } from "../services/apiService";
+import {
+  getSpareParts,
+  getSparePartsForMachine,
+  toUserMessage,
+} from "../services/apiService";
+import { MachineSparePart } from "../types";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import { formatWithUnit } from "../lib/format";
 
@@ -54,9 +61,22 @@ export interface WorkOrderFormPrefill {
   title?: string;
   description?: string;
   priority?: WorkOrderPriority;
+  /** Matched against spare-part code OR name — kept for the assistant's suggestion flow. */
   suggestedParts?: string[];
+  /**
+   * Exact parts already on the order (edit flow). Takes priority over
+   * `suggestedParts` when present, and preserves quantities.
+   */
+  requestedParts?: Array<{
+    partId: string | null;
+    partCode: string | null;
+    partName: string | null;
+    quantity: number;
+  }>;
   /** Free-text plan, one step per line. */
   actionPlan?: string;
+  dueDate?: string;
+  symptoms?: string[];
 }
 
 interface SelectedPart {
@@ -64,6 +84,10 @@ interface SelectedPart {
   code: string;
   name: string;
   qty: number;
+  /** Stock info — populated when picked from search / AI suggestion; absent on drafts saved before this field existed. */
+  stockQuantity?: number;
+  unit?: string | null;
+  status?: SparePart["status"];
 }
 
 interface DraftSnapshot {
@@ -87,10 +111,13 @@ interface WorkOrderFormProps {
   /** The person filling the form in. Used for ผู้แจ้ง and the default assignee. */
   currentUser?: UserProfile;
   /**
-   * Real technician names to choose from. Omit it and the assignee is a plain
-   * text field — an invented roster is worse than typing a name.
+   * Real technicians to choose from (id + display name — `assignedTo` stores
+   * `profiles.id`, never a name). Omit it and the assignee falls back to a
+   * plain text field that can only ever back `technicianName` — with no
+   * roster to resolve a typed name to an id, `assignedTo` is sent as `null`
+   * rather than guessed.
    */
-  technicians?: string[];
+  technicians?: Pick<UserProfile, "id" | "name">[];
   prefill?: WorkOrderFormPrefill | null;
   /** Change this to re-initialise the form (the dialog bumps it on open). */
   resetKey?: string | number;
@@ -108,6 +135,22 @@ interface WorkOrderFormProps {
   onDirtyChange?: (isDirty: boolean) => void;
   Body?: Shell;
   Footer?: Shell;
+  /** Submit button label. Defaults to the create-flow copy. */
+  submitLabel?: string;
+  /**
+   * "create" (default) submits a brand-new work order with its initial
+   * lifecycle fields. "edit" submits only the fields this form actually
+   * lets the user change — it must never re-send status/progress/ownership
+   * fields the backend would otherwise overwrite on an in-progress order.
+   */
+  mode?: "create" | "edit";
+  /**
+   * The id of the work order being edited. Only meaningful when `mode ===
+   * "edit"` — passed through to `getSparePartsForMachine` so it can weigh
+   * this work order's own history. Omitted in create mode since no work
+   * order exists yet.
+   */
+  workOrderId?: string;
 }
 
 const COMMON_SYMPTOMS = [
@@ -149,14 +192,30 @@ function buildInitialDraft(
   activeMachine: Machine | undefined,
   spareParts: SparePart[],
   currentUser: UserProfile | undefined,
-  prefill: WorkOrderFormPrefill | null | undefined
+  prefill: WorkOrderFormPrefill | null | undefined,
+  technicians: Pick<UserProfile, "id" | "name">[] | undefined
 ): DraftSnapshot {
   const fallbackMachineId = activeMachine?.id || machines[0]?.id || "";
 
-  const parts: SelectedPart[] = (prefill?.suggestedParts || [])
-    .map((name) => spareParts.find((p) => p.name.toLowerCase().includes(name.toLowerCase())))
-    .filter((p): p is SparePart => Boolean(p))
-    .map((p) => ({ id: p.id, code: p.code, name: p.name, qty: 1 }));
+  const parts: SelectedPart[] = prefill?.requestedParts?.length
+    ? prefill.requestedParts
+        .filter((p) => p.partId || p.partCode || p.partName)
+        .map((p) => ({
+          id: p.partId || p.partCode || p.partName || "",
+          code: p.partCode || "",
+          name: p.partName || p.partCode || "",
+          qty: p.quantity > 0 ? p.quantity : 1,
+        }))
+    : (prefill?.suggestedParts || [])
+        .map((needle) =>
+          spareParts.find(
+            (p) =>
+              p.code.toLowerCase() === needle.toLowerCase() ||
+              p.name.toLowerCase().includes(needle.toLowerCase())
+          )
+        )
+        .filter((p): p is SparePart => Boolean(p))
+        .map((p) => ({ id: p.id, code: p.code, name: p.name, qty: 1 }));
 
   const steps = (prefill?.actionPlan || "")
     .split("\n")
@@ -176,9 +235,19 @@ function buildInitialDraft(
     description: prefill?.description || "",
     priority:
       prefill?.priority || (machineForPriority?.status === "error" ? "high" : "medium"),
-    symptoms: [],
-    assignee: currentUser?.name || "",
-    dueDate: inTwoDays(),
+    symptoms: prefill?.symptoms || [],
+    // In roster (select) mode, `assignee` holds a technician id — default to
+    // the current user only when they are themselves a technician on the
+    // roster. In fallback text mode (no roster available), it holds a plain
+    // display name instead.
+    assignee:
+      technicians && technicians.length > 0
+        ? currentUser?.role === "technician" &&
+          technicians.some((t) => t.id === currentUser.id)
+          ? currentUser.id
+          : ""
+        : currentUser?.name || "",
+    dueDate: prefill?.dueDate || inTwoDays(),
     parts,
     steps,
   };
@@ -199,9 +268,12 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
   onDirtyChange,
   Body,
   Footer,
+  submitLabel = "ส่งใบงานแจ้งซ่อม",
+  mode = "create",
+  workOrderId,
 }) => {
   const initial = useMemo(
-    () => buildInitialDraft(machines, activeMachine, spareParts, currentUser, prefill),
+    () => buildInitialDraft(machines, activeMachine, spareParts, currentUser, prefill, technicians),
     // Rebuilt only when the surface asks for a reset.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [resetKey]
@@ -219,12 +291,15 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
   const [parts, setParts] = useState<SelectedPart[]>(initial.parts);
   const [steps, setSteps] = useState<string[]>(initial.steps);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const [partSearch, setPartSearch] = useState("");
   // ยิงค้นหาไป server หลังพิมพ์หยุด ~300ms กันยิงถี่ทุกตัวอักษร
   const debouncedPartSearch = useDebouncedValue(partSearch, 300);
   const [newStep, setNewStep] = useState("");
-  const [showParts, setShowParts] = useState(initial.parts.length > 0);
+  // Parts are the primary way to pick spare parts (not a secondary, collapsed
+  // area) — expanded by default rather than gated on whether any are picked.
+  const [showParts, setShowParts] = useState(true);
   const [showSteps, setShowSteps] = useState(initial.steps.length > 0);
   const [restoredDraft, setRestoredDraft] = useState(false);
 
@@ -264,6 +339,39 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
     };
   }, [debouncedPartSearch, showParts]);
 
+  // อะไหล่ที่เคยใช้/รองรับกับเครื่องจักรที่เลือก — วิธีหลักในการเลือกอะไหล่เบิก
+  const [machineParts, setMachineParts] = useState<MachineSparePart[]>([]);
+  const [isLoadingMachineParts, setIsLoadingMachineParts] = useState(false);
+  const [machinePartsError, setMachinePartsError] = useState<string | null>(null);
+  const selectedMachineCode = machines.find((m) => m.id === machineId)?.code ?? activeMachine?.code;
+
+  useEffect(() => {
+    if (!selectedMachineCode) {
+      setMachineParts([]);
+      setIsLoadingMachineParts(false);
+      setMachinePartsError(null);
+      return;
+    }
+    let cancelled = false;
+    setIsLoadingMachineParts(true);
+    setMachinePartsError(null);
+    getSparePartsForMachine({ machineCode: selectedMachineCode, workOrderId, limit: 30 })
+      .then((res) => {
+        if (cancelled) return;
+        setMachineParts(res.items);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setMachinePartsError(toUserMessage(err, "โหลดรายการอะไหล่ของเครื่องจักรนี้ไม่สำเร็จ"));
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingMachineParts(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedMachineCode, workOrderId]);
+
   const baselineRef = useRef<DraftSnapshot>(initial);
 
   const snapshot: DraftSnapshot = useMemo(
@@ -286,7 +394,7 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
     setDueDate(next.dueDate);
     setParts(next.parts);
     setSteps(next.steps);
-    setShowParts(next.parts.length > 0);
+    setShowParts(true);
     setShowSteps(next.steps.length > 0);
   };
 
@@ -363,6 +471,12 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
   const machine = machines.find((m) => m.id === machineId) || activeMachine || machines[0];
   const evaluation = machine ? evaluateMachine(machine) : null;
 
+  // Whether a real technician roster backs the assignee select — see the
+  // `technicians` prop doc. `assignee` holds a technician id in this mode,
+  // a plain typed name otherwise.
+  const hasRoster = Boolean(technicians && technicians.length > 0);
+  const selectedTechnician = hasRoster ? technicians!.find((t) => t.id === assignee) : undefined;
+
   const toggleSymptom = (symptom: string) =>
     setSymptoms((prev) =>
       prev.includes(symptom) ? prev.filter((s) => s !== symptom) : [...prev, symptom]
@@ -372,13 +486,54 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
     setParts((prev) =>
       prev.some((p) => p.id === part.id)
         ? prev.filter((p) => p.id !== part.id)
-        : [...prev, { id: part.id, code: part.code, name: part.name, qty: 1 }]
+        : [
+            ...prev,
+            {
+              id: part.id,
+              code: part.code,
+              name: part.name,
+              qty: 1,
+              stockQuantity: part.stockQuantity,
+              unit: part.unit,
+              status: part.status,
+            },
+          ]
     );
 
   const changeQty = (partId: string, delta: number) =>
     setParts((prev) =>
       prev.map((p) => (p.id === partId ? { ...p, qty: Math.max(1, p.qty + delta) } : p))
     );
+
+  // เพิ่มอะไหล่จากรายการของเครื่องจักร — คลิกแรกเพิ่มเข้ารายการ (จำนวนเริ่มต้นตาม
+  // suggestedQuantity), คลิกซ้ำเพิ่มทีละ 1 โดยใช้ตรรกะเดิมของ togglePart/changeQty
+  const addMachinePart = (part: MachineSparePart) => {
+    const already = parts.some((p) => p.id === part.id);
+    if (!already) {
+      setParts((prev) => [
+        ...prev,
+        {
+          id: part.id,
+          code: part.code,
+          name: part.name,
+          qty: part.suggestedQuantity > 0 ? part.suggestedQuantity : 1,
+          stockQuantity: part.stockQuantity,
+          unit: part.unit,
+          status: part.status,
+        },
+      ]);
+    } else {
+      changeQty(part.id, 1);
+    }
+  };
+
+  const decrementOrRemovePart = (partId: string) =>
+    setParts((prev) => {
+      const found = prev.find((p) => p.id === partId);
+      if (!found) return prev;
+      if (found.qty <= 1) return prev.filter((p) => p.id !== partId);
+      return prev.map((p) => (p.id === partId ? { ...p, qty: p.qty - 1 } : p));
+    });
 
   const addStep = (text: string) => {
     const value = text.trim();
@@ -406,50 +561,95 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
       addedAt: today(),
     }));
 
-    const draft: Partial<WorkOrder> = {
-      title: title.trim(),
-      description: description.trim() || "ไม่ระบุรายละเอียดเพิ่มเติม",
-      machineId: machine.id,
-      // Machine.code is null for 3/973 real machines — machineCode is optional
-      // on WorkOrder, so a missing code is omitted rather than coerced to null.
-      machineCode: machine.code ?? undefined,
-      machineName: machine.name,
-      priority,
-      // A job nobody has started is waiting, not in progress.
+    const requestedParts = parts.map((p) => ({
+      partId: p.id,
+      partCode: p.code,
+      partName: p.name,
+      quantity: p.qty,
       status: "pending",
-      technicianName: assignee.trim() || currentUser?.name || "",
-      assignedTo: assignee.trim() || currentUser?.name || "",
-      requestedBy: currentUser
-        ? `${currentUser.name} (${ROLE_LABELS[currentUser.role]})`
-        : undefined,
-      assignedDate: today(),
-      dueDate: dueDate || inTwoDays(),
-      symptoms: symptoms.length > 0 ? symptoms : undefined,
-      createdAt: stamp,
-      updatedAt: today(),
-      requestedParts: parts.map((p) => ({
-        partId: p.id,
-        partCode: p.code,
-        partName: p.name,
-        quantity: p.qty,
-        status: "pending",
-      })),
-      actionPlan: steps,
-      actionPlanSteps: planSteps.length > 0 ? planSteps : undefined,
-      totalSteps: steps.length,
-      stepsCompleted: 0,
-    };
+    }));
+
+    const draft: Partial<WorkOrder> =
+      mode === "edit"
+        ? {
+            // Edit mode only ever changes the fields this form exposes.
+            // It must never re-send create-time lifecycle/ownership fields
+            // (status, stepsCompleted, assignedDate, requestedBy, createdAt,
+            // assignedTo, aiVerificationScore, code) — those are whitelisted
+            // by the backend PATCH and would clobber real progress on an
+            // in-progress order.
+            title: title.trim(),
+            description: description.trim() || "ไม่ระบุรายละเอียดเพิ่มเติม",
+            machineId: machine.id,
+            machineCode: machine.code ?? undefined,
+            machineName: machine.name,
+            priority,
+            dueDate: dueDate || inTwoDays(),
+            symptoms: symptoms.length > 0 ? symptoms : undefined,
+            requestedParts,
+            actionPlan: steps,
+            actionPlanSteps: planSteps.length > 0 ? planSteps : undefined,
+            totalSteps: steps.length,
+          }
+        : {
+            title: title.trim(),
+            description: description.trim() || "ไม่ระบุรายละเอียดเพิ่มเติม",
+            machineId: machine.id,
+            // Machine.code is null for 3/973 real machines — machineCode is optional
+            // on WorkOrder, so a missing code is omitted rather than coerced to null.
+            machineCode: machine.code ?? undefined,
+            machineName: machine.name,
+            priority,
+            // A job nobody has started is waiting, not in progress.
+            status: "pending",
+            // `assigned_to` stores profiles.id (`usr-...`), never a display name —
+            // never render assignedTo directly, always resolve it to a name first.
+            // In roster (select) mode, `assignee` already holds that id; a blank
+            // selection means genuinely unassigned, so it is left `undefined`
+            // (backend/src/routes/workOrders.ts coerces that to `null` on write)
+            // rather than silently falling back to whoever is submitting the form.
+            technicianName:
+              selectedTechnician?.name ||
+              (hasRoster ? "" : assignee.trim()) ||
+              currentUser?.name ||
+              "",
+            assignedTo: hasRoster ? assignee || undefined : undefined,
+            requestedBy: currentUser
+              ? `${currentUser.name} (${ROLE_LABELS[currentUser.role]})`
+              : undefined,
+            assignedDate: today(),
+            dueDate: dueDate || inTwoDays(),
+            symptoms: symptoms.length > 0 ? symptoms : undefined,
+            createdAt: stamp,
+            updatedAt: today(),
+            requestedParts,
+            actionPlan: steps,
+            actionPlanSteps: planSteps.length > 0 ? planSteps : undefined,
+            totalSteps: steps.length,
+            stepsCompleted: 0,
+          };
 
     setMachineError("");
+    setSubmitError("");
 
     setIsSubmitting(true);
     try {
       await onSubmit(draft);
       clearDraft();
       baselineRef.current = snapshot;
-    } catch {
-      // onSubmit already surfaced the failure to the user (SweetAlert2). Swallow it
-      // here so the draft and the unsaved-changes baseline are preserved for a retry.
+    } catch (err) {
+      if (mode === "edit") {
+        // Keep the form open with the entered data and surface the failure
+        // inline instead of silently looking like it saved.
+        setSubmitError(
+          err instanceof Error && err.message
+            ? err.message
+            : "บันทึกการแก้ไขไม่สำเร็จ กรุณาลองใหม่"
+        );
+      }
+      // Otherwise onSubmit already surfaced the failure to the user (SweetAlert2).
+      // Swallow it here so the draft and the unsaved-changes baseline are
+      // preserved for a retry.
     } finally {
       setIsSubmitting(false);
     }
@@ -477,6 +677,16 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col min-h-0 flex-1">
       <BodyShell className={variant === "page" ? "space-y-5" : "space-y-6"}>
+        {submitError && (
+          <div
+            role="alert"
+            className="flex items-center gap-2 p-3.5 rounded-[14px] bg-rose-50 text-rose-700 text-xs font-semibold"
+          >
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+            <span>{submitError}</span>
+          </div>
+        )}
+
         {restoredDraft && (
           <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-[14px] bg-amber-50 text-amber-900 text-xs">
             <span>กู้คืนข้อมูลจากแบบร่างที่บันทึกไว้ในเครื่องนี้แล้ว</span>
@@ -635,14 +845,21 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
             <label htmlFor="wo-description" className={labelClass}>
               รายละเอียดเพิ่มเติม
             </label>
-            <textarea
-              id="wo-description"
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="เช่น เสียงดังบริเวณ Spindle เมื่อหมุนเกิน 8,000 RPM และความร้อนขึ้นเร็วหลังเปิดเครื่อง"
-              className={areaClass}
-            />
+            <div className="relative">
+              <textarea
+                id="wo-description"
+                rows={3}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="เช่น เสียงดังบริเวณ Spindle เมื่อหมุนเกิน 8,000 RPM และความร้อนขึ้นเร็วหลังเปิดเครื่อง"
+                className={`${areaClass} pr-14 pb-14`}
+              />
+              <MicDictationButton
+                currentValue={description}
+                onTranscript={(text) => setDescription((prev) => prev + text)}
+                className="absolute right-2.5 bottom-2.5"
+              />
+            </div>
           </div>
         </section>
 
@@ -687,9 +904,9 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
                     className={`${inputClass} appearance-none pr-11 cursor-pointer`}
                   >
                     <option value="">ยังไม่มอบหมาย</option>
-                    {technicians.map((name) => (
-                      <option key={name} value={name}>
-                        {name}
+                    {technicians.map((tech) => (
+                      <option key={tech.id} value={tech.id}>
+                        {tech.name}
                       </option>
                     ))}
                   </select>
@@ -737,10 +954,107 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
           />
 
           {showParts && (
+            <div className="space-y-2">
+              <p className={labelClass}>อะไหล่ที่เคยใช้กับเครื่องนี้</p>
+              {isLoadingMachineParts ? (
+                <p className="text-xs text-ink-faint py-2 flex items-center gap-1.5">
+                  <Loader2 className="w-3.5 h-3.5 shrink-0 animate-spin" />
+                  <span>กำลังโหลดรายการอะไหล่ของเครื่องจักรนี้...</span>
+                </p>
+              ) : machinePartsError ? (
+                <p className="text-xs text-rose-700 font-semibold py-2 flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{machinePartsError}</span>
+                </p>
+              ) : machineParts.length === 0 ? (
+                <p className="text-xs text-ink-faint py-2">
+                  ยังไม่มีประวัติการใช้อะไหล่ของเครื่องจักรนี้ — ค้นหาจากคลังด้านล่าง
+                </p>
+              ) : (
+                <ul className="rounded-[14px] overflow-hidden divide-y divide-divider border border-hairline">
+                  {machineParts.map((part) => {
+                    const selectedPart = parts.find((p) => p.id === part.id);
+                    const outOfStock = part.stockQuantity <= 0;
+                    const usageHint =
+                      part.matchReason === "compatible" && !part.usageCount
+                        ? "อะไหล่ที่รองรับเครื่องนี้"
+                        : [
+                            part.usageCount ? `เคยใช้ ${part.usageCount} ครั้ง` : null,
+                            part.lastUsedDate ? `ล่าสุด ${part.lastUsedDate}` : null,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ");
+                    return (
+                      <li
+                        key={part.id}
+                        className="p-3 flex items-center justify-between gap-3 bg-white"
+                      >
+                        <div className="min-w-0">
+                          <span className="font-mono text-[11px] text-primary font-semibold block">
+                            {part.code}
+                          </span>
+                          <span className="text-xs font-semibold text-ink-muted truncate block">
+                            {part.name}
+                          </span>
+                          <span className={sparePartStatusPillClass(part.status) + " mt-1"}>
+                            คงเหลือ {part.stockQuantity} {part.unit ?? ""}
+                          </span>
+                          {usageHint && (
+                            <span className="text-[11px] text-ink-faint block mt-0.5">
+                              {usageHint}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          {selectedPart && (
+                            <div className="flex items-center rounded-full border border-hairline overflow-hidden">
+                              <button
+                                type="button"
+                                onClick={() => decrementOrRemovePart(part.id)}
+                                aria-label={`ลดจำนวน ${part.name}`}
+                                className="w-11 h-11 text-ink-muted hover:bg-parchment font-semibold cursor-pointer flex items-center justify-center"
+                              >
+                                −
+                              </button>
+                              <span className="px-3 text-xs font-semibold text-ink tabular-nums">
+                                {selectedPart.qty}
+                              </span>
+                            </div>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => addMachinePart(part)}
+                            title={
+                              outOfStock
+                                ? "อะไหล่หมดสต็อก แต่ยังเลือกเบิกได้ (เบิกได้เมื่อมีของเข้า)"
+                                : undefined
+                            }
+                            aria-label={`เพิ่ม ${part.name} เข้ารายการเบิก`}
+                            className={`w-11 h-11 rounded-full flex items-center justify-center cursor-pointer active:scale-95 transition-all ${TAP} ${
+                              outOfStock
+                                ? "bg-rose-50 text-rose-700 hover:bg-rose-100"
+                                : "bg-primary/10 text-primary hover:bg-primary/20"
+                            }`}
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          )}
+
+          {showParts && (
             <div id="wo-parts-panel" className="space-y-3">
               {parts.length > 0 && (
                 <ul className="rounded-[14px] overflow-hidden divide-y divide-divider border border-hairline">
-                  {parts.map((item) => (
+                  {parts.map((item) => {
+                    const overStock =
+                      typeof item.stockQuantity === "number" && item.qty > item.stockQuantity;
+                    return (
                     <li
                       key={item.id}
                       className="p-3 flex items-center justify-between gap-3 bg-white"
@@ -752,6 +1066,22 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
                         <span className="text-xs font-semibold text-ink-muted truncate block">
                           {item.name}
                         </span>
+                        {typeof item.stockQuantity === "number" && (
+                          <span
+                            className={
+                              item.status
+                                ? sparePartStatusPillClass(item.status) + " mt-1"
+                                : "text-[10px] text-ink-faint mt-1 inline-block"
+                            }
+                          >
+                            คงเหลือ {item.stockQuantity} {item.unit ?? ""}
+                          </span>
+                        )}
+                        {overStock && (
+                          <span className="text-[11px] text-rose-700 font-semibold block mt-0.5">
+                            จำนวนที่เบิกเกินยอดคงเหลือ
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <div className="flex items-center rounded-full border border-hairline overflow-hidden">
@@ -785,7 +1115,8 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
                         </button>
                       </div>
                     </li>
-                  ))}
+                    );
+                  })}
                 </ul>
               )}
 
@@ -828,15 +1159,19 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {availableParts.map((part) => {
                     const selected = parts.some((p) => p.id === part.id);
+                    const outOfStock = part.stockQuantity <= 0;
                     return (
                       <button
                         key={part.id}
                         type="button"
                         aria-pressed={selected}
                         onClick={() => togglePart(part)}
+                        title={outOfStock ? "อะไหล่หมดสต็อก แต่ยังเลือกเบิกได้ (เบิกได้เมื่อมีของเข้า)" : undefined}
                         className={`p-3 rounded-[14px] border text-left flex items-center justify-between gap-2 cursor-pointer transition-all active:scale-[0.98] ${TAP} ${
                           selected
                             ? "bg-primary/10 border-primary text-primary"
+                            : outOfStock
+                            ? "bg-white border-rose-200 text-ink-muted hover:bg-rose-50"
                             : "bg-white border-hairline text-ink-muted hover:bg-parchment"
                         }`}
                       >
@@ -847,9 +1182,12 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
                           <span className="text-xs font-semibold truncate block">
                             {part.name}
                           </span>
+                          <span className={sparePartStatusPillClass(part.status) + " mt-1"}>
+                            คงเหลือ {part.stockQuantity} {part.unit}
+                          </span>
                         </span>
                         <span className="text-[10px] font-semibold shrink-0">
-                          {selected ? "เลือกแล้ว" : "เบิก"}
+                          {selected ? "เลือกแล้ว" : outOfStock ? "หมด" : "เบิก"}
                         </span>
                       </button>
                     );
@@ -971,7 +1309,7 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
           className={`w-full sm:w-auto px-6 rounded-full bg-primary hover:bg-primary-focus text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed ${TAP}`}
         >
           <CheckCircle2 className="w-5 h-5 shrink-0" />
-          <span>{isSubmitting ? "กำลังบันทึก..." : "ส่งใบงานแจ้งซ่อม"}</span>
+          <span>{isSubmitting ? "กำลังบันทึก..." : submitLabel}</span>
         </button>
       </FooterShell>
     </form>

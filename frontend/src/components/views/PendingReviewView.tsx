@@ -8,12 +8,18 @@ import {
   Eye,
   Circle,
   Loader2,
+  Paperclip,
 } from "lucide-react";
-import { WorkOrder, UserRole, WorkOrderStep } from "../../types";
+import { WorkOrder, UserRole, WorkOrderStep, WorkOrderAttachment } from "../../types";
 import { WorkOrderDetailModal } from "../WorkOrderDetailModal";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "../ui/Modal";
 import { Pagination } from "../ui/Pagination";
-import { getWorkOrders, toUserMessage } from "../../services/apiService";
+import {
+  getWorkOrders,
+  getWorkOrderAttachments,
+  getCurrentUserId,
+  toUserMessage,
+} from "../../services/apiService";
 import { notifySaving, dismissSaving, notifyDone, notifyFailed } from "../../lib/swal";
 
 interface PendingReviewViewProps {
@@ -23,6 +29,8 @@ interface PendingReviewViewProps {
   onApproveWorkOrder: (woId: string) => Promise<void>;
   onUpdateWorkOrder?: (updatedWO: WorkOrder) => Promise<void>;
   onAskAI: (prompt: string) => void;
+  /** เรียกเมื่อมีการเบิกอะไหล่จริงสำเร็จในใบงาน — ให้ App.tsx รีเฟรช spareParts */
+  onStockChanged?: () => void;
 }
 
 // จำนวนใบงานรอตรวจสอบต่อหน้า
@@ -46,6 +54,7 @@ export const PendingReviewView: React.FC<PendingReviewViewProps> = ({
   onApproveWorkOrder,
   onUpdateWorkOrder,
   onAskAI,
+  onStockChanged,
 }) => {
   const [selectedWO, setSelectedWO] = useState<WorkOrder | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,6 +64,8 @@ export const PendingReviewView: React.FC<PendingReviewViewProps> = ({
   const [revisionError, setRevisionError] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
   const [isRevising, setIsRevising] = useState(false);
+  const [approveAttachments, setApproveAttachments] = useState<WorkOrderAttachment[]>([]);
+  const [approveAttachmentsLoading, setApproveAttachmentsLoading] = useState(false);
 
   // ใบงานที่ import จาก Excel มี 8,589 แถว การกรอง status==="review" ในเครื่อง
   // จากอาเรย์ที่แชร์กับหน้าอื่น (จำกัดแค่ ~100 แถว) จะพลาดใบงานรอตรวจสอบที่ไม่ได้
@@ -90,6 +101,30 @@ export const PendingReviewView: React.FC<PendingReviewViewProps> = ({
   }, [offset]);
 
   useEffect(() => fetchPage(), [fetchPage]);
+
+  // Read-only summary for the approve dialog — attaching is optional, this
+  // never blocks approval, it just tells the engineer what's already there.
+  useEffect(() => {
+    if (!approveWO) {
+      setApproveAttachments([]);
+      return;
+    }
+    let cancelled = false;
+    setApproveAttachmentsLoading(true);
+    getWorkOrderAttachments(approveWO.id)
+      .then((list) => {
+        if (!cancelled) setApproveAttachments(list);
+      })
+      .catch(() => {
+        if (!cancelled) setApproveAttachments([]);
+      })
+      .finally(() => {
+        if (!cancelled) setApproveAttachmentsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [approveWO]);
 
   const handleOpenDetailModal = (wo: WorkOrder) => {
     setSelectedWO(wo);
@@ -230,6 +265,25 @@ export const PendingReviewView: React.FC<PendingReviewViewProps> = ({
 
             <Evidence workOrder={approveWO} />
 
+            <section className="space-y-1.5">
+              <h3 className="text-xs font-semibold text-ink flex items-center gap-1.5">
+                <Paperclip className="w-3.5 h-3.5 text-ink-faint" />
+                <span>เอกสารแนบ</span>
+              </h3>
+              {approveAttachmentsLoading ? (
+                <p className="text-xs text-ink-faint">กำลังโหลด...</p>
+              ) : approveAttachments.length === 0 ? (
+                <p className="text-xs text-ink-faint">
+                  ยังไม่มีเอกสารแนบ — สามารถแนบเพิ่มได้ที่ "ดูรายละเอียด → เอกสารแนบ"
+                </p>
+              ) : (
+                <p className="text-xs text-ink-muted leading-relaxed">
+                  แนบไว้ {approveAttachments.length} ไฟล์:{" "}
+                  {approveAttachments.map((a) => a.fileName).join(", ")}
+                </p>
+              )}
+            </section>
+
             {typeof approveWO.aiVerificationScore !== "number" && (
               <div className="p-3.5 rounded-[14px] bg-amber-50 text-amber-900 text-xs flex items-start gap-2">
                 <AlertTriangle className="w-4 h-4 shrink-0 text-amber-700 mt-0.5" />
@@ -331,9 +385,11 @@ export const PendingReviewView: React.FC<PendingReviewViewProps> = ({
         workOrder={selectedWO}
         currentUserRole={currentUserRole}
         currentUserName={currentUserName}
+        currentUserId={getCurrentUserId() ?? undefined}
         onApproveWorkOrder={handleModalApprove}
         onUpdateWorkOrder={handleModalUpdate}
         onAskAI={onAskAI}
+        onStockChanged={onStockChanged}
       />
     </div>
   );
@@ -366,6 +422,12 @@ function ReviewCard(props: {
             <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-800">
               <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
               ยังไม่ผ่านการประเมินโดย AI
+            </span>
+          )}
+          {typeof wo.attachments?.length === "number" && wo.attachments.length > 0 && (
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-ink-faint">
+              <Paperclip className="w-3.5 h-3.5 shrink-0" />
+              เอกสารแนบ {wo.attachments.length}
             </span>
           )}
         </div>

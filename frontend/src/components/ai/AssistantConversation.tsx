@@ -10,7 +10,6 @@ import type { Components } from "react-markdown";
 import {
   ArrowUp,
   Sparkles,
-  Mic,
   AlertOctagon,
   AlertTriangle,
   Wrench,
@@ -20,9 +19,12 @@ import {
   ClipboardList,
   Thermometer,
   ShieldCheck,
+  ThumbsUp,
+  ThumbsDown,
 } from "lucide-react";
 import { Machine, UserRole, ChatMessage } from "../../types";
-import { aiChat } from "../../services/apiService";
+import { MicDictationButton } from "../MicDictationButton";
+import { aiChat, aiFeedback, type AiMode } from "../../services/apiService";
 import {
   hasWorkOrderAction,
   buildWorkOrderPrefill,
@@ -53,7 +55,14 @@ const AI_FALLBACK_NOTICE =
   "⚠️ ระบบ AI ไม่พร้อมใช้งานชั่วคราว — นี่เป็นคำตอบทั่วไปแบบออฟไลน์ ไม่ได้อ้างอิงข้อมูลเครื่องจักรจริง";
 
 // เก็บ fallback ต่อข้อความ (ไม่ใช่ flag รวมของทั้งบทสนทนา) เพราะบางคำถามอาจตอบได้จริง บางคำถามอาจตกไปใช้คำตอบสำรอง
-type ChatMessageWithFallback = ChatMessage & { fallback?: boolean };
+// mode/logId เก็บต่อข้อความเช่นเดียวกับ fallback: logId ใช้ผูกปุ่มให้ผลตอบรับกับคำตอบ
+// ข้อนั้น ๆ (Frame 4 ของ UX Storyboard) และ mode ใช้บอกผู้ใช้ว่าคำตอบนี้มาจากกฎ
+// (โหมดสาธิต) หรือจากโมเดลภาษาจริง
+type ChatMessageWithFallback = ChatMessage & {
+  fallback?: boolean;
+  mode?: AiMode;
+  logId?: number | null;
+};
 
 const chatMarkdownComponents: Components = {
   p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
@@ -96,7 +105,7 @@ export interface AssistantChat {
  * keeps its history while it is closed.
  */
 export function useAssistantChat(
-  activeMachine: Machine,
+  activeMachine: Machine | null,
   currentUserRole: UserRole
 ): AssistantChat {
   const welcome = (): ChatMessageWithFallback => ({
@@ -115,14 +124,16 @@ export function useAssistantChat(
   const failedRef = useRef(failedPrompts);
   failedRef.current = failedPrompts;
 
-  // เปลี่ยนเครื่องจักร = บริบทใหม่ ทักทายด้วยค่าจริงของเครื่องนั้น
-  const machineIdRef = useRef(activeMachine.id);
+  // เปลี่ยนเครื่องจักร = บริบทใหม่ ทักทายด้วยค่าจริงของเครื่องนั้น (หรือทักทายแบบภาพรวม
+  // ทั้งฟลีตถ้าไม่มีเครื่องจักรเลือกอยู่ — activeMachine เป็น null ได้)
+  const machineIdRef = useRef(activeMachine?.id ?? null);
   useEffect(() => {
-    if (machineIdRef.current === activeMachine.id) return;
-    machineIdRef.current = activeMachine.id;
+    const currentId = activeMachine?.id ?? null;
+    if (machineIdRef.current === currentId) return;
+    machineIdRef.current = currentId;
     setFailedPrompts({});
     setMessages([welcome()]);
-  }, [activeMachine.id]);
+  }, [activeMachine?.id]);
 
   const send = async (prompt: string) => {
     const textToSend = prompt.trim();
@@ -144,9 +155,16 @@ export function useAssistantChat(
     setIsLoading(true);
 
     try {
+      // apiService.ts types AiChatPayload.machineContext as a non-null `Machine`
+      // (that file is out of scope for this change — other agents own it), but
+      // aiChat() itself only JSON.stringifies the payload and never dereferences
+      // machineContext, and the backend already treats a null/omitted
+      // machineContext as a fleet-wide question. Only this field is cast; the
+      // rest of the payload keeps full type-checking. The null value flows
+      // through unchanged at runtime.
       const data = await aiChat({
         prompt: textToSend,
-        machineContext: activeMachine,
+        machineContext: activeMachine as Machine,
         role: currentUserRole,
         history,
       });
@@ -162,6 +180,8 @@ export function useAssistantChat(
           timestamp: nowTime(),
           // ธงนี้เป็นของข้อความนี้เท่านั้น คำถามอื่นในบทสนทนาเดียวกันอาจได้คำตอบจริงตามปกติ
           fallback: data.fallback === true,
+          mode: data.mode,
+          logId: data.logId ?? null,
         },
       ]);
     } catch {
@@ -213,7 +233,8 @@ export function useAssistantChat(
 
 interface AssistantConversationProps {
   chat: AssistantChat;
-  activeMachine: Machine;
+  /** null = ไม่มีเครื่องจักรเลือกอยู่ — ยังคุยได้ (ตอบแบบภาพรวมทั้งฟลีต) แต่เปิดใบงานซ่อมไม่ได้ */
+  activeMachine: Machine | null;
   /** ชื่อผู้ใช้ปัจจุบัน — แสดงในแผงยืนยันว่าใบงานจะถูกบันทึกในชื่อใคร */
   currentUserName?: string;
   /** ความหนาแน่นของเลย์เอาต์เท่านั้น พฤติกรรมและข้อความเหมือนกันทุกช่องทาง */
@@ -237,9 +258,13 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
   const { messages, isLoading, failedPrompts, send, retry } = chat;
 
   const [inputPrompt, setInputPrompt] = useState("");
-  const [isRecording, setIsRecording] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [confirmingActionId, setConfirmingActionId] = useState<string | null>(null);
+  // ผลตอบรับที่ผู้ใช้ให้ไว้ ต่อ id ของข้อความ (Frame 4) — เก็บในหน่วยความจำของหน้าจอ
+  // ค่าจริงถูกบันทึกที่เซิร์ฟเวอร์แล้ว ที่นี่เก็บไว้เพื่อแสดงสถานะปุ่มเท่านั้น
+  const [feedbackGiven, setFeedbackGiven] = useState<Record<string, 1 | -1>>({});
+  const [feedbackPending, setFeedbackPending] = useState<string | null>(null);
+  const [feedbackError, setFeedbackError] = useState<Record<string, string>>({});
 
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -270,13 +295,32 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  // DEV only: types a fixed sentence to exercise the input without a microphone.
-  const handleSimulateVoice = () => {
-    setIsRecording(true);
-    setTimeout(() => {
-      setIsRecording(false);
-      setInputPrompt("ตรวจสอบอุณหภูมิ Spindle และระบุขั้นตอนการล้างกรองน้ำมันระบายความร้อน");
-    }, 1800);
+  /**
+   * ส่งผลตอบรับของคำตอบหนึ่งข้อ (Frame 4 ของ UX Storyboard)
+   *
+   * อัปเดตหน้าจอ "หลัง" เซิร์ฟเวอร์ตอบสำเร็จเท่านั้น ไม่ทำ optimistic update เพราะ
+   * ปุ่มที่ติดค้างเป็น "บันทึกแล้ว" ทั้งที่บันทึกไม่สำเร็จ ทำให้ผู้ใช้เชื่อว่าความเห็น
+   * ของตัวเองถูกเก็บไปแล้ว ซึ่งแย่กว่าการเห็นว่ากดไม่ติดแล้วกดใหม่
+   */
+  const handleFeedback = async (msgId: string, logId: number, value: 1 | -1) => {
+    if (feedbackPending === msgId) return;
+    setFeedbackPending(msgId);
+    try {
+      await aiFeedback(logId, value);
+      setFeedbackGiven((prev) => ({ ...prev, [msgId]: value }));
+      setFeedbackError((prev) => {
+        const next = { ...prev };
+        delete next[msgId];
+        return next;
+      });
+    } catch (error) {
+      setFeedbackError((prev) => ({
+        ...prev,
+        [msgId]: error instanceof Error ? error.message : "บันทึกผลตอบรับไม่สำเร็จ",
+      }));
+    } finally {
+      setFeedbackPending(null);
+    }
   };
 
   const runAction = (fn?: (p: WorkOrderPrefill) => void, prefill?: WorkOrderPrefill) => {
@@ -340,9 +384,13 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
               }
 
               const showActionCard = hasWorkOrderAction(msg.text);
-              const prefill = showActionCard
-                ? buildWorkOrderPrefill(activeMachine, msg.text)
-                : null;
+              // เปิดใบงานซ่อมต้องมีเครื่องจักรจริงเสมอ (buildWorkOrderPrefill ต้องการ
+              // Machine ไม่ใช่ null) — ถ้ายังไม่มีเครื่องจักรเลือกอยู่ ให้แสดงคำแนะนำ
+              // ให้เลือก/สแกนเครื่องก่อน แทนปุ่มสร้างใบงาน
+              const prefill =
+                showActionCard && activeMachine
+                  ? buildWorkOrderPrefill(activeMachine, msg.text)
+                  : null;
               const retryPrompt = failedPrompts[msg.id];
 
               return (
@@ -389,13 +437,25 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
                       </button>
                     )}
 
+                    {/* ไม่มีเครื่องจักรเลือกอยู่ — บอกให้เลือก/สแกนเครื่องก่อน แทนปุ่มสร้างใบงาน */}
+                    {showActionCard && !activeMachine && (
+                      <div className="mt-3 rounded-[18px] border border-hairline bg-parchment p-3 text-xs text-ink-muted">
+                        กรุณาเลือกหรือสแกนเครื่องจักรก่อนเพื่อเปิดใบงานซ่อม
+                      </div>
+                    )}
+
                     {/* Work order action card */}
-                    {showActionCard && prefill && (
+                    {showActionCard && prefill && activeMachine && (
                       <div className="mt-3 rounded-[18px] border border-primary/30 bg-primary/10 p-4 space-y-2.5 text-ink">
                         <div className="flex items-center gap-2 text-[13px] font-semibold">
                           <Wrench className="w-4 h-4 text-primary shrink-0" />
+                          {/* ข้อความต้องตรงกับสิ่งที่ตัดสินใจจริง: ในโหมดสาธิตผู้เสนอคือ
+                              กฎเกณฑ์ตามค่าตรวจวัด ไม่ใช่โมเดล AI การเขียนว่า "AI แนะนำ"
+                              ทั้งที่เป็นกฎ คือการให้เครดิตผิดที่และทำให้คนดูเข้าใจระบบผิด */}
                           <span>
-                            AI แนะนำให้เปิดใบงานซ่อมบำรุงสำหรับเครื่อง {activeMachine.code}
+                            {msg.mode === "mock"
+                              ? `ระบบประเมินตามเกณฑ์แล้วแนะนำให้เปิดใบงานซ่อมบำรุงสำหรับเครื่อง ${activeMachine.code}`
+                              : `AI แนะนำให้เปิดใบงานซ่อมบำรุงสำหรับเครื่อง ${activeMachine.code}`}
                           </span>
                         </div>
 
@@ -499,7 +559,50 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
                         )}
                         <span>{copiedId === msg.id ? "คัดลอกแล้ว" : "คัดลอก"}</span>
                       </button>
+
+                      {/* ผลตอบรับ (Frame 4) — แสดงเฉพาะคำตอบที่บันทึก log สำเร็จ
+                          (มี logId) และไม่ใช่ข้อความแจ้งข้อผิดพลาด เพราะการให้ผู้ใช้กด
+                          ประเมินคำตอบที่ระบบไม่ได้ผูกกับ log ใด ๆ คือปุ่มที่ไม่ทำอะไรเลย */}
+                      {typeof msg.logId === "number" && !retryPrompt && (
+                        <div className="flex items-center gap-1">
+                          {feedbackGiven[msg.id] !== undefined ? (
+                            <span className="text-xs text-ink-muted inline-flex items-center gap-1">
+                              {feedbackGiven[msg.id] === 1 ? (
+                                <ThumbsUp className="w-3.5 h-3.5 text-emerald-700" />
+                              ) : (
+                                <ThumbsDown className="w-3.5 h-3.5 text-ink-muted" />
+                              )}
+                              <span>ขอบคุณสำหรับผลตอบรับ</span>
+                            </span>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => handleFeedback(msg.id, msg.logId as number, 1)}
+                                disabled={feedbackPending === msg.id}
+                                aria-label="คำตอบนี้มีประโยชน์"
+                                title="คำตอบนี้มีประโยชน์"
+                                className="opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition text-ink-muted hover:text-emerald-700 cursor-pointer rounded px-1 py-1 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                              >
+                                <ThumbsUp className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleFeedback(msg.id, msg.logId as number, -1)}
+                                disabled={feedbackPending === msg.id}
+                                aria-label="คำตอบนี้ไม่ตรงคำถาม"
+                                title="คำตอบนี้ไม่ตรงคำถาม"
+                                className="opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition text-ink-muted hover:text-rose-700 cursor-pointer rounded px-1 py-1 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                              >
+                                <ThumbsDown className="w-3.5 h-3.5" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      )}
                     </div>
+
+                    {feedbackError[msg.id] && (
+                      <p className="mt-1 text-xs text-rose-700">{feedbackError[msg.id]}</p>
+                    )}
                   </div>
                 </div>
               );
@@ -552,25 +655,13 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
             e.preventDefault();
             handleSubmit();
           }}
-          className="flex items-end gap-2 rounded-full border border-hairline bg-white focus-within:border-primary focus-within:ring-2 focus-within:ring-primary-focus/40 px-2 py-2 transition-all"
+          className="flex items-center gap-2 rounded-full border border-hairline bg-white focus-within:border-primary focus-within:ring-2 focus-within:ring-primary-focus/40 px-2 py-2 transition-all"
         >
-          {/* Simulated voice input — development builds only */}
-          {import.meta.env.DEV && (
-            <button
-              type="button"
-              onClick={handleSimulateVoice}
-              disabled={isLoading}
-              className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60 ${
-                isRecording
-                  ? "bg-rose-500 text-white animate-pulse"
-                  : "text-ink-muted hover:bg-parchment"
-              }`}
-              title="จำลองเสียงพูด (DEV)"
-              aria-label="จำลองเสียงพูด (สำหรับรุ่นทดสอบ)"
-            >
-              <Mic className="w-5 h-5" />
-            </button>
-          )}
+          <MicDictationButton
+            currentValue={inputPrompt}
+            onTranscript={(text) => setInputPrompt((prev) => `${prev}${text}`)}
+            className="flex-row! items-center!"
+          />
 
           <textarea
             ref={textareaRef}

@@ -11,10 +11,13 @@ import {
   Cpu,
   X,
   Loader2,
+  type LucideIcon,
 } from "lucide-react";
-import { Machine, WorkOrder, UserRole } from "../../types";
+import { Machine, WorkOrder, UserRole, WorkOrderStats, SparePart, UserProfile } from "../../types";
 import { WorkOrderDetailModal } from "../WorkOrderDetailModal";
+import { EditWorkOrderModal } from "../EditWorkOrderModal";
 import { MachineSelect } from "../MachineSelect";
+import { Pencil, Trash2 } from "lucide-react";
 import {
   woStatusLabel,
   woStatusPillClass,
@@ -23,36 +26,64 @@ import {
 } from "../../lib/pillStyles";
 import {
   compareByUrgency,
-  countOverdue,
   dueLabel,
   duePillClass,
   dueState,
-  isOverdue,
   overdueCardClass,
 } from "../../lib/workOrderStatus";
 import { getWorkOrders, toUserMessage } from "../../services/apiService";
+import { notifyFailed } from "../../lib/swal";
+import type { WorkOrderListParams } from "../../services/apiService";
 import { Pagination } from "../ui/Pagination";
 
 interface MyWorkOrdersViewProps {
   currentUserRole?: UserRole;
   /**
-   * ชื่อผู้ใช้ปัจจุบัน — ใช้ประทับชื่อผู้เพิ่มขั้นตอนในใบงาน และใช้กรองใบงาน
-   * "ของฉัน" จาก server ด้วย ?assignedTo= (work_orders.assigned_to เก็บเป็น
-   * ชื่อ ไม่ใช่ user id — ดู WorkOrderForm/App.tsx ตอนสร้างใบงาน)
+   * profiles.id ของผู้ใช้ปัจจุบัน (`usr-...`) — ใช้กรองใบงาน "ของฉัน" จาก
+   * server ด้วย ?assignedTo= เพราะ work_orders.assigned_to เก็บ profiles.id
+   * จริง ๆ (8,589/8,606 แถว) ไม่ใช่ชื่อคน มีเพียง 17 แถวเก่าที่ยังเป็นชื่อไทย
+   * จากก่อนแก้บั๊กนี้ ห้ามใช้ชื่อผู้ใช้เป็นตัวกรองที่นี่
+   */
+  currentAssigneeKey?: string;
+  /**
+   * ชื่อผู้ใช้ปัจจุบัน (สำหรับแสดงผลเท่านั้น) — ใช้ประทับชื่อผู้เพิ่มขั้นตอน
+   * ในใบงาน (WorkOrderStep.addedBy) เมื่อส่งต่อไปยัง WorkOrderDetailModal
+   * ห้ามใช้ค่านี้เป็นตัวกรอง ?assignedTo= (ดู currentAssigneeKey ด้านบน)
    */
   currentUserName?: string;
   /** เครื่องจักรที่กำลังทำงานอยู่ (จาก TopBar) — เปิดใช้ตัวกรองเฉพาะเครื่องนี้ */
   activeMachine?: Machine;
   /** รายการเครื่องจักรทั้งหมด — ใช้กับดรอปดาวน์เลือกเครื่องจักร */
   machines?: Machine[];
+  /**
+   * สถิติ (นับ/แท็บ) ของใบงานที่ scope ด้วย assignedTo เดียวกับหน้านี้ — มาจาก
+   * App.tsx (myWorkOrderStats) แทนที่จะดึงซ้ำเองที่นี่ เพื่อไม่ให้เกิดการ scan
+   * ตารางทั้งหมดซ้ำซ้อนทุกครั้งที่สลับแท็บ/เปลี่ยนหน้า และตัวเลขไม่เพี้ยนกัน
+   * ระหว่าง badge กับแท็บ (สอง state คนละที่คำนวณ)
+   */
+  myWorkOrderStats?: WorkOrderStats | null;
   /** เปลี่ยนเครื่องจักรที่กำลังใช้งาน (sync กับ TopBar/หน้าหลัก) */
   onSelectMachine?: (machine: Machine) => void;
   onUpdateWorkOrder: (updatedWO: WorkOrder) => Promise<void>;
+  /** ลบใบงาน — ปุ่ม "ลบ" จะแสดงบนการ์ดเฉพาะเมื่อมี prop นี้และผู้ใช้มีสิทธิ์ */
+  onDeleteWorkOrder?: (id: string) => Promise<void>;
+  /** รายการอะไหล่ — ส่งต่อให้ EditWorkOrderModal เท่านั้น */
+  spareParts?: SparePart[];
+  /** รายชื่อช่างสำหรับมอบหมายงานใหม่ — ส่งต่อให้ EditWorkOrderModal เท่านั้น */
+  technicians?: Pick<UserProfile, "id" | "name">[];
+  /** ผู้ใช้ปัจจุบัน (สำหรับ EditWorkOrderModal) */
+  currentUser?: UserProfile | null;
   onAskAI: (prompt: string) => void;
+  /** เรียกเมื่อมีการเบิกอะไหล่จริงสำเร็จในใบงาน — ให้ App.tsx รีเฟรช spareParts */
+  onStockChanged?: () => void;
 }
 
 // ใบงานของช่างคนเดียวไม่ควรมีจำนวนมากเท่าใบงานทั้งระบบ แต่กันเผื่อไว้ด้วยการแบ่งหน้า
 const PAGE_SIZE = 200;
+
+// แท็บ "ปิดงานแล้ว" มักมีจำนวนมากสะสมตามเวลา (งานเก่าที่ปิดไปแล้วไม่ควร
+// รกหน้าจอ) จึงใช้หน้าเล็กกว่าแท็บอื่น ๆ ร่วมกับตัวกรองรายเดือน
+const CLOSED_PAGE_SIZE = 20;
 
 const FILTER_TABS = [
   { id: "all", label: "ทั้งหมด" },
@@ -60,11 +91,64 @@ const FILTER_TABS = [
   { id: "in_progress", label: "กำลังซ่อม" },
   { id: "pending", label: "รอดำเนินการ" },
   { id: "review", label: "รอวิศวกรอนุมัติ" },
+  { id: "completed", label: "ปิดงานแล้ว" },
 ] as const;
+
+/** ตัวเลือกเดือนสำหรับตัวกรองในแท็บ "ปิดงานแล้ว" — ย้อนหลัง 12 เดือนล่าสุด
+ * บวกตัวเลือก "ทุกเดือน" เพราะเราไม่มีสถิติจำนวนใบงานปิดต่อเดือนพร้อมใช้
+ * ที่ฝั่งนี้ (จะต้องดึงข้อมูลเพิ่มเพียงเพื่อสร้างรายการเดือน ซึ่งไม่คุ้มค่า) */
+function buildRecentMonthOptions(count = 12): { value: string; label: string }[] {
+  const now = new Date();
+  const options: { value: string; label: string }[] = [];
+  for (let i = 0; i < count; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const year = d.getFullYear();
+    const month = d.getMonth() + 1;
+    const value = `${year}-${String(month).padStart(2, "0")}`;
+    const label = d.toLocaleDateString("th-TH", { year: "numeric", month: "long" });
+    options.push({ value, label });
+  }
+  return options;
+}
+
+const MONTH_OPTIONS = buildRecentMonthOptions();
+
+/** ช่วงวันที่ (from/to แบบ YYYY-MM-DD) ของเดือนที่เลือก ใช้กรองบน
+ * assigned_date ฝั่ง server (เหมือนที่ AllWorkOrdersView ใช้) — คืนค่า
+ * undefined ทั้งคู่เมื่อเลือก "ทุกเดือน" */
+function monthRange(monthValue: string): { from?: string; to?: string } {
+  if (!monthValue) return {};
+  const [yearStr, monthStr] = monthValue.split("-");
+  const year = Number(yearStr);
+  const month = Number(monthStr);
+  if (!year || !month) return {};
+  const from = `${yearStr}-${monthStr}-01`;
+  const lastDay = new Date(year, month, 0).getDate();
+  const to = `${yearStr}-${monthStr}-${String(lastDay).padStart(2, "0")}`;
+  return { from, to };
+}
+
+/**
+ * ตัวกรองฝั่ง server ต่อแท็บ — ต้องดึงจาก server ตามแท็บที่เลือก ไม่ใช่กรอง
+ * client-side เฉพาะหน้าที่โหลดมาแล้ว (PAGE_SIZE = 200 แถว) เพราะช่างที่มีใบงาน
+ * เกิน 200 ใบจะเห็นแท็บว่างเปล่าทั้งที่ badge บอกว่ามีงานค้างอยู่
+ *
+ * "overdue" อิงวันที่ (ไม่ใช่ status ธรรมดา) จึงส่งเป็น query param แยก
+ * (`overdue=true`) ที่ backend คำนวณด้วย predicate เดียวกับ /stats ทุกประการ
+ * (ดู isOverdueRow ใน backend/src/routes/workOrders.ts)
+ */
+const TAB_QUERY: Record<string, Pick<WorkOrderListParams, "status" | "overdue">> = {
+  all: {},
+  overdue: { overdue: true },
+  in_progress: { status: "in_progress" },
+  pending: { status: "pending" },
+  review: { status: "review" },
+  completed: { status: "completed" },
+};
 
 const EMPTY_STATES: Record<
   string,
-  { icon: React.ElementType; message: string; hint: string }
+  { icon: LucideIcon; message: string; hint: string }
 > = {
   all: {
     icon: FileText,
@@ -91,21 +175,52 @@ const EMPTY_STATES: Record<
     message: "ยังไม่มีใบงานที่รอตรวจสอบ",
     hint: "เมื่อบันทึกผลการทำงานแล้ว ใบงานจะมารอวิศวกรอนุมัติที่นี่",
   },
+  completed: {
+    icon: CheckSquare,
+    message: "ไม่พบใบงานที่ปิดแล้วในเดือนนี้",
+    hint: "ลองเลือกเดือนอื่น หรือดู “ทุกเดือน” เพื่อดูใบงานที่ปิดแล้วทั้งหมด",
+  },
 };
 
 export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
   currentUserRole = "technician",
+  currentAssigneeKey,
   currentUserName,
   activeMachine,
   machines = [],
   onSelectMachine,
+  myWorkOrderStats = null,
   onUpdateWorkOrder,
+  onDeleteWorkOrder,
+  spareParts = [],
+  technicians = [],
+  currentUser = null,
   onAskAI,
+  onStockChanged,
 }) => {
   const [selectedWO, setSelectedWO] = useState<WorkOrder | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("all");
+  // "" หมายถึง "ทุกเดือน" — ใช้เฉพาะเมื่อ activeFilter === "completed"
+  const [closedMonth, setClosedMonth] = useState<string>(MONTH_OPTIONS[0]?.value ?? "");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [onlyActiveMachine, setOnlyActiveMachine] = useState(false);
+  const [editingWO, setEditingWO] = useState<WorkOrder | null>(null);
+  const [deletingWO, setDeletingWO] = useState<WorkOrder | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // สิทธิ์แก้ไข/ลบ: engineer/supervisor แก้ไข/ลบได้ทุกใบงาน, technician
+  // แก้ไข/ลบได้เฉพาะใบงานที่ตัวเองเป็นผู้รับผิดชอบหรือผู้ขอ (จับคู่ด้วย
+  // currentAssigneeKey เพราะ view นี้ไม่มี currentUser.id เป็น prop เดิม —
+  // ใช้ prop `currentUser` ใหม่ถ้ามี ไม่งั้น fallback ไปที่ currentAssigneeKey)
+  const canMutate = (wo: WorkOrder) =>
+    currentUserRole === "engineer" ||
+    currentUserRole === "supervisor" ||
+    (!!(currentUser?.id ?? currentAssigneeKey) &&
+      (wo.assignedTo === (currentUser?.id ?? currentAssigneeKey) ||
+        wo.requestedBy === (currentUser?.id ?? currentAssigneeKey)));
+
+  const canDelete = (wo: WorkOrder) =>
+    canMutate(wo) && !(currentUserRole === "technician" && wo.status === "completed");
 
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
@@ -120,12 +235,21 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  // เดิม tab (ทั้งหมด/เลยกำหนด/กำลังซ่อม/รอดำเนินการ/รอวิศวกรอนุมัติ) กรอง
+  // client-side ทับเฉพาะหน้าที่โหลดมาแล้ว (PAGE_SIZE = 200) — ช่างที่มีใบงาน
+  // เกิน 200 ใบจะเห็นบางแท็บว่างเปล่าทั้งที่มีงานค้างอยู่จริง (แค่ไม่อยู่ใน 200
+  // แถวแรก) จึงต้องส่งแท็บที่เลือกไปเป็นตัวกรองฝั่ง server (status/overdue) แทน
+  // และรีเซ็ต offset กลับหน้าแรกทุกครั้งที่เปลี่ยนแท็บ เช่นเดียวกับตอนเปลี่ยนผู้ใช้
   useEffect(() => {
     setOffset(0);
-  }, [currentUserName]);
+  }, [currentAssigneeKey, activeFilter, closedMonth]);
+
+  // แท็บ "ปิดงานแล้ว" ใช้หน้าเล็กกว่า (CLOSED_PAGE_SIZE) เพราะสะสมงานเก่าไว้
+  // มาก การเทหน้าทั้งหมดแบบแท็บอื่น (PAGE_SIZE = 200) จะรกหน้าจอโดยไม่จำเป็น
+  const effectivePageSize = activeFilter === "completed" ? CLOSED_PAGE_SIZE : PAGE_SIZE;
 
   const fetchPage = useCallback(() => {
-    if (!currentUserName) {
+    if (!currentAssigneeKey) {
       setWorkOrders([]);
       setTotal(0);
       setIsLoading(false);
@@ -136,7 +260,15 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
     setIsLoading(true);
     setLoadError(null);
 
-    getWorkOrders({ assignedTo: currentUserName, limit: PAGE_SIZE, offset })
+    const tabQuery = TAB_QUERY[activeFilter] ?? {};
+    const dateRange = activeFilter === "completed" ? monthRange(closedMonth) : {};
+    getWorkOrders({
+      assignedTo: currentAssigneeKey,
+      limit: effectivePageSize,
+      offset,
+      ...tabQuery,
+      ...dateRange,
+    })
       .then((res) => {
         if (cancelled) return;
         setWorkOrders(res.data);
@@ -153,11 +285,15 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [currentUserName, offset]);
+  }, [currentAssigneeKey, offset, activeFilter, closedMonth, effectivePageSize]);
 
   useEffect(() => fetchPage(), [fetchPage]);
 
   const handleModalUpdate = async (updatedWO: WorkOrder) => {
+    // onUpdateWorkOrder is App.tsx's handleUpdateWorkOrder, which already
+    // calls refreshWorkOrderStats() — that keeps the myWorkOrderStats prop
+    // (passed down from App.tsx) in sync, so the tab counts below update
+    // without this view fetching its own copy.
     await onUpdateWorkOrder(updatedWO);
     // สถานะที่เปลี่ยน (เช่น กำลังซ่อม -> รอวิศวกรอนุมัติ) ต้องย้ายแท็บ/หายไปจริง
     fetchPage();
@@ -168,6 +304,17 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
   // work order cannot accidentally match a code-less machine today. The explicit
   // `Boolean(activeMachine.code)` guard below makes that safety a visible
   // invariant rather than an accident of the two types never lining up.
+  //
+  // Kept client-side (not pushed into `?machineCode=` on the server query)
+  // deliberately: a work order identifies "its" machine two different ways —
+  // imported rows via `machine_code` (machine_id is null for all 8,589 of
+  // them), manually-created ones via `machine_id`. The server filter can only
+  // do a plain `.eq("machine_code", ...)`, which would silently drop any
+  // manually-created order matched here only by `machineId`. That's a
+  // behaviour change this task's scope doesn't call for, so machine scoping
+  // stays a client-side filter — now applied on top of an already
+  // server-scoped (by tab) page, instead of on top of an arbitrary 200-row
+  // slice like before.
   const belongsToActiveMachine = (wo: WorkOrder) =>
     !!activeMachine &&
     (wo.machineId === activeMachine.id ||
@@ -182,19 +329,17 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
   );
 
   const hiddenByMachineFilter = workOrders.length - machineScoped.length;
-  const overdueCount = useMemo(() => countOverdue(machineScoped), [machineScoped]);
 
+  // เลยกำหนด: ตัวเลขบนแท็บมาจาก myWorkOrderStats.overdue (prop จาก App.tsx,
+  // scope เดียวกับ badge) ไม่ใช่นับจาก workOrders ที่โหลดมาเฉพาะหน้านี้ —
+  // ไม่งั้นตัวเลขจะไม่ตรงกับ badge อีกครั้งเมื่อช่างมีใบงานเกิน PAGE_SIZE
+  const overdueCount = myWorkOrderStats?.overdue ?? 0;
+
+  // เรียงตามความเร่งด่วนเท่านั้น — การกรองตามแท็บ (status/overdue) ทำที่ server
+  // แล้วใน fetchPage ข้างต้น ไม่ต้องกรองซ้ำที่นี่
   const filteredOrders = useMemo(
-    () =>
-      machineScoped
-        .filter((wo) => {
-          if (activeFilter === "all") return true;
-          if (activeFilter === "overdue") return isOverdue(wo);
-          return wo.status === activeFilter;
-        })
-        .slice()
-        .sort((a, b) => compareByUrgency(a, b)),
-    [machineScoped, activeFilter]
+    () => machineScoped.slice().sort((a, b) => compareByUrgency(a, b)),
+    [machineScoped]
   );
 
   const handleOpenDetailModal = (wo: WorkOrder) => {
@@ -279,6 +424,27 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
           })}
         </div>
 
+        {activeFilter === "completed" && (
+          <div className="flex items-center gap-2">
+            <label htmlFor="closed-month-filter" className="text-[13px] text-ink-muted">
+              เดือนที่ปิดงาน
+            </label>
+            <select
+              id="closed-month-filter"
+              value={closedMonth}
+              onChange={(e) => setClosedMonth(e.target.value)}
+              className="appearance-none bg-white border border-hairline rounded-full pl-3.5 pr-8 py-2 text-[13px] text-ink-muted focus:outline-none focus:ring-2 focus:ring-primary-focus/40 cursor-pointer"
+            >
+              <option value="">ทุกเดือน</option>
+              {MONTH_OPTIONS.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {activeMachine && (
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -301,7 +467,7 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
 
             {onlyActiveMachine && hiddenByMachineFilter > 0 && (
               <span className="text-xs text-ink-muted">
-                ซ่อนใบงานของเครื่องอื่นอยู่ {hiddenByMachineFilter} ใบงาน
+                ซ่อนใบงานของเครื่องอื่นอยู่ {hiddenByMachineFilter} ใบงาน (เฉพาะหน้านี้)
               </span>
             )}
           </div>
@@ -443,6 +609,30 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
                     >
                       <Sparkles className="w-5 h-5 text-primary" />
                     </button>
+
+                    {canMutate(wo) && (
+                      <button
+                        onClick={() => setEditingWO(wo)}
+                        aria-label={`แก้ไขใบงาน ${wo.code}`}
+                        className="min-h-11 px-3 shrink-0 rounded-[11px] bg-pearl hover:bg-parchment text-ink-muted text-[13px] font-semibold cursor-pointer transition-colors border border-divider flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                        title="แก้ไข"
+                      >
+                        <Pencil className="w-4 h-4 text-primary" />
+                        <span>แก้ไข</span>
+                      </button>
+                    )}
+
+                    {onDeleteWorkOrder && canDelete(wo) && (
+                      <button
+                        onClick={() => setDeletingWO(wo)}
+                        aria-label={`ลบใบงาน ${wo.code}`}
+                        className="min-h-11 px-3 shrink-0 rounded-[11px] bg-rose-50 hover:bg-rose-100 text-rose-700 text-[13px] font-semibold cursor-pointer transition-colors border border-rose-200 flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                        title="ลบ"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span>ลบ</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -453,16 +643,31 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
         )}
       </div>
 
-      {/* แบ่งหน้า — ใบงานของช่างคนเดียวปกติไม่ควรเกินหน้าเดียว แต่กันเผื่อไว้ */}
+      {/* แบ่งหน้า — ใบงานของช่างคนเดียวปกติไม่ควรเกินหน้าเดียว แต่กันเผื่อไว้
+          `total` มาจาก server แบบไม่รู้จักเครื่องจักร (นับทุกเครื่องในแท็บนี้)
+          ส่วนตัวกรอง "เฉพาะเครื่อง" ทำงานที่ client (ดู belongsToActiveMachine
+          ด้านบนว่าทำไม) — เมื่อเปิดตัวกรองนี้ ตัวเลข/ปุ่มเปลี่ยนหน้าปกติจะอ้างอิง
+          จำนวนที่ยังไม่กรอง ทำให้ผู้ใช้กดไปหน้าถัดไปแล้วอาจไม่เจอใบงานของ
+          เครื่องนี้เลยทั้งที่ตัวนับบอกว่ายังมีอีก จึงจำกัด total ที่ส่งให้
+          Pagination ไว้ที่ขอบเขตของหน้าที่โหลดมาแล้วเมื่อเปิดตัวกรองนี้ —
+          ปุ่ม "ถัดไป" จะถูกปิดแทนที่จะโฆษณาหน้าที่กรองแล้วอาจว่างเปล่า */}
       {total > 0 && (
-        <Pagination
-          offset={offset}
-          limit={PAGE_SIZE}
-          total={total}
-          onOffsetChange={setOffset}
-          isLoading={isLoading}
-          itemLabel="ใบงาน"
-        />
+        <div className="space-y-1.5">
+          {onlyActiveMachine && activeMachine && (
+            <p className="text-xs text-ink-muted">
+              ตัวเลขนับและปุ่มเปลี่ยนหน้าด้านล่างนับรวมใบงานทุกเครื่องจักรในแท็บนี้
+              ไม่ใช่เฉพาะเครื่อง {activeMachine.code} — ปิดตัวกรอง "เฉพาะเครื่อง" เพื่อดูจำนวน/หน้าถัดไปของเครื่องอื่น
+            </p>
+          )}
+          <Pagination
+            offset={offset}
+            limit={effectivePageSize}
+            total={onlyActiveMachine && activeMachine ? Math.min(total, offset + workOrders.length) : total}
+            onOffsetChange={setOffset}
+            isLoading={isLoading}
+            itemLabel="ใบงาน"
+          />
+        </div>
       )}
 
       {/* Work Order Detail Modal */}
@@ -472,9 +677,84 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
         workOrder={selectedWO}
         currentUserRole={currentUserRole}
         currentUserName={currentUserName}
+        currentUserId={currentUser?.id}
         onUpdateWorkOrder={handleModalUpdate}
+        onDeleteWorkOrder={onDeleteWorkOrder}
+        canDelete={selectedWO ? canDelete(selectedWO) : false}
         onAskAI={onAskAI}
+        onStockChanged={onStockChanged}
       />
+
+      {/* Edit Work Order Modal */}
+      {editingWO && (
+        <EditWorkOrderModal
+          isOpen={!!editingWO}
+          workOrder={editingWO}
+          onClose={() => setEditingWO(null)}
+          onSubmit={async (id, draft) => {
+            try {
+              await onUpdateWorkOrder({ id, ...draft } as WorkOrder);
+              setEditingWO(null);
+              fetchPage();
+            } catch (err) {
+              await notifyFailed(
+                "แก้ไขใบงานไม่สำเร็จ",
+                toUserMessage(err, "ไม่สามารถบันทึกการแก้ไขใบงานนี้ได้ กรุณาลองอีกครั้ง")
+              );
+            }
+          }}
+          machines={machines}
+          spareParts={spareParts}
+          technicians={technicians}
+          currentUser={currentUser ?? null}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {deletingWO && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4">
+          <div className="bg-white rounded-[18px] border border-hairline p-6 max-w-sm w-full space-y-4">
+            <h3 className="text-base font-semibold text-ink">ยืนยันการลบใบงาน</h3>
+            <p className="text-sm text-ink-muted">
+              ใบงาน {deletingWO.code} — {deletingWO.title}
+              <br />
+              การลบไม่สามารถย้อนกลับได้
+            </p>
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                onClick={() => setDeletingWO(null)}
+                disabled={isDeleting}
+                className="min-h-11 px-4 rounded-full bg-pearl hover:bg-parchment text-ink-muted text-[13px] font-semibold cursor-pointer transition-colors border border-divider disabled:opacity-60"
+              >
+                ยกเลิก
+              </button>
+              <button
+                onClick={async () => {
+                  if (!onDeleteWorkOrder || !deletingWO) return;
+                  setIsDeleting(true);
+                  try {
+                    await onDeleteWorkOrder(deletingWO.id);
+                    setDeletingWO(null);
+                    fetchPage();
+                  } catch (err) {
+                    await notifyFailed(
+                      "ลบใบงานไม่สำเร็จ",
+                      toUserMessage(err, "ไม่สามารถลบใบงานนี้ได้ กรุณาลองอีกครั้ง")
+                    );
+                  } finally {
+                    setIsDeleting(false);
+                  }
+                }}
+                disabled={isDeleting}
+                className="min-h-11 px-4 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-[13px] font-semibold cursor-pointer transition-colors disabled:opacity-60 inline-flex items-center gap-1.5"
+              >
+                {isDeleting && <Loader2 className="w-4 h-4 animate-spin" />}
+                <span>ลบ</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

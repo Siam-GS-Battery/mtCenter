@@ -29,7 +29,7 @@ import {
   dueState,
   isOverdue,
 } from "../../lib/workOrderStatus";
-import { getWorkOrders, toUserMessage } from "../../services/apiService";
+import { getWorkOrders, getCurrentUserId, toUserMessage } from "../../services/apiService";
 import { Pagination } from "../ui/Pagination";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";
 
@@ -40,6 +40,8 @@ interface AllWorkOrdersViewProps {
   onUpdateWorkOrder?: (updatedWO: WorkOrder) => Promise<void>;
   onApproveWorkOrder?: (woId: string) => Promise<void>;
   onAskAI: (prompt: string) => void;
+  /** เรียกเมื่อมีการเบิกอะไหล่จริงสำเร็จในใบงาน — ให้ App.tsx รีเฟรช spareParts */
+  onStockChanged?: () => void;
 }
 
 // จำนวนใบงานต่อหน้าของตาราง
@@ -76,6 +78,7 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
   onUpdateWorkOrder,
   onApproveWorkOrder,
   onAskAI,
+  onStockChanged,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   // ยิงค้นหาไป server หลังพิมพ์หยุด ~300ms กันยิงถี่ทุกตัวอักษร
@@ -601,9 +604,11 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
         workOrder={selectedWO}
         currentUserRole={currentUserRole}
         currentUserName={currentUserName}
+        currentUserId={getCurrentUserId() ?? undefined}
         onUpdateWorkOrder={handleModalUpdate}
         onApproveWorkOrder={handleModalApprove}
         onAskAI={onAskAI}
+        onStockChanged={onStockChanged}
       />
     </div>
   );

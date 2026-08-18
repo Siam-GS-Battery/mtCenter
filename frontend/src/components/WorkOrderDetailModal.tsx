@@ -58,7 +58,7 @@ interface WorkOrderDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   workOrder: WorkOrder | null;
-  currentUserRole?: UserRole;
+  currentUserRole: UserRole;
   /** ชื่อผู้ใช้งานปัจจุบัน — ใช้บันทึกว่าใครเป็นผู้เพิ่มขั้นตอนปฏิบัติงาน */
   currentUserName?: string;
   /** profiles.id ของผู้ใช้งานปัจจุบัน — ใช้เป็น x-user-id ตอนบันทึกการเบิกอะไหล่จริง
@@ -101,7 +101,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
   isOpen,
   onClose,
   workOrder,
-  currentUserRole = "technician",
+  currentUserRole,
   currentUserName,
   currentUserId,
   onUpdateWorkOrder,

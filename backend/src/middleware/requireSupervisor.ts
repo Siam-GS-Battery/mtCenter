@@ -1,8 +1,6 @@
 import type { Request } from "express";
-import { supabase } from "../lib/supabase.js";
+import { authenticateRequest } from "./authenticate.js";
 import { ApiError, asyncHandler } from "./errorHandler.js";
-
-const USER_HEADER = "x-user-id";
 
 export interface SupervisorProfile {
   id: string;
@@ -15,29 +13,17 @@ export interface RequestWithProfile extends Request {
   profile?: SupervisorProfile;
 }
 
-// TODO: การเชื่อ header x-user-id ที่ client ส่งมาเป็นเพียง stopgap ชั่วคราว ยังไม่ใช่
-// การพิสูจน์ตัวตนจริง (client ปลอมค่านี้ได้) ต้องเปลี่ยนไปใช้ session/JWT จริงก่อนขึ้น production
-// fail closed เสมอ: ต้องมี x-user-id ที่ตรงกับ profile ที่มี role = supervisor เท่านั้น
-// จึงจะจัดการคลังอะไหล่ได้ ไม่เช่นนั้นปฏิเสธ request
+// fail closed เสมอ: ต้องมี Bearer token ที่ verify ผ่าน, บัญชียังอยู่, โทเคนยังไม่ถูกยกเลิก,
+// เปลี่ยนรหัสผ่านเริ่มต้นแล้ว และมี profile ที่ role = supervisor เท่านั้น จึงจะจัดการคลังอะไหล่ได้
+// (ตรรกะการตรวจโทเคน/รหัสผ่านอยู่ที่ middleware/authenticate.ts แหล่งเดียว)
 export const requireSupervisor = asyncHandler(async (req, _res, next) => {
-  const userId = req.header(USER_HEADER);
-  if (!userId || userId.trim().length === 0) {
-    throw new ApiError(401, "ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่");
-  }
+  const { profile } = await authenticateRequest(req);
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id, role")
-    .eq("id", userId)
-    .maybeSingle();
-  if (error) throw new ApiError(500, error.message);
-  if (!data) throw new ApiError(403, "ไม่พบสิทธิ์ผู้ใช้งานนี้");
-
-  if (data.role !== "supervisor") {
+  if (profile.role !== "supervisor") {
     throw new ApiError(403, "เฉพาะหัวหน้างานเท่านั้นที่สามารถจัดการคลังอะไหล่ได้");
   }
 
-  (req as RequestWithProfile).profile = { id: data.id, role: data.role };
+  (req as RequestWithProfile).profile = { id: profile.id, role: profile.role };
 
   next();
 });

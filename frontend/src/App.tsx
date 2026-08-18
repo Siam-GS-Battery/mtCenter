@@ -30,6 +30,9 @@ import {
   toUserMessage,
   setCurrentUserId,
 } from "./services/apiService";
+import { useAuth } from "./contexts/AuthContext";
+import { LoginPage } from "./components/LoginPage";
+import { ChangePasswordScreen } from "./components/ChangePasswordScreen";
 import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
 import { ScanMachineView } from "./components/views/ScanMachineView";
@@ -58,18 +61,12 @@ import { AlertCircle, Menu } from "lucide-react";
 import { notifyToast, notifySaving, dismissSaving, notifySaved, notifyFailed } from "./lib/swal";
 
 export default function App() {
-  // 1. Role & Profile State
-  const [currentRole, setCurrentRole] = useState<UserRole>("technician");
-  const [users, setUsers] = useState<Record<string, UserProfile>>({});
-  // Full technician roster (id + name) for WorkOrderForm's assignee select —
-  // `users` above only keeps the last profile per role (for the role
-  // switcher), so it cannot list every technician.
+  // 1. Auth state — identity now comes from the auth context, not a
+  // hardcoded role default or a role->profile map built from GET /api/users.
+  const { user: currentUser, isLoading: isAuthLoading, mustChangePassword, logout } = useAuth();
+  const currentRole: UserRole | undefined = currentUser?.role;
+  // Full technician roster (id + name) for WorkOrderForm's assignee select.
   const [technicians, setTechnicians] = useState<Pick<UserProfile, "id" | "name">[]>([]);
-  // No mock fallback: until the real profiles load, there is no "current
-  // user" — every place that needs one must handle the null case (see the
-  // loading/error gate below, right before the main render).
-  const currentUser: UserProfile | null =
-    users[currentRole] ?? Object.values(users)[0] ?? null;
   // Single source of truth for the "assignee" identity used to scope
   // "ใบงานของฉัน" (my work orders) — both the stats badge count and the
   // list (MyWorkOrdersView) must filter on this exact same value.
@@ -160,6 +157,12 @@ export default function App() {
   // supplementary — a failure in any one of those degrades just that slice
   // (surfaced via toast) without blocking the rest of the app from loading.
   useEffect(() => {
+    // Wait for a signed-in user (and a completed password change) before
+    // hitting any authenticated endpoint — otherwise this fires on the
+    // login/change-password screens too and every call 401s.
+    if (!currentUser || mustChangePassword) {
+      return;
+    }
     let cancelled = false;
     setIsLoading(true);
     setLoadError(null);
@@ -181,11 +184,6 @@ export default function App() {
       .then(([usersRes, machinesRes]) => {
         if (cancelled) return;
 
-        const usersByRole: Record<string, UserProfile> = {};
-        usersRes.forEach((u) => {
-          usersByRole[u.role] = u;
-        });
-        setUsers(usersByRole);
         setTechnicians(
           usersRes
             .filter((u) => u.role === "technician")
@@ -261,7 +259,7 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, [reloadToken]);
+  }, [reloadToken, currentUser, mustChangePassword]);
 
   // Refetch the current user's own work-order stats whenever the assignee
   // identity changes (initial load once users/currentUser resolve, or a role
@@ -284,24 +282,6 @@ export default function App() {
       cancelled = true;
     };
   }, [currentAssigneeKey, reloadToken]);
-
-  // Handle Role Change
-  const handleRoleChange = (newRole: UserRole) => {
-    setCurrentRole(newRole);
-    if (newRole === "technician") {
-      setActiveTab("scan");
-    } else if (newRole === "engineer") {
-      setActiveTab("review");
-    } else if (newRole === "supervisor") {
-      setActiveTab("dashboard");
-    }
-    // ป้องกันไม่ให้ผู้ใช้ค้างอยู่ที่หน้า "จัดการคลังอะไหล่" (เฉพาะหัวหน้างาน) หลังสลับบทบาทไปเป็นบทบาทอื่น
-    if (newRole !== "supervisor" && activeTab === "parts_admin") {
-      setActiveTab(newRole === "technician" ? "scan" : newRole === "engineer" ? "review" : "scan");
-    }
-    // ป้องกันไม่ให้ช่างเทคนิคค้างอยู่ที่หน้า "จัดการเครื่องจักร" (เฉพาะหัวหน้างาน/วิศวกร)
-    if (newRole === "technician" && activeTab === "machine_admin") setActiveTab("scan");
-  };
 
   // Jump from a TopBar notification to the page that answers it, switching the
   // active machine first when the alert is about a specific one.
@@ -658,6 +638,30 @@ export default function App() {
     showToast("ลบเครื่องจักรสำเร็จ");
   };
 
+  // --- Auth gate -----------------------------------------------------------
+  // Identity now comes entirely from AuthContext: no signed-in user -> only
+  // the login screen renders; signed in but must change the (default =
+  // employee id) password -> only that screen renders, blocking the rest of
+  // the app until it's done.
+  if (isAuthLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-parchment">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+          <p className="text-sm text-ink-faint">กำลังตรวจสอบสิทธิ์การเข้าใช้งาน...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return <LoginPage />;
+  }
+
+  if (mustChangePassword) {
+    return <ChangePasswordScreen />;
+  }
+
   // --- Loading / error gate ---------------------------------------------
   // The rest of the app assumes a signed-in profile and at least one machine
   // to show. Rather than fake either with mock data, show a real loading
@@ -692,25 +696,6 @@ export default function App() {
     );
   }
 
-  // เดิม gate นี้บล็อกทั้งแอปเมื่อไม่มี activeMachine ด้วย ทำให้แชท AI แบบภาพรวมทั้งฟลีต
-  // (ซึ่งรองรับ machine เป็น null อยู่แล้วทั้ง backend และ aiActions.ts) เข้าไม่ถึงเลย
-  // ทั้งที่ activeMachine เป็น null ได้จริงในทางปฏิบัติ (ยังไม่มีเครื่องจักรในระบบ หรือ
-  // ลบเครื่องจักรสุดท้ายไปแล้ว — ดู handleMachineDeleted) จึงบล็อกเฉพาะกรณีไม่มีผู้ใช้งาน
-  // เท่านั้น ส่วนแท็บ/วิวที่ยังต้องมีเครื่องจักรจริงจะมี guard ของตัวเองด้านล่าง
-  if (!currentUser) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-parchment px-4">
-        <div className="max-w-md w-full bg-white rounded-[18px] border border-hairline p-8 text-center space-y-4">
-          <AlertCircle className="w-10 h-10 text-amber-500 mx-auto" />
-          <h1 className="text-base font-semibold text-ink">ยังไม่มีข้อมูลพร้อมใช้งาน</h1>
-          <p className="text-sm text-ink-faint">
-            ไม่พบข้อมูลผู้ใช้งานในระบบ กรุณาติดต่อผู้ดูแลระบบ
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex h-screen bg-white text-ink font-sans antialiased overflow-hidden">
       {/* 1. PERSISTENT SIDEBAR */}
@@ -718,7 +703,6 @@ export default function App() {
         currentUser={currentUser}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        onRoleChange={handleRoleChange}
         isCollapsed={isCollapsed}
         setIsCollapsed={setIsCollapsed}
         isMobileDrawerOpen={isMobileDrawerOpen}
@@ -726,6 +710,7 @@ export default function App() {
         pendingBadges={pendingBadges}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenHelp={() => setIsHelpOpen(true)}
+        onLogout={logout}
       />
 
       {/* 2. MAIN CONTENT WRAPPER */}
@@ -823,7 +808,7 @@ export default function App() {
           {activeTab === "chat" && (
             <AIChatView
               activeMachine={activeMachine}
-              currentUserRole={currentRole}
+              currentUserRole={currentUser.role}
               currentUserName={currentUser.name}
               initialPrompt={chatInitialPrompt}
               onAutoCreateWorkOrder={handleAutoCreateWorkOrder}
@@ -835,7 +820,7 @@ export default function App() {
             // Fetches only this technician's own work orders directly from the
             // server (?assignedTo=) now — see the component.
             <MyWorkOrdersView
-              currentUserRole={currentRole}
+              currentUserRole={currentUser.role}
               currentAssigneeKey={currentAssigneeKey}
               currentUserName={currentUser.name}
               activeMachine={activeMachine ?? undefined}
@@ -894,7 +879,7 @@ export default function App() {
           {activeTab === "review" && (
             // Fetches its own ?status=review page directly now — see the component.
             <PendingReviewView
-              currentUserRole={currentRole}
+              currentUserRole={currentUser.role}
               currentUserName={currentUser.name}
               onApproveWorkOrder={handleApproveWorkOrder}
               onUpdateWorkOrder={handleUpdateWorkOrder}
@@ -932,7 +917,7 @@ export default function App() {
             // orders don't fit in the shared `workOrders` slice below, so this
             // view fetches/filters/paginates its own copy straight from the API.
             <AllWorkOrdersView
-              currentUserRole={currentRole}
+              currentUserRole={currentUser.role}
               currentUserName={currentUser.name}
               onUpdateWorkOrder={handleUpdateWorkOrder}
               onApproveWorkOrder={handleApproveWorkOrder}
@@ -986,7 +971,6 @@ export default function App() {
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         currentUser={currentUser}
-        onRoleChange={handleRoleChange}
       />
 
       <HelpModal
@@ -1012,7 +996,7 @@ export default function App() {
         isOpen={isAiDrawerOpen}
         onClose={() => setIsAiDrawerOpen(false)}
         activeMachine={activeMachine}
-        currentUserRole={currentRole}
+        currentUserRole={currentUser.role}
         currentUserName={currentUser.name}
         initialPrompt={aiDrawerPrompt}
         onOpenFullChatPage={() => {

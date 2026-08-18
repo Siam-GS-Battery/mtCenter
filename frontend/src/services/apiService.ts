@@ -41,6 +41,46 @@ export function getCurrentUserId(): string | null {
   return currentUserId;
 }
 
+// ---- Auth token (module-level, mirrors currentUserId above) ----
+// AuthContext calls setAuthToken() once it reads/writes localStorage; every
+// request() call below attaches it as a Bearer header automatically so
+// call sites don't need to be touched one by one. A 401 response triggers
+// the registered global-logout callback so the app returns to the login
+// screen from anywhere a request fails.
+let authToken: string | null = null;
+let onUnauthorized: (() => void) | null = null;
+let onPasswordChangeRequired: (() => void) | null = null;
+
+export function setAuthToken(token: string | null | undefined): void {
+  authToken = token ?? null;
+}
+
+export function getAuthToken(): string | null {
+  return authToken;
+}
+
+/** Registered once by AuthContext — called whenever any request comes back 401. */
+export function setUnauthorizedHandler(handler: (() => void) | null): void {
+  onUnauthorized = handler;
+}
+
+/**
+ * Registered once by AuthContext — called whenever any business endpoint
+ * comes back 403 with error.code === "PASSWORD_CHANGE_REQUIRED" (the backend
+ * blocks all business endpoints until the forced password change is done).
+ * This must NOT go through the 401/logout path — the session is still valid,
+ * it just needs to be routed to the change-password screen.
+ */
+export function setPasswordChangeRequiredHandler(handler: (() => void) | null): void {
+  onPasswordChangeRequired = handler;
+}
+
+function isPasswordChangeRequiredError(res: Response, json: any): boolean {
+  if (res.status !== 403) return false;
+  const err = json?.error;
+  return !!err && typeof err === "object" && err.code === "PASSWORD_CHANGE_REQUIRED";
+}
+
 /** Pagination envelope carried alongside `data` on paginated list responses. */
 export interface ApiListMeta {
   total: number;
@@ -62,7 +102,7 @@ interface ApiSuccessEnvelope<T> {
 
 interface ApiErrorEnvelope {
   success: false;
-  error?: { message?: string } | string;
+  error?: { message?: string; code?: string } | string;
 }
 
 type ApiEnvelope<T> = ApiSuccessEnvelope<T> | ApiErrorEnvelope;
@@ -125,6 +165,7 @@ async function requestEnvelope<T>(
     res = await fetch(`${base}${path}`, {
       headers: {
         "Content-Type": "application/json",
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
         ...(headers || {}),
       },
       ...restOptions,
@@ -138,6 +179,14 @@ async function requestEnvelope<T>(
     json = await res.json();
   } catch {
     throw new Error(`เซิร์ฟเวอร์ตอบกลับไม่ถูกต้อง (HTTP ${res.status})`);
+  }
+
+  if (isPasswordChangeRequiredError(res, json)) {
+    // Valid session, forced password change still pending — route to that
+    // screen instead of the 401/logout path.
+    onPasswordChangeRequired?.();
+  } else if (res.status === 401) {
+    onUnauthorized?.();
   }
 
   if (!res.ok || !json || json.success !== true) {
@@ -804,7 +853,7 @@ export async function aiChat(payload: AiChatPayload, actorId?: string): Promise<
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-user-id": actorId ?? currentUserId ?? "",
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       },
       body: JSON.stringify(payload),
     });
@@ -849,7 +898,7 @@ export async function aiDiagnose(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-user-id": actorId ?? currentUserId ?? "",
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       },
       body: JSON.stringify(payload),
     });
@@ -997,6 +1046,122 @@ export interface KnowledgeOverview {
 
 export function getKnowledgeOverview(actorId?: string): Promise<KnowledgeOverview> {
   return request<KnowledgeOverview>("/api/knowledge/overview", { headers: withActor(actorId) });
+}
+
+// ---- Auth ----
+// The three auth routes ARE wrapped in the standard {success, data} envelope
+// (see sendSuccess in backend/src/middleware/errorHandler.ts and
+// backend/src/routes/auth.ts) — on success the payload is under `.data`, and
+// on failure they return {success:false, error:{message:"<thai>"}}
+// (occasionally a bare string in `error` too) — so this reads the error
+// shape tolerantly rather than assuming one.
+function extractAuthErrorMessage(json: any, fallback: string): string {
+  const err = json?.error;
+  if (err && typeof err === "object" && typeof err.message === "string" && err.message) {
+    return err.message;
+  }
+  if (typeof err === "string" && err) return err;
+  return fallback;
+}
+
+/**
+ * Raw fetch helper for the auth endpoints. `isLoginCall` suppresses the
+ * global 401-logout handler — a failed login attempt (wrong credentials)
+ * must not trigger a "logout" of a session that never existed, which would
+ * otherwise wipe any real token and could loop. Also suppressed for the
+ * change-password call, so a mistyped current password (401/400) doesn't
+ * log the user out mid-flow.
+ */
+async function authRequest<T>(
+  path: string,
+  options: RequestInit,
+  isLoginCall = false
+): Promise<T> {
+  let res: Response;
+  try {
+    const { headers, ...restOptions } = options;
+    res = await fetch(`${API_BASE}${path}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+        ...(headers || {}),
+      },
+      ...restOptions,
+    });
+  } catch {
+    throw new Error("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+  }
+
+  if (res.status === 401 && !isLoginCall) {
+    onUnauthorized?.();
+  }
+
+  let json: any;
+  try {
+    json = await res.json();
+  } catch {
+    throw new Error(`เซิร์ฟเวอร์ตอบกลับไม่ถูกต้อง (HTTP ${res.status})`);
+  }
+
+  if (!res.ok || json?.success === false) {
+    throw new Error(
+      extractAuthErrorMessage(json, `เกิดข้อผิดพลาดจากเซิร์ฟเวอร์ (HTTP ${res.status})`)
+    );
+  }
+
+  return (json?.data !== undefined ? json.data : json) as T;
+}
+
+export interface LoginResponse {
+  token: string;
+  user: UserProfile;
+  mustChangePassword: boolean;
+}
+
+export function login(employeeId: string, password: string): Promise<LoginResponse> {
+  return authRequest<LoginResponse>(
+    "/api/auth/login",
+    {
+      method: "POST",
+      body: JSON.stringify({ employeeId, password }),
+    },
+    true
+  );
+}
+
+export interface MeResponse {
+  user: UserProfile;
+  mustChangePassword: boolean;
+}
+
+export function getMe(): Promise<MeResponse> {
+  return authRequest<MeResponse>("/api/auth/me", { method: "GET" });
+}
+
+export interface ChangePasswordResponse {
+  ok: true;
+  /**
+   * Changing the password rewrites profiles.password_updated_at, which is
+   * baked into the JWT as a `pv` claim checked on every request — so the
+   * token the caller was holding is now dead. The backend issues a fresh one
+   * here; callers MUST store it (see AuthContext.changePassword) or the very
+   * next request 401s.
+   */
+  token: string;
+}
+
+export function changePassword(
+  currentPassword: string,
+  newPassword: string
+): Promise<ChangePasswordResponse> {
+  return authRequest<ChangePasswordResponse>(
+    "/api/auth/change-password",
+    {
+      method: "POST",
+      body: JSON.stringify({ currentPassword, newPassword }),
+    },
+    true
+  );
 }
 
 export function getKnowledgeContent(

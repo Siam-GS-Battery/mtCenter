@@ -27,6 +27,65 @@ const ROLE_LABELS: Record<UserRole, string> = {
   supervisor: "หัวหน้างาน",
 };
 
+// Nav items ต่อ role — export ไว้ให้ App.tsx ใช้ตรวจสอบว่า activeTab
+// ที่ค้างอยู่ยังอยู่ในสิทธิ์ของ role ปัจจุบันหรือไม่ (กันหน้าค้างตอนสลับ role)
+export const getRoleNavItems = (role: UserRole) => {
+  switch (role) {
+    case "technician":
+      return [
+        { id: "scan", label: "หน้าหลัก", icon: QrCode, badgeKey: "" },
+        { id: "create_work_order", label: "แจ้งงานซ่อม", icon: FilePlus, badgeKey: "" },
+        { id: "chat", label: "ผู้ช่วย AI", icon: Bot, badgeKey: "" },
+        { id: "my_work_orders", label: "ใบงานของฉัน", icon: FileText, badgeKey: "my_work_orders" },
+        { id: "parts", label: "อะไหล่", icon: Package, badgeKey: "" },
+        { id: "manuals", label: "คู่มือ", icon: BookOpen, badgeKey: "" },
+      ];
+    case "engineer":
+      return [
+        { id: "review", label: "รอตรวจสอบ", icon: ClipboardCheck, badgeKey: "review" },
+        // UX Storyboard Scenario C Frame 1+2 — แยกจาก "รอตรวจสอบ" (อนุมัติใบงาน)
+        // เพราะเป้าหมายต่างกัน: หน้านี้คือสกัดความรู้จากใบงานที่ปิดแล้วเข้าคลัง
+        { id: "knowledge_review", label: "รีวิวความรู้", icon: BookMarked, badgeKey: "" },
+        { id: "create_work_order", label: "แจ้งงานซ่อม", icon: FilePlus, badgeKey: "" },
+        { id: "chat", label: "ผู้ช่วย AI", icon: Bot, badgeKey: "" },
+        { id: "manuals", label: "คู่มือ", icon: BookOpen, badgeKey: "" },
+        { id: "upload_manual", label: "อัปโหลดคู่มือ", icon: Upload, badgeKey: "" },
+        { id: "knowledge_base", label: "คลังความรู้", icon: BookMarked, badgeKey: "" },
+        { id: "all_work_orders", label: "ใบงานทั้งหมด", icon: FileText, badgeKey: "" },
+        { id: "machine_admin", label: "จัดการเครื่องจักร", icon: Factory, badgeKey: "" },
+      ];
+    case "supervisor":
+      return [
+        { id: "dashboard", label: "ภาพรวมโรงงาน", icon: BarChart3, badgeKey: "" },
+        { id: "create_work_order", label: "แจ้งงานซ่อม", icon: FilePlus, badgeKey: "" },
+        { id: "parts_admin", label: "คลังอะไหล่", icon: Package, badgeKey: "" },
+        { id: "machine_admin", label: "จัดการเครื่องจักร", icon: Factory, badgeKey: "" },
+        { id: "chat", label: "ผู้ช่วย AI", icon: Bot, badgeKey: "" },
+        { id: "manuals", label: "คู่มือ", icon: BookOpen, badgeKey: "" },
+        { id: "upload_manual", label: "อัปโหลดคู่มือ", icon: Upload, badgeKey: "" },
+        { id: "all_work_orders", label: "ใบงานทั้งหมด", icon: FileText, badgeKey: "" },
+        { id: "reports", label: "รายงาน", icon: FileBarChart, badgeKey: "" },
+      ];
+    default:
+      return [];
+  }
+};
+
+// หน้าเริ่มต้นหลังล็อกอินของแต่ละ role — ใช้ตอนรีเซ็ต/กันหน้าค้างใน App.tsx
+// แทนที่จะ hardcode "scan" ให้ทุก role เหมือนกัน
+export function getRoleDefaultTab(role: UserRole): string {
+  switch (role) {
+    case "technician":
+      return "scan";
+    case "engineer":
+      return "review";
+    case "supervisor":
+      return "dashboard";
+    default:
+      return "scan";
+  }
+}
+
 interface SidebarProps {
   currentUser: UserProfile;
   activeTab: string;
@@ -54,49 +113,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenHelp,
   onLogout,
 }) => {
-  // Define nav items for each role
-  const getRoleNavItems = (role: UserRole) => {
-    switch (role) {
-      case "technician":
-        return [
-          { id: "scan", label: "หน้าหลัก", icon: QrCode, badgeKey: "" },
-          { id: "create_work_order", label: "แจ้งงานซ่อม", icon: FilePlus, badgeKey: "" },
-          { id: "chat", label: "ผู้ช่วย AI", icon: Bot, badgeKey: "" },
-          { id: "my_work_orders", label: "ใบงานของฉัน", icon: FileText, badgeKey: "my_work_orders" },
-          { id: "parts", label: "อะไหล่", icon: Package, badgeKey: "" },
-          { id: "manuals", label: "คู่มือ", icon: BookOpen, badgeKey: "" },
-        ];
-      case "engineer":
-        return [
-          { id: "review", label: "รอตรวจสอบ", icon: ClipboardCheck, badgeKey: "review" },
-          // UX Storyboard Scenario C Frame 1+2 — แยกจาก "รอตรวจสอบ" (อนุมัติใบงาน)
-          // เพราะเป้าหมายต่างกัน: หน้านี้คือสกัดความรู้จากใบงานที่ปิดแล้วเข้าคลัง
-          { id: "knowledge_review", label: "รีวิวความรู้", icon: BookMarked, badgeKey: "" },
-          { id: "create_work_order", label: "แจ้งงานซ่อม", icon: FilePlus, badgeKey: "" },
-          { id: "chat", label: "ผู้ช่วย AI", icon: Bot, badgeKey: "" },
-          { id: "manuals", label: "คู่มือ", icon: BookOpen, badgeKey: "" },
-          { id: "upload_manual", label: "อัปโหลดคู่มือ", icon: Upload, badgeKey: "" },
-          { id: "knowledge_base", label: "คลังความรู้", icon: BookMarked, badgeKey: "" },
-          { id: "all_work_orders", label: "ใบงานทั้งหมด", icon: FileText, badgeKey: "" },
-          { id: "machine_admin", label: "จัดการเครื่องจักร", icon: Factory, badgeKey: "" },
-        ];
-      case "supervisor":
-        return [
-          { id: "dashboard", label: "ภาพรวมโรงงาน", icon: BarChart3, badgeKey: "" },
-          { id: "create_work_order", label: "แจ้งงานซ่อม", icon: FilePlus, badgeKey: "" },
-          { id: "parts_admin", label: "คลังอะไหล่", icon: Package, badgeKey: "" },
-          { id: "machine_admin", label: "จัดการเครื่องจักร", icon: Factory, badgeKey: "" },
-          { id: "chat", label: "ผู้ช่วย AI", icon: Bot, badgeKey: "" },
-          { id: "manuals", label: "คู่มือ", icon: BookOpen, badgeKey: "" },
-          { id: "upload_manual", label: "อัปโหลดคู่มือ", icon: Upload, badgeKey: "" },
-          { id: "all_work_orders", label: "ใบงานทั้งหมด", icon: FileText, badgeKey: "" },
-          { id: "reports", label: "รายงาน", icon: FileBarChart, badgeKey: "" },
-        ];
-      default:
-        return [];
-    }
-  };
-
   const primaryNavItems = getRoleNavItems(currentUser.role);
 
   const handleNavClick = (tabId: string) => {

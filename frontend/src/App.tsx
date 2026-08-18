@@ -33,7 +33,7 @@ import {
 import { useAuth } from "./contexts/AuthContext";
 import { LoginPage } from "./components/LoginPage";
 import { ChangePasswordScreen } from "./components/ChangePasswordScreen";
-import { Sidebar } from "./components/Sidebar";
+import { Sidebar, getRoleNavItems, getRoleDefaultTab } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
 import { ScanMachineView } from "./components/views/ScanMachineView";
 import { AIChatView } from "./components/views/AIChatView";
@@ -148,6 +148,31 @@ export default function App() {
   useEffect(() => {
     setCurrentUserId(currentUser?.id ?? null);
   }, [currentUser?.id]);
+
+  // รีเซ็ตหน้าจอเมื่อสลับผู้ใช้หรือ role เพราะ App ไม่ถูก unmount ตอน logout
+  // (AuthProvider แค่ re-render) ทำให้ activeTab/activeMachine/modal ต่างๆ
+  // ที่ผูกกับผู้ใช้เดิมค้างอยู่ ต้องรีเซ็ตกลับค่าเริ่มต้นทุกครั้งที่ user หรือ role เปลี่ยน
+  const userSessionKey = currentUser ? `${currentUser.id}:${currentUser.role}` : null;
+  useEffect(() => {
+    setActiveTab(currentRole ? getRoleDefaultTab(currentRole) : "scan");
+    setActiveMachine(null);
+    setIsSettingsOpen(false);
+    setIsHelpOpen(false);
+    setIsCreateWOModalOpen(false);
+    setIsAiDrawerOpen(false);
+    setPrefilledWOData(null);
+  }, [userSessionKey]);
+
+  // กันหน้าค้าง: ถ้า activeTab ปัจจุบันไม่ได้อยู่ในสิทธิ์ของ role ปัจจุบัน
+  // (เช่นสลับ role แล้ว effect ด้านบนยังไม่ทันรีเซ็ต หรือกรณีอื่นที่ทำให้ activeTab
+  // เพี้ยนไปจากสิทธิ์) ให้ตกกลับไปหน้าเริ่มต้นของ role นั้นแทน
+  useEffect(() => {
+    if (!currentRole) return;
+    const allowedTabIds = getRoleNavItems(currentRole).map((item) => item.id);
+    if (!allowedTabIds.includes(activeTab)) {
+      setActiveTab(getRoleDefaultTab(currentRole));
+    }
+  }, [currentRole, activeTab]);
 
   // Load live data from the backend on mount. No mock fallback of any kind:
   // `users` and `machines` are the two things the rest of the app cannot

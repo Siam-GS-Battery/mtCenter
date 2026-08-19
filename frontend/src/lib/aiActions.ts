@@ -92,6 +92,44 @@ const FLEET_PRESET_QUESTIONS: string[] = [
   "เครื่องไหนต้องเข้าซ่อมด่วนที่สุด",
 ];
 
+/** Uppercase, trimmed, spaces/dashes collapsed — so "gr-1141", " GR 1141 " etc. all match the same curated entry. */
+export function normalizeMachineCode(code: string): string {
+  return code.trim().toUpperCase().replace(/[\s-]+/g, "-");
+}
+
+/**
+ * Curated, per-machine preset questions for the POC demo — exactly two machines
+ * (GR-1141: escalating spindle-bearing failure story; ALL-000: healthy/preventive
+ * story). Every other machine keeps the generic list in buildPresetQuestions().
+ * The first item of each list is replaced at call time by buildMachinePresetQuestion()
+ * so a live activeErrorCode is always reflected accurately.
+ *
+ * Every question here contains a keyword matched by INTENT_KEYWORDS in
+ * backend/src/lib/mockAssistant.ts — check-intents.ts (npm run check:intents)
+ * verifies this for GR-1141.
+ */
+const MACHINE_PRESET_QUESTIONS: Record<string, string[]> = {
+  // Item [0] is always overwritten with buildMachinePresetQuestion(machine) — kept here
+  // only so the array's length/order is easy to read; its text is never shown.
+  "GR-1141": [
+    "แนวทางแก้ไขรหัสข้อผิดพลาดของเครื่องนี้",
+    "แนวโน้มอุณหภูมิ Spindle และค่าสั่นสะเทือนของเครื่อง GR-1141 ในช่วง 30 วันที่ผ่านมา เกินพิกัดที่กำหนดหรือไม่",
+    "สาเหตุที่แท้จริงของปัญหาตลับลูกปืน Spindle ที่ทรุดตัวลงเรื่อยๆ จากประวัติการซ่อมที่ผ่านมาของเครื่อง GR-1141 คืออะไร",
+    "ต้องเตรียมอะไหล่ Spindle Bearing, Oil Seal, Spindle Grease ชิ้นไหนบ้างสำหรับขั้นตอนการเปลี่ยนอะไหล่ครั้งนี้",
+    "ขั้นตอนการเปลี่ยนอะไหล่ Spindle Bearing ของเครื่อง GR-1141 อย่างปลอดภัย",
+    "ขั้นตอนความปลอดภัย Lockout-Tagout ก่อนเริ่มงานเปลี่ยนลูกปืน Spindle",
+    "สรุปประวัติการซ่อมทั้ง 9 ใบงานที่ผ่านมาของเครื่อง GR-1141",
+  ],
+  "ALL-000": [
+    "สรุปสถานะและค่าตรวจวัดล่าสุดของเครื่องนี้",
+    "กำหนดซ่อมบำรุงเชิงป้องกันครั้งถัดไปของเครื่อง ALL-000 คือเมื่อไหร่ ขอเช็กลิสต์ PM Checklist ด้วย",
+    "ค่าอุณหภูมิและแรงสั่นสะเทือนตอนนี้ของเครื่อง ALL-000 เกินพิกัดที่กำหนดหรือไม่",
+    "สรุปประวัติการซ่อมบำรุงตามรอบ (Routine) ของเครื่อง ALL-000 ที่ผ่านมา",
+    "ต้องเฝ้าระวังอะไรบ้างเพื่อไม่ให้เครื่อง ALL-000 กลายเป็นเครื่องผิดปกติเหมือน GR-1141",
+    "รอบการหยอดน้ำมันหล่อลื่นและตรวจสอบ (Lubrication/Inspection Interval) ของเครื่อง ALL-000 อยู่ในเช็กลิสต์ PM Checklist อย่างไร",
+  ],
+};
+
 /**
  * The one set of preset questions the assistant offers — the same list on the
  * full page and in the side drawer, so the assistant is one product wherever
@@ -100,9 +138,18 @@ const FLEET_PRESET_QUESTIONS: string[] = [
  * maintenance questions, including ones that exercise the assistant's live
  * telemetry and repair-history access. With no machine selected, the fleet-
  * level set above is offered instead.
+ *
+ * Exactly two machines (GR-1141, ALL-000) get a curated per-machine list for
+ * the POC demo — see MACHINE_PRESET_QUESTIONS above. Every other machine keeps
+ * this generic behavior unchanged.
  */
 export function buildPresetQuestions(machine: Machine | null): string[] {
   if (!machine) return FLEET_PRESET_QUESTIONS;
+
+  const curated = machine.code ? MACHINE_PRESET_QUESTIONS[normalizeMachineCode(machine.code)] : undefined;
+  if (curated) {
+    return [buildMachinePresetQuestion(machine), ...curated.slice(1)];
+  }
 
   return [
     buildMachinePresetQuestion(machine),

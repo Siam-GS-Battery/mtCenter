@@ -17,6 +17,7 @@ import path from "node:path";
 import { detectIntent, type Intent } from "../src/lib/mockAssistant.js";
 
 const MACHINE_CODE = "GR-1141";
+const ALL_MACHINE_CODE = "ALL-000";
 
 // คำถามเมื่อ "เลือกเครื่องจักรแล้ว" — ข้อแรกสองแบบตาม buildMachinePresetQuestion()
 // (มี/ไม่มีรหัสข้อผิดพลาดค้างอยู่)
@@ -29,6 +30,64 @@ const MACHINE_PRESETS: { question: string; expected: Intent }[] = [
   { question: "เครื่องนี้ตอนนี้ปกติหรือผิดปกติ เพราะอะไร", expected: "machine_status" },
   { question: "ประวัติการซ่อมล่าสุดของเครื่องนี้เป็นอย่างไร", expected: "repair_history" },
   { question: "ค่าอุณหภูมิและการสั่นสะเทือนตอนนี้เกินพิกัดไหม", expected: "sensor_readings" },
+];
+
+// คำถามสำเร็จรูปที่คัดสรรไว้เฉพาะ GR-1141 (POC demo) — MACHINE_PRESET_QUESTIONS ใน
+// frontend/src/lib/aiActions.ts ข้อ [0] ถูกแทนที่ด้วย buildMachinePresetQuestion()
+// เสมอ จึงตรวจเฉพาะข้อ [1..6] ที่นี่ (ตรงกับ curated[1..6] ที่ buildPresetQuestions ใช้จริง)
+const GR1141_CURATED_PRESETS: { question: string; expected: Intent }[] = [
+  {
+    question:
+      "แนวโน้มอุณหภูมิ Spindle และค่าสั่นสะเทือนของเครื่อง GR-1141 ในช่วง 30 วันที่ผ่านมา เกินพิกัดที่กำหนดหรือไม่",
+    expected: "sensor_readings",
+  },
+  {
+    question:
+      "สาเหตุที่แท้จริงของปัญหาตลับลูกปืน Spindle ที่ทรุดตัวลงเรื่อยๆ จากประวัติการซ่อมที่ผ่านมาของเครื่อง GR-1141 คืออะไร",
+    expected: "repair_history",
+  },
+  {
+    question:
+      "ต้องเตรียมอะไหล่ Spindle Bearing, Oil Seal, Spindle Grease ชิ้นไหนบ้างสำหรับขั้นตอนการเปลี่ยนอะไหล่ครั้งนี้",
+    expected: "part_replacement",
+  },
+  {
+    question: "ขั้นตอนการเปลี่ยนอะไหล่ Spindle Bearing ของเครื่อง GR-1141 อย่างปลอดภัย",
+    expected: "part_replacement",
+  },
+  {
+    question: "ขั้นตอนความปลอดภัย Lockout-Tagout ก่อนเริ่มงานเปลี่ยนลูกปืน Spindle",
+    expected: "safety_loto",
+  },
+  {
+    question: "สรุปประวัติการซ่อมทั้ง 9 ใบงานที่ผ่านมาของเครื่อง GR-1141",
+    expected: "repair_history",
+  },
+];
+
+// คำถามสำเร็จรูปที่คัดสรรไว้เฉพาะ ALL-000 (POC demo) — เช่นเดียวกับ GR-1141 ข้อ [0]
+// ถูกแทนที่ด้วย buildMachinePresetQuestion() เสมอ จึงตรวจเฉพาะข้อ [1..5]
+const ALL000_CURATED_PRESETS: { question: string; expected: Intent }[] = [
+  {
+    question: `กำหนดซ่อมบำรุงเชิงป้องกันครั้งถัดไปของเครื่อง ${ALL_MACHINE_CODE} คือเมื่อไหร่ ขอเช็กลิสต์ PM Checklist ด้วย`,
+    expected: "pm_checklist",
+  },
+  {
+    question: `ค่าอุณหภูมิและแรงสั่นสะเทือนตอนนี้ของเครื่อง ${ALL_MACHINE_CODE} เกินพิกัดที่กำหนดหรือไม่`,
+    expected: "sensor_readings",
+  },
+  {
+    question: `สรุปประวัติการซ่อมบำรุงตามรอบ (Routine) ของเครื่อง ${ALL_MACHINE_CODE} ที่ผ่านมา`,
+    expected: "repair_history",
+  },
+  {
+    question: `ต้องเฝ้าระวังอะไรบ้างเพื่อไม่ให้เครื่อง ${ALL_MACHINE_CODE} กลายเป็นเครื่องผิดปกติเหมือน ${MACHINE_CODE}`,
+    expected: "machine_status",
+  },
+  {
+    question: `รอบการหยอดน้ำมันหล่อลื่นและตรวจสอบ (Lubrication/Inspection Interval) ของเครื่อง ${ALL_MACHINE_CODE} อยู่ในเช็กลิสต์ PM Checklist อย่างไร`,
+    expected: "pm_checklist",
+  },
 ];
 
 // คำถามเมื่อ "ไม่ได้เลือกเครื่องจักร" — FLEET_PRESET_QUESTIONS
@@ -64,9 +123,14 @@ function verifyPresetsInSync(): string[] {
     return [`ไม่พบไฟล์ฝั่งหน้าจอที่ ${frontendFile} — ข้ามการตรวจว่า preset ตรงกัน`];
   }
   const source = fs.readFileSync(frontendFile, "utf-8");
-  const staticQuestions = [...MACHINE_PRESETS, ...FLEET_PRESETS]
+  const staticQuestions = [
+    ...MACHINE_PRESETS,
+    ...FLEET_PRESETS,
+    ...GR1141_CURATED_PRESETS,
+    ...ALL000_CURATED_PRESETS,
+  ]
     .map((c) => c.question)
-    .filter((q) => !q.includes(MACHINE_CODE) && !q.includes("ALM-52"));
+    .filter((q) => !q.includes(MACHINE_CODE) && !q.includes(ALL_MACHINE_CODE) && !q.includes("ALM-52"));
 
   const missing = staticQuestions.filter((q) => !source.includes(q));
   return missing.map((q) => `คำถาม "${q}" ไม่พบใน frontend/src/lib/aiActions.ts แล้ว (preset อาจถูกแก้ไปโดยไม่อัปเดตที่นี่)`);
@@ -89,6 +153,8 @@ function main(): void {
 
   runGroup("คำถามสำเร็จรูป: เลือกเครื่องจักรแล้ว", MACHINE_PRESETS);
   runGroup("คำถามสำเร็จรูป: ภาพรวมทั้งฟลีต", FLEET_PRESETS);
+  runGroup("คำถามสำเร็จรูปคัดสรร: GR-1141 (POC demo)", GR1141_CURATED_PRESETS);
+  runGroup("คำถามสำเร็จรูปคัดสรร: ALL-000 (POC demo)", ALL000_CURATED_PRESETS);
   runGroup("คำถามอิสระที่ควรจับได้", FREE_FORM);
 
   console.log("\n[คำถามนอกขอบเขต ต้องตอบว่าไม่รู้]");

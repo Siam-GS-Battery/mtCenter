@@ -21,6 +21,12 @@ export interface MachineSelectProps {
   placeholder?: string;
   /** show a red required-field asterisk after the label; default false */
   required?: boolean;
+  /** show an extra "ไม่ระบุเครื่องจักร" row above the list to clear the selection */
+  allowClear?: boolean;
+  /** label for the clear row; default "ไม่ระบุเครื่องจักร (ถามแบบทั่วไป)" */
+  clearLabel?: string;
+  /** called when the user picks the clear row (only relevant when allowClear is true) */
+  onClear?: () => void;
 }
 
 const RECENTS_KEY = "mtcenter.recentMachineIds";
@@ -89,6 +95,9 @@ export const MachineSelect: React.FC<MachineSelectProps> = ({
   label = "เครื่องจักรที่กำลังตรวจสอบ",
   placeholder,
   required = false,
+  allowClear = false,
+  clearLabel = "ไม่ระบุเครื่องจักร (ถามแบบทั่วไป)",
+  onClear,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -185,6 +194,12 @@ export const MachineSelect: React.FC<MachineSelectProps> = ({
   const handleSelect = (machine: Machine) => {
     onSelectMachine(machine);
     setRecentIds(pushRecentId(machine.id));
+    setQuery("");
+    setIsOpen(false);
+  };
+
+  const handleSelectClear = () => {
+    onClear?.();
     setQuery("");
     setIsOpen(false);
   };
@@ -342,6 +357,21 @@ export const MachineSelect: React.FC<MachineSelectProps> = ({
             aria-label={label}
             className="max-h-[320px] overflow-y-auto bg-white"
           >
+            {allowClear && (
+              <button
+                type="button"
+                role="option"
+                aria-selected={!activeMachine}
+                onClick={handleSelectClear}
+                className={`w-full text-left px-3 py-2.5 min-h-[52px] flex items-center justify-between gap-2 cursor-pointer transition-colors border-b border-hairline ${
+                  !activeMachine ? "bg-primary/5" : ""
+                }`}
+              >
+                <span className="text-sm text-ink-muted">{clearLabel}</span>
+                {!activeMachine && <Check className="w-4 h-4 text-primary" />}
+              </button>
+            )}
+
             {recentMachines.length > 0 && (
               <div role="group" aria-label="ล่าสุด">
                 <div

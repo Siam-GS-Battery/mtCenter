@@ -833,6 +833,7 @@ export default function App() {
           {activeTab === "chat" && (
             <AIChatView
               activeMachine={activeMachine}
+              machines={machines}
               currentUserRole={currentUser.role}
               currentUserName={currentUser.name}
               initialPrompt={chatInitialPrompt}

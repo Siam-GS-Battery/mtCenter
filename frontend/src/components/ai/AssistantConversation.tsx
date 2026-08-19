@@ -98,15 +98,37 @@ export interface AssistantChat {
   send: (prompt: string) => void;
   retry: (errorMessageId: string) => void;
   reset: () => void;
+  /**
+   * โหลดข้อความของ session อื่นเข้ามาแทนของปัจจุบัน โดยไม่ให้ effect ที่คอย
+   * reset ตอนเปลี่ยนเครื่องจักรมาทับ — ใช้เมื่อผู้เรียกกำลังสลับ session
+   * (ซึ่งมักเปลี่ยนเครื่องจักรที่เลือกไปพร้อมกันด้วย) ต้องเรียกในรอบ event
+   * เดียวกันกับที่เปลี่ยน activeMachine (ตัวแปรที่ส่งเข้า useAssistantChat)
+   * เพื่อให้ React batch ทั้งสองการเปลี่ยนแปลงเข้าด้วยกัน
+   */
+  hydrate: (messages: ChatMessageWithFallback[]) => void;
+  /**
+   * เรียกก่อนเปลี่ยน activeMachine (ในรอบ event เดียวกัน) เมื่อต้องการแค่เปลี่ยน
+   * บริบทเครื่องจักรที่จะส่งไปกับคำถามถัดไป โดยไม่ล้างบทสนทนาปัจจุบัน — ต่างจาก
+   * hydrate ตรงที่ไม่แตะ messages/failedPrompts เลย
+   */
+  suppressNextMachineReset: () => void;
 }
 
 /**
  * Conversation state + the network call. Lives in the parent so the drawer
  * keeps its history while it is closed.
  */
+export interface UseAssistantChatOptions {
+  /** ข้อความเริ่มต้น — ใช้ตอน hydrate จาก session ที่บันทึกไว้ */
+  initialMessages?: ChatMessageWithFallback[];
+  /** เรียกทุกครั้งที่ messages เปลี่ยน — ใช้ mirror เข้า session storage */
+  onMessagesChange?: (messages: ChatMessageWithFallback[]) => void;
+}
+
 export function useAssistantChat(
   activeMachine: Machine | null,
-  currentUserRole: UserRole
+  currentUserRole: UserRole,
+  options?: UseAssistantChatOptions
 ): AssistantChat {
   const welcome = (): ChatMessageWithFallback => ({
     id: `welcome-${Date.now()}`,
@@ -115,7 +137,11 @@ export function useAssistantChat(
     timestamp: "เมื่อสักครู่",
   });
 
-  const [messages, setMessages] = useState<ChatMessageWithFallback[]>(() => [welcome()]);
+  const [messages, setMessages] = useState<ChatMessageWithFallback[]>(
+    () => options?.initialMessages && options.initialMessages.length > 0
+      ? options.initialMessages
+      : [welcome()]
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [failedPrompts, setFailedPrompts] = useState<Record<string, string>>({});
 
@@ -124,13 +150,30 @@ export function useAssistantChat(
   const failedRef = useRef(failedPrompts);
   failedRef.current = failedPrompts;
 
+  const onMessagesChangeRef = useRef(options?.onMessagesChange);
+  onMessagesChangeRef.current = options?.onMessagesChange;
+
+  useEffect(() => {
+    onMessagesChangeRef.current?.(messages);
+  }, [messages]);
+
   // เปลี่ยนเครื่องจักร = บริบทใหม่ ทักทายด้วยค่าจริงของเครื่องนั้น (หรือทักทายแบบภาพรวม
   // ทั้งฟลีตถ้าไม่มีเครื่องจักรเลือกอยู่ — activeMachine เป็น null ได้)
+  //
+  // ข้อยกเว้น: ถ้าผู้เรียก (เช่นตอนสลับ session ในหน้าแชตเต็มหน้า) กำลังโหลด
+  // ข้อความของ session อื่นเข้ามาพร้อม ๆ กับเปลี่ยนเครื่องจักร ไม่ควรให้ effect นี้
+  // ทับด้วยข้อความทักทายใหม่ — ผู้เรียกส่ง skipNextResetRef.current = true ก่อน
+  // เปลี่ยนทั้ง activeMachine และ messages ในรอบเดียวกันได้
   const machineIdRef = useRef(activeMachine?.id ?? null);
+  const skipNextResetRef = useRef(false);
   useEffect(() => {
     const currentId = activeMachine?.id ?? null;
     if (machineIdRef.current === currentId) return;
     machineIdRef.current = currentId;
+    if (skipNextResetRef.current) {
+      skipNextResetRef.current = false;
+      return;
+    }
     setFailedPrompts({});
     setMessages([welcome()]);
   }, [activeMachine?.id]);
@@ -228,7 +271,26 @@ export function useAssistantChat(
     setMessages([welcome()]);
   };
 
-  return { messages, isLoading, failedPrompts, send, retry, reset };
+  const hydrate = (nextMessages: ChatMessageWithFallback[]) => {
+    skipNextResetRef.current = true;
+    setFailedPrompts({});
+    setMessages(nextMessages.length > 0 ? nextMessages : [welcome()]);
+  };
+
+  const suppressNextMachineReset = () => {
+    skipNextResetRef.current = true;
+  };
+
+  return {
+    messages,
+    isLoading,
+    failedPrompts,
+    send,
+    retry,
+    reset,
+    hydrate,
+    suppressNextMachineReset,
+  };
 }
 
 interface AssistantConversationProps {
@@ -338,7 +400,12 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
         aria-busy={isLoading}
       >
         {!hasUserMessage ? (
-          <div className="h-full flex flex-col items-center justify-center text-center px-2 pb-8">
+          // เดิมใช้ h-full + justify-center บนคอนเทนเนอร์ที่ overflow-y-auto ได้ — เมื่อคำถาม
+          // แนะนำล้นสูงกว่าพื้นที่ (เพิ่มจาก 3-4 เป็น 6-7 ข้อ) จะเจอบั๊ก flex-centering-overflow
+          // คลาสสิก: เนื้อหาที่ล้นจากการจัดกึ่งกลางถูก "หนีบ" เท่า ๆ กันทั้งบนล่าง จนเลื่อนไปสุดปุ่มบนๆ
+          // ไม่ได้ (เห็น/กดได้แค่ 2 ปุ่มแรก) — เอา justify-center ออก ให้ไหลจากบนลงล่างตามปกติ
+          // แทน เนื้อหาสั้นยังดูกึ่งกลางได้ด้วย min-h-full + py
+          <div className="min-h-full flex flex-col items-center text-center px-2 py-8">
             <div
               className={`rounded-full bg-primary/10 flex items-center justify-center mb-4 ${isPage ? "w-16 h-16" : "w-14 h-14"}`}
             >
@@ -355,7 +422,7 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
               className={`w-full ${isPage ? "grid grid-cols-1 sm:grid-cols-2 gap-3" : "flex flex-col gap-2"}`}
             >
               {presetQuestions.map((q, idx) => {
-                const Icon = presetIcons[idx] || Sparkles;
+                const Icon = presetIcons[idx % presetIcons.length] ?? Sparkles;
                 return (
                   <button
                     key={idx}
@@ -636,7 +703,7 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
         className={`shrink-0 ${isPage ? "pb-4 pt-2 bg-parchment" : "bg-white border-t border-hairline p-3"}`}
       >
         {hasUserMessage && (
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+          <div className="flex flex-nowrap items-center gap-2 overflow-x-auto overflow-y-hidden -mx-4 px-4 pb-2 scrollbar-none">
             {presetQuestions.map((q, idx) => (
               <button
                 key={idx}

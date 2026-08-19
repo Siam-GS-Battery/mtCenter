@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Zap, Lock, User, Eye, EyeOff } from "lucide-react";
+import { Lock, User, Eye, EyeOff } from "lucide-react";
+import PixelAILogo from "./PixelAILogo";
 import { useAuth } from "../contexts/AuthContext";
 import { toUserMessage } from "../services/apiService";
 import { notifyFailed } from "../lib/swal";
@@ -40,7 +41,7 @@ export const LoginPage: React.FC = () => {
       <div className="max-w-md w-full bg-white rounded-[18px] border border-hairline p-8 space-y-6">
         <div className="flex flex-col items-center gap-2">
           <div className="w-12 h-12 rounded-full bg-nav-black flex items-center justify-center">
-            <Zap className="w-6 h-6 text-white fill-white" />
+            <PixelAILogo className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-lg font-semibold text-ink tracking-[-0.02em]">MT Center</h1>
           <p className="text-sm text-ink-faint">เข้าสู่ระบบเพื่อใช้งานศูนย์ซ่อมบำรุง</p>

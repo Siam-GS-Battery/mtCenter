@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
   type ReactElement,
+  type RefObject,
 } from "react";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import {
@@ -3294,6 +3295,23 @@ function SceneContents({
           blur={2}
           far={4}
           color={LIVE_FLOOR_THEME.shadowColor}
+          // `frames={1}` (drei): render the blurred depth pass ONCE instead of
+          // every frame. Verified this is safe: `<ContactShadows>` has no
+          // children here, so it is not depth-capturing any specific moving
+          // object at all — it captures whatever three.js renders in its own
+          // internal shadow-camera pass looking straight down at this plane,
+          // and every animated part of this scene (`MachineInstances`,
+          // `ConveyorSystem`, `FloorTraffic`) explicitly sets
+          // `castShadow={false}` (see SceneLights' block comment above — the
+          // renderer's own shadow map is intentionally off too). Nothing here
+          // moves in a way this pass would ever need to react to, so a
+          // continuous re-render was pure waste: a full extra off-screen
+          // scene render + blur pass, at this same viewport resolution, on
+          // EVERY frame, for a shadow blob that never changes shape. `frames`
+          // still re-fires once whenever `scale`/`position`/children remount
+          // (drei re-runs its finite-frame counter on prop identity changes),
+          // so a camera-preset-driven site resize still gets a fresh capture.
+          frames={1}
         />
       )}
 
@@ -3396,13 +3414,91 @@ function ContextLossBridge({
   return null;
 }
 
+// FILL-RATE BUDGET, not a fixed dpr multiplier. This scene is dominated by
+// large transparent, non-early-Z-friendly surfaces (WallGlassLayer, the AO
+// skirt, ContactShadows' blurred pass) whose per-frame cost scales with
+// DRAWING-BUFFER PIXELS, i.e. cssWidth * cssHeight * dpr^2 — not with machine
+// count. A fixed `dpr` multiplier ignores the actual canvas size: a
+// 2560x1440 desktop monitor at the old dpr-2 cap pushed ~14.7M pixels/frame,
+// while a phone's small canvas at dpr 3 only pushed ~3M — 5x less work for
+// mobile despite the "higher" dpr. That is exactly why desktop stuttered and
+// mobile didn't: it was never a machine-count/CPU problem, it was fill rate.
+//
+// 2.4M was chosen as: a 1080p canvas (1920x1080 = ~2.07M) still gets to render
+// at a full dpr of ~1.08 (effectively "sharp"), while anything bigger
+// (1440p, 4K, ultrawide) gets smoothly throttled down instead of cliff-diving.
+// It is also comfortably above typical phone canvases (a 390x844 canvas is
+// ~0.33M even before dpr), so mobile is never affected by this cap — it was
+// already fine.
+const PIXEL_BUDGET = 2_400_000;
+
+/** dpr ceiling from the old code path, kept as the upper bound so small/phone
+ *  canvases that are already under budget still get full quality. */
+const DPR_CEILING = 2;
+
+/**
+ * Resize-aware CSS-pixel measurement of the Canvas's actual container size.
+ * A one-shot read (e.g. `window.innerWidth` at mount) goes stale the moment
+ * the window resizes, a panel opens/closes, or the user enters/exits
+ * fullscreen — all of which change how many pixels the canvas actually has
+ * to fill. ResizeObserver is the correct primitive for "this specific
+ * element changed size" (vs. `window.resize`, which fires for the *window*
+ * and misses container-only layout changes, e.g. a sidebar toggling).
+ */
+function useElementSize<T extends HTMLElement>(): [RefObject<T | null>, { width: number; height: number }] {
+  const ref = useRef<T | null>(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      const { width, height } = entry.contentRect;
+      setSize((prev) => (prev.width === width && prev.height === height ? prev : { width, height }));
+    });
+    observer.observe(el);
+    // Seed with a synchronous read so the very first frame already has a
+    // sane budget instead of momentarily rendering at DPR_CEILING before the
+    // first ResizeObserver callback fires.
+    const rect = el.getBoundingClientRect();
+    setSize({ width: rect.width, height: rect.height });
+    return () => observer.disconnect();
+  }, []);
+
+  return [ref, size];
+}
+
 export default function LiveFloor4DScene(props: LiveFloor4DSceneProps): ReactElement {
   const { highQuality, machines, onContextLost, onContextRestored } = props;
+  const [containerRef, containerSize] = useElementSize<HTMLDivElement>();
+
+  // Max dpr this canvas is allowed, given its actual CSS size and the fill-
+  // rate budget above. Guarded against a 0x0 measurement (before the first
+  // layout/ResizeObserver tick) so we don't divide by zero and momentarily
+  // ask for an absurd dpr — fall back to the old ceiling until real numbers
+  // land, which is a single early frame at worst.
+  const cssPixels = containerSize.width * containerSize.height;
+  const budgetDprMax = cssPixels > 0 ? Math.sqrt(PIXEL_BUDGET / cssPixels) : DPR_CEILING;
+  const dprMax = Math.min(DPR_CEILING, Math.max(1, budgetDprMax));
+
+  // Even at the floor of the dpr range (1x), a big-enough desktop viewport
+  // can still exceed the pixel budget on its own (e.g. an ultrawide monitor:
+  // 3440x1440 = ~4.95M CSS pixels, already 2x budget at dpr 1). That case
+  // can't be fixed by lowering dpr any further, so it's exactly the signal
+  // to fold into the `lite` decision (Fix 4): the true cost driver is total
+  // pixels, and machine count alone (the old `> 250` rule) says nothing
+  // about how large the viewport is.
+  const budgetPixelLite = cssPixels >= PIXEL_BUDGET;
+
   // Single source of truth for the auto-lite path: an explicit highQuality
-  // override, or an automatic downgrade once the floor gets heavy. Computed
-  // here (outside SceneContents) so the Canvas wrapper's dpr and the inner
-  // scene's per-part lite drops always agree.
-  const lite = highQuality === false || machines.length > 250;
+  // override, an automatic downgrade once the floor gets heavy, OR the
+  // viewport itself being too large to afford full-quality fill-rate work
+  // (MSAA, ContactShadows, glass) even at the minimum dpr. Computed here
+  // (outside SceneContents) so the Canvas wrapper's dpr/antialias and the
+  // inner scene's per-part lite drops always agree.
+  const lite = highQuality === false || machines.length > 250 || budgetPixelLite;
 
   // Note: `antialias` only takes effect at WebGL context creation, so
   // toggling highQuality at runtime cannot retroactively change MSAA. That is
@@ -3429,9 +3525,20 @@ export default function LiveFloor4DScene(props: LiveFloor4DSceneProps): ReactEle
   // would simply undo that.
   const gl = useMemo(
     () => ({
-      // `lite` already folds in `highQuality === false`, so `!lite` alone
-      // implies highQuality wasn't explicitly turned off — no need to repeat
-      // the check (and TS's aliased-condition narrowing flags it as redundant).
+      // `lite` already folds in `highQuality === false` AND `budgetPixelLite`
+      // (see the `lite` derivation above), so `!lite` alone gates MSAA on
+      // BOTH the explicit quality switch and the resolved pixel budget: MSAA
+      // is the most expensive per-fragment cost in the fill-rate budget, and
+      // at high dpr it is also nearly pointless (supersampling already
+      // antialiases). Note `antialias` only takes effect at WebGL context
+      // creation — toggling `lite` after mount cannot retroactively add/remove
+      // MSAA, and this file deliberately avoids remounting the Canvas to fix
+      // that (see the note above the `lite` derivation and on `<Canvas>`
+      // below). In practice that means: whichever quality tier the scene
+      // MOUNTS at is the one that keeps its antialias setting for the life of
+      // that mount, even if the container is later resized across the
+      // budget's threshold — a resize only ever changes `dpr` live, never
+      // this flag.
       antialias: !lite,
       powerPreference: "high-performance" as const,
       stencil: false,
@@ -3441,10 +3548,22 @@ export default function LiveFloor4DScene(props: LiveFloor4DSceneProps): ReactEle
     }),
     [lite, highQuality]
   );
-  const dpr = useMemo<[number, number]>(() => [1, lite ? 1.25 : 2], [lite]);
+  // Min stays 1 (never upsample below native), max is the smaller of the old
+  // per-tier ceiling and the fill-rate budget's ceiling for THIS container's
+  // current size — so a phone-sized canvas still gets dpr up to 2 (or 1.25 in
+  // `lite`) exactly as before, while a large desktop viewport is capped lower
+  // automatically. R3F re-applies `dpr` on every render when it's a plain
+  // array (no clientside internal memo across value changes), so a live
+  // window resize naturally recomputes `budgetDprMax` above and flows through
+  // here without remounting the Canvas.
+  const dpr = useMemo<[number, number]>(
+    () => [1, Math.min(lite ? 1.25 : DPR_CEILING, dprMax)],
+    [lite, dprMax]
+  );
 
   return (
-    <Canvas
+    <div ref={containerRef} style={{ width: "100%", height: "100%" }}>
+      <Canvas
       style={{ width: "100%", height: "100%" }}
       dpr={dpr}
       gl={gl}
@@ -3473,6 +3592,7 @@ export default function LiveFloor4DScene(props: LiveFloor4DSceneProps): ReactEle
       <AdaptiveDpr pixelated={false} />
       <AdaptiveEvents />
       <SceneContents {...props} lite={lite} />
-    </Canvas>
+      </Canvas>
+    </div>
   );
 }

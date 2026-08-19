@@ -7,7 +7,8 @@ import type { AppRole } from "../middleware/requireRole.js";
 // ห้าม fallback ไปใช้ secret เริ่มต้นใด ๆ — ถ้าไม่ได้ตั้งค่า server จะ throw ตอน startup
 const JWT_SECRET: string = config.jwtSecret;
 
-const EXPIRES_IN = "12h";
+const DEFAULT_EXPIRES_IN = "12h";
+const REMEMBER_ME_EXPIRES_IN = "7d";
 
 export interface AuthTokenPayload {
   sub: string;
@@ -33,10 +34,10 @@ export function passwordTokenVersion(passwordUpdatedAt: string | null | undefine
   return Number.isNaN(parsed) ? String(passwordUpdatedAt) : String(parsed);
 }
 
-export function signToken(payload: Omit<AuthTokenPayload, "jti">): string {
+export function signToken(payload: Omit<AuthTokenPayload, "jti">, rememberMe = false): string {
   return jwt.sign({ ...payload, jti: randomUUID() }, JWT_SECRET, {
     algorithm: "HS256",
-    expiresIn: EXPIRES_IN,
+    expiresIn: rememberMe ? REMEMBER_ME_EXPIRES_IN : DEFAULT_EXPIRES_IN,
   });
 }
 

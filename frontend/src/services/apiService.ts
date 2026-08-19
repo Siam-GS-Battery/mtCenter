@@ -1118,12 +1118,16 @@ export interface LoginResponse {
   mustChangePassword: boolean;
 }
 
-export function login(employeeId: string, password: string): Promise<LoginResponse> {
+export function login(
+  employeeId: string,
+  password: string,
+  rememberMe?: boolean
+): Promise<LoginResponse> {
   return authRequest<LoginResponse>(
     "/api/auth/login",
     {
       method: "POST",
-      body: JSON.stringify({ employeeId, password }),
+      body: JSON.stringify({ employeeId, password, rememberMe: !!rememberMe }),
     },
     true
   );

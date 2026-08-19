@@ -253,7 +253,7 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
           the KPI strip is pushed to the bottom by `mt-auto` whenever there is
           slack, which reproduces the previous bottom-left placement. */}
       <div
-        className={`hidden @min-[640px]:flex absolute top-4 left-4 bottom-4 z-10 w-64 max-w-[calc(100%-2rem)] flex-col gap-3 pointer-events-none overflow-y-auto overflow-x-hidden overscroll-contain ${HIDE_SCROLLBAR_CLASS}`}
+        className={`hidden @min-[640px]:flex absolute top-4 left-4 bottom-4 z-10 w-64 max-w-[calc(100%-2rem)] flex-col gap-3 pointer-events-none overflow-y-auto overflow-x-hidden overscroll-contain min-h-0 ${HIDE_SCROLLBAR_CLASS}`}
       >
         {/* overview / status filters — natural height, never shrinks */}
         <div

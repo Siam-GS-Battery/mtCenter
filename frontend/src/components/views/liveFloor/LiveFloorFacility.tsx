@@ -2412,26 +2412,8 @@ export function FloorTraffic({ layout, lite }: FloorTrafficProps): ReactElement 
     }
     } // end throttled AGV/worker/truck block
 
-    // --- overhead gantry crane, bound to the largest building ---
-    const bridge = bridgeRef.current;
-    if (bridge && crane) {
-      const bx = crane.x + Math.sin(t * 0.06) * crane.travelX;
-      bridge.position.x = bx;
-      const trolley = trolleyRef.current;
-      if (trolley) {
-        const tz = crane.z + Math.sin(t * 0.13) * crane.travelZ;
-        trolley.position.x = bx;
-        trolley.position.z = tz;
-        const cable = cableRef.current;
-        const hook = hookRef.current;
-        if (cable && hook) {
-          const drop = 1.5 + (Math.sin(t * 0.29) * 0.5 + 0.5) * (crane.y - 2.6);
-          cable.position.set(bx, crane.y - 0.35 - drop / 2, tz);
-          cable.scale.y = drop;
-          hook.position.set(bx, crane.y - 0.35 - drop, tz);
-        }
-      }
-    }
+    // เครนถูกตรึงให้อยู่นิ่งกับที่ตามคำขอ จึงไม่มีการอัปเดตตำแหน่งเครนต่อเฟรมอีกต่อไป
+    // (ตั้งค่าตำแหน่งเริ่มต้นครั้งเดียวใน useLayoutEffect ด้านล่างแทน)
   });
 
   if (empty) return null;

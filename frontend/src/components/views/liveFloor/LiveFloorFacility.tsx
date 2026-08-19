@@ -1778,6 +1778,7 @@ export function ConveyorSystem({
   const chevronRef = useRef<THREE.InstancedMesh>(null);
   const cargoRef = useRef<THREE.InstancedMesh>(null);
   const refreshAcc = useRef(0);
+  const moveAcc = useRef(0); // throttle heavy per-rider update to ~30Hz
 
   // static instances: belts, rails, rollers — written once
   useLayoutEffect(() => {
@@ -1931,36 +1932,45 @@ export function ConveyorSystem({
     }
 
     // --- advance riders, patching translation in place ---
-    const chevron = chevronRef.current;
-    if (chevron) {
-      const arr = chevron.instanceMatrix.array as Float32Array;
-      for (let i = 0; i < data.chevronLine.length; i++) {
-        const l = data.chevronLine[i];
-        let p = data.chevronPos[i] + data.speed[l] * dt;
-        const L = data.len[l];
-        if (p >= L) p -= L;
-        data.chevronPos[i] = p;
-        const base = i * 16;
-        arr[base + 12] = data.originX[l] + data.dirX[l] * p;
-        arr[base + 14] = data.originZ[l] + data.dirZ[l] * p;
-      }
-      if (data.chevronLine.length > 0) chevron.instanceMatrix.needsUpdate = true;
-    }
+    // throttled to ~30Hz: accumulate dt and use the accumulated amount as the
+    // effective step so speed stays identical, we just update less often.
+    moveAcc.current += dt;
+    const MOVE_STEP = 1 / 30;
+    if (moveAcc.current >= MOVE_STEP) {
+      const moveDt = moveAcc.current;
+      moveAcc.current = 0;
 
-    const cargo = cargoRef.current;
-    if (cargo) {
-      const arr = cargo.instanceMatrix.array as Float32Array;
-      for (let i = 0; i < data.cargoLine.length; i++) {
-        const l = data.cargoLine[i];
-        let p = data.cargoPos[i] + data.speed[l] * dt;
-        const L = data.len[l];
-        if (p >= L) p -= L;
-        data.cargoPos[i] = p;
-        const base = i * 16;
-        arr[base + 12] = data.originX[l] + data.dirX[l] * p;
-        arr[base + 14] = data.originZ[l] + data.dirZ[l] * p;
+      const chevron = chevronRef.current;
+      if (chevron) {
+        const arr = chevron.instanceMatrix.array as Float32Array;
+        for (let i = 0; i < data.chevronLine.length; i++) {
+          const l = data.chevronLine[i];
+          let p = data.chevronPos[i] + data.speed[l] * moveDt;
+          const L = data.len[l];
+          if (p >= L) p -= L;
+          data.chevronPos[i] = p;
+          const base = i * 16;
+          arr[base + 12] = data.originX[l] + data.dirX[l] * p;
+          arr[base + 14] = data.originZ[l] + data.dirZ[l] * p;
+        }
+        if (data.chevronLine.length > 0) chevron.instanceMatrix.needsUpdate = true;
       }
-      if (data.cargoLine.length > 0) cargo.instanceMatrix.needsUpdate = true;
+
+      const cargo = cargoRef.current;
+      if (cargo) {
+        const arr = cargo.instanceMatrix.array as Float32Array;
+        for (let i = 0; i < data.cargoLine.length; i++) {
+          const l = data.cargoLine[i];
+          let p = data.cargoPos[i] + data.speed[l] * moveDt;
+          const L = data.len[l];
+          if (p >= L) p -= L;
+          data.cargoPos[i] = p;
+          const base = i * 16;
+          arr[base + 12] = data.originX[l] + data.dirX[l] * p;
+          arr[base + 14] = data.originZ[l] + data.dirZ[l] * p;
+        }
+        if (data.cargoLine.length > 0) cargo.instanceMatrix.needsUpdate = true;
+      }
     }
   });
 
@@ -2226,6 +2236,7 @@ export function FloorTraffic({ layout, lite }: FloorTrafficProps): ReactElement 
   const cableRef = useRef<THREE.Mesh>(null);
   const hookRef = useRef<THREE.Mesh>(null);
   const clock = useRef(0);
+  const trafficMoveAcc = useRef(0); // throttle AGV/worker/truck matrix updates to ~30Hz
 
   const crane = useMemo(() => {
     const b = pickCraneBuilding(layout.buildings ?? []);
@@ -2252,6 +2263,15 @@ export function FloorTraffic({ layout, lite }: FloorTrafficProps): ReactElement 
     const dt = dtRaw > 0.1 ? 0.1 : dtRaw;
     clock.current += dt;
     const t = clock.current;
+
+    // --- AGVs / workers / trucks: throttled to ~30Hz. accumulate dt and use
+    // the accumulated amount as the effective step so speed stays identical,
+    // we just skip the (expensive) per-item matrix rebuild on skipped frames.
+    trafficMoveAcc.current += dt;
+    const TRAFFIC_MOVE_STEP = 1 / 30;
+    if (trafficMoveAcc.current >= TRAFFIC_MOVE_STEP) {
+      const dt = trafficMoveAcc.current;
+      trafficMoveAcc.current = 0;
 
     // --- AGVs on the main arteries ---
     const agv = agvRef.current;
@@ -2390,6 +2410,7 @@ export function FloorTraffic({ layout, lite }: FloorTrafficProps): ReactElement 
       if (trailer) trailer.instanceMatrix.needsUpdate = true;
       if (tail) tail.instanceMatrix.needsUpdate = true;
     }
+    } // end throttled AGV/worker/truck block
 
     // --- overhead gantry crane, bound to the largest building ---
     const bridge = bridgeRef.current;

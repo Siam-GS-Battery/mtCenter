@@ -29,7 +29,7 @@ import { Pagination } from "../ui/Pagination";
 import { MachineSelect } from "../MachineSelect";
 import { TelemetryTrendCard } from "./TelemetryTrendCard";
 import LiveFloorView from "./liveFloor/LiveFloorView";
-import { getWorkOrders, toUserMessage } from "../../services/apiService";
+import { getMachines, getWorkOrders, toUserMessage } from "../../services/apiService";
 import {
   machineStatusLabel,
   machineStatusBadgeClass,
@@ -281,15 +281,21 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
   const [pickedMachine, setPickedMachine] = useState<Machine | null>(null);
   const [statusFilter, setStatusFilter] = useState<MachineStatusFilter>("all");
 
-  // The registry can hold up to 1000 machines (App.tsx fetches
-  // getMachines({limit:1000})) — rendering every ~90-line card at once locked up
-  // the browser. Render only the first `visibleCount` and let "แสดงเพิ่ม" grow it
-  // in pages of 24, resetting whenever the filter or the underlying data changes
-  // so a previously-expanded list doesn't stay expanded across an unrelated filter.
-  const [visibleCount, setVisibleCount] = useState(24);
+  // The registry used to render straight off the `machines` prop, itself capped
+  // at App.tsx's getMachines({limit:1000}) snapshot — fine only while the fleet
+  // stays under 1000 rows. Real server-side paging replaces that hard cap: the
+  // grid below fetches its own page directly from GET /api/machines.
+  const REGISTRY_PAGE_SIZE = 24;
+  const [registryOffset, setRegistryOffset] = useState(0);
+  const [registryMachines, setRegistryMachines] = useState<Machine[]>([]);
+  const [registryTotal, setRegistryTotal] = useState(0);
+  const [registryLoading, setRegistryLoading] = useState(false);
+  const [registryError, setRegistryError] = useState<string | null>(null);
+
+  // เปลี่ยนตัวกรองสถานะ -> กลับไปหน้าแรกของทะเบียนเครื่องจักรเสมอ
   useEffect(() => {
-    setVisibleCount(24);
-  }, [statusFilter, machines]);
+    setRegistryOffset(0);
+  }, [statusFilter]);
 
   // Prefer /api/machines/stats and /api/work-orders/stats for every KPI tile
   // and the pie chart below — `machines`/`workOrders` are now paginated (max
@@ -356,6 +362,54 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
     };
   }, [machines, workOrders, machineStats, workOrderStats]);
 
+  // แถวทะเบียนเครื่องจักร — ดึงเองแยกจาก `machines` prop เพื่อไม่ให้ถูกจำกัดที่
+  // 1000 แถวจาก App.tsx อีกต่อไป "attention" (เตือน+ขัดข้องรวมกัน) เป็นตัวกรอง
+  // เดียวที่ backend ทำ OR สถานะให้ในคำขอเดียวไม่ได้ (GET /api/machines รับ
+  // status เดี่ยวเท่านั้น) จึงขอทั้งสองสถานะแยกกัน คนละคำขอ โดยจำกัดจำนวนตาม
+  // ยอดจริงจาก machineStats/การนับสำรองด้านบน (ไม่ทะลุ 1000 ทั้งคู่ตามปกติ)
+  // แล้วรวม/ตัดหน้าแบบฝั่ง client เพื่อให้ยังใช้ <Pagination> ตัวเดียวกันได้
+  useEffect(() => {
+    let cancelled = false;
+    setRegistryLoading(true);
+    setRegistryError(null);
+
+    const load = async () => {
+      try {
+        if (statusFilter === "attention") {
+          const [warningRes, errorRes] = await Promise.all([
+            getMachines({ limit: Math.max(warningMachines, 1), offset: 0, status: "warning" }),
+            getMachines({ limit: Math.max(errorMachines, 1), offset: 0, status: "error" }),
+          ]);
+          if (cancelled) return;
+          const merged = [...warningRes.data, ...errorRes.data].sort((a, b) =>
+            (a.code ?? "").localeCompare(b.code ?? "")
+          );
+          setRegistryTotal(merged.length);
+          setRegistryMachines(merged.slice(registryOffset, registryOffset + REGISTRY_PAGE_SIZE));
+        } else {
+          const res = await getMachines({
+            limit: REGISTRY_PAGE_SIZE,
+            offset: registryOffset,
+            status: statusFilter === "all" ? undefined : statusFilter,
+          });
+          if (cancelled) return;
+          setRegistryMachines(res.data);
+          setRegistryTotal(res.meta?.total ?? res.data.length);
+        }
+      } catch (err) {
+        if (!cancelled) setRegistryError(toUserMessage(err, "ไม่สามารถโหลดทะเบียนเครื่องจักรได้"));
+      } finally {
+        if (!cancelled) setRegistryLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusFilter, registryOffset, warningMachines, errorMachines]);
+
   const handleAskDailySummary = () => {
     const errorList = machines.filter((m) => m.status === "error");
     const warningList = machines.filter((m) => m.status === "warning");
@@ -400,14 +454,6 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
     () => statusDistribution.filter((item) => item.value > 0),
     [statusDistribution]
   );
-
-  const filteredMachines = useMemo(() => {
-    if (statusFilter === "all") return machines;
-    if (statusFilter === "attention") {
-      return machines.filter((m) => m.status === "warning" || m.status === "error");
-    }
-    return machines.filter((m) => m.status === statusFilter);
-  }, [machines, statusFilter]);
 
   // Which readings actually exist across the fleet. The repeated metric cells in
   // the registry below must all agree — gating them per machine would leave a
@@ -776,8 +822,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
               </button>
             )}
             <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20">
-              แสดง {Math.min(visibleCount, filteredMachines.length)} จาก{" "}
-              {statusFilter !== "all" ? filteredMachines.length : totalMachines} เครื่อง
+              แสดง {registryMachines.length} จาก {statusFilter !== "all" ? registryTotal : totalMachines} เครื่อง
             </span>
           </div>
         </div>
@@ -785,9 +830,10 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
         {/* Machine dropdown — same picker as the technician (ScanMachineView) page.
             Jumping to a machine here opens the same detail modal the cards below
             open, without needing to scroll/paginate through the registry. Fed the
-            full `machines` list (not `filteredMachines`) because MachineSelect has
-            its own status filter chips + search box — feeding it a pre-filtered
-            list would make its own chip counts wrongly show "(0)". */}
+            full `machines` list (not the paginated registry page) because
+            MachineSelect has its own status filter chips + search box — feeding
+            it a pre-filtered/paginated list would make its own chip counts
+            wrongly show "(0)". */}
         {machines.length > 0 && (
           <div className="max-w-md mb-4">
             <MachineSelect
@@ -802,12 +848,24 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
           </div>
         )}
 
-        {filteredMachines.length === 0 ? (
+        {registryError && (
+          <div className="p-3.5 rounded-[11px] bg-rose-50 border border-rose-200 text-xs text-rose-900 flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-rose-700 shrink-0 mt-0.5" aria-hidden="true" />
+            <span>{registryError}</span>
+          </div>
+        )}
+
+        {registryLoading && registryMachines.length === 0 ? (
+          <div className="p-8 text-center space-y-2">
+            <Loader2 className="w-6 h-6 text-primary mx-auto animate-spin" />
+            <p className="text-xs text-ink-faint">กำลังโหลดทะเบียนเครื่องจักร...</p>
+          </div>
+        ) : registryMachines.length === 0 ? (
           <p className="text-sm text-ink-faint text-center py-8">ไม่มีเครื่องจักรในสถานะนี้</p>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-              {filteredMachines.slice(0, visibleCount).map((m) => (
+              {registryMachines.map((m) => (
                 <MachineCard
                   key={m.id}
                   machine={m}
@@ -818,16 +876,16 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
               ))}
             </div>
 
-            {filteredMachines.length > visibleCount && (
-              <div className="flex justify-center pt-2">
-                <button
-                  type="button"
-                  onClick={() => setVisibleCount((c) => c + 24)}
-                  className="text-xs font-semibold text-ink-muted bg-pearl hover:bg-parchment px-3 py-1.5 rounded-full border border-divider cursor-pointer"
-                >
-                  แสดงเพิ่ม
-                </button>
-              </div>
+            {registryTotal > 0 && (
+              <Pagination
+                offset={registryOffset}
+                limit={REGISTRY_PAGE_SIZE}
+                total={registryTotal}
+                onOffsetChange={setRegistryOffset}
+                isLoading={registryLoading}
+                itemLabel="เครื่อง"
+                className="pt-2"
+              />
             )}
           </>
         )}

@@ -40,8 +40,6 @@ export interface KnowledgeOverview {
   articles: KnowledgeUsageRow[];
 }
 
-const MAX_ARTICLES = 200;
-
 interface ArticleRow {
   id: string;
   title: string;
@@ -65,13 +63,27 @@ interface LogRow {
  * โยน error เมื่ออ่านฐานข้อมูลไม่สำเร็จ — หน้านี้มีหน้าที่ "ยืนยันว่าความรู้ถูกใช้จริง"
  * การแสดงเลข 0 เพราะอ่านฐานข้อมูลไม่ได้ จะสื่อผิดว่าไม่มีใครใช้ความรู้เลย ซึ่งตรงข้าม
  * กับความจริงและทำให้ Engineer สรุปผลผิด
+ *
+ * `limit`/`offset` แบ่งหน้ารายการ `articles` ที่คืนออกไป (เดิม hardcode .limit(200)
+ * ซึ่งเป็น query ไม่จำกัดขนาดจริงเมื่อคลังความรู้โตเกิน 200 เรื่อง) — `totalArticles`
+ * ยังคงเป็นจำนวนทั้งหมดจริง (จาก exact count) แต่ neverCitedCount/totalCitations/
+ * totalHelpful/totalNotHelpful คำนวณจากเฉพาะหน้าที่ส่งกลับไปเท่านั้น ไม่ใช่ทั้งคลังแล้ว
+ * (การคำนวณสถิติเหล่านี้ข้ามทั้งคลังจะย้อนกลับไปเป็น query ไม่จำกัดขนาดแบบเดิม)
  */
-export async function getKnowledgeOverview(): Promise<KnowledgeOverview> {
+export async function getKnowledgeOverview(
+  limit: number,
+  offset: number
+): Promise<{ overview: KnowledgeOverview; total: number }> {
+  const { count: total, error: countError } = await supabase
+    .from("knowledge_articles")
+    .select("id", { count: "exact", head: true });
+  if (countError) throw new Error(`นับจำนวนความรู้ไม่สำเร็จ: ${countError.message}`);
+
   const { data: articleData, error: articleError } = await supabase
     .from("knowledge_articles")
     .select("id,title,category,machine_code,source_work_order_code,confirmed_by_name,confirmed_at,content,draft_content")
     .order("confirmed_at", { ascending: false })
-    .limit(MAX_ARTICLES);
+    .range(offset, offset + limit - 1);
   if (articleError) throw new Error(`ดึงรายการความรู้ไม่สำเร็จ: ${articleError.message}`);
   const articles = (articleData ?? []) as ArticleRow[];
 
@@ -120,12 +132,15 @@ export async function getKnowledgeOverview(): Promise<KnowledgeOverview> {
   });
 
   return {
-    totalArticles: rows.length,
-    neverCitedCount: rows.filter((r) => r.citedCount === 0).length,
-    totalCitations: rows.reduce((sum, r) => sum + r.citedCount, 0),
-    totalHelpful: rows.reduce((sum, r) => sum + r.helpfulCount, 0),
-    totalNotHelpful: rows.reduce((sum, r) => sum + r.notHelpfulCount, 0),
-    pendingReviewCount: pendingCount ?? 0,
-    articles: rows,
+    overview: {
+      totalArticles: total ?? rows.length,
+      neverCitedCount: rows.filter((r) => r.citedCount === 0).length,
+      totalCitations: rows.reduce((sum, r) => sum + r.citedCount, 0),
+      totalHelpful: rows.reduce((sum, r) => sum + r.helpfulCount, 0),
+      totalNotHelpful: rows.reduce((sum, r) => sum + r.notHelpfulCount, 0),
+      pendingReviewCount: pendingCount ?? 0,
+      articles: rows,
+    },
+    total: total ?? rows.length,
   };
 }

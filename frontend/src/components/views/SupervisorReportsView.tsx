@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   FileBarChart,
   Download,
@@ -7,6 +7,8 @@ import {
   Wrench,
   UserCheck,
   Inbox,
+  Loader2,
+  AlertTriangle,
 } from "lucide-react";
 import { WorkOrder, Machine } from "../../types";
 import {
@@ -17,9 +19,10 @@ import {
   machineStatusLabel,
   machineStatusBadgeClass,
 } from "../../lib/pillStyles";
+import { getWorkOrders, getWorkOrderStats, toUserMessage } from "../../services/apiService";
+import { Pagination } from "../ui/Pagination";
 
 interface SupervisorReportsViewProps {
-  workOrders?: WorkOrder[];
   machines?: Machine[];
 }
 
@@ -58,16 +61,42 @@ const THAI_MONTHS = [
   "ธันวาคม",
 ];
 
-function monthKeyOf(dateStr?: string | null): string | null {
-  if (!dateStr) return null;
-  const m = /^(\d{4})-(\d{2})/.exec(dateStr);
-  return m ? `${m[1]}-${m[2]}` : null;
-}
+// จำนวนใบงานต่อหน้าของตารางสรุป (report type "summary")
+const SUMMARY_PAGE_SIZE = 50;
+// ขนาดหน้าต่อคำขอตอนดึงข้อมูลทั้งเดือน/ทั้งชุดสำหรับส่งออก CSV
+const FETCH_CHUNK_SIZE = 500;
 
 function monthLabel(monthKey: string): string {
   const [y, m] = monthKey.split("-");
   const idx = parseInt(m, 10) - 1;
   return `${THAI_MONTHS[idx] ?? m} ${y}`;
+}
+
+/** ช่วงวันที่ (assigned_date) ครอบคลุมทั้งเดือนของ monthKey ("YYYY-MM") */
+function monthDateRange(monthKey: string): { from: string; to: string } {
+  const [y, m] = monthKey.split("-").map((n) => parseInt(n, 10));
+  const lastDay = new Date(y, m, 0).getDate();
+  return { from: `${monthKey}-01`, to: `${monthKey}-${String(lastDay).padStart(2, "0")}` };
+}
+
+/**
+ * ดึงใบงานทั้งหมดที่ตรงเงื่อนไข (ไม่จำกัดแค่หน้าเดียว) โดยวนหน้าทีละ
+ * FETCH_CHUNK_SIZE แถวจนครบ meta.total — ใช้ทั้งสำหรับข้อมูลประจำเดือน (KPI /
+ * รายงานตามระดับความสำคัญ / รายช่าง) และตอนส่งออก CSV เพื่อไม่ให้ทั้งตาราง
+ * และไฟล์ที่ส่งออกถูกตัดที่ 100 แถวเหมือนเดิม (ตอนที่ยังรับ workOrders มาจาก
+ * App.tsx ซึ่งโหลดมาแค่ getWorkOrders({limit:100}))
+ */
+async function fetchAllMatching(params: { from: string; to: string; search?: string }): Promise<WorkOrder[]> {
+  let offset = 0;
+  let all: WorkOrder[] = [];
+  for (;;) {
+    const res = await getWorkOrders({ ...params, limit: FETCH_CHUNK_SIZE, offset });
+    all = all.concat(res.data);
+    const total = res.meta?.total ?? all.length;
+    if (res.data.length < FETCH_CHUNK_SIZE || all.length >= total) break;
+    offset += FETCH_CHUNK_SIZE;
+  }
+  return all;
 }
 
 interface PriorityRow {
@@ -82,6 +111,44 @@ interface TechRow {
   jobs: number;
   completed: number;
   avgAiScore: number | null;
+}
+
+function computePriorityRows(orders: WorkOrder[]): PriorityRow[] {
+  const levels: Array<WorkOrder["priority"]> = ["high", "medium", "low"];
+  const total = orders.length;
+  return levels
+    .map((p) => {
+      const rows = orders.filter((wo) => wo.priority === p);
+      return {
+        priority: p,
+        jobs: rows.length,
+        completed: rows.filter((wo) => wo.status === "completed").length,
+        sharePct: total > 0 ? Math.round((rows.length / total) * 100) : 0,
+      };
+    })
+    .filter((r) => r.jobs > 0);
+}
+
+function computeTechRows(orders: WorkOrder[]): TechRow[] {
+  const map = new Map<string, { jobs: number; completed: number; scoreSum: number; scoreCount: number }>();
+  for (const wo of orders) {
+    const entry = map.get(wo.technicianName) || { jobs: 0, completed: 0, scoreSum: 0, scoreCount: 0 };
+    entry.jobs += 1;
+    if (wo.status === "completed") entry.completed += 1;
+    if (typeof wo.aiVerificationScore === "number") {
+      entry.scoreSum += wo.aiVerificationScore;
+      entry.scoreCount += 1;
+    }
+    map.set(wo.technicianName, entry);
+  }
+  return [...map.entries()]
+    .map(([technician, e]) => ({
+      technician,
+      jobs: e.jobs,
+      completed: e.completed,
+      avgAiScore: e.scoreCount > 0 ? Math.round(e.scoreSum / e.scoreCount) : null,
+    }))
+    .sort((a, b) => b.jobs - a.jobs);
 }
 
 function escapeCsvCell(value: string | number): string {
@@ -104,12 +171,85 @@ function downloadCsv(filename: string, rows: Array<Array<string | number>>) {
 }
 
 export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
-  workOrders = [],
   machines = [],
 }) => {
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [selectedReportType, setSelectedReportType] = useState<ReportType>("summary");
   const [searchTable, setSearchTable] = useState("");
+
+  // รายชื่อเดือนที่มีใบงานจริง — ดึงจาก /api/work-orders/stats (byMonth) ซึ่ง
+  // คำนวณจากทั้งตาราง work_orders ไม่ใช่แค่หน้าที่โหลดมาแล้ว จึงไม่พลาดเดือน
+  // เก่า ๆ ที่อยู่นอกหน้าแรก
+  const [monthOptions, setMonthOptions] = useState<string[]>([]);
+  const [totalWorkOrdersEver, setTotalWorkOrdersEver] = useState<number | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setStatsLoading(true);
+    getWorkOrderStats()
+      .then((stats) => {
+        if (cancelled) return;
+        setMonthOptions(
+          [...stats.byMonth.map((b) => b.month)].filter((m) => /^\d{4}-\d{2}$/.test(m)).sort().reverse()
+        );
+        setTotalWorkOrdersEver(stats.total);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setStatsError(toUserMessage(err, "ไม่สามารถโหลดสรุปใบงานได้"));
+      })
+      .finally(() => {
+        if (!cancelled) setStatsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const effectiveMonth =
+    selectedMonth && monthOptions.includes(selectedMonth) ? selectedMonth : monthOptions[0] ?? null;
+
+  // ใบงานทั้งหมดของเดือนที่เลือก (ไม่จำกัด 100 แถวเหมือนเดิม) — ใช้เป็นฐาน
+  // สำหรับการ์ด KPI และรายงานตามระดับความสำคัญ/รายช่าง ซึ่งต้องนับจากทุกแถว
+  // ในเดือนนั้นจริง ๆ ไม่ใช่แค่หน้าที่แสดงบนจอ
+  const [monthOrders, setMonthOrders] = useState<WorkOrder[]>([]);
+  const [monthOrdersLoading, setMonthOrdersLoading] = useState(false);
+  const [monthOrdersError, setMonthOrdersError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!effectiveMonth) {
+      setMonthOrders([]);
+      return;
+    }
+    let cancelled = false;
+    setMonthOrdersLoading(true);
+    setMonthOrdersError(null);
+    const { from, to } = monthDateRange(effectiveMonth);
+    fetchAllMatching({ from, to })
+      .then((rows) => {
+        if (!cancelled) setMonthOrders(rows);
+      })
+      .catch((err) => {
+        if (!cancelled) setMonthOrdersError(toUserMessage(err, "ไม่สามารถโหลดใบงานของเดือนนี้ได้"));
+      })
+      .finally(() => {
+        if (!cancelled) setMonthOrdersLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [effectiveMonth]);
+
+  // หน้าตารางสรุป (report type "summary") — รีเซ็ตกลับหน้าแรกเมื่อเปลี่ยนเดือน/คำค้น/ประเภทรายงาน
+  const [offset, setOffset] = useState(0);
+  useEffect(() => {
+    setOffset(0);
+  }, [effectiveMonth, searchTable, selectedReportType]);
+
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   const machinesById = useMemo(() => {
     const map = new Map<string, Machine>();
@@ -117,22 +257,11 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
     return map;
   }, [machines]);
 
-  const monthOptions = useMemo(() => {
-    const set = new Set<string>();
-    for (const wo of workOrders) {
-      const k = monthKeyOf(wo.assignedDate);
-      if (k) set.add(k);
-    }
-    return [...set].sort().reverse();
-  }, [workOrders]);
-
-  const effectiveMonth =
-    selectedMonth && monthOptions.includes(selectedMonth) ? selectedMonth : monthOptions[0] ?? null;
-
-  const monthOrders = useMemo(
-    () => (effectiveMonth ? workOrders.filter((wo) => monthKeyOf(wo.assignedDate) === effectiveMonth) : []),
-    [workOrders, effectiveMonth]
-  );
+  const machinesByCode = useMemo(() => {
+    const map = new Map<string, Machine>();
+    for (const m of machines) if (m.code) map.set(m.code, m);
+    return map;
+  }, [machines]);
 
   const filteredOrders = useMemo(() => {
     const q = searchTable.trim().toLowerCase();
@@ -146,6 +275,11 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
         wo.technicianName.toLowerCase().includes(q)
     );
   }, [monthOrders, searchTable]);
+
+  const pagedSummaryOrders = useMemo(
+    () => filteredOrders.slice(offset, offset + SUMMARY_PAGE_SIZE),
+    [filteredOrders, offset]
+  );
 
   // KPI figures — computed only from the work orders assigned in the selected month
   const completedCount = monthOrders.filter((wo) => wo.status === "completed").length;
@@ -161,10 +295,10 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
 
   const topMachine = useMemo(() => {
     // machineId is null on every imported work order (the import never
-    // resolved the FK), so grouping by it would bucket all 8,589 rows under
-    // one null key. Group by machineCode instead, falling back to machineId
-    // only when a row somehow lacks a code; rows with neither are excluded
-    // rather than silently merged together.
+    // resolved the FK), so grouping by it would bucket all rows under one
+    // null key. Group by machineCode instead, falling back to machineId only
+    // when a row somehow lacks a code; rows with neither are excluded rather
+    // than silently merged together.
     const counts = new Map<
       string,
       { machineCode?: string; machineId: string | null; machineName: string; count: number }
@@ -184,102 +318,90 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
     return [...counts.values()].sort((a, b) => b.count - a.count)[0] ?? null;
   }, [monthOrders]);
 
-  const machinesByCode = useMemo(() => {
-    const map = new Map<string, Machine>();
-    for (const m of machines) if (m.code) map.set(m.code, m);
-    return map;
-  }, [machines]);
-
   const topMachineRecord = topMachine
     ? (topMachine.machineCode ? machinesByCode.get(topMachine.machineCode) : undefined) ??
       (topMachine.machineId ? machinesById.get(topMachine.machineId) : undefined)
     : undefined;
 
-  const priorityRows: PriorityRow[] = useMemo(() => {
-    const levels: Array<WorkOrder["priority"]> = ["high", "medium", "low"];
-    const total = filteredOrders.length;
-    return levels
-      .map((p) => {
-        const rows = filteredOrders.filter((wo) => wo.priority === p);
-        return {
-          priority: p,
-          jobs: rows.length,
-          completed: rows.filter((wo) => wo.status === "completed").length,
-          sharePct: total > 0 ? Math.round((rows.length / total) * 100) : 0,
-        };
-      })
-      .filter((r) => r.jobs > 0);
-  }, [filteredOrders]);
-
-  const techRows: TechRow[] = useMemo(() => {
-    const map = new Map<string, { jobs: number; completed: number; scoreSum: number; scoreCount: number }>();
-    for (const wo of filteredOrders) {
-      const entry = map.get(wo.technicianName) || { jobs: 0, completed: 0, scoreSum: 0, scoreCount: 0 };
-      entry.jobs += 1;
-      if (wo.status === "completed") entry.completed += 1;
-      if (typeof wo.aiVerificationScore === "number") {
-        entry.scoreSum += wo.aiVerificationScore;
-        entry.scoreCount += 1;
-      }
-      map.set(wo.technicianName, entry);
-    }
-    return [...map.entries()]
-      .map(([technician, e]) => ({
-        technician,
-        jobs: e.jobs,
-        completed: e.completed,
-        avgAiScore: e.scoreCount > 0 ? Math.round(e.scoreSum / e.scoreCount) : null,
-      }))
-      .sort((a, b) => b.jobs - a.jobs);
-  }, [filteredOrders]);
+  const priorityRows: PriorityRow[] = useMemo(() => computePriorityRows(filteredOrders), [filteredOrders]);
+  const techRows: TechRow[] = useMemo(() => computeTechRows(filteredOrders), [filteredOrders]);
 
   const machineLabelOf = (wo: WorkOrder) => {
     const code = wo.machineCode ?? (wo.machineId ? machinesById.get(wo.machineId)?.code : undefined);
     return code ? `${code} · ${wo.machineName}` : wo.machineName;
   };
 
-  const handleExport = () => {
-    if (!effectiveMonth) return;
-    let rows: Array<Array<string | number>>;
-    if (selectedReportType === "priority") {
-      rows = [
-        ["ระดับความสำคัญ", "จำนวนงาน", "สัดส่วน (%)", "ปิดงานแล้ว"],
-        ...priorityRows.map((r) => [priorityLabel(r.priority), r.jobs, r.sharePct, r.completed]),
-      ];
-    } else if (selectedReportType === "tech") {
-      rows = [
-        ["ช่างเทคนิค", "จำนวนงาน", "ปิดงานแล้ว", "คะแนนตรวจสอบ AI เฉลี่ย (%)"],
-        ...techRows.map((t) => [t.technician, t.jobs, t.completed, t.avgAiScore ?? "—"]),
-      ];
-    } else {
-      rows = [
-        [
-          "วันที่มอบหมาย",
-          "รหัสใบงาน",
-          "เครื่องจักร",
-          "ชื่องาน",
-          "ความสำคัญ",
-          "สถานะ",
-          "ช่างผู้รับผิดชอบ",
-          "คะแนนตรวจสอบ AI (%)",
-        ],
-        ...filteredOrders.map((wo) => [
-          wo.assignedDate || "—",
-          wo.code,
-          machineLabelOf(wo),
-          wo.title,
-          priorityLabel(wo.priority),
-          woStatusLabel(wo.status),
-          wo.technicianName,
-          typeof wo.aiVerificationScore === "number" ? wo.aiVerificationScore : "—",
-        ]),
-      ];
+  const handleExport = async () => {
+    if (!effectiveMonth || isExporting) return;
+    setIsExporting(true);
+    setExportError(null);
+    try {
+      // ดึงใบงานทั้งหมดที่ตรงเงื่อนไข (ไม่ใช่แค่หน้าที่กำลังแสดงอยู่บนจอ) ก่อน
+      // สร้างไฟล์ CSV เสมอ — วนหน้าทีละ FETCH_CHUNK_SIZE แถวจน meta.total ครบ
+      const { from, to } = monthDateRange(effectiveMonth);
+      const exportOrders = await fetchAllMatching({
+        from,
+        to,
+        search: searchTable.trim() || undefined,
+      });
+
+      let rows: Array<Array<string | number>>;
+      if (selectedReportType === "priority") {
+        rows = [
+          ["ระดับความสำคัญ", "จำนวนงาน", "สัดส่วน (%)", "ปิดงานแล้ว"],
+          ...computePriorityRows(exportOrders).map((r) => [priorityLabel(r.priority), r.jobs, r.sharePct, r.completed]),
+        ];
+      } else if (selectedReportType === "tech") {
+        rows = [
+          ["ช่างเทคนิค", "จำนวนงาน", "ปิดงานแล้ว", "คะแนนตรวจสอบ AI เฉลี่ย (%)"],
+          ...computeTechRows(exportOrders).map((t) => [t.technician, t.jobs, t.completed, t.avgAiScore ?? "—"]),
+        ];
+      } else {
+        rows = [
+          [
+            "วันที่มอบหมาย",
+            "รหัสใบงาน",
+            "เครื่องจักร",
+            "ชื่องาน",
+            "ความสำคัญ",
+            "สถานะ",
+            "ช่างผู้รับผิดชอบ",
+            "คะแนนตรวจสอบ AI (%)",
+          ],
+          ...exportOrders.map((wo) => [
+            wo.assignedDate || "—",
+            wo.code,
+            machineLabelOf(wo),
+            wo.title,
+            priorityLabel(wo.priority),
+            woStatusLabel(wo.status),
+            wo.technicianName,
+            typeof wo.aiVerificationScore === "number" ? wo.aiVerificationScore : "—",
+          ]),
+        ];
+      }
+      downloadCsv(`mtcenter-report-${selectedReportType}-${effectiveMonth}.csv`, rows);
+    } catch (err) {
+      setExportError(toUserMessage(err, "ไม่สามารถส่งออกรายงานได้"));
+    } finally {
+      setIsExporting(false);
     }
-    downloadCsv(`mtcenter-report-${selectedReportType}-${effectiveMonth}.csv`, rows);
   };
 
+  // ยังโหลดสรุปเดือนอยู่ครั้งแรก — แสดงสถานะกำลังโหลด ไม่ใช่สรุปว่าไม่มีข้อมูล
+  if (statsLoading) {
+    return (
+      <div className="p-4 md:p-8 max-w-[1600px] mx-auto space-y-6">
+        <div className="bg-white rounded-[18px] border border-hairline p-10 text-center space-y-3">
+          <Loader2 className="w-8 h-8 text-primary mx-auto animate-spin" />
+          <p className="text-xs text-ink-faint">กำลังโหลดข้อมูลสำหรับสร้างรายงาน...</p>
+        </div>
+      </div>
+    );
+  }
+
   // No work orders at all — a real empty state, nothing fabricated to show
-  if (workOrders.length === 0) {
+  if (!statsError && (totalWorkOrdersEver ?? 0) === 0) {
     return (
       <div className="p-4 md:p-8 max-w-[1600px] mx-auto space-y-6">
         <div className="bg-white rounded-[18px] border border-hairline p-10 text-center space-y-3">
@@ -293,6 +415,27 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
 
   return (
     <div className="p-4 md:p-8 max-w-[1600px] mx-auto space-y-6">
+      {statsError && (
+        <div className="bg-rose-50 border border-rose-200 rounded-[18px] p-4 flex items-start gap-2.5">
+          <AlertTriangle className="w-4 h-4 text-rose-700 shrink-0 mt-0.5" />
+          <p className="text-[13px] font-semibold text-rose-900 leading-relaxed">{statsError}</p>
+        </div>
+      )}
+
+      {monthOrdersError && (
+        <div className="bg-rose-50 border border-rose-200 rounded-[18px] p-4 flex items-start gap-2.5">
+          <AlertTriangle className="w-4 h-4 text-rose-700 shrink-0 mt-0.5" />
+          <p className="text-[13px] font-semibold text-rose-900 leading-relaxed">{monthOrdersError}</p>
+        </div>
+      )}
+
+      {exportError && (
+        <div className="bg-rose-50 border border-rose-200 rounded-[18px] p-4 flex items-start gap-2.5">
+          <AlertTriangle className="w-4 h-4 text-rose-700 shrink-0 mt-0.5" />
+          <p className="text-[13px] font-semibold text-rose-900 leading-relaxed">{exportError}</p>
+        </div>
+      )}
+
       {/* Date Filter & Export */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-3 pb-2 border-b border-hairline">
         <div className="flex items-center gap-3">
@@ -313,15 +456,22 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
                 </option>
               ))}
             </select>
+            {monthOrdersLoading && (
+              <Loader2 className="w-3.5 h-3.5 text-ink-faint animate-spin" aria-label="กำลังโหลด" />
+            )}
           </div>
 
           <button
             onClick={handleExport}
-            disabled={!effectiveMonth}
+            disabled={!effectiveMonth || isExporting}
             className="px-4 py-2 min-h-[44px] rounded-full bg-primary hover:bg-primary-focus disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
           >
-            <Download className="w-4 h-4" aria-hidden="true" />
-            <span>ส่งออกเป็นไฟล์ CSV</span>
+            {isExporting ? (
+              <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+            ) : (
+              <Download className="w-4 h-4" aria-hidden="true" />
+            )}
+            <span>{isExporting ? "กำลังส่งออก..." : "ส่งออกเป็นไฟล์ CSV"}</span>
           </button>
         </div>
       </div>
@@ -458,8 +608,8 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-divider">
-                  {filteredOrders.length > 0 ? (
-                    filteredOrders.map((wo) => (
+                  {pagedSummaryOrders.length > 0 ? (
+                    pagedSummaryOrders.map((wo) => (
                       <tr key={wo.id} className="hover:bg-parchment/80 transition-colors">
                         <td className="p-3 font-mono text-ink-muted">{wo.assignedDate || "—"}</td>
                         <td className="p-3 font-mono font-semibold text-primary">{wo.code}</td>
@@ -480,7 +630,7 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
                   ) : (
                     <tr>
                       <td colSpan={7} className="p-8 text-center text-ink-faint">
-                        ไม่พบใบงานตามคำค้นหาในเดือนที่เลือก
+                        {monthOrdersLoading ? "กำลังโหลด..." : "ไม่พบใบงานตามคำค้นหาในเดือนที่เลือก"}
                       </td>
                     </tr>
                   )}
@@ -490,9 +640,9 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
 
             {/* Card list for mobile */}
             <div className="md:hidden rounded-[11px] border border-hairline overflow-hidden">
-              {filteredOrders.length > 0 ? (
+              {pagedSummaryOrders.length > 0 ? (
                 <div className="divide-y divide-divider">
-                  {filteredOrders.map((wo) => (
+                  {pagedSummaryOrders.map((wo) => (
                     <div key={wo.id} className="p-4 space-y-2.5">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
@@ -522,10 +672,21 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
                 </div>
               ) : (
                 <div className="p-8 text-center text-ink-faint text-xs">
-                  ไม่พบใบงานตามคำค้นหาในเดือนที่เลือก
+                  {monthOrdersLoading ? "กำลังโหลด..." : "ไม่พบใบงานตามคำค้นหาในเดือนที่เลือก"}
                 </div>
               )}
             </div>
+
+            {filteredOrders.length > 0 && (
+              <Pagination
+                offset={offset}
+                limit={SUMMARY_PAGE_SIZE}
+                total={filteredOrders.length}
+                onOffsetChange={setOffset}
+                isLoading={monthOrdersLoading}
+                itemLabel="ใบงาน"
+              />
+            )}
           </>
         )}
 
@@ -570,7 +731,7 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
                 ) : (
                   <tr>
                     <td colSpan={4} className="p-8 text-center text-ink-faint">
-                      ไม่พบใบงานตามคำค้นหาในเดือนที่เลือก
+                      {monthOrdersLoading ? "กำลังโหลด..." : "ไม่พบใบงานตามคำค้นหาในเดือนที่เลือก"}
                     </td>
                   </tr>
                 )}
@@ -615,7 +776,7 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
                 ) : (
                   <tr>
                     <td colSpan={4} className="p-8 text-center text-ink-faint">
-                      ไม่พบข้อมูลช่างตามคำค้นหาในเดือนที่เลือก
+                      {monthOrdersLoading ? "กำลังโหลด..." : "ไม่พบข้อมูลช่างตามคำค้นหาในเดือนที่เลือก"}
                     </td>
                   </tr>
                 )}

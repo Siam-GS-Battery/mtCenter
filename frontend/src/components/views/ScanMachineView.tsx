@@ -44,6 +44,7 @@ import {
   NO_REPAIR_HISTORY_TH,
 } from "../../lib/format";
 import { getWorkOrders, toUserMessage } from "../../services/apiService";
+import { Pagination } from "../ui/Pagination";
 import { GloveFriendlyCTA } from "../GloveFriendlyCTA";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "../ui/Modal";
 import { useQrScanner } from "../../hooks/useQrScanner";
@@ -266,8 +267,14 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
   const machineCode = activeMachine.code;
   const [machineHistory, setMachineHistory] = useState<WorkOrder[]>([]);
   const [machineHistoryTotal, setMachineHistoryTotal] = useState(0);
+  const [machineHistoryOffset, setMachineHistoryOffset] = useState(0);
   const [machineHistoryLoading, setMachineHistoryLoading] = useState(false);
   const [machineHistoryError, setMachineHistoryError] = useState<string | null>(null);
+
+  // สแกน/เลือกเครื่องใหม่ -> กลับไปหน้าแรกของประวัติซ่อมเสมอ
+  useEffect(() => {
+    setMachineHistoryOffset(0);
+  }, [machineCode]);
 
   useEffect(() => {
     if (!machineCode) {
@@ -284,7 +291,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
     setMachineHistoryLoading(true);
     setMachineHistoryError(null);
 
-    getWorkOrders({ machineCode, limit: MACHINE_HISTORY_LIMIT })
+    getWorkOrders({ machineCode, limit: MACHINE_HISTORY_LIMIT, offset: machineHistoryOffset })
       .then((res) => {
         if (cancelled) return;
         // The server already returns newest-first (ordered by assigned_date, see
@@ -305,10 +312,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [machineCode]);
-
-  /** Rows fetched but not shown, because the machine has more than one page. */
-  const machineHistoryHidden = Math.max(0, machineHistoryTotal - machineHistory.length);
+  }, [machineCode, machineHistoryOffset]);
 
   // Real machines may have no code on record (3/973) — never render the
   // literal "null" for it; every interpolation below reuses this one label.
@@ -1384,15 +1388,20 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
                 ))
               )}
 
-              {/* Never truncate in silence: if the machine has more history than one
-                  request returns, say how much is missing and where to read it. */}
-              {machineHistoryHidden > 0 && (
-                <p className="text-xs text-ink-faint text-center pt-2 border-t border-divider">
-                  แสดง {machineHistory.length} รายการล่าสุด จากทั้งหมด {machineHistoryTotal} รายการ ·
-                  ดูประวัติทั้งหมดได้ที่หน้าใบงาน
-                </p>
-              )}
             </div>
+
+            {/* แบ่งหน้าประวัติซ่อมของเครื่องนี้ — ใช้ total จริงจาก server แทนการตัด
+                รายการทิ้งเงียบๆ เหมือนก่อนหน้านี้ (ดู SupervisorDashboardView) */}
+            {machineHistoryTotal > 0 && (
+              <Pagination
+                offset={machineHistoryOffset}
+                limit={MACHINE_HISTORY_LIMIT}
+                total={machineHistoryTotal}
+                onOffsetChange={setMachineHistoryOffset}
+                isLoading={machineHistoryLoading}
+                itemLabel="รายการ"
+              />
+            )}
           </div>
         </>
       )}

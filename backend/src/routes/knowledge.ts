@@ -17,20 +17,36 @@ import { supabase } from "../lib/supabase.js";
 import { getReviewQueue } from "../lib/reviewQueue.js";
 import { buildKnowledgeDraft, confirmKnowledge } from "../lib/knowledgeDraft.js";
 import { getKnowledgeOverview } from "../lib/knowledgeStats.js";
+import { parsePaging } from "../lib/queryHelpers.js";
 
 const router = Router();
+
+// คิวรีวิวมักมีจำนวนน้อย (ใบงานที่ยังรอ Engineer ตรวจ) แต่เดิมไม่มี limit เลย —
+// ป้องกันไม่ให้กลายเป็น query ไม่จำกัดขนาดถ้าใบงานค้างสะสมมาก
+const REVIEW_QUEUE_PAGING_DEFAULTS = { defaultLimit: 20, maxLimit: 100 };
+const KNOWLEDGE_OVERVIEW_PAGING_DEFAULTS = { defaultLimit: 20, maxLimit: 100 };
 
 // Frame 1 — รายการใบงานรอรีวิว
 router.get(
   "/review-queue",
   requireAuthenticated,
-  asyncHandler(async (_req, res) => {
+  asyncHandler(async (req, res) => {
+    const { limit, offset } = parsePaging(req.query as Record<string, unknown>, REVIEW_QUEUE_PAGING_DEFAULTS);
+    // getReviewQueue() ต้องจัดลำดับความสำคัญข้ามทั้งคิวก่อนเสมอ (คะแนนขึ้นกับสภาพเครื่อง/
+    // ความสำคัญ/เวลาสูญเสีย/วันที่ค้าง) จึงตัดหน้าเฉพาะตอนส่งกลับ ไม่ใช่ตอน query
     const items = await getReviewQueue();
-    sendSuccess(res, {
-      items,
-      // ป้ายจำนวนงานค้างที่ storyboard ระบุไว้ใน Frame 1 ("มีป้ายจำนวนงานค้างอยู่")
-      pendingCount: items.filter((i) => !i.hasKnowledge).length,
-      totalCount: items.length,
+    const total = items.length;
+    const page = items.slice(offset, offset + limit);
+    res.json({
+      success: true,
+      data: {
+        items: page,
+        // ป้ายจำนวนงานค้างที่ storyboard ระบุไว้ใน Frame 1 ("มีป้ายจำนวนงานค้างอยู่") —
+        // นับจากทั้งคิว ไม่ใช่แค่หน้าที่ส่งกลับ
+        pendingCount: items.filter((i) => !i.hasKnowledge).length,
+        totalCount: total,
+      },
+      meta: { total, limit, offset },
     });
   })
 );
@@ -108,8 +124,10 @@ router.post(
 router.get(
   "/overview",
   requireAuthenticated,
-  asyncHandler(async (_req, res) => {
-    sendSuccess(res, await getKnowledgeOverview());
+  asyncHandler(async (req, res) => {
+    const { limit, offset } = parsePaging(req.query as Record<string, unknown>, KNOWLEDGE_OVERVIEW_PAGING_DEFAULTS);
+    const { overview, total } = await getKnowledgeOverview(limit, offset);
+    res.json({ success: true, data: overview, meta: { total, limit, offset } });
   })
 );
 

@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { Machine, ManualDoc } from "../../types";
 import {
+  getManuals,
   getManualFileUrl,
   getManualContent,
   toUserMessage,
@@ -27,12 +28,13 @@ import {
   updateManual,
 } from "../../services/apiService";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "../ui/Modal";
+import { Pagination } from "../ui/Pagination";
 import { MANUAL_CATEGORIES, CUSTOM_MODEL_OPTION } from "../../lib/manualCategories";
 import { detectTocPages } from "../../lib/manualToc";
+import { useDebouncedValue } from "../../hooks/useDebouncedValue";
 import type { Components } from "react-markdown";
 
 interface ManualsViewProps {
-  manuals: ManualDoc[];
   /** เครื่องจักรที่กำลังทำงานอยู่ (จาก TopBar) — เปิดใช้ตัวกรองคู่มือเฉพาะรุ่นของเครื่องนี้ */
   activeMachine?: Machine;
   onAskAI: (prompt: string) => void;
@@ -40,12 +42,12 @@ interface ManualsViewProps {
   onGoToUpload?: () => void;
   /** เมื่อเป็น true จะแสดงปุ่ม "แก้ไข" และ "ลบ" บนคู่มือแต่ละเล่ม (สิทธิ์วิศวกร/หัวหน้างาน) */
   canManage?: boolean;
-  /** เรียกหลังลบคู่มือสำเร็จ เพื่อให้หน้าจอหลักนำคู่มือออกจากรายการ (มาพร้อมชื่อคู่มือ เพื่อให้ toast เอ่ยชื่อคู่มือที่ถูกลบได้) */
-  onDeleted?: (id: string, title: string) => void;
-  /** เรียกหลังบันทึกการแก้ไขคู่มือสำเร็จ เพื่อให้หน้าจอหลักอัปเดตรายการ */
-  onUpdated?: (manual: ManualDoc) => void;
   /** รุ่นเครื่องจักรที่มีอยู่จริงในระบบ — ใช้กับฟอร์มแก้ไขคู่มือ (เหมือนหน้าอัปโหลด) */
   machineModels?: string[];
+  /** เรียกหลังลบคู่มือสำเร็จ (แค่แจ้ง toast — คอมโพเนนต์นี้อัปเดตรายการของตัวเองแล้ว) */
+  onDeleted?: (id: string, title: string) => void;
+  /** เรียกหลังบันทึกการแก้ไขคู่มือสำเร็จ (แค่แจ้ง toast — คอมโพเนนต์นี้อัปเดตรายการของตัวเองแล้ว) */
+  onUpdated?: (manual: ManualDoc) => void;
 }
 
 const markdownComponents: Components = {
@@ -121,22 +123,28 @@ const markdownComponents: Components = {
 // คู่มือที่นำเข้าจากสคริปต์ import มีโครงสร้างสม่ำเสมอ: หัวเรื่อง/สารบัญสั้น ๆ ตามด้วยส่วนย่อยต่อหน้า
 // ที่ขึ้นต้นด้วย "## หน้า N" เรียงลำดับ — ใช้ตัดเนื้อหาเป็นก้อนต่อหน้าเพื่อเรนเดอร์ทีละส่วน
 const PAGE_HEADING_REGEX = /^## หน้า \d+/gm;
+// จำนวนการ์ดคู่มือต่อหน้าในกริดรายการ (แยกจาก DEFAULT_VISIBLE_PAGES ด้านล่าง ซึ่งเป็นคนละ
+// "หน้า" — อันนั้นคือหน้าเนื้อหาในหน้าต่างอ่านคู่มือหนึ่งเล่ม อันนี้คือหน้าของกริดรายการ)
+// ค่านี้ยังใช้เป็น `limit` ของ getManuals({ ... }) ด้วย — แบ่งหน้าที่ server จริง ๆ
+// (ไม่ใช่แบ่งบนก้อนที่โหลดมาครั้งเดียวเหมือนเดิม) คลังคู่มือจึงไม่ถูกจำกัดที่ 100 เล่มแรกอีกต่อไป
+const MANUALS_PAGE_SIZE = 12;
 // จำนวนหน้าที่แสดงเริ่มต้น / ต่อการกดโหลดเพิ่มหนึ่งครั้ง
 const DEFAULT_VISIBLE_PAGES = 15;
 // เพดานความยาวของเนื้อหา fallback (คู่มือที่ไม่มีโครงสร้าง "## หน้า N") ที่จะเรนเดอร์ตั้งแต่แรก
 const FALLBACK_CHAR_LIMIT = 200_000;
 
 export const ManualsView: React.FC<ManualsViewProps> = ({
-  manuals,
   activeMachine,
   onAskAI,
   onGoToUpload,
   canManage = false,
+  machineModels,
   onDeleted,
   onUpdated,
-  machineModels,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  // ยิงค้นหาไป server หลังพิมพ์หยุด ~300ms กันยิงถี่ทุกตัวอักษร (เหมือน SparePartsView)
+  const debouncedSearch = useDebouncedValue(searchQuery, 300);
   const [selectedDoc, setSelectedDoc] = useState<ManualDoc | null>(null);
   const [copied, setCopied] = useState(false);
   // ข้อผิดพลาดของการคัดลอกเนื้อหาในหน้าต่างอ่านคู่มือ (แยกจาก error ของการเปิดไฟล์)
@@ -160,10 +168,52 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
   // เพราะฮิวริสติกอาจพลาด จึงต้องมีทางกู้คืนให้ผู้ใช้กดดูต้นฉบับทั้งหมดได้เสมอ
   const [showToc, setShowToc] = useState(false);
   const [onlyActiveMachine, setOnlyActiveMachine] = useState(false);
+  // แบ่งหน้ากริดรายการคู่มือ — แบ่งหน้า/ค้นหาที่ server จริง (เหมือน SparePartsView) แทนการ
+  // โหลดก้อนเดียวจาก App.tsx (เดิมสูงสุด 100 เล่มตาม getManuals({ limit: 100 }) ซึ่งคู่มือ
+  // เล่มที่ 101 ขึ้นไปจะมองไม่เห็นเลย) ไฟล์นี้ดึงคู่มือของตัวเองแล้ว
+  const [manualsOffset, setManualsOffset] = useState(0);
+  const [manuals, setManuals] = useState<ManualDoc[]>([]);
+  const [manualsTotal, setManualsTotal] = useState(0);
+  const [manualsLoading, setManualsLoading] = useState(true);
+  const [manualsLoadError, setManualsLoadError] = useState<string | null>(null);
   // เก็บสถานะกำลังโหลดแยกเป็นชุด (Set) เพื่อให้การ์ดหลายใบที่กดพร้อมกันไม่ทับสถานะกัน
   const [loadingFileIds, setLoadingFileIds] = useState<Set<string>>(new Set());
   // ผูกข้อความ error กับ id ของคู่มือ เพื่อให้ error แสดงในการ์ดที่ถูกต้อง
   const [fileErrorMessages, setFileErrorMessages] = useState<Record<string, string>>({});
+
+  // เปลี่ยนคำค้นหา/ตัวกรองเครื่องจักร -> กลับไปหน้าแรกของกริดเสมอ (ผลลัพธ์ชุดใหม่ไม่ใช่หน้าเดิม)
+  useEffect(() => {
+    setManualsOffset(0);
+  }, [debouncedSearch, onlyActiveMachine]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setManualsLoading(true);
+    setManualsLoadError(null);
+
+    getManuals({
+      search: debouncedSearch.trim() || undefined,
+      machineModel: onlyActiveMachine && activeMachine ? activeMachine.model ?? undefined : undefined,
+      limit: MANUALS_PAGE_SIZE,
+      offset: manualsOffset,
+    })
+      .then((res) => {
+        if (cancelled) return;
+        setManuals(res.data);
+        setManualsTotal(res.meta?.total ?? res.data.length);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setManualsLoadError(toUserMessage(err, "ไม่สามารถโหลดคลังคู่มือได้"));
+      })
+      .finally(() => {
+        if (!cancelled) setManualsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedSearch, onlyActiveMachine, activeMachine, manualsOffset]);
 
   // คู่มือที่กำลังจะลบ (เปิดหน้าต่างยืนยัน) — null คือไม่มีหน้าต่างยืนยันเปิดอยู่
   const [manualToDelete, setManualToDelete] = useState<ManualDoc | null>(null);
@@ -361,24 +411,6 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
   // ในป้ายข้อความและปุ่มโหลดเพิ่ม เพื่อให้ตัวเลขตรงกับเนื้อหาที่แสดงบนจอเสมอ
   const effectivePageCount = displayedPageIndices?.length ?? pageSplit?.pageCount ?? 0;
 
-  // คู่มือผูกกับเครื่องผ่านรุ่นเครื่อง (ManualDoc.machineModel === Machine.model)
-  const machineScoped =
-    onlyActiveMachine && activeMachine
-      ? manuals.filter((doc) => doc.machineModel === activeMachine.model)
-      : manuals;
-
-  const hiddenByMachineFilter = manuals.length - machineScoped.length;
-
-  const filteredManuals = machineScoped.filter((doc) => {
-    const query = searchQuery.trim().toLowerCase();
-    if (query === "") return true;
-    return (
-      doc.title.toLowerCase().includes(query) ||
-      doc.machineModel.toLowerCase().includes(query) ||
-      doc.tags.some((t) => t.toLowerCase().includes(query))
-    );
-  });
-
   const handleCopyMarkdown = (text?: string) => {
     if (!text) return;
     // บนเครือข่ายโรงงานที่ใช้ http ธรรมดา (non-secure context) navigator.clipboard
@@ -449,6 +481,17 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
     setDeleteError(null);
     try {
       await deleteManual(doc.id);
+      // อัปเดตรายการในหน้านี้เอง (view ดึงข้อมูลเอง ไม่มี App.tsx คอยรีเฟรชให้แล้ว)
+      setManuals((prev) => {
+        const next = prev.filter((m) => m.id !== doc.id);
+        // ลบเล่มสุดท้ายของหน้านี้ (เช่นอยู่หน้าท้ายสุดที่มีเล่มเดียว) แล้วต้องไม่ค้างแสดง
+        // หน้าว่างเปล่า — ถอยกลับไปหน้าก่อนหน้าแทน (useEffect ด้านบนจะดึงใหม่ตาม offset นี้)
+        if (next.length === 0 && manualsOffset > 0) {
+          setManualsOffset((prevOffset) => Math.max(0, prevOffset - MANUALS_PAGE_SIZE));
+        }
+        return next;
+      });
+      setManualsTotal((prev) => Math.max(0, prev - 1));
       onDeleted?.(doc.id, doc.title);
       // ปิดหน้าต่างอ่านคู่มือถ้ากำลังเปิดคู่มือเล่มที่ถูกลบอยู่ ไม่เช่นนั้นจะค้างแสดงคู่มือที่ไม่มีอยู่แล้ว
       if (selectedDoc?.id === doc.id) {
@@ -500,6 +543,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
         category: editCategory,
         tags,
       });
+      setManuals((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
       onUpdated?.(updated);
       if (selectedDoc?.id === updated.id) {
         setSelectedDoc(updated);
@@ -547,9 +591,23 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="ค้นหาชื่อคู่มือ รุ่นเครื่อง หรือคำค้น เช่น Wiring, Spindle"
           aria-label="ค้นหาชื่อคู่มือ รุ่นเครื่อง หรือคำค้น"
-          className="w-full bg-white border border-hairline rounded-full pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-focus/40"
+          className="w-full bg-white border border-hairline rounded-full pl-10 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-focus/40"
         />
+        {/* บอกว่ากำลังค้นหาที่ server อยู่ โดยไม่ล้างผลลัพธ์เดิมออกจนกระพริบ */}
+        {manualsLoading && (
+          <Loader2
+            className="w-4 h-4 text-ink-faint absolute right-3.5 top-3 animate-spin"
+            aria-hidden="true"
+          />
+        )}
       </div>
+
+      {manualsLoadError && (
+        <div className="bg-rose-50 border border-rose-200 rounded-[18px] p-4 flex items-start gap-2.5">
+          <AlertCircle className="w-4 h-4 text-rose-700 shrink-0 mt-0.5" />
+          <p className="text-[13px] font-semibold text-rose-900 leading-relaxed">{manualsLoadError}</p>
+        </div>
+      )}
 
       {/* Machine-context filter — off by default so nothing is hidden by surprise */}
       {activeMachine && (
@@ -570,27 +628,26 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
             </span>
             {onlyActiveMachine && <X className="w-4 h-4 shrink-0" />}
           </button>
-
-          {onlyActiveMachine && hiddenByMachineFilter > 0 && (
-            <span className="text-xs text-ink-muted">
-              ซ่อนคู่มือของรุ่นอื่นอยู่ {hiddenByMachineFilter} เล่ม
-            </span>
-          )}
         </div>
       )}
 
       {/* Manuals List Cards */}
-      {filteredManuals.length === 0 ? (
+      {manualsLoading && manuals.length === 0 && !manualsLoadError ? (
+        <div className="bg-white rounded-[18px] border border-hairline p-10 text-center space-y-3">
+          <Loader2 className="w-8 h-8 text-primary mx-auto animate-spin" />
+          <p className="text-[13px] text-ink-muted">กำลังโหลดคลังคู่มือ...</p>
+        </div>
+      ) : manualsTotal === 0 && !manualsLoadError ? (
         <div className="bg-white rounded-[18px] border border-hairline p-10 text-center space-y-2">
           <BookOpen className="w-10 h-10 text-ink-muted mx-auto" />
-          {manuals.length === 0 ? (
+          {searchQuery.trim() === "" && !onlyActiveMachine ? (
             <>
               <p className="text-sm font-semibold text-ink">ยังไม่มีคู่มือในคลัง</p>
               <p className="text-xs text-ink-muted">
                 อัปโหลดคู่มือ PDF เข้าคลังเพื่อให้ทีมช่างค้นหาเนื้อหาได้จากทุกหน้าจอ
               </p>
             </>
-          ) : onlyActiveMachine && machineScoped.length === 0 && activeMachine ? (
+          ) : onlyActiveMachine && activeMachine && searchQuery.trim() === "" ? (
             <>
               <p className="text-sm font-semibold text-ink">
                 ยังไม่มีคู่มือของรุ่น {activeMachine.model} ในคลัง
@@ -620,7 +677,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredManuals.map((doc) => (
+          {manuals.map((doc) => (
             <div
               key={doc.id}
               className="bg-white rounded-[18px] border border-hairline p-5 hover:border-primary/40 transition-all flex flex-col justify-between space-y-4"
@@ -738,6 +795,17 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
             </div>
           ))}
         </div>
+      )}
+
+      {manualsTotal > 0 && (
+        <Pagination
+          offset={manualsOffset}
+          limit={MANUALS_PAGE_SIZE}
+          total={manualsTotal}
+          onOffsetChange={setManualsOffset}
+          isLoading={manualsLoading}
+          itemLabel="เล่ม"
+        />
       )}
 
       {/* Manual reader modal */}

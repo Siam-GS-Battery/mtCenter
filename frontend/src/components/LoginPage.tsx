@@ -9,6 +9,7 @@ export const LoginPage: React.FC = () => {
   const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -24,7 +25,7 @@ export const LoginPage: React.FC = () => {
     setError(null);
     setIsSubmitting(true);
     try {
-      await login(employeeId.trim(), password);
+      await login(employeeId.trim(), password, rememberMe);
     } catch (err) {
       const msg = toUserMessage(err, "เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
       setError(msg);
@@ -93,6 +94,20 @@ export const LoginPage: React.FC = () => {
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              id="rememberMe"
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              disabled={isSubmitting}
+              className="w-4 h-4 rounded border-hairline text-primary focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-60 cursor-pointer"
+            />
+            <label htmlFor="rememberMe" className="text-[13px] text-ink-muted select-none cursor-pointer">
+              จดจำการเข้าใช้งาน 7 วัน
+            </label>
           </div>
 
           {error && (

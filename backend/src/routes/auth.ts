@@ -51,9 +51,10 @@ router.post(
   loginRateLimitByIp,
   loginRateLimitByEmployeeId,
   asyncHandler(async (req, res) => {
-    const { employeeId, password } = (req.body ?? {}) as {
+    const { employeeId, password, rememberMe } = (req.body ?? {}) as {
       employeeId?: string;
       password?: string;
+      rememberMe?: boolean;
     };
 
     if (!employeeId || !password) {
@@ -87,12 +88,15 @@ router.post(
       throw new ApiError(401, INVALID_CREDENTIALS_MESSAGE);
     }
 
-    const token = signToken({
-      sub: profile.id,
-      employeeId: profile.employee_id,
-      role: profile.role as "technician" | "engineer" | "supervisor",
-      pv: passwordTokenVersion(profile.password_updated_at),
-    });
+    const token = signToken(
+      {
+        sub: profile.id,
+        employeeId: profile.employee_id,
+        role: profile.role as "technician" | "engineer" | "supervisor",
+        pv: passwordTokenVersion(profile.password_updated_at),
+      },
+      rememberMe === true
+    );
 
     sendSuccess(res, {
       token,

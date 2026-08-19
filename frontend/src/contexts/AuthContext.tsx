@@ -11,12 +11,44 @@ import {
 
 const TOKEN_STORAGE_KEY = "mtcenter.token";
 
+// Token lives in localStorage (survives browser close) when the user checked
+// "จดจำการเข้าใช้งาน", or in sessionStorage (cleared when the browser closes)
+// otherwise. These helpers keep that choice in one place.
+type StoredToken = { token: string; rememberMe: boolean } | null;
+
+function readStoredToken(): StoredToken {
+  const local = localStorage.getItem(TOKEN_STORAGE_KEY);
+  if (local) {
+    return { token: local, rememberMe: true };
+  }
+  const session = sessionStorage.getItem(TOKEN_STORAGE_KEY);
+  if (session) {
+    return { token: session, rememberMe: false };
+  }
+  return null;
+}
+
+function storeToken(token: string, rememberMe: boolean): void {
+  if (rememberMe) {
+    localStorage.setItem(TOKEN_STORAGE_KEY, token);
+    sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+  } else {
+    sessionStorage.setItem(TOKEN_STORAGE_KEY, token);
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
+  }
+}
+
+function clearStoredToken(): void {
+  localStorage.removeItem(TOKEN_STORAGE_KEY);
+  sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+}
+
 interface AuthContextValue {
   token: string | null;
   user: UserProfile | null;
   mustChangePassword: boolean;
   isLoading: boolean;
-  login: (employeeId: string, password: string) => Promise<void>;
+  login: (employeeId: string, password: string, rememberMe?: boolean) => Promise<void>;
   logout: () => void;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
@@ -28,9 +60,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserProfile | null>(null);
   const [mustChangePassword, setMustChangePassword] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  // Tracks the user's current "remember me" choice so changePassword() can
+  // re-store the refreshed token in the same place without silently
+  // downgrading a remembered session to a session-only one.
+  const rememberMeRef = React.useRef(false);
 
   const logout = useCallback(() => {
-    localStorage.removeItem(TOKEN_STORAGE_KEY);
+    clearStoredToken();
     setAuthToken(null);
     setToken(null);
     setUser(null);
@@ -54,20 +90,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Rehydrate from a stored token on mount.
   useEffect(() => {
-    const stored = localStorage.getItem(TOKEN_STORAGE_KEY);
+    const stored = readStoredToken();
     if (!stored) {
       setIsLoading(false);
       return;
     }
-    setAuthToken(stored);
-    setToken(stored);
+    rememberMeRef.current = stored.rememberMe;
+    setAuthToken(stored.token);
+    setToken(stored.token);
     getMe()
       .then((res) => {
         setUser(res.user);
         setMustChangePassword(res.mustChangePassword);
       })
       .catch(() => {
-        localStorage.removeItem(TOKEN_STORAGE_KEY);
+        clearStoredToken();
         setAuthToken(null);
         setToken(null);
         setUser(null);
@@ -75,9 +112,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .finally(() => setIsLoading(false));
   }, []);
 
-  const login = useCallback(async (employeeId: string, password: string) => {
-    const res = await apiLogin(employeeId, password);
-    localStorage.setItem(TOKEN_STORAGE_KEY, res.token);
+  const login = useCallback(async (employeeId: string, password: string, rememberMe = false) => {
+    const res = await apiLogin(employeeId, password, rememberMe);
+    rememberMeRef.current = rememberMe;
+    storeToken(res.token, rememberMe);
     setAuthToken(res.token);
     setToken(res.token);
     setUser(res.user);
@@ -96,7 +134,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       logout();
       return;
     }
-    localStorage.setItem(TOKEN_STORAGE_KEY, res.token);
+    storeToken(res.token, rememberMeRef.current);
     setAuthToken(res.token);
     setToken(res.token);
     setMustChangePassword(false);

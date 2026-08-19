@@ -9,7 +9,10 @@ import { Loader2, MonitorX, RotateCcw } from "lucide-react";
 import { Machine, MachineStatus, WorkOrder } from "../../../types";
 import { buildFloorLayout } from "../../../lib/floorLayout";
 import { useFloorSimulation } from "../../../lib/floorSimulation";
+import { useInspectionAgent } from "../../../lib/inspectionAgent";
+import PixelAILogo from "../../PixelAILogo";
 import LiveFloorHUD, { FloorCameraPreset } from "./LiveFloorHUD";
+import InspectorPanel from "./InspectorPanel";
 import { LIVE_FLOOR_THEME } from "./liveFloorTheme";
 
 /**
@@ -298,6 +301,19 @@ export default function LiveFloorView({
   const [isFullscreen, setIsFullscreen] = useState(false);
   // null = no explicit pick; the scene falls back to `layout.focusBuildingId`.
   const [focusBuildingId, setFocusBuildingId] = useState<string | null>(null);
+  /**
+   * โหมด Agent (POC): เปิดแล้วจะมีหุ่นยนต์เดินไล่ตรวจเครื่องจักรในผัง และมี
+   * พาเนลแชตรายงานด้านขวา ปิดไว้เป็นค่าเริ่มต้นเพราะโหมดปกติของหน้านี้คือ
+   * "ดูผังโรงงาน" — และเมื่อปิด ตัวหุ่นจะไม่ถูก mount เลย ฉากจึงไม่มี
+   * useFrame ส่วนเกินวิ่งอยู่
+   */
+  const [inspectorMode, setInspectorMode] = useState(false);
+  /**
+   * true = กล้องเกาะติดตัวหุ่นไปตลอด (เปิดอัตโนมัติเมื่อคลิกที่ตัวหุ่นในฉาก)
+   * โหมดนี้ขยับเฉพาะ "จุดที่กล้องเล็ง" ไปพร้อมหุ่น ไม่ยึดมุม/ระยะซูมที่ผู้ใช้
+   * ตั้งไว้ — จะหมุนดูรอบตัวหุ่นระหว่างที่มันเดินอยู่ก็ยังได้
+   */
+  const [inspectorFollow, setInspectorFollow] = useState(false);
 
   // Bumped by "ลองอีกครั้ง" to bust the memoised probe result: a context limit
   // that was temporarily full, or a GPU process that has since restarted, must
@@ -322,6 +338,13 @@ export default function LiveFloorView({
   // render loop; this hook only re-renders HUD consumers at `hz` — it never
   // steps on its own.
   const { sim, snapshot } = useFloorSimulation(machines, { hz: 2, autoStep: false });
+
+  // หุ่นยนต์ตรวจสายการผลิต: ฉากเป็นผู้ก้าวเวลาให้ (เหมือน `sim`) hook นี้แค่
+  // รีเฟรช snapshot ให้พาเนลแชตที่ 4Hz — อ่านค่าเซนเซอร์จาก `sim` ตัวเดียวกับ
+  // ที่ฉากใช้ ผลตรวจจึงตรงกับสิ่งที่ผู้ชมเห็นวิ่งอยู่บนจอ
+  const { agent: inspector, snapshot: inspectorSnapshot } = useInspectionAgent(layout, sim, {
+    hz: 4,
+  });
 
   // Real CSS-based fullscreen (not the browser Fullscreen API) so it keeps
   // working inside the app shell. Lock body scroll while active and always
@@ -413,6 +436,34 @@ export default function LiveFloorView({
    * clearing the pick ("ดูทั้งไซต์" / clicking the active row) pulls back out to
    * the whole-site overview.
    */
+  /**
+   * เปิด/ปิดโหมด Agent การปิดจะสั่งหยุดรอบตรวจด้วย — ไม่ทิ้งหุ่นให้เดินอยู่
+   * เบื้องหลังโดยผู้ใช้มองไม่เห็น (บันทึกและรายงานเดิมยังอยู่ เปิดกลับมาแล้ว
+   * ดูรายงานรอบก่อนได้)
+   */
+  const handleToggleInspector = useCallback(() => {
+    setInspectorMode((on) => {
+      if (on) {
+        inspector.stop();
+        setInspectorFollow(false);
+      }
+      return !on;
+    });
+  }, [inspector]);
+
+  /**
+   * คลิกที่ตัวหุ่นในฉาก = "จับตัวหุ่น": เปิดพาเนลรายงานถ้ายังปิดอยู่ แล้วให้
+   * กล้องเกาะติดตัวมันไป คลิกซ้ำที่ตัวเดิม (หรือกดปุ่มในพาเนล) เป็นการปล่อย
+   */
+  const handleSelectInspector = useCallback(() => {
+    setInspectorMode(true);
+    setInspectorFollow((following) => !following);
+  }, []);
+
+  const handleToggleFollow = useCallback(() => {
+    setInspectorFollow((following) => !following);
+  }, []);
+
   const handleFocusBuilding = useCallback((buildingId: string | null) => {
     setFocusBuildingId(buildingId);
     setCameraPreset(buildingId === null ? "plant" : "line");
@@ -475,6 +526,10 @@ export default function LiveFloorView({
                   simulation={sim}
                   focusBuildingId={focusBuildingId}
                   layout={layout}
+                  inspector={inspector}
+                  inspectorActive={inspectorMode}
+                  inspectorFollow={inspectorFollow}
+                  onSelectInspector={handleSelectInspector}
                   onContextLost={handleContextLost}
                   onContextRestored={handleContextRestored}
                 />
@@ -510,6 +565,28 @@ export default function LiveFloorView({
           focusBuildingId={focusBuildingId}
           onFocusBuilding={handleFocusBuilding}
         />
+
+        {/* โหมด Agent — ปุ่มเปิด และพาเนลแชตรายงาน ใช้จุดยึดเดียวกัน
+            (ใต้แถบควบคุมกล้องมุมขวาบน) จึงไม่ทับพาเนลไหนของ HUD */}
+        {inspectorMode ? (
+          <InspectorPanel
+            agent={inspector}
+            snapshot={inspectorSnapshot}
+            onAskAI={onAskAI}
+            follow={inspectorFollow}
+            onToggleFollow={handleToggleFollow}
+            onClose={handleToggleInspector}
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={handleToggleInspector}
+            className="absolute right-4 top-[76px] z-40 flex items-center gap-2 rounded-[14px] border border-[var(--lf-panel-border)] bg-[var(--lf-panel-bg)] px-3 py-2 text-[11.5px] font-bold text-[var(--lf-text)] shadow-[0_8px_24px_-12px_var(--lf-panel-glow)] backdrop-blur-md hover:bg-[var(--lf-accent-14)] transition-colors pointer-events-auto"
+          >
+            <PixelAILogo className="w-4 h-4 text-[var(--lf-accent)]" />
+            หุ่นยนต์เดินตรวจ
+          </button>
+        )}
       </div>
     </div>
   );

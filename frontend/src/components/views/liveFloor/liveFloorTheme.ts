@@ -45,6 +45,11 @@ export const LIVE_FLOOR_THEME = {
   /** building + props */
   structure: "#dbe4f0",
   structureAlt: "#c6d3e4",
+  /** Sims-style dark silhouette outline ink used by the inverted-hull outline
+   *  meshes in LiveFloorFacility.tsx (building shells, office cluster, and a
+   *  handful of larger props). Near-black navy rather than pure black so it
+   *  still reads as "ink" and not a void against the pale daylight scene. */
+  outlineInk: "#12151d",
   /** primary accent (product blue) and secondary violet accent */
   accent: "#0066cc",
   accentAlt: "#6b5bd6",
@@ -96,6 +101,25 @@ export const LIVE_FLOOR_THEME = {
   placeholderText: "#5f6b7d",
   /** fallback colour for an unrecognised machine status */
   statusFallback: "#78859a",
+  /**
+   * PLC stack light (โคมไฟสัญญาณ 3 ชั้น) lamp endpoints. Replaces the old
+   * animated beacon dome — every machine now carries a STATIC 3-lamp tower
+   * (green / yellow / red) and only the LIT/UNLIT set changes, on a status
+   * change, never per frame. `*Lit` reuses the exact reviewed `status.*`
+   * tokens above (same hue, same >=3:1-on-ground guarantee) so the lamp and
+   * the status strip always agree. `*Dark` is a DARK, DESATURATED version of
+   * the same hue — not a pale tint — so an unlit lamp still reads as "a lamp
+   * that is off" (frosted, dim glass) rather than disappearing into the pale
+   * floor the way a fully-desaturated grey would.
+   */
+  stackLight: {
+    greenLit: "#0b8163",
+    greenDark: "#5c6a63",
+    yellowLit: "#b87503",
+    yellowDark: "#6b6152",
+    redLit: "#d92d4b",
+    redDark: "#6b565b",
+  },
   /** shared neutral endpoints for materials whose actual colour comes from instance tinting */
   neutral: {
     white: "#ffffff",
@@ -153,6 +177,25 @@ export const LIVE_FLOOR_THEME = {
     foliage: "#7fa66f",
     /** ลำต้นไม้ */
     trunk: "#8a7358",
+    /** ผนังหลักอาคารสำนักงาน — เข้มกว่าโรงผลิตเล็กน้อยให้ดู "corporate" */
+    officeWall: "#c3cee0",
+    /** แถบกระจกโค้งอาคารสำนักงาน (curtain wall) */
+    officeGlass: "#7ea3c9",
+    /** แถบพื้นชั้น (floor-slab band) คั่นระหว่างชั้นของอาคารสำนักงาน */
+    officeBand: "#98a7bd",
+    /** ฝาหลังคายื่นของอาคารสำนักงาน — เข้มสุดในกลุ่มให้ดูมีน้ำหนักด้านบน */
+    officeRoof: "#5f6f88",
+    /** ผิวลานพลาซ่าหน้าอาคารสำนักงาน — อ่อนกว่าลาดยางทั่วไซต์เล็กน้อย */
+    plazaPaving: "#dbe1ea",
+    /** เสาธง */
+    flagpole: "#8f97a3",
+    /** ผืนธง */
+    flag: "#0066cc",
+    /** แนวรั้วต้นไม้เตี้ย (hedge) */
+    hedge: "#5f8a53",
+    /** เรือนไฟของเสาไฟถนน — สีทึบอิ่มตัว (ไม่ใช่ emissive จ้า) ให้เห็นชัดกลางวัน
+     *  แม้เปิด emissive อ่อนๆ ก็ยังอ่านได้เพราะฐานสีเข้มกว่าพื้นถนน/ท้องฟ้า */
+    lampHousing: "#b9711c",
   },
   /** 2D HUD tokens — Tailwind-arbitrary-value strings, used by LiveFloorHUD */
   hud: {

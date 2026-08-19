@@ -115,7 +115,23 @@ export type FloorPropKind =
   /** ลานวางวัสดุ/พาเลทกลางแจ้ง */
   | "yard"
   /** ต้นไม้ริมรั้วและช่องว่างระหว่างอาคาร */
-  | "tree";
+  | "tree"
+  /** อาคารสำนักงานหน้าโรงงาน (ของประดับฉากล้วนๆ ไม่มีเครื่องจักร/โซน) */
+  | "officeBlock"
+  /** ลานพลาซ่า/ลานหน้าอาคารสำนักงาน */
+  | "officePlaza"
+  /** เสาธงหน้าลานพลาซ่า */
+  | "flagpole"
+  /** แนวรั้วต้นไม้เตี้ยขอบลานพลาซ่า */
+  | "hedge"
+  /** ป้ายชื่อไลน์ผลิตที่หัวไลน์ ยกสูงให้อ่านได้ หันหน้าตามแนวสายพาน */
+  | "lineSign"
+  /** อาคารเสริมขนาดเล็ก (โรงอาหาร/ธุรการ) ข้างอาคารสำนักงานหลัก ของประดับฉากล้วนๆ */
+  | "officeAnnex"
+  /** ทางเดินมีหลังคา/ที่จอดรถคลุมหน้าอาคารสำนักงาน */
+  | "carPorch"
+  /** เสาไฟถนนริมถนนหลักในพื้นที่โรงงาน */
+  | "lightPole";
 
 /** วัตถุประกอบฉากหนึ่งชิ้น (พิกัดโลกสัมบูรณ์) */
 export interface FloorProp {
@@ -261,6 +277,53 @@ const TREE_SPACING = 9;
 const TREE_SIZE = 3;
 /** ความยาวของแผงรั้วหนึ่งแผง */
 const FENCE_SEGMENT = 12;
+/** ความกว้างอาคารสำนักงาน (ของประดับฉาก): กว้างพอให้ดูเป็นอาคารบริหารจริงจัง */
+const OFFICE_BLOCK_WIDTH = 34;
+/** ความลึกอาคารสำนักงาน */
+const OFFICE_BLOCK_DEPTH = 18;
+/** ความสูงอาคารสำนักงาน: สูงกว่า WALL_HEIGHT (12 ม.) ของโรงผลิตและป้อมยาม
+ * เพื่อให้ดูเป็นตึกสำนักงาน 3–4 ชั้น แยกออกจากอาคารผลิตอย่างชัดเจน */
+const OFFICE_BLOCK_HEIGHT = 14;
+/** ความลึกลานพลาซ่าหน้าอาคารสำนักงาน (กว้างเท่าตัวอาคาร) */
+const OFFICE_PLAZA_DEPTH = 10;
+/** ระยะเว้นจากถนนทางเข้า/ประตูถึงขอบอาคารสำนักงาน กันไม่ให้ล้ำเขตประตู */
+const OFFICE_SIDE_CLEARANCE = 4;
+/** ความสูงเสาธงหน้าลานพลาซ่า */
+const FLAGPOLE_HEIGHT = 9;
+/** ความสูงแนวรั้วต้นไม้เตี้ยขอบลานพลาซ่า */
+const HEDGE_HEIGHT = 0.8;
+/** ความกว้างป้ายชื่อไลน์ผลิต (ข้ามแนวสายพาน) */
+const LINE_SIGN_WIDTH = 2.2;
+/** ความหนาแผ่นป้ายชื่อไลน์ */
+const LINE_SIGN_DEPTH = 0.3;
+/** ความสูงป้ายชื่อไลน์ (รวมเสา) — ยกพ้นหัวคนเดินและมองเห็นข้ามเครื่องจักรได้ */
+const LINE_SIGN_HEIGHT = 3.6;
+/** ระยะจากปลายสายพาน (spineX1) ถึงป้าย กันไม่ให้ทับเครื่องจักรตัวแรก */
+const LINE_SIGN_GAP = 0.9;
+/** จำนวนป้ายไลน์สูงสุดทั้งผัง กันโรงงานใหญ่มากไม่ให้มีป้ายเป็นร้อย */
+const LINE_SIGN_MAX = 60;
+/** ความกว้างอาคารเสริม (โรงอาหาร/ธุรการ) ข้างอาคารสำนักงานหลัก — เล็กกว่าตึกหลักชัดเจน */
+const OFFICE_ANNEX_WIDTH = 16;
+/** ความลึกอาคารเสริม */
+const OFFICE_ANNEX_DEPTH = 12;
+/** ความสูงอาคารเสริม — เตี้ยกว่าตึกสำนักงานหลัก (ชั้นเดียว-สองชั้น) */
+const OFFICE_ANNEX_HEIGHT = 6;
+/** ช่องว่างระหว่างอาคารสำนักงานหลักกับอาคารเสริม */
+const OFFICE_ANNEX_GAP = 5;
+/** ความกว้างทางเดิน/ที่จอดรถมีหลังคาหน้าอาคารสำนักงาน */
+const CAR_PORCH_WIDTH = 10;
+/** ความลึกทางเดินมีหลังคา (ยื่นจากตัวอาคาร) */
+const CAR_PORCH_DEPTH = 4;
+/** ความสูงหลังคาทางเดิน — เตี้ยพอดีรถวิ่งลอด */
+const CAR_PORCH_HEIGHT = 2.8;
+/** ระยะห่างเสาไฟถนนตามแนวถนนหลัก */
+const LIGHT_POLE_SPACING = 20;
+/** ขนาดฐานเสาไฟ */
+const LIGHT_POLE_SIZE = 0.35;
+/** ความสูงเสาไฟถนน */
+const LIGHT_POLE_HEIGHT = 6.5;
+/** ระยะเสาไฟจากขอบถนนหลัก กันไม่ให้ล้ำเข้าไปในผิวถนน */
+const LIGHT_POLE_OFFSET = 1.0;
 /**
  * เพดานจำนวน prop รวม เพื่อให้ฉาก 3D ไม่หนักเกินไป
  * ถ้าโรงงานใหญ่มากจะบางต้นไม้ (tree) ลังสินค้า (crate) และเสา (pillar) ตามลำดับ
@@ -1398,6 +1461,22 @@ export function buildFloorLayout(machines: Machine[]): FloorLayout {
     }
   }
 
+  // lineSign: ป้ายชื่อไลน์หนึ่งป้ายต่อไลน์ผลิต วางเลยปลายสายพาน (spineX1) ออกไป
+  // เล็กน้อยกันทับเครื่องจักรตัวแรก หมุนหน้าป้ายให้ขวางแนวสายพาน (อ่านได้เมื่อมองลงไลน์)
+  // จำกัดจำนวนรวมด้วย LINE_SIGN_MAX ก่อนตัด (เว้นระยะสม่ำเสมอ) กันโรงงานใหญ่มากมีป้ายเป็นร้อย
+  for (const line of thin(lines, LINE_SIGN_MAX)) {
+    tryPush({
+      id: `LINESIGN_${line.id}`,
+      kind: "lineSign",
+      x: line.horizontal ? line.x1 - LINE_SIGN_GAP : line.x1,
+      z: line.horizontal ? line.z1 : line.z1 - LINE_SIGN_GAP,
+      rotationY: line.horizontal ? Math.PI / 2 : 0,
+      width: LINE_SIGN_WIDTH,
+      depth: LINE_SIGN_DEPTH,
+      height: LINE_SIGN_HEIGHT,
+    });
+  }
+
   // ---- 4b. prop ระดับพื้นที่โรงงาน: ประตู ป้อมยาม ลานจอด ลานวัสดุ รั้ว ต้นไม้ ----
   const fenceWestX = -FENCE_PADDING;
   const fenceEastX = contentWidth + FENCE_PADDING;
@@ -1514,6 +1593,134 @@ export function buildFloorLayout(machines: Machine[]): FloorLayout {
       { avoidBuildings: true, avoidRoads: true }
     );
     if (placed) parkingPlaced += 1;
+  }
+
+  // officeBlock: อาคารสำนักงาน (ของประดับฉากล้วนๆ) วางข้างแนวแกนประตูฝั่งที่มีที่ว่างมากกว่า
+  // พร้อมลานพลาซ่าคั่นระหว่างตัวอาคารกับถนนทางเข้า และเสาธง/แนวรั้วต้นไม้รอบลาน
+  {
+    const officeHalfW = OFFICE_BLOCK_WIDTH / 2;
+    const westCenterX = gateX - MAIN_ROAD_WIDTH / 2 - OFFICE_SIDE_CLEARANCE - officeHalfW;
+    const eastCenterX = gateX + MAIN_ROAD_WIDTH / 2 + OFFICE_SIDE_CLEARANCE + officeHalfW;
+    const westFree = westCenterX - officeHalfW;
+    const eastFree = contentWidth - (eastCenterX + officeHalfW);
+    const westValid = westFree >= 2;
+    const eastValid = eastFree >= 2;
+    let officeCenterX: number | null = null;
+    if (westValid && eastValid) {
+      officeCenterX = westFree >= eastFree ? westCenterX : eastCenterX;
+    } else if (westValid) {
+      officeCenterX = westCenterX;
+    } else if (eastValid) {
+      officeCenterX = eastCenterX;
+    }
+
+    if (officeCenterX !== null) {
+      const officeZ = apronTopZ + APRON_MARGIN + OFFICE_BLOCK_DEPTH / 2;
+      const plazaZ = apronTopZ + APRON_MARGIN + OFFICE_BLOCK_DEPTH + OFFICE_PLAZA_DEPTH / 2;
+      const officePlaced = tryPush(
+        {
+          id: "OFFICE_BLOCK_1",
+          kind: "officeBlock",
+          x: officeCenterX,
+          z: officeZ,
+          rotationY: 0,
+          width: OFFICE_BLOCK_WIDTH,
+          depth: OFFICE_BLOCK_DEPTH,
+          height: OFFICE_BLOCK_HEIGHT,
+        },
+        { avoidBuildings: true, avoidRoads: true }
+      );
+      if (officePlaced) {
+        const plazaPlaced = tryPush(
+          {
+            id: "OFFICE_PLAZA_1",
+            kind: "officePlaza",
+            x: officeCenterX,
+            z: plazaZ,
+            rotationY: 0,
+            width: OFFICE_BLOCK_WIDTH,
+            depth: OFFICE_PLAZA_DEPTH,
+            height: 0.15,
+          },
+          { avoidBuildings: true, avoidRoads: true }
+        );
+        if (plazaPlaced) {
+          // hedge: แนวรั้วต้นไม้เตี้ยขอบซ้าย-ขวาของลานพลาซ่า
+          tryPush({
+            id: "HEDGE_1_W",
+            kind: "hedge",
+            x: officeCenterX - OFFICE_BLOCK_WIDTH / 2 + 0.3,
+            z: plazaZ,
+            rotationY: Math.PI / 2,
+            width: OFFICE_PLAZA_DEPTH - 1,
+            depth: 0.6,
+            height: HEDGE_HEIGHT,
+          });
+          tryPush({
+            id: "HEDGE_1_E",
+            kind: "hedge",
+            x: officeCenterX + OFFICE_BLOCK_WIDTH / 2 - 0.3,
+            z: plazaZ,
+            rotationY: Math.PI / 2,
+            width: OFFICE_PLAZA_DEPTH - 1,
+            depth: 0.6,
+            height: HEDGE_HEIGHT,
+          });
+          // flagpole: 3 เสาธงเรียงกึ่งกลางแนวขอบลานด้านที่ใกล้ถนนทางเข้าที่สุด
+          const flagZ = plazaZ + OFFICE_PLAZA_DEPTH / 2 - 1;
+          for (const offset of [-8, 0, 8]) {
+            tryPush({
+              id: `FLAGPOLE_1_${offset}`,
+              kind: "flagpole",
+              x: officeCenterX + offset,
+              z: flagZ,
+              rotationY: 0,
+              width: 0.4,
+              depth: 0.4,
+              height: FLAGPOLE_HEIGHT,
+            });
+          }
+
+          // carPorch: ทางเดิน/ที่จอดรถมีหลังคายื่นจากหน้าอาคารสำนักงานหลักลงมาคลุมลานพลาซ่า
+          tryPush(
+            {
+              id: "CARPORCH_1",
+              kind: "carPorch",
+              x: officeCenterX,
+              z: officeZ + OFFICE_BLOCK_DEPTH / 2 + CAR_PORCH_DEPTH / 2,
+              rotationY: 0,
+              width: CAR_PORCH_WIDTH,
+              depth: CAR_PORCH_DEPTH,
+              height: CAR_PORCH_HEIGHT,
+            },
+            { avoidBuildings: true, avoidRoads: true }
+          );
+
+          // officeAnnex: อาคารเสริมเล็ก (โรงอาหาร/ธุรการ) ต่อข้างอาคารสำนักงานหลัก
+          // ลองทั้งสองด้าน (ตะวันออก/ตะวันตก) เลือกด้านแรกที่วางได้ไม่ทับสิ่งใด
+          const annexHalfW = OFFICE_ANNEX_WIDTH / 2;
+          const annexZ = officeZ + OFFICE_BLOCK_DEPTH / 2 - OFFICE_ANNEX_DEPTH / 2;
+          for (const annexSide of [1, -1]) {
+            const annexX =
+              officeCenterX + annexSide * (OFFICE_BLOCK_WIDTH / 2 + OFFICE_ANNEX_GAP + annexHalfW);
+            const placedAnnex = tryPush(
+              {
+                id: "OFFICE_ANNEX_1",
+                kind: "officeAnnex",
+                x: annexX,
+                z: annexZ,
+                rotationY: 0,
+                width: OFFICE_ANNEX_WIDTH,
+                depth: OFFICE_ANNEX_DEPTH,
+                height: OFFICE_ANNEX_HEIGHT,
+              },
+              { avoidBuildings: true, avoidRoads: true }
+            );
+            if (placedAnnex) break;
+          }
+        }
+      }
+    }
   }
 
   // fence: รั้วรอบพื้นที่โรงงานทั้งผืน เว้นช่องตรงประตูทางเข้า
@@ -1685,7 +1892,36 @@ export function buildFloorLayout(machines: Machine[]): FloorLayout {
     }
   }
 
-  // ---- เพดานจำนวน prop: บาง tree → crate → pillar ตามลำดับ -------------------
+  // lightPole: เสาไฟเรียงสองฝั่งถนนหลักทุกเส้น (kind "main") ห่างกัน LIGHT_POLE_SPACING
+  // ระยะจากขอบถนน = LIGHT_POLE_OFFSET กันไม่ให้ล้ำผิวถนน
+  const lightPoleCandidates: FloorProp[] = [];
+  for (const road of roads) {
+    if (road.kind !== "main") continue;
+    const length = road.horizontal ? road.width : road.depth;
+    const count = Math.max(1, Math.floor(length / LIGHT_POLE_SPACING));
+    const step = length / count;
+    const start = -length / 2;
+    for (let i = 0; i <= count; i++) {
+      const along = start + step * i;
+      for (const side of [-1, 1] as const) {
+        const offset = side * (road.horizontal ? road.depth : road.width) / 2 + side * LIGHT_POLE_OFFSET;
+        const x = road.horizontal ? road.x + along : road.x + offset;
+        const z = road.horizontal ? road.z + offset : road.z + along;
+        lightPoleCandidates.push({
+          id: `LIGHTPOLE_${road.id}_${i}_${side}`,
+          kind: "lightPole",
+          x,
+          z,
+          rotationY: 0,
+          width: LIGHT_POLE_SIZE,
+          depth: LIGHT_POLE_SIZE,
+          height: LIGHT_POLE_HEIGHT,
+        });
+      }
+    }
+  }
+
+  // ---- เพดานจำนวน prop: บาง tree → crate → pillar → lightPole ตามลำดับ -------
   const budget = Math.max(0, PROP_CAP - fixedPropCount);
   const treeBudget = Math.min(treeCandidates.length, Math.round(budget * 0.28));
   for (const tree of thin(treeCandidates, treeBudget)) {
@@ -1696,8 +1932,15 @@ export function buildFloorLayout(machines: Machine[]): FloorLayout {
     Math.round(Math.max(0, PROP_CAP - props.length) * 0.55)
   );
   for (const crate of thin(crateCandidates, crateBudget)) tryPush(crate);
-  const pillarBudget = Math.max(0, PROP_CAP - props.length);
+  const pillarBudget = Math.max(
+    0,
+    Math.round(Math.max(0, PROP_CAP - props.length) * 0.7)
+  );
   for (const pillar of thin(pillarCandidates, pillarBudget)) tryPush(pillar);
+  const lightPoleBudget = Math.max(0, PROP_CAP - props.length);
+  for (const pole of thin(lightPoleCandidates, lightPoleBudget)) {
+    tryPush(pole, { avoidBuildings: true, avoidRoads: true });
+  }
 
   // ---- 5. จัดทุกอย่างให้กึ่งกลางจุดกำเนิด ------------------------------------
   const offsetX = contentWidth / 2;

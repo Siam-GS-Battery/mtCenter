@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -6,7 +7,7 @@ import {
   type ReactElement,
 } from "react";
 import { Html } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import type {
   FloorAisle,
@@ -18,6 +19,7 @@ import type {
   FloorZone,
 } from "../../../lib/floorLayout";
 import type { FloorSimulation } from "../../../lib/floorSimulation";
+import type { FloorCameraPreset } from "./LiveFloor4DScene";
 import { LIVE_FLOOR_THEME, statusColor } from "./liveFloorTheme";
 
 /**
@@ -66,6 +68,16 @@ const AISLE_MAIN_COLOR = LIVE_FLOOR_THEME.structureAlt;
 const AISLE_WALK_COLOR = LIVE_FLOOR_THEME.aisleWalk;
 const BELT_COLOR = LIVE_FLOOR_THEME.belt;
 const SITE = LIVE_FLOOR_THEME.site;
+/** Sims-style dark silhouette outline ink — see the `backSide` doc on `StaticLayer`. */
+const OUTLINE_INK = LIVE_FLOOR_THEME.outlineInk;
+/**
+ * World-space outline "ink width" added (symmetrically, on every axis) to an
+ * outlined shape's scale. Additive rather than multiplicative so one constant
+ * gives every silhouette — a 12 m truss bay and a 2 m sign board alike — the
+ * same visual line weight, the way a comic/cel outline stays a constant pen
+ * width regardless of the object it traces.
+ */
+const OUTLINE_MARGIN = 0.07;
 
 // ---------------------------------------------------------------------------
 // Vertical stacking of the flat plates. The 4D scene puts its ground plane and
@@ -85,6 +97,14 @@ const SITE = LIVE_FLOOR_THEME.site;
 // is the wall skirt (`WALL_SKIRT_H`), which spans y 0 → 0.34 on the building
 // perimeter: it is a box, not a plate, so it deliberately buries its bottom edge
 // through the grass/asphalt plates instead of sharing a plane with them.
+//
+// The baked-AO skirt (`AO_SKIRT_H`, see `AoSkirtLayer`) shares that same
+// "box, not plate" trick: it spans y 0 → 0.3, strictly inside the solid
+// skirt's 0 → 0.34 band, so its top edge never pokes out past the solid trim
+// and never sits exactly level with Y_SLAB (0.024) or Y_ZONE_DECAL (0.038) —
+// both of which are plates it partially overlaps in plan. Its footprint is
+// the wall footprint padded by `AO_SKIRT_MARGIN`, so the gradient is visible
+// peeking out from under the opaque skirt instead of being fully hidden by it.
 // ---------------------------------------------------------------------------
 
 const Y_GRASS = 0.004;
@@ -114,6 +134,65 @@ const SCRATCH_COLOR = new THREE.Color();
 const SCRATCH_COLOR_B = new THREE.Color();
 /** scratch HSL target for the module-scope tint derivations below. */
 const SCRATCH_HSL = { h: 0, s: 0, l: 0 };
+
+/**
+ * Visibility-gate scratch for `ConveyorSystem` / `FloorTraffic`: a coarse,
+ * per-line/per-lane frustum test against a precomputed bounding sphere, used
+ * to skip the expensive per-instance matrix writes for motion the camera
+ * cannot currently see. All three objects are mutated in place every check —
+ * never reallocated — so the gate itself costs nothing extra per frame.
+ */
+const CULL_FRUSTUM = new THREE.Frustum();
+const CULL_PROJ_MATRIX = new THREE.Matrix4();
+const CULL_SPHERE = new THREE.Sphere();
+/** how often the coarse visibility gate re-evaluates, seconds (~5 Hz) — the
+ *  lines/lanes are static in world space, so nothing is lost by checking
+ *  rarely, and re-testing every frame would cost more than the writes it saves. */
+const CULL_INTERVAL = 0.2;
+/**
+ * Hysteresis margin applied to every line/lane bounding-sphere radius before
+ * the frustum test above, so a lane is marked visible slightly BEFORE it
+ * actually enters the screen and stays marked visible slightly AFTER it
+ * leaves — instead of the exact-radius test, which lets a fast pan carry a
+ * lane across the frustum boundary between two 0.2s checks and leaves its
+ * riders/AGVs/trucks frozen on screen at their last-written transform for up
+ * to CULL_INTERVAL. Raising the check cadence would "fix" the same symptom
+ * but cost more CPU every frame, which is exactly what this gate exists to
+ * avoid — a one-off multiply against a radius we already have costs nothing
+ * extra. The 50% figure is deliberately proportional to each line's own
+ * bounding radius (already sized to that line's world footprint) rather than
+ * a fixed metre value, so it scales with layout size the same way the rest
+ * of this file's LOD constants do, and is generous enough to absorb a fast
+ * drag/zoom's worth of camera travel within one CULL_INTERVAL window.
+ *
+ * NOTE ON CROSS-FILE CONSISTENCY: LiveFloor4DScene.tsx culls machines with
+ * its own per-zone bounding spheres on its FPS-capped decimated tick, using
+ * a generous margin of its own for the same reason. If this file's margin
+ * were smaller than that one, a fast pan could reveal a running machine
+ * next to a conveyor/AGV lane that still reads as offscreen (or vice
+ * versa) — a visibly broken mismatch at the frustum edge. Keep this factor
+ * at least as generous as the machine-side margin in LiveFloor4DScene.tsx
+ * whenever either one changes.
+ */
+const CULL_MARGIN_FACTOR = 0.5;
+/** CULL_MARGIN_FACTOR expressed as a radius multiplier — applied to every
+ *  line/lane bounding-sphere radius at the point of the frustum test itself
+ *  (not baked into the stored radius) so the derivation stays visible where
+ *  it's used. `1 + CULL_MARGIN_FACTOR` = 1.5x radius, i.e. the sphere is
+ *  treated as 50% larger than its true world footprint for visibility
+ *  purposes only — the underlying geometry/collision data is untouched. */
+const CULL_RADIUS_MULTIPLIER = 1 + CULL_MARGIN_FACTOR;
+/**
+ * Same distance-LOD multiple as `ANIM_LOD_DISTANCE_FACTOR` in
+ * LiveFloor4DScene.tsx (kept as a local copy — the two files don't share a
+ * module — so both stay in numeric lockstep): beyond this multiple of the
+ * layout's own `suggestedCameraDistance`, motion this fine (belt scroll,
+ * AGV/worker/truck travel) is a few pixels at most. Applying the same factor
+ * here means a zoomed-out `plant`/`top` view freezes distant conveyors and
+ * traffic at the same distance it already freezes distant machines, instead
+ * of showing frozen machines next to full-speed belts in the same shot.
+ */
+const CONVEYOR_LOD_DISTANCE_FACTOR = 1.6;
 
 /** `base` lerped `STATUS_TINT_FACTOR` of the way toward the status colour. */
 function statusTint(base: string, status: Parameters<typeof statusColor>[0]): string {
@@ -196,6 +275,9 @@ const MARKING_INK = scaleSrgb(SITE.asphalt, 0.55);
 
 /** Guaranteed-darker-than-the-pad kerb, so pads have a grounding edge. */
 const PAD_KERB = scaleSrgb(SITE.kerb, 0.82);
+
+/** Office block curtain-wall glazing, semi-transparent like the hall glass. */
+const OFFICE_GLASS = scaleSrgb(SITE.officeGlass, 0.86);
 
 /** Near-black ink for the rooftop sign text, on a near-white plate. */
 const SIGN_INK = scaleSrgb(WALL_COLOR, 0.18);
@@ -308,6 +390,21 @@ function applyBatch(b: Batch, i: number): void {
   DUMMY.scale.set(b.sx[i], b.sy[i], b.sz[i]);
 }
 
+/**
+ * Same transform as `applyBatch`, inflated by `OUTLINE_MARGIN` on every axis —
+ * feeds the `backSide`-rendered outline copy of a batch (see `StaticLayer`'s
+ * `backSide` doc for the inverted-hull technique this supports).
+ */
+function applyOutlineBatch(b: Batch, i: number): void {
+  DUMMY.position.set(b.x[i], b.y[i], b.z[i]);
+  DUMMY.rotation.set(b.rx[i], b.ry[i], 0);
+  DUMMY.scale.set(
+    b.sx[i] + OUTLINE_MARGIN * 2,
+    b.sy[i] + OUTLINE_MARGIN * 2,
+    b.sz[i] + OUTLINE_MARGIN * 2
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Generic static instanced layer
 // ---------------------------------------------------------------------------
@@ -331,6 +428,19 @@ interface StaticLayerProps {
   roughness?: number;
   opacity?: number;
   doubleSided?: boolean;
+  /**
+   * Renders only back faces (`THREE.BackSide`). Combined with an
+   * instance-space size inflation baked into `write`, this is the
+   * "inverted-hull" outline technique: an enlarged, backface-only copy of a
+   * shape drawn behind the normal front-facing copy reads as a crisp dark rim
+   * around its silhouette wherever the enlarged shell peeks out from behind
+   * the real one. Used instead of literal `THREE.EdgesGeometry` line
+   * segments because `THREE.InstancedMesh` only instances triangle meshes —
+   * instancing actual line geometry would need a hand-rolled shader/attribute
+   * path, which is more moving parts than this single-technique outline
+   * needs. Mutually exclusive with `doubleSided`.
+   */
+  backSide?: boolean;
   /** polygonOffsetFactor — used to order the coplanar flat plates */
   offsetFactor?: number;
 }
@@ -344,10 +454,11 @@ function StaticLayer({
   color,
   emissive,
   emissiveIntensity = 0.6,
-  metalness = 0.35,
-  roughness = 0.7,
+  metalness = 0.15,
+  roughness = 0.85,
   opacity = 1,
   doubleSided = false,
+  backSide = false,
   offsetFactor,
 }: StaticLayerProps): ReactElement | null {
   const meshRef = useRef<THREE.InstancedMesh>(null);
@@ -396,7 +507,7 @@ function StaticLayer({
         transparent={opacity < 1}
         opacity={opacity}
         depthWrite={opacity >= 1}
-        side={doubleSided ? THREE.DoubleSide : THREE.FrontSide}
+        side={backSide ? THREE.BackSide : doubleSided ? THREE.DoubleSide : THREE.FrontSide}
         polygonOffset={offsetFactor !== undefined}
         polygonOffsetFactor={offsetFactor ?? 0}
       />
@@ -419,6 +530,7 @@ interface PropLayerProps {
   roughness?: number;
   opacity?: number;
   doubleSided?: boolean;
+  backSide?: boolean;
   offsetFactor?: number;
 }
 
@@ -435,6 +547,269 @@ function PropLayer({ items, perItem, write, ...rest }: PropLayerProps): ReactEle
         write(prop, index % perItem);
       }}
     />
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Camera-aware wall transparency ("roof cutaway")
+// ---------------------------------------------------------------------------
+
+/**
+ * The shell has no solid roof (only trusses, above), so the "cutaway" the
+ * operator actually wants is the glass wall getting out of the way once the
+ * camera commits to a hall or a machine. `plant`/`top` keep today's 0.52 —
+ * those presets frame the whole site, where a building should still read as
+ * a building. `line` (one hall) drops to 0.18 and `eye` (one machine) drops
+ * to 0.10, low enough that the shell stops occluding what the operator
+ * zoomed in for while still leaving a faint outline of the hall.
+ */
+const WALL_OPACITY_BY_PRESET: Record<FloorCameraPreset, number> = {
+  plant: 0.52,
+  top: 0.52,
+  line: 0.18,
+  eye: 0.1,
+};
+/** Preset unset (older call sites, or default prop) — matches the old fixed value. */
+const WALL_OPACITY_DEFAULT = 0.52;
+/** Seconds to lerp from one preset's wall opacity to the next — no popping. */
+const WALL_OPACITY_LERP_SECONDS = 0.4;
+/** Below this delta the lerp is considered settled; the `useFrame` below no-ops. */
+const WALL_OPACITY_EPSILON = 0.001;
+
+interface WallGlassLayerProps {
+  count: number;
+  source: unknown;
+  write: (index: number) => void;
+  targetOpacity: number;
+  /**
+   * Optional inverted-hull outline for the same wall batch (see
+   * `applyOutlineBatch`/`StaticLayer`'s `backSide` doc). Rendered as a second
+   * instanced mesh sharing this component's matrices-once effect and its one
+   * `useFrame`, rather than a separate `StaticLayer`, because a flat-opaque
+   * dark hull behind a wall that is fading toward near-invisible at the
+   * `line`/`eye` presets (0.18/0.10 opacity) shows straight through the glass
+   * and reads as a dirty, muddy smear instead of the crisp wall the operator
+   * zoomed in to see clearly — the whole point of the camera-aware fade. Tying
+   * the outline's own opacity to the same lerped value makes it fade out in
+   * lockstep with the glass it traces, so at `eye`/`line` the shell reads as
+   * a faint, receding hint (matching the glass) instead of a solid dark box
+   * sitting inside a see-through one. Caller omits this when `lite` (or
+   * outlines are otherwise disabled) so no outline mesh mounts at all.
+   */
+  outlineWrite?: (index: number) => void;
+}
+
+/**
+ * `StaticLayer` specialised for the glass wall family only: it needs a
+ * `useFrame` to lerp opacity toward whichever camera preset is active, which
+ * `StaticLayer` deliberately does not support (its matrices are write-once).
+ * The lerp mutates the shared material's `opacity` in place — no per-instance
+ * work, no allocation — and bails out once the value has settled within
+ * `WALL_OPACITY_EPSILON` of the target, per this file's perf contract. When
+ * `outlineWrite` is supplied, the same `useFrame` also drives the wall
+ * outline's opacity toward the same target (see `outlineWrite` doc above) —
+ * no second `useFrame` is added.
+ */
+function WallGlassLayer({
+  count,
+  source,
+  write,
+  targetOpacity,
+  outlineWrite,
+}: WallGlassLayerProps): ReactElement | null {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const materialRef = useRef<THREE.MeshStandardMaterial>(null);
+  const outlineMeshRef = useRef<THREE.InstancedMesh>(null);
+  const outlineMaterialRef = useRef<THREE.MeshStandardMaterial>(null);
+  const writeRef = useRef(write);
+  writeRef.current = write;
+  const outlineWriteRef = useRef(outlineWrite);
+  outlineWriteRef.current = outlineWrite;
+  const currentOpacity = useRef(targetOpacity);
+
+  useLayoutEffect(() => {
+    const mesh = meshRef.current;
+    if (!mesh || count === 0) return;
+    const emit = writeRef.current;
+    for (let i = 0; i < count; i++) {
+      emit(i);
+      DUMMY.updateMatrix();
+      mesh.setMatrixAt(i, DUMMY.matrix);
+    }
+    mesh.count = count;
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingSphere();
+  }, [count, source]);
+
+  useLayoutEffect(() => {
+    const outlineMesh = outlineMeshRef.current;
+    const emitOutline = outlineWriteRef.current;
+    if (!outlineMesh || !emitOutline || count === 0) return;
+    for (let i = 0; i < count; i++) {
+      emitOutline(i);
+      DUMMY.updateMatrix();
+      outlineMesh.setMatrixAt(i, DUMMY.matrix);
+    }
+    outlineMesh.count = count;
+    outlineMesh.instanceMatrix.needsUpdate = true;
+    outlineMesh.computeBoundingSphere();
+  }, [count, source, outlineWrite]);
+
+  useFrame((_state, delta) => {
+    const material = materialRef.current;
+    if (!material) return;
+    const diff = targetOpacity - currentOpacity.current;
+    if (Math.abs(diff) < WALL_OPACITY_EPSILON) {
+      if (currentOpacity.current !== targetOpacity) {
+        currentOpacity.current = targetOpacity;
+        material.opacity = targetOpacity;
+        if (outlineMaterialRef.current) outlineMaterialRef.current.opacity = targetOpacity;
+      }
+      return;
+    }
+    const t = Math.min(1, delta / WALL_OPACITY_LERP_SECONDS);
+    currentOpacity.current += diff * t;
+    material.opacity = currentOpacity.current;
+    if (outlineMaterialRef.current) outlineMaterialRef.current.opacity = currentOpacity.current;
+  });
+
+  if (count === 0) return null;
+
+  return (
+    <>
+      <instancedMesh
+        key={count}
+        ref={meshRef}
+        args={[undefined, undefined, count]}
+        frustumCulled={false}
+        raycast={() => null}
+        castShadow={false}
+        receiveShadow={false}
+      >
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial
+          ref={materialRef}
+          color={WALL_GLASS}
+          roughness={0.32}
+          metalness={0.28}
+          transparent
+          opacity={currentOpacity.current}
+          depthWrite={false}
+          side={THREE.DoubleSide}
+        />
+      </instancedMesh>
+      {outlineWrite && (
+        <instancedMesh
+          key={`outline-${count}`}
+          ref={outlineMeshRef}
+          args={[undefined, undefined, count]}
+          frustumCulled={false}
+          raycast={() => null}
+          castShadow={false}
+          receiveShadow={false}
+        >
+          <boxGeometry args={[1, 1, 1]} />
+          <meshStandardMaterial
+            ref={outlineMaterialRef}
+            color={OUTLINE_INK}
+            metalness={0}
+            roughness={1}
+            side={THREE.BackSide}
+            transparent
+            opacity={currentOpacity.current}
+            depthWrite={false}
+          />
+        </instancedMesh>
+      )}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Ambient-occlusion grounding at wall bases
+// ---------------------------------------------------------------------------
+
+/** Builds the AO gradient once: opaque at the ground edge, transparent by mid-height. */
+function buildAoGradientTexture(): THREE.CanvasTexture {
+  const size = 64;
+  const canvas = document.createElement("canvas");
+  canvas.width = 1;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    // Canvas y grows downward and CanvasTexture flips on upload, so canvas
+    // y=0 (top) ends up at texture v=1 (the wall's top edge, away from the
+    // ground) and canvas y=size (bottom) ends up at v=0 (the ground edge).
+    // Opaque at the ground, fading to nothing by just past mid-height.
+    const gradient = ctx.createLinearGradient(0, 0, 0, size);
+    gradient.addColorStop(0, "rgba(255,255,255,0)");
+    gradient.addColorStop(0.55, "rgba(255,255,255,0.35)");
+    gradient.addColorStop(1, "rgba(255,255,255,1)");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 1, size);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * Cheap baked-looking AO, no screen-space pass and no new dependency: one
+ * instanced mesh reusing the wall footprint (see `AO_SKIRT_MARGIN`/`AO_SKIRT_H`
+ * above), skinned with a small procedural `CanvasTexture` (built once here,
+ * memoized) used as an `alphaMap` so each box reads as a soft dark pool
+ * hugging the wall base instead of a hard-edged plinth. Colour always comes
+ * from `LIVE_FLOOR_THEME.shadowColor`, never a hardcoded hex.
+ */
+function AoSkirtLayer({ batch, color }: { batch: Batch; color: string }): ReactElement | null {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const texture = useMemo(() => buildAoGradientTexture(), []);
+
+  // `buildAoGradientTexture()` allocates a `THREE.CanvasTexture` (backed by a
+  // real <canvas> and its own GPU texture handle); without an explicit
+  // dispose it outlives the component on every unmount/remount, leaking one
+  // canvas + GPU texture per batch each time.
+  useEffect(() => () => texture.dispose(), [texture]);
+
+  useLayoutEffect(() => {
+    const mesh = meshRef.current;
+    if (!mesh || batch.count === 0) return;
+    for (let i = 0; i < batch.count; i++) {
+      applyBatch(batch, i);
+      DUMMY.updateMatrix();
+      mesh.setMatrixAt(i, DUMMY.matrix);
+    }
+    mesh.count = batch.count;
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingSphere();
+  }, [batch]);
+
+  if (batch.count === 0) return null;
+
+  return (
+    <instancedMesh
+      key={batch.count}
+      ref={meshRef}
+      args={[undefined, undefined, batch.count]}
+      frustumCulled={false}
+      raycast={() => null}
+      castShadow={false}
+      receiveShadow={false}
+    >
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial
+        color={color}
+        alphaMap={texture}
+        transparent
+        opacity={0.55}
+        depthWrite={false}
+        roughness={1}
+        metalness={0}
+        side={THREE.DoubleSide}
+        polygonOffset
+        polygonOffsetFactor={-2}
+      />
+    </instancedMesh>
   );
 }
 
@@ -697,6 +1072,16 @@ const TRUSS_PARTS = 4;
 /** height of the grounding plinth at the foot of every wall (metres) */
 const WALL_SKIRT_H = 0.34;
 
+/**
+ * Baked-looking AO at the foot of every wall — see the vertical-stacking
+ * comment above for the y-height reasoning. `AO_SKIRT_MARGIN` is how far the
+ * gradient box is padded beyond the wall's own footprint on every side, so it
+ * reads as a shadow *pooling outward* from the wall rather than a second,
+ * slightly-larger plinth stacked on the first.
+ */
+const AO_SKIRT_H = 0.3;
+const AO_SKIRT_MARGIN = 0.9;
+
 interface ShellBatches {
   slab: Batch;
   /** per-instance floor tint, one hex string per `slab` instance */
@@ -704,6 +1089,8 @@ interface ShellBatches {
   wall: Batch;
   trim: Batch;
   truss: Batch;
+  /** baked AO gradient hugging the foot of every wall, see `AoSkirtLayer` */
+  aoSkirt: Batch;
   /**
    * Optional per-zone status decal, only populated when a building can hold
    * more than one zone (see `buildShellBatches`); empty otherwise so it costs
@@ -738,6 +1125,7 @@ function buildShellBatches(
   const wall = newBatch();
   const trim = newBatch();
   const truss = newBatch();
+  const aoSkirt = newBatch();
   const zoneDecal = newBatch();
   const zoneDecalColor: string[] = [];
   const parts = lite ? 1 : TRUSS_PARTS;
@@ -782,6 +1170,15 @@ function buildShellBatches(
       pushBox(wall, px, h / 2, pz, sx, h, sz);
       pushBox(trim, px, h + 0.06, pz, sx, 0.14, sz * 1.25);
       pushBox(trim, px, WALL_SKIRT_H / 2, pz, sx, WALL_SKIRT_H, sz * 1.3);
+      pushBox(
+        aoSkirt,
+        px,
+        AO_SKIRT_H / 2,
+        pz,
+        sx + AO_SKIRT_MARGIN,
+        AO_SKIRT_H,
+        sz + AO_SKIRT_MARGIN
+      );
     }
 
     // roof trusses: one beam across the depth per `trussX`, plus cross purlins
@@ -807,7 +1204,7 @@ function buildShellBatches(
     }
   }
 
-  return { slab, slabColor, wall, trim, truss, zoneDecal, zoneDecalColor };
+  return { slab, slabColor, wall, trim, truss, aoSkirt, zoneDecal, zoneDecalColor };
 }
 
 // ---------------------------------------------------------------------------
@@ -1027,6 +1424,12 @@ function buildStallBatch(lots: FloorProp[], lite: boolean): Batch {
 export interface FacilityShellProps {
   layout: FloorLayout;
   lite: boolean;
+  /**
+   * Active camera preset, used only to fade the glass wall opacity (see
+   * `WALL_OPACITY_BY_PRESET`). Optional and defaults to the pre-cutaway
+   * fixed 0.52, so existing call sites are unaffected.
+   */
+  cameraPreset?: FloorCameraPreset;
 }
 
 const RACK_SHELVES = 3;
@@ -1035,6 +1438,13 @@ const GATE_SLATS = 5;
 const YARD_CRATES = 3;
 const YARD_KERBS = 4;
 const TREE_FOLIAGE = 2;
+/** Horizontal floor-slab bands marking storeys on the office block. */
+const OFFICE_FLOOR_BANDS = 3;
+/** Vertical share of a line-sign's total height (`FloorProp.height`) that the
+ *  board plate itself occupies; the rest below it is the post. */
+const LINE_SIGN_BOARD_H = 1.0;
+/** One column per corner of a car porch canopy. */
+const CAR_PORCH_COLUMNS = 4;
 const FENCE_POSTS = 2;
 
 interface FenceSplit {
@@ -1071,7 +1481,13 @@ function splitFences(fences: FloorProp[], buildings: FloorBuilding[]): FenceSpli
   return { cordon, perimeter };
 }
 
-export function FacilityShell({ layout, lite }: FacilityShellProps): ReactElement | null {
+export function FacilityShell({
+  layout,
+  lite,
+  cameraPreset,
+}: FacilityShellProps): ReactElement | null {
+  const wallTargetOpacity =
+    (cameraPreset && WALL_OPACITY_BY_PRESET[cameraPreset]) ?? WALL_OPACITY_DEFAULT;
   const empty = isEmptyLayout(layout);
 
   const byKind = useMemo(() => {
@@ -1089,6 +1505,14 @@ export function FacilityShell({ layout, lite }: FacilityShellProps): ReactElemen
       parking: [],
       yard: [],
       tree: [],
+      officeBlock: [],
+      officePlaza: [],
+      flagpole: [],
+      hedge: [],
+      lineSign: [],
+      officeAnnex: [],
+      carPorch: [],
+      lightPole: [],
     };
     for (const prop of layout.props) {
       const bucket = map[prop.kind];
@@ -1190,33 +1614,40 @@ export function FacilityShell({ layout, lite }: FacilityShellProps): ReactElemen
         metalness={0.06}
         offsetFactor={-1.5}
       />
-      <StaticLayer
+      <WallGlassLayer
         count={shell.wall.count}
         source={shell}
-        color={WALL_GLASS}
-        roughness={0.32}
-        metalness={0.28}
-        opacity={0.52}
-        doubleSided
         write={(i) => applyBatch(shell.wall, i)}
+        targetOpacity={wallTargetOpacity}
+        outlineWrite={lite ? undefined : (i) => applyOutlineBatch(shell.wall, i)}
       />
+      {/* baked AO pooling at the foot of every wall, see AoSkirtLayer */}
+      <AoSkirtLayer batch={shell.aoSkirt} color={LIVE_FLOOR_THEME.shadowColor} />
       {/* cap band + grounding skirt, one mesh: solid accent, no glow */}
       <StaticLayer
         count={shell.trim.count}
         source={shell}
         color={ACCENT_CYAN}
-        roughness={0.5}
-        metalness={0.3}
+        roughness={0.78}
+        metalness={0.12}
         write={(i) => applyBatch(shell.trim, i)}
       />
       <StaticLayer
         count={shell.truss.count}
         source={shell}
         color={STRUCTURE_COLOR}
-        roughness={0.6}
-        metalness={0.55}
+        roughness={0.82}
+        metalness={0.18}
         write={(i) => applyBatch(shell.truss, i)}
       />
+
+      {/* Sims-style shell-silhouette outline is now rendered by
+          `WallGlassLayer` itself (via `outlineWrite` above, gated on `lite`),
+          because it must fade in lockstep with the glass wall's own
+          camera-aware opacity — see the `outlineWrite` doc on
+          `WallGlassLayerProps`. Trusses, trim bands and the AO skirt stay
+          un-outlined — surface detail inside the silhouette, not the shape
+          that defines it. */}
 
       <RooftopSigns buildings={buildings} />
 
@@ -1229,8 +1660,8 @@ export function FacilityShell({ layout, lite }: FacilityShellProps): ReactElemen
       <PropLayer
         items={byKind.rack}
         color={STRUCTURE_COLOR}
-        metalness={0.6}
-        roughness={0.55}
+        metalness={0.18}
+        roughness={0.8}
         perItem={1}
         write={(p) => {
           DUMMY.rotation.set(0, p.rotationY, 0);
@@ -1241,8 +1672,8 @@ export function FacilityShell({ layout, lite }: FacilityShellProps): ReactElemen
       <PropLayer
         items={byKind.rack}
         color={STEEL_MID}
-        metalness={0.5}
-        roughness={0.6}
+        metalness={0.15}
+        roughness={0.8}
         perItem={RACK_SHELVES}
         write={(p, sub) => {
           DUMMY.rotation.set(0, p.rotationY, 0);
@@ -1294,8 +1725,8 @@ export function FacilityShell({ layout, lite }: FacilityShellProps): ReactElemen
       <PropLayer
         items={byKind.dock}
         color={ACCENT_CYAN}
-        metalness={0.45}
-        roughness={0.5}
+        metalness={0.15}
+        roughness={0.7}
         perItem={1}
         write={(p) => {
           const k = -p.depth / 2;
@@ -1353,8 +1784,8 @@ export function FacilityShell({ layout, lite }: FacilityShellProps): ReactElemen
       <PropLayer
         items={byKind.tank}
         color={STEEL_MID}
-        metalness={0.7}
-        roughness={0.35}
+        metalness={0.22}
+        roughness={0.65}
         shape="cylinder"
         perItem={1}
         write={(p) => {
@@ -1383,8 +1814,8 @@ export function FacilityShell({ layout, lite }: FacilityShellProps): ReactElemen
       <PropLayer
         items={fences.perimeter}
         color={STEEL_MID}
-        metalness={0.65}
-        roughness={0.5}
+        metalness={0.2}
+        roughness={0.75}
         perItem={FENCE_POSTS}
         write={(p, sub) => {
           const h = Math.max(0.8, p.height);
@@ -1418,8 +1849,8 @@ export function FacilityShell({ layout, lite }: FacilityShellProps): ReactElemen
       <PropLayer
         items={byKind.gate}
         color={STEEL_MID}
-        metalness={0.7}
-        roughness={0.45}
+        metalness={0.2}
+        roughness={0.75}
         perItem={FENCE_POSTS}
         write={(p, sub) => {
           const h = Math.max(1.5, p.height);
@@ -1436,8 +1867,8 @@ export function FacilityShell({ layout, lite }: FacilityShellProps): ReactElemen
       <PropLayer
         items={byKind.gate}
         color={SITE.gateAccent}
-        metalness={0.45}
-        roughness={0.4}
+        metalness={0.2}
+        roughness={0.6}
         perItem={GATE_SLATS}
         write={(p, sub) => {
           const h = Math.max(1.5, p.height);
@@ -1594,6 +2025,384 @@ export function FacilityShell({ layout, lite }: FacilityShellProps): ReactElemen
         }}
       />
 
+      {/* --- office block: solid core + glazed band + floor-slab bands + roof cap --- */}
+      <PropLayer
+        items={byKind.officeBlock}
+        color={SITE.officeWall}
+        metalness={0.2}
+        roughness={0.75}
+        perItem={1}
+        write={(p) => {
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x, p.height / 2, p.z);
+          DUMMY.scale.set(p.width, p.height, p.depth);
+        }}
+      />
+      <PropLayer
+        items={byKind.officeBlock}
+        color={OFFICE_GLASS}
+        metalness={0.4}
+        roughness={0.2}
+        opacity={0.82}
+        perItem={1}
+        write={(p) => {
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x, p.height * 0.56, p.z);
+          DUMMY.scale.set(p.width * 1.005, p.height * 0.42, p.depth * 1.005);
+        }}
+      />
+      <PropLayer
+        items={byKind.officeBlock}
+        color={SITE.officeBand}
+        metalness={0.3}
+        roughness={0.55}
+        perItem={OFFICE_FLOOR_BANDS}
+        write={(p, sub) => {
+          const bandY = (p.height * (sub + 1)) / (OFFICE_FLOOR_BANDS + 1);
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x, bandY, p.z);
+          DUMMY.scale.set(p.width * 1.02, Math.max(0.14, p.height * 0.03), p.depth * 1.02);
+        }}
+      />
+      <PropLayer
+        items={byKind.officeBlock}
+        color={SITE.officeRoof}
+        metalness={0.25}
+        roughness={0.6}
+        perItem={1}
+        write={(p) => {
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x, p.height + 0.15, p.z);
+          DUMMY.scale.set(p.width + 1.2, 0.3, p.depth + 1.2);
+        }}
+      />
+      {/* outline: office cluster core massing only (not the glazed band, floor
+          bands or roof cap — those are surface detail on top of the shape the
+          outline is meant to trace). Gated behind `lite` for the same reason
+          as the machine outlines in LiveFloor4DScene.tsx: a weak machine
+          (auto-lite past 250 machines, or an explicit `highQuality={false}`)
+          drops every inverted-hull outline at once, machine and site alike. */}
+      {!lite && (
+        <PropLayer
+          items={byKind.officeBlock}
+          color={OUTLINE_INK}
+          metalness={0}
+          roughness={1}
+          backSide
+          perItem={1}
+          write={(p) => {
+            DUMMY.rotation.set(0, p.rotationY, 0);
+            DUMMY.position.set(p.x, p.height / 2, p.z);
+            DUMMY.scale.set(
+              p.width + OUTLINE_MARGIN * 2,
+              p.height + OUTLINE_MARGIN * 2,
+              p.depth + OUTLINE_MARGIN * 2
+            );
+          }}
+        />
+      )}
+
+      {/* --- office annex: smaller closed admin/canteen block, same visual
+          family as the office block above — solid core, glazed band, roof
+          cap. Deliberately no interior: this is decorative massing only. --- */}
+      <PropLayer
+        items={byKind.officeAnnex}
+        color={SITE.officeWall}
+        metalness={0.18}
+        roughness={0.8}
+        perItem={1}
+        write={(p) => {
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x, p.height / 2, p.z);
+          DUMMY.scale.set(p.width, p.height, p.depth);
+        }}
+      />
+      <PropLayer
+        items={byKind.officeAnnex}
+        color={OFFICE_GLASS}
+        metalness={0.35}
+        roughness={0.25}
+        opacity={0.82}
+        perItem={1}
+        write={(p) => {
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x, p.height * 0.55, p.z);
+          DUMMY.scale.set(p.width * 1.005, p.height * 0.36, p.depth * 1.005);
+        }}
+      />
+      <PropLayer
+        items={byKind.officeAnnex}
+        color={SITE.officeRoof}
+        metalness={0.2}
+        roughness={0.7}
+        perItem={1}
+        write={(p) => {
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x, p.height + 0.12, p.z);
+          DUMMY.scale.set(p.width + 0.8, 0.26, p.depth + 0.8);
+        }}
+      />
+      {!lite && (
+        <PropLayer
+          items={byKind.officeAnnex}
+          color={OUTLINE_INK}
+          metalness={0}
+          roughness={1}
+          backSide
+          perItem={1}
+          write={(p) => {
+            DUMMY.rotation.set(0, p.rotationY, 0);
+            DUMMY.position.set(p.x, p.height / 2, p.z);
+            DUMMY.scale.set(
+              p.width + OUTLINE_MARGIN * 2,
+              p.height + OUTLINE_MARGIN * 2,
+              p.depth + OUTLINE_MARGIN * 2
+            );
+          }}
+        />
+      )}
+
+      {/* --- car porch: slim columns + a flat canopy roof projecting from the
+          office front. Columns are thin enough that the outline pass would
+          read as noise on them, so only the canopy slab (the part that reads
+          as a silhouette from a distance) is outlined below. --- */}
+      <PropLayer
+        items={byKind.carPorch}
+        color={STEEL_MID}
+        metalness={0.18}
+        roughness={0.78}
+        perItem={CAR_PORCH_COLUMNS}
+        write={(p, sub) => {
+          const cx = (sub % 2 === 0 ? -1 : 1) * (p.width / 2 - 0.4);
+          const cz = (sub < 2 ? -1 : 1) * (p.depth / 2 - 0.3);
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(
+            p.x + localXOffsetX(p.rotationY, cx) + localZOffsetX(p.rotationY, cz),
+            p.height / 2,
+            p.z + localXOffsetZ(p.rotationY, cx) + localZOffsetZ(p.rotationY, cz)
+          );
+          DUMMY.scale.set(0.22, p.height, 0.22);
+        }}
+      />
+      <PropLayer
+        items={byKind.carPorch}
+        color={SITE.officeRoof}
+        metalness={0.2}
+        roughness={0.65}
+        perItem={1}
+        write={(p) => {
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x, p.height + 0.1, p.z);
+          DUMMY.scale.set(p.width, 0.2, p.depth);
+        }}
+      />
+      {!lite && (
+        <PropLayer
+          items={byKind.carPorch}
+          color={OUTLINE_INK}
+          metalness={0}
+          roughness={1}
+          backSide
+          perItem={1}
+          write={(p) => {
+            DUMMY.rotation.set(0, p.rotationY, 0);
+            DUMMY.position.set(p.x, p.height + 0.1, p.z);
+            DUMMY.scale.set(
+              p.width + OUTLINE_MARGIN * 2,
+              0.2 + OUTLINE_MARGIN * 2,
+              p.depth + OUTLINE_MARGIN * 2
+            );
+          }}
+        />
+      )}
+
+      {/* --- production line signs: post + board + a coloured header bar. No
+          per-sign <Html> label — geometry/colour only, per this file's DOM
+          overlay cap. Outlined (the board only, not the slim post) since this
+          is the one prop family whose entire purpose is to be read at a
+          glance down the line. --- */}
+      <PropLayer
+        items={byKind.lineSign}
+        color={STEEL_MID}
+        metalness={0.18}
+        roughness={0.78}
+        perItem={1}
+        write={(p) => {
+          const postH = Math.max(0.4, p.height - LINE_SIGN_BOARD_H);
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x, postH / 2, p.z);
+          DUMMY.scale.set(0.14, postH, 0.14);
+        }}
+      />
+      <PropLayer
+        items={byKind.lineSign}
+        color={SITE.signPlate}
+        metalness={0.05}
+        roughness={0.8}
+        perItem={1}
+        write={(p) => {
+          const postH = Math.max(0.4, p.height - LINE_SIGN_BOARD_H);
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x, postH + LINE_SIGN_BOARD_H / 2, p.z);
+          DUMMY.scale.set(p.width, LINE_SIGN_BOARD_H, p.depth);
+        }}
+      />
+      <PropLayer
+        items={byKind.lineSign}
+        color={ACCENT_CYAN}
+        metalness={0.1}
+        roughness={0.6}
+        perItem={1}
+        write={(p) => {
+          const headerH = LINE_SIGN_BOARD_H * 0.34;
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x, p.height - headerH / 2, p.z);
+          DUMMY.scale.set(p.width * 1.01, headerH, p.depth * 1.15);
+        }}
+      />
+      {!lite && (
+        <PropLayer
+          items={byKind.lineSign}
+          color={OUTLINE_INK}
+          metalness={0}
+          roughness={1}
+          backSide
+          perItem={1}
+          write={(p) => {
+            const postH = Math.max(0.4, p.height - LINE_SIGN_BOARD_H);
+            DUMMY.rotation.set(0, p.rotationY, 0);
+            DUMMY.position.set(p.x, postH + LINE_SIGN_BOARD_H / 2, p.z);
+            DUMMY.scale.set(
+              p.width + OUTLINE_MARGIN * 2,
+              LINE_SIGN_BOARD_H + OUTLINE_MARGIN * 2,
+              p.depth + OUTLINE_MARGIN * 2
+            );
+          }}
+        />
+      )}
+
+      {/* --- road light poles: pole + arm + lamp head. No outline — thin poles
+          in large numbers are exactly the "noise, not signal" case called out
+          for this pass, and the lamp housing already reads via saturated
+          diffuse colour against the pale road/sky per this file's daylight
+          contract. --- */}
+      <PropLayer
+        items={byKind.lightPole}
+        color={STEEL_MID}
+        metalness={0.2}
+        roughness={0.75}
+        shape="cylinder"
+        perItem={1}
+        write={(p) => {
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x, p.height / 2, p.z);
+          DUMMY.scale.set(p.width, p.height, p.depth);
+        }}
+      />
+      <PropLayer
+        items={byKind.lightPole}
+        color={STEEL_MID}
+        metalness={0.2}
+        roughness={0.75}
+        perItem={1}
+        write={(p) => {
+          const armLen = 1.1;
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x + armLen / 2, p.height - 0.15, p.z);
+          DUMMY.scale.set(armLen, 0.12, 0.12);
+        }}
+      />
+      <PropLayer
+        items={byKind.lightPole}
+        color={SITE.lampHousing}
+        emissive={SITE.lampHousing}
+        emissiveIntensity={0.35}
+        metalness={0.1}
+        roughness={0.55}
+        perItem={1}
+        write={(p) => {
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x + 1.1, p.height - 0.32, p.z);
+          DUMMY.scale.set(0.4, 0.22, 0.26);
+        }}
+      />
+
+      {/* --- office plaza: paved forecourt + a narrower entrance walkway --- */}
+      <PropLayer
+        items={byKind.officePlaza}
+        color={SITE.plazaPaving}
+        metalness={0.05}
+        roughness={0.9}
+        offsetFactor={1}
+        perItem={1}
+        write={(p) => {
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x, Y_PAD, p.z);
+          DUMMY.scale.set(p.width, 0.02, p.depth);
+        }}
+      />
+      <PropLayer
+        items={byKind.officePlaza}
+        color={SITE.plazaPaving}
+        metalness={0.05}
+        roughness={0.9}
+        offsetFactor={1}
+        perItem={1}
+        write={(p) => {
+          // narrow walkway continuing from the plaza's far edge toward the
+          // entrance road, at the same Y_PAD height as the plaza slab itself
+          // (see the vertical-stacking note near Y_GRASS above) so it shares
+          // the plaza's plane instead of introducing a new coplanar layer.
+          const walkDepth = Math.min(6, p.depth * 0.6);
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x, Y_PAD, p.z + p.depth / 2 + walkDepth / 2);
+          DUMMY.scale.set(Math.min(4, p.width * 0.18), 0.02, walkDepth);
+        }}
+      />
+
+      {/* --- flagpoles: thin pole + a small static flag near the top --- */}
+      <PropLayer
+        items={byKind.flagpole}
+        color={SITE.flagpole}
+        metalness={0.5}
+        roughness={0.4}
+        shape="cylinder"
+        perItem={1}
+        write={(p) => {
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x, p.height / 2, p.z);
+          DUMMY.scale.set(p.width * 0.3, p.height, p.depth * 0.3);
+        }}
+      />
+      <PropLayer
+        items={byKind.flagpole}
+        color={SITE.flag}
+        metalness={0.1}
+        roughness={0.7}
+        doubleSided
+        perItem={1}
+        write={(p) => {
+          const flagH = p.height * 0.18;
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x + p.width * 0.9, p.height - flagH / 2, p.z);
+          DUMMY.scale.set(p.width * 1.8, flagH, 0.02);
+        }}
+      />
+
+      {/* --- hedges: low rounded green boxes along the plaza edges --- */}
+      <PropLayer
+        items={byKind.hedge}
+        color={SITE.hedge}
+        metalness={0.02}
+        roughness={0.95}
+        perItem={1}
+        write={(p) => {
+          DUMMY.rotation.set(0, p.rotationY, 0);
+          DUMMY.position.set(p.x, p.height / 2, p.z);
+          DUMMY.scale.set(p.width, p.height, p.depth);
+        }}
+      />
+
       {/* --- in-hall hanging signs: post + plate --- */}
       <PropLayer
         items={byKind.sign}
@@ -1664,6 +2473,16 @@ interface ConveyorData {
   rollerCount: number;
   rollerLine: Int32Array;
   rollerPos: Float32Array;
+  /** per-line bounding-sphere centre/radius, computed once — used by the
+   *  throttled visibility gate in `useFrame` so it never has to re-derive
+   *  geometry from the line endpoints. */
+  lineCenterX: Float32Array;
+  lineCenterZ: Float32Array;
+  lineRadius: Float32Array;
+  /** per-line visibility flag, mutated in place by the throttled gate (never
+   *  reallocated) — 1 while the line's bounding sphere is in the camera
+   *  frustum, 0 while it is fully offscreen. */
+  lineVisible: Uint8Array;
 }
 
 /** Spread `cap` riders across the lines proportionally to their length. */
@@ -1743,6 +2562,21 @@ function buildConveyorData(layout: FloorLayout, lite: boolean): ConveyorData {
   const cargo = distributeRiders(len, 6.5, lite ? CARGO_CAP_LITE : CARGO_CAP);
   const rollers = distributeRiders(len, 1.6, lite ? ROLLER_CAP_LITE : ROLLER_CAP);
 
+  // one bounding sphere per line, computed once — the gate in useFrame just
+  // tests these against the camera frustum instead of touching geometry.
+  const lineCenterX = new Float32Array(lineCount);
+  const lineCenterZ = new Float32Array(lineCount);
+  const lineRadius = new Float32Array(lineCount);
+  const lineVisible = new Uint8Array(lineCount);
+  for (let l = 0; l < lineCount; l++) {
+    lineCenterX[l] = originX[l] + dirX[l] * (len[l] / 2);
+    lineCenterZ[l] = originZ[l] + dirZ[l] * (len[l] / 2);
+    // half-length plus belt width/cargo box margin so the sphere fully
+    // encloses every rider on the line, not just its centreline
+    lineRadius[l] = len[l] / 2 + BELT_WIDTH * 1.5;
+    lineVisible[l] = 1; // default visible until the first throttled check runs
+  }
+
   return {
     lineCount,
     originX,
@@ -1761,6 +2595,10 @@ function buildConveyorData(layout: FloorLayout, lite: boolean): ConveyorData {
     rollerCount: rollers.line.length,
     rollerLine: rollers.line,
     rollerPos: rollers.pos,
+    lineCenterX,
+    lineCenterZ,
+    lineRadius,
+    lineVisible,
   };
 }
 
@@ -1779,6 +2617,18 @@ export function ConveyorSystem({
   const cargoRef = useRef<THREE.InstancedMesh>(null);
   const refreshAcc = useRef(0);
   const moveAcc = useRef(0); // throttle heavy per-rider update to ~30Hz
+  const cullAcc = useRef(0); // throttle the coarse per-line visibility gate to ~5Hz
+  const { camera } = useThree();
+  // Distance-LOD companion to the frustum gate below (mirrors
+  // ANIM_LOD_DISTANCE_FACTOR in LiveFloor4DScene.tsx): beyond this camera
+  // distance a conveyor line's belt scroll / rider motion is a few pixels at
+  // most, so animating it is wasted work — and it keeps a zoomed-out plant
+  // view consistent with the machines, which already freeze at this same
+  // multiple of suggestedCameraDistance.
+  const conveyorLodDistanceSq = useMemo(() => {
+    const d = layout.suggestedCameraDistance * CONVEYOR_LOD_DISTANCE_FACTOR;
+    return d * d;
+  }, [layout]);
 
   // static instances: belts, rails, rollers — written once
   useLayoutEffect(() => {
@@ -1894,6 +2744,40 @@ export function ConveyorSystem({
   useFrame((_, dtRaw) => {
     const dt = dtRaw > 0.1 ? 0.1 : dtRaw;
 
+    // --- coarse per-line visibility gate, re-evaluated at ~5 Hz ---
+    // one frustum test per conveyor line (not per instance), against a
+    // bounding sphere computed once in buildConveyorData. Lines outside the
+    // frustum have their rider matrix WRITES skipped below (see moveAcc
+    // block) — the phase itself keeps advancing every frame regardless (a
+    // cheap scalar add), so nothing pops or teleports when the line scrolls
+    // back into view.
+    cullAcc.current += dt;
+    if (cullAcc.current >= CULL_INTERVAL) {
+      cullAcc.current = 0;
+      CULL_PROJ_MATRIX.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+      CULL_FRUSTUM.setFromProjectionMatrix(CULL_PROJ_MATRIX);
+      const camX = camera.position.x;
+      const camY = camera.position.y;
+      const camZ = camera.position.z;
+      for (let l = 0; l < data.lineCount; l++) {
+        const cx = data.lineCenterX[l];
+        const cz = data.lineCenterZ[l];
+        CULL_SPHERE.center.set(cx, BELT_TOP, cz);
+        // dilated radius: see CULL_MARGIN_FACTOR for why (hysteresis against
+        // fast pans between 0.2s checks).
+        CULL_SPHERE.radius = data.lineRadius[l] * CULL_RADIUS_MULTIPLIER;
+        if (!CULL_FRUSTUM.intersectsSphere(CULL_SPHERE)) {
+          data.lineVisible[l] = 0;
+          continue;
+        }
+        const dx = cx - camX;
+        const dy = BELT_TOP - camY;
+        const dz = cz - camZ;
+        data.lineVisible[l] =
+          dx * dx + dy * dy + dz * dz <= conveyorLodDistanceSq ? 1 : 0;
+      }
+    }
+
     // --- per-line target speed, re-aggregated at ~4 Hz ---
     refreshAcc.current += dt;
     if (refreshAcc.current >= SPEED_REFRESH) {
@@ -1943,33 +2827,42 @@ export function ConveyorSystem({
       const chevron = chevronRef.current;
       if (chevron) {
         const arr = chevron.instanceMatrix.array as Float32Array;
+        let wrote = false;
         for (let i = 0; i < data.chevronLine.length; i++) {
           const l = data.chevronLine[i];
+          // phase always advances — cheap scalar — so a line that scrolls
+          // back into view resumes at the correct position instead of
+          // jumping back to where it was when it left the frustum.
           let p = data.chevronPos[i] + data.speed[l] * moveDt;
           const L = data.len[l];
           if (p >= L) p -= L;
           data.chevronPos[i] = p;
+          if (!data.lineVisible[l]) continue; // skip only the matrix write
           const base = i * 16;
           arr[base + 12] = data.originX[l] + data.dirX[l] * p;
           arr[base + 14] = data.originZ[l] + data.dirZ[l] * p;
+          wrote = true;
         }
-        if (data.chevronLine.length > 0) chevron.instanceMatrix.needsUpdate = true;
+        if (wrote) chevron.instanceMatrix.needsUpdate = true;
       }
 
       const cargo = cargoRef.current;
       if (cargo) {
         const arr = cargo.instanceMatrix.array as Float32Array;
+        let wrote = false;
         for (let i = 0; i < data.cargoLine.length; i++) {
           const l = data.cargoLine[i];
           let p = data.cargoPos[i] + data.speed[l] * moveDt;
           const L = data.len[l];
           if (p >= L) p -= L;
           data.cargoPos[i] = p;
+          if (!data.lineVisible[l]) continue; // skip only the matrix write
           const base = i * 16;
           arr[base + 12] = data.originX[l] + data.dirX[l] * p;
           arr[base + 14] = data.originZ[l] + data.dirZ[l] * p;
+          wrote = true;
         }
-        if (data.cargoLine.length > 0) cargo.instanceMatrix.needsUpdate = true;
+        if (wrote) cargo.instanceMatrix.needsUpdate = true;
       }
     }
   });
@@ -2094,9 +2987,22 @@ interface TrafficLane {
   /** half-width available for lateral offset / jitter */
   lateral: number;
   yaw: number;
+  /** bounding-sphere centre/radius for the coarse visibility gate, computed
+   *  once here so useFrame never has to re-derive geometry from x/z/dx/dz. */
+  cx: number;
+  cz: number;
+  radius: number;
 }
 
-function buildLanes(aisles: FloorAisle[], main: boolean, margin: number): TrafficLane[] {
+function buildLanes(
+  aisles: FloorAisle[],
+  main: boolean,
+  margin: number,
+  /** extra sphere padding beyond the lane footprint — covers the size of
+   *  whatever rides the lane (AGV body, worker capsule) so the bounding
+   *  sphere never clips something that's visually still on-lane. */
+  extraRadius: number
+): TrafficLane[] {
   const lanes: TrafficLane[] = [];
   const pool = aisles.filter((a) => a.main === main);
   const source = pool.length > 0 ? pool : aisles;
@@ -2107,14 +3013,20 @@ function buildLanes(aisles: FloorAisle[], main: boolean, margin: number): Traffi
     if (len <= 1) continue;
     const dx = a.horizontal ? 1 : 0;
     const dz = a.horizontal ? 0 : 1;
+    const x = a.horizontal ? a.x - len / 2 : a.x;
+    const z = a.horizontal ? a.z : a.z - len / 2;
+    const lateral = Math.max(0, across / 2 - 0.7);
     lanes.push({
-      x: a.horizontal ? a.x - len / 2 : a.x,
-      z: a.horizontal ? a.z : a.z - len / 2,
+      x,
+      z,
       dx,
       dz,
       len,
-      lateral: Math.max(0, across / 2 - 0.7),
+      lateral,
       yaw: yawFor(dx, dz),
+      cx: x + dx * (len / 2),
+      cz: z + dz * (len / 2),
+      radius: len / 2 + lateral + extraRadius,
     });
   }
   return lanes;
@@ -2126,6 +3038,9 @@ function buildLanes(aisles: FloorAisle[], main: boolean, margin: number): Traffi
  */
 function buildRoadLanes(roads: FloorRoad[]): TrafficLane[] {
   const lanes: TrafficLane[] = [];
+  // rigs extend a full trailer length beyond their phase point, so the
+  // sphere needs to swallow that plus the cab, not just the lane footprint.
+  const extraRadius = CAB_LEN + TRAILER_LEN + 2;
   for (const r of roads) {
     if (r.width <= 0 || r.depth <= 0) continue;
     const travel = r.horizontal ? r.width : r.depth;
@@ -2134,14 +3049,20 @@ function buildRoadLanes(roads: FloorRoad[]): TrafficLane[] {
     if (len <= 4) continue;
     const dx = r.horizontal ? 1 : 0;
     const dz = r.horizontal ? 0 : 1;
+    const x = r.horizontal ? r.x - len / 2 : r.x;
+    const z = r.horizontal ? r.z : r.z - len / 2;
+    const lateral = clamp(across / 4, 0, Math.max(0, across / 2 - TRUCK_W / 2 - 0.2));
     lanes.push({
-      x: r.horizontal ? r.x - len / 2 : r.x,
-      z: r.horizontal ? r.z : r.z - len / 2,
+      x,
+      z,
       dx,
       dz,
       len,
-      lateral: clamp(across / 4, 0, Math.max(0, across / 2 - TRUCK_W / 2 - 0.2)),
+      lateral,
       yaw: yawFor(dx, dz),
+      cx: x + dx * (len / 2),
+      cz: z + dz * (len / 2),
+      radius: len / 2 + lateral + extraRadius,
     });
   }
   return lanes;
@@ -2157,11 +3078,17 @@ interface TrafficData {
   agvPhase: Float32Array;
   workerPhase: Float32Array;
   truckPhase: Float32Array;
+  /** per-lane visibility flags, mutated in place by the throttled gate. */
+  agvLaneVisible: Uint8Array;
+  workerLaneVisible: Uint8Array;
+  roadLaneVisible: Uint8Array;
 }
 
 function buildTrafficData(layout: FloorLayout, lite: boolean): TrafficData {
-  const agvLanes = buildLanes(layout.aisles, true, 1.6);
-  const workerLanes = buildLanes(layout.aisles, false, 1.0);
+  // AGV body is ~1.7m long, worker capsule ~0.5m — padding just needs to
+  // cover that plus a little slack so the sphere never clips a visible rider.
+  const agvLanes = buildLanes(layout.aisles, true, 1.6, 2.5);
+  const workerLanes = buildLanes(layout.aisles, false, 1.0, 1.5);
   const roadLanes = buildRoadLanes(layout.roads ?? []);
 
   const agvCount = agvLanes.length === 0 ? 0 : lite ? AGV_COUNT_LITE : AGV_COUNT;
@@ -2175,6 +3102,12 @@ function buildTrafficData(layout: FloorLayout, lite: boolean): TrafficData {
   const truckPhase = new Float32Array(truckCount);
   for (let i = 0; i < truckCount; i++) truckPhase[i] = hash01(i, 83) * 2;
 
+  // default visible until the first throttled check runs, so nothing
+  // is hidden before the gate has had a chance to evaluate it
+  const agvLaneVisible = new Uint8Array(agvLanes.length).fill(1);
+  const workerLaneVisible = new Uint8Array(workerLanes.length).fill(1);
+  const roadLaneVisible = new Uint8Array(roadLanes.length).fill(1);
+
   return {
     agvLanes,
     workerLanes,
@@ -2185,6 +3118,9 @@ function buildTrafficData(layout: FloorLayout, lite: boolean): TrafficData {
     agvPhase,
     workerPhase,
     truckPhase,
+    agvLaneVisible,
+    workerLaneVisible,
+    roadLaneVisible,
   };
 }
 
@@ -2237,6 +3173,14 @@ export function FloorTraffic({ layout, lite }: FloorTrafficProps): ReactElement 
   const hookRef = useRef<THREE.Mesh>(null);
   const clock = useRef(0);
   const trafficMoveAcc = useRef(0); // throttle AGV/worker/truck matrix updates to ~30Hz
+  const trafficCullAcc = useRef(0); // throttle the coarse per-lane visibility gate to ~5Hz
+  const { camera } = useThree();
+  // Same distance-LOD companion as ConveyorSystem's conveyorLodDistanceSq —
+  // see CONVEYOR_LOD_DISTANCE_FACTOR for the reasoning.
+  const trafficLodDistanceSq = useMemo(() => {
+    const d = layout.suggestedCameraDistance * CONVEYOR_LOD_DISTANCE_FACTOR;
+    return d * d;
+  }, [layout]);
 
   const crane = useMemo(() => {
     const b = pickCraneBuilding(layout.buildings ?? []);
@@ -2264,6 +3208,62 @@ export function FloorTraffic({ layout, lite }: FloorTrafficProps): ReactElement 
     clock.current += dt;
     const t = clock.current;
 
+    // --- coarse per-lane visibility gate, re-evaluated at ~5 Hz ---
+    // one frustum test per lane/route (not per AGV/worker/truck instance),
+    // against a bounding sphere computed once in buildTrafficData. Instances
+    // on a lane outside the frustum have their matrix WRITE skipped below —
+    // their phase keeps advancing every frame (cheap scalar), so re-entering
+    // the frustum resumes motion instead of popping to a stale position.
+    trafficCullAcc.current += dt;
+    if (trafficCullAcc.current >= CULL_INTERVAL) {
+      trafficCullAcc.current = 0;
+      CULL_PROJ_MATRIX.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+      CULL_FRUSTUM.setFromProjectionMatrix(CULL_PROJ_MATRIX);
+      const camX = camera.position.x;
+      const camY = camera.position.y;
+      const camZ = camera.position.z;
+      for (let i = 0; i < data.agvLanes.length; i++) {
+        const lane = data.agvLanes[i];
+        CULL_SPHERE.center.set(lane.cx, 0.5, lane.cz);
+        // dilated radius: see CULL_MARGIN_FACTOR for why.
+        CULL_SPHERE.radius = lane.radius * CULL_RADIUS_MULTIPLIER;
+        if (!CULL_FRUSTUM.intersectsSphere(CULL_SPHERE)) {
+          data.agvLaneVisible[i] = 0;
+          continue;
+        }
+        const dx = lane.cx - camX;
+        const dy = 0.5 - camY;
+        const dz = lane.cz - camZ;
+        data.agvLaneVisible[i] = dx * dx + dy * dy + dz * dz <= trafficLodDistanceSq ? 1 : 0;
+      }
+      for (let i = 0; i < data.workerLanes.length; i++) {
+        const lane = data.workerLanes[i];
+        CULL_SPHERE.center.set(lane.cx, 0.6, lane.cz);
+        CULL_SPHERE.radius = lane.radius * CULL_RADIUS_MULTIPLIER;
+        if (!CULL_FRUSTUM.intersectsSphere(CULL_SPHERE)) {
+          data.workerLaneVisible[i] = 0;
+          continue;
+        }
+        const dx = lane.cx - camX;
+        const dy = 0.6 - camY;
+        const dz = lane.cz - camZ;
+        data.workerLaneVisible[i] = dx * dx + dy * dy + dz * dz <= trafficLodDistanceSq ? 1 : 0;
+      }
+      for (let i = 0; i < data.roadLanes.length; i++) {
+        const lane = data.roadLanes[i];
+        CULL_SPHERE.center.set(lane.cx, CAB_H / 2, lane.cz);
+        CULL_SPHERE.radius = lane.radius * CULL_RADIUS_MULTIPLIER;
+        if (!CULL_FRUSTUM.intersectsSphere(CULL_SPHERE)) {
+          data.roadLaneVisible[i] = 0;
+          continue;
+        }
+        const dx = lane.cx - camX;
+        const dy = CAB_H / 2 - camY;
+        const dz = lane.cz - camZ;
+        data.roadLaneVisible[i] = dx * dx + dy * dy + dz * dz <= trafficLodDistanceSq ? 1 : 0;
+      }
+    }
+
     // --- AGVs / workers / trucks: throttled to ~30Hz. accumulate dt and use
     // the accumulated amount as the effective step so speed stays identical,
     // we just skip the (expensive) per-item matrix rebuild on skipped frames.
@@ -2277,12 +3277,15 @@ export function FloorTraffic({ layout, lite }: FloorTrafficProps): ReactElement 
     const agv = agvRef.current;
     const lamp = lampRef.current;
     if (agv && data.agvCount > 0 && data.agvLanes.length > 0) {
+      let agvWrote = false;
       for (let i = 0; i < data.agvCount; i++) {
-        const lane = data.agvLanes[i % data.agvLanes.length];
+        const laneIdx = i % data.agvLanes.length;
+        const lane = data.agvLanes[laneIdx];
         const speed = 2.4 + hash01(i, 31) * 2.2;
         let phase = data.agvPhase[i] + (dt * speed) / lane.len;
         if (phase >= 2) phase -= 2;
         data.agvPhase[i] = phase;
+        if (!data.agvLaneVisible[laneIdx]) continue; // phase advanced; skip only the write
 
         const forward = phase < 1;
         const u = smooth(forward ? phase : 2 - phase);
@@ -2306,17 +3309,22 @@ export function FloorTraffic({ layout, lite }: FloorTrafficProps): ReactElement 
           DUMMY.updateMatrix();
           lamp.setMatrixAt(i, DUMMY.matrix);
         }
+        agvWrote = true;
       }
-      agv.instanceMatrix.needsUpdate = true;
-      if (lamp) lamp.instanceMatrix.needsUpdate = true;
+      if (agvWrote) {
+        agv.instanceMatrix.needsUpdate = true;
+        if (lamp) lamp.instanceMatrix.needsUpdate = true;
+      }
     }
 
     // --- workers on the walkways ---
     const worker = workerRef.current;
     const helmet = helmetRef.current;
     if (worker && data.workerCount > 0 && data.workerLanes.length > 0) {
+      let workerWrote = false;
       for (let i = 0; i < data.workerCount; i++) {
-        const lane = data.workerLanes[i % data.workerLanes.length];
+        const laneIdx = i % data.workerLanes.length;
+        const lane = data.workerLanes[laneIdx];
         const baseSpeed = 0.9 + hash01(i, 53) * 0.7;
         // deterministic pauses: a slow sine per worker gates its motion
         const gate = Math.sin(t * 0.55 + hash01(i, 67) * 6.283);
@@ -2324,6 +3332,7 @@ export function FloorTraffic({ layout, lite }: FloorTrafficProps): ReactElement 
         let phase = data.workerPhase[i] + (dt * speed) / lane.len;
         if (phase >= 2) phase -= 2;
         data.workerPhase[i] = phase;
+        if (!data.workerLaneVisible[laneIdx]) continue; // phase advanced; skip only the write
 
         const forward = phase < 1;
         const u = smooth(forward ? phase : 2 - phase);
@@ -2347,9 +3356,12 @@ export function FloorTraffic({ layout, lite }: FloorTrafficProps): ReactElement 
           DUMMY.updateMatrix();
           helmet.setMatrixAt(i, DUMMY.matrix);
         }
+        workerWrote = true;
       }
-      worker.instanceMatrix.needsUpdate = true;
-      if (helmet) helmet.instanceMatrix.needsUpdate = true;
+      if (workerWrote) {
+        worker.instanceMatrix.needsUpdate = true;
+        if (helmet) helmet.instanceMatrix.needsUpdate = true;
+      }
     }
 
     // --- delivery trucks on the site roads ---
@@ -2357,8 +3369,10 @@ export function FloorTraffic({ layout, lite }: FloorTrafficProps): ReactElement 
     const trailer = trailerRef.current;
     const tail = tailRef.current;
     if (cab && data.truckCount > 0 && data.roadLanes.length > 0) {
+      let truckWrote = false;
       for (let i = 0; i < data.truckCount; i++) {
-        const lane = data.roadLanes[i % data.roadLanes.length];
+        const laneIdx = i % data.roadLanes.length;
+        const lane = data.roadLanes[laneIdx];
         const cruise = 1.1 + hash01(i, 131) * 0.9;
         const prev = data.truckPhase[i];
         // ~40% of the rigs are "docking" ones: they hold at the far end of the
@@ -2373,6 +3387,7 @@ export function FloorTraffic({ layout, lite }: FloorTrafficProps): ReactElement 
         let phase = prev + (dt * speed) / lane.len;
         if (phase >= 2) phase -= 2;
         data.truckPhase[i] = phase;
+        if (!data.roadLaneVisible[laneIdx]) continue; // phase advanced; skip only the write
 
         const forward = phase < 1;
         const u = smooth(forward ? phase : 2 - phase);
@@ -2405,10 +3420,13 @@ export function FloorTraffic({ layout, lite }: FloorTrafficProps): ReactElement 
           DUMMY.updateMatrix();
           tail.setMatrixAt(i, DUMMY.matrix);
         }
+        truckWrote = true;
       }
-      cab.instanceMatrix.needsUpdate = true;
-      if (trailer) trailer.instanceMatrix.needsUpdate = true;
-      if (tail) tail.instanceMatrix.needsUpdate = true;
+      if (truckWrote) {
+        cab.instanceMatrix.needsUpdate = true;
+        if (trailer) trailer.instanceMatrix.needsUpdate = true;
+        if (tail) tail.instanceMatrix.needsUpdate = true;
+      }
     }
     } // end throttled AGV/worker/truck block
 

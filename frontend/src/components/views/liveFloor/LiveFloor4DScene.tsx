@@ -19,6 +19,7 @@ import {
   AdaptiveEvents,
 } from "@react-three/drei";
 import * as THREE from "three";
+import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { buildFloorLayout, ARCHETYPE_LABELS } from "../../../lib/floorLayout";
 import type {
@@ -146,15 +147,6 @@ const FADE_COLOR = new THREE.Color(FOG_COLOR);
 const HTML_SHADOW = `0 6px 18px ${LIVE_FLOOR_THEME.shadowColor}59`;
 
 /**
- * Multiplier that turns a status colour into the DARK endpoint of the beacon
- * blink. 0.16 in linear space is roughly "the same hue at 40% of its sRGB
- * lightness" — dark enough that the swap to the full colour is a hard,
- * unmissable transition on a pale floor, while still staying a colour (not
- * black), so the hue keeps telling you WHICH status is blinking.
- */
-const BEACON_DARK = 0.16;
-
-/**
  * `density * depth` of the exponential-squared fog at one full SITE diagonal.
  *
  * fogExp2 hides `1 - exp(-(density * d)^2)`, and every preset's fit distance is
@@ -200,6 +192,50 @@ const SCRATCH_TINT = new THREE.Color();
 const BASE_MAT = new THREE.Matrix4();
 /** BASE_MAT * localMatrix */
 const OUT_MAT = new THREE.Matrix4();
+/**
+ * Per-zone (per-hall) visibility culling scratch, reused every decimated tick
+ * in `MachineInstancesInner`'s useFrame — a fresh Frustum/Matrix4/Sphere per
+ * frame would itself be the kind of per-frame allocation this whole feature
+ * exists to avoid.
+ */
+const CULL_VIEW_PROJ = new THREE.Matrix4();
+const CULL_FRUSTUM = new THREE.Frustum();
+const CULL_SPHERE = new THREE.Sphere();
+/**
+ * Fallback hall clear height used to size a zone's bounding sphere ONLY when
+ * the zone can't be matched to an owning `FloorBuilding` (should not happen
+ * in practice — every zone belongs to exactly one building — but keeps this
+ * defensive rather than crashing on an unexpected layout shape). Real halls
+ * use their own building's `wallHeight` instead (see the `zoneCull` useMemo
+ * below) — a fixed guess previously matched floorLayout's `WALL_HEIGHT` (12m)
+ * but a hall taller than that (e.g. a 14m building) would poke its top out of
+ * the sphere and get wrongly culled while still visible on screen.
+ */
+const ZONE_HALL_HEIGHT = 12;
+/**
+ * Screen-edge safety margin added to each zone's bounding-sphere radius, as a
+ * fraction of the sphere's own (footprint + height) radius rather than a
+ * fixed metre pad. The frustum test only runs on the decimated tick (see the
+ * FPS cap above), so during a fast camera pan an object can be well inside
+ * the actual view before the next test executes — an exact-radius sphere
+ * would freeze it mid-pan for a frame or more, which reads as a visible
+ * stutter. Padding the sphere trades a slightly larger "active" set (a
+ * cheap O(zones) test either way) for eliminating that visible freeze,
+ * which is the right trade given the hard requirement is no stutter. Scaling
+ * off the zone's own radius (not a flat metres value) means a huge hall gets
+ * a proportionally huge margin and a small one isn't overpadded.
+ */
+const ZONE_CULL_MARGIN_FACTOR = 0.35;
+/**
+ * Beyond this multiple of the layout's own `suggestedCameraDistance` (the
+ * distance the camera sits at to frame the whole floor by default), a hall
+ * is far enough from the camera that its machines' fine per-part animation
+ * (arms, rams, spindles) is visually imperceptible — a few pixels of motion
+ * at most. Scaling off `suggestedCameraDistance` means the threshold tracks
+ * the actual size of THIS floor instead of a fixed metre value that would be
+ * wrong for a small demo layout or a large real one.
+ */
+const ANIM_LOD_DISTANCE_FACTOR = 1.6;
 
 function clamp01(v: number): number {
   return v < 0 ? 0 : v > 1 ? 1 : v;
@@ -374,13 +410,13 @@ function fitCameraDistance(
   return needed * margin;
 }
 
-/** Tallest machine silhouette on the floor, plus beacon headroom. */
+/** Tallest machine silhouette on the floor, plus stack-light mast headroom. */
 function contentHeight(layout: FloorLayout): number {
   let max = 0;
   for (const slot of layout.slots) {
     if (slot.height > max) max = slot.height;
   }
-  return Math.max(3.2, max + 0.6);
+  return Math.max(3.2, max + 0.85);
 }
 
 // ---------------------------------------------------------------------------
@@ -544,7 +580,8 @@ const UNIT_BOX: readonly number[] = [1, 1, 1];
 
 /**
  * Per-archetype part kits. Every machine also gets the shared plinth, status
- * strip and beacon (three floor-wide instanced meshes, see SHARED_PARTS).
+ * strip and PLC stack light (mast + 3 lamps, all floor-wide instanced meshes,
+ * see SHARED_PARTS).
  */
 const ARCHETYPE_PARTS: Record<MachineArchetype, readonly PartSpec[]> = {
   cnc: [
@@ -605,18 +642,23 @@ const ARCHETYPE_PARTS: Record<MachineArchetype, readonly PartSpec[]> = {
 /**
  * Floor-wide parts every machine shares — keeps the draw count at 8 kits + 4.
  *
- * `beaconCollar` is a light-theme addition: the dome used to be a bloom against
- * black, and a bloom has no silhouette on a pale floor. A dark steel collar
- * directly under the dome gives it a hard edge and a cast-shadow-like base, so a
- * saturated 0.15 m dome reads as a lamp at the `line` distance instead of a
- * coloured speck. The dome itself also grew (0.13 -> 0.15 m) and gained a
- * segment ring, since it is now the primary status signal rather than a halo.
+ * `mast` + `lampGreen`/`lampYellow`/`lampRed` are a real industrial PLC stack
+ * light (โคมไฟสัญญาณ 3 ชั้น), replacing the old animated glow beacon. It is a
+ * short pole with three small lamp cylinders stacked on it (red on top —
+ * alarms should be the highest, most visible lamp — yellow in the middle,
+ * green at the base). Every lamp is a SHARED instanced part like the old
+ * beacon (fixed draw count, bounded by part count not machine count); the
+ * difference is that none of them are `animatedColor` any more — see the
+ * "PLC stack light" write-up above `stackLampColor` for why this is now a
+ * pure static write.
  */
 const SHARED_PARTS: readonly PartSpec[] = [
   { id: "plinth", geom: "box", args: UNIT_BOX, mat: "dark" },
   { id: "strip", geom: "box", args: UNIT_BOX, mat: "flat" },
-  { id: "beaconCollar", geom: "cyl", args: [0.17, 0.2, 0.08, 12], mat: "dark" },
-  { id: "beacon", geom: "sphere", args: [0.15, 10, 7], mat: "glow", animatedColor: true },
+  { id: "mast", geom: "cyl", args: [0.03, 0.035, 1, 8], mat: "dark" },
+  { id: "lampRed", geom: "cyl", args: [0.055, 0.055, 1, 10], mat: "glow" },
+  { id: "lampYellow", geom: "cyl", args: [0.055, 0.055, 1, 10], mat: "glow" },
+  { id: "lampGreen", geom: "cyl", args: [0.055, 0.055, 1, 10], mat: "glow" },
 ];
 
 // -- shape factors, shared by the static writer and the animator -------------
@@ -654,27 +696,92 @@ const PACK_PUSH_FRACTION = 0.32; // portion of the cycle spent pushing out
 const COLOR_INTERVAL = 0.1;
 const FLASH_DECAY = 3.2;
 
-// -- per-activity beacon modulation, all in the b ∈ [0, 1] lerp space ---------
+// ---------------------------------------------------------------------------
+// Sims-style outline ("inverted hull" silhouette rim)
+// ---------------------------------------------------------------------------
 //
-// b = 0 -> the dark endpoint (status hue at BEACON_DARK), b = 1 -> the fully
-// saturated status colour. On a pale floor BOTH endpoints are clearly visible,
-// so the animation reads as a saturation/darkness swing rather than a bloom.
-/** `running`: steady, but parked below 1 so the cycleTick flash has headroom. */
-const BEACON_RUN = 0.75;
-/** `idle` / `setup`: slow shallow breath, 0.20 … 0.90. */
-const BEACON_IDLE_MID = 0.55;
-const BEACON_IDLE_AMP = 0.35;
-const BEACON_IDLE_RATE = 1.3;
-/** `down`: hard 1.7 Hz square blink, full colour <-> almost the dark endpoint. */
-const BEACON_DOWN_RATE = 3.4;
-const BEACON_DOWN_HI = 1;
-const BEACON_DOWN_LO = 0.06;
-/** `maintenance` (and any unknown activity): slow deep pulse, 0.28 … 0.96. */
-const BEACON_PULSE_MID = 0.62;
-const BEACON_PULSE_AMP = 0.34;
-const BEACON_PULSE_RATE = 1.1;
-/** How far a cycleTick flash pushes b toward 1. */
-const BEACON_FLASH_REACH = 0.9;
+// A true instanced LineSegments outline (EdgesGeometry + per-instance
+// transform) turned out to be impractical here: three's built-in line shaders
+// (LineBasicMaterial / ShaderLib.line) never got the `USE_INSTANCING` chunk
+// that mesh/points shaders have, so an InstancedMesh built from an
+// EdgesGeometry silently renders as degenerate triangles instead of lines,
+// and driving raw instanced attributes through a hand-rolled ShaderMaterial
+// would mean re-deriving lighting/tone-mapping/fade by hand for a single
+// visual effect. Instead this uses the classic cheap "inverted hull" trick:
+// an enlarged, BACK-FACE-ONLY copy of the body geometry drawn per archetype.
+// Where the surface faces the camera the real (smaller) body mesh occludes
+// it entirely; only at the silhouette rim does the larger back-facing shell
+// peek out, reading as a hard dark outline — exactly the crisp-line ask,
+// and it stays a plain InstancedMesh, so it costs nothing beyond one more
+// draw call per archetype (bounded by ARCHETYPE_ORDER.length, not by machine
+// count) and needs no new npm dependency.
+//
+// Only the "body" part of each archetype is outlined — the one part every
+// archetype marks `pick: true`, i.e. the dominant mass that actually defines
+// the machine's read silhouette (frame/console/rack/stack/etc are secondary
+// greebles; outlining all ~7 parts per machine at ~1000 machines would be
+// noise, the opposite of "readable" per the brief).
+/**
+ * How much larger (per axis) the outline shell is than the real body, as a
+ * multiplier on the body's own UNIT geometry args. Applied to unit-sized
+ * geometry BEFORE the shared instance matrix's own w/h/d scale, so the
+ * enlargement stays proportional to each machine's own size instead of a
+ * fixed metre offset (which would look wrong on both a 0.6 m and 3 m body).
+ */
+const OUTLINE_SCALE = 1.06;
+/**
+ * Outline colour. `LIVE_FLOOR_THEME` has no dedicated dark "ink"/outline
+ * token yet, so this deliberately reuses the darkest existing token in the
+ * theme (`labelText`, the app's near-black HUD text ink) rather than
+ * inventing an unreviewed hex here. Promote to a real `machineOutline` token
+ * once the theme file grows one.
+ */
+const OUTLINE_COLOR = LIVE_FLOOR_THEME.labelText;
+
+// ---------------------------------------------------------------------------
+// PLC stack light (โคมไฟสัญญาณ 3 ชั้น) — replaces the old animated beacon
+// ---------------------------------------------------------------------------
+//
+// The user found the pulsing/breathing glow beacon distracting and asked for
+// a real industrial stack light instead: a short mast carrying three lamps
+// (green / yellow / red), where LIT vs UNLIT is decided purely by the
+// machine's STATUS. Unlike the old beacon this is NOT re-evaluated every
+// frame — the lamp colours are written once per machine inside the existing
+// static `writeMachineParts` pass, which already runs once per layout/status
+// filter/status change (see the `useLayoutEffect` deps below). There is no
+// per-activity modulation, no per-frame colour upload, and no `useFrame` cost
+// for this part at all any more — a straight subtraction from the old
+// per-machine-per-frame walk (the beacon's write used to live at the very end
+// of that loop's body, right after the `switch (arch)` block).
+//
+// Status -> lamp mapping (three-lamp tower, bottom to top: green, yellow, red):
+//   normal      -> green lit only
+//   warning     -> yellow lit only
+//   error       -> red lit only (steady; NOT blinking — a blink would need a
+//                  per-frame colour upload for every machine just to serve
+//                  this one status, which is exactly the per-frame cost this
+//                  rewrite exists to remove, so it stays static too)
+//   maintenance -> yellow + red lit together (a technician is present /
+//                  machine is intentionally out of the running state — reads
+//                  as "attention", distinct from both a clean run and a hard
+//                  fault) — chosen over inventing a 4th lamp colour/token.
+// An unlit lamp is not hidden — it is drawn at its own DARK, desaturated
+// endpoint (`stackLight.*Dark` in the theme) so the tower always reads as a
+// three-lamp fixture, exactly like a real switched-off stack light.
+const STACK_LAMP_LIT: Readonly<Record<MachineStatus, readonly [boolean, boolean, boolean]>> = {
+  // [green, yellow, red]
+  normal: [true, false, false],
+  warning: [false, true, false],
+  error: [false, false, true],
+  maintenance: [false, true, true],
+};
+
+/** Mast: short pole the three lamps sit on, in metres. */
+const STACK_MAST_HEIGHT = 0.5;
+/** Each lamp cylinder's real height, in metres (unit geometry is 1 m tall). */
+const STACK_LAMP_HEIGHT = 0.09;
+/** Vertical clearance between stacked lamps. */
+const STACK_LAMP_GAP = 0.02;
 
 /** Furnace mouth: cold-steel base … fully saturated ember at 100 °C. */
 const FURNACE_MIN = 0.35;
@@ -693,7 +800,7 @@ const SCANLINE_SPAN = 0.45;
  * `machineSteel` is now #aebbcd, whose luminance is already close to the status
  * colours', so a 22% lerp moves the hue but barely moves the perceived colour.
  * At 42% the status reads off the body itself at the `plant` distance, where the
- * beacon is sub-pixel, while the machine still reads as painted metal.
+ * stack light is sub-pixel, while the machine still reads as painted metal.
  */
 const BODY_TINT = 0.42;
 /** Tank liquid is tinted harder still — it is a fluid, not a painted panel. */
@@ -732,10 +839,6 @@ interface FloorAnim {
   fade: Float32Array;
   runtimes: Array<MachineRuntime | undefined>;
   missing: number;
-  /** rgb of each beacon's LIT endpoint (b = 1), already fade-adjusted */
-  beaconRgb: Float32Array;
-  /** rgb of each beacon's DARK endpoint (b = 0), already fade-adjusted */
-  beaconDarkRgb: Float32Array;
   /** rgb of the three glow accents at b = 1: furnace, press impact, scan line */
   glowRgb: Float32Array;
   /**
@@ -747,6 +850,38 @@ interface FloorAnim {
   /** decaying 0..1 cycle-completion flash */
   flash: Float32Array;
   colorTimer: number;
+  /**
+   * Index into the per-zone bounding-sphere arrays (see `ZoneCullMeta`), so
+   * the frame loop can gate a whole hall's worth of machines with one lookup
+   * instead of testing each machine's own position against the frustum.
+   */
+  zoneOf: Uint16Array;
+}
+
+/**
+ * Coarse per-zone (per-hall) bounding spheres used to cull the animation walk
+ * without ever testing an individual machine's position. One sphere per
+ * `FloorZone`, built once from the zone's floor footprint plus a fixed height
+ * margin so it fully encloses every machine and part swing inside that hall.
+ */
+interface ZoneCullMeta {
+  /** zone.id -> index into the arrays below, built once per layout */
+  indexOf: Map<string, number>;
+  cx: Float32Array;
+  cy: Float32Array;
+  cz: Float32Array;
+  radius: Float32Array;
+  /** true when the zone's sphere is in the camera frustum AND within LOD range */
+  active: Uint8Array;
+  /**
+   * Real seconds this zone has spent culled (inactive) since it was last
+   * active, accumulated on the decimated cull tick. Zeroed the tick a zone
+   * goes active again. This is how `flash` decay stays correct in real time
+   * even while a zone's machine loop is skipped — see the per-machine loop
+   * in `useFrame` for how it's consumed as a one-off catch-up.
+   */
+  culledElapsed: Float32Array;
+  count: number;
 }
 
 /** Loads the slot's local→world basis (translate + rotateY) into BASE_MAT. */
@@ -860,7 +995,7 @@ function writeMachineParts(
   const get = (id: string): THREE.InstancedMesh | null =>
     meshes.get(`${archetype}:${id}`) ?? null;
 
-  // -- shared: plinth, status strip, beacon ---------------------------------
+  // -- shared: plinth, status strip, stack-light mast + lamps ---------------
   const plinth = meshes.get("shared:plinth") ?? null;
   if (plinth) {
     putPart(plinth, gi, anim, gi, 0, 0.055, 0, 0, 0, 0, w * 1.16, 0.11, d * 1.16);
@@ -893,34 +1028,57 @@ function writeMachineParts(
     putColor(strip, gi, status, fade);
   }
 
-  const collar = meshes.get("shared:beaconCollar") ?? null;
-  if (collar) {
-    putPart(collar, gi, anim, gi, 0, h + 0.24, 0, 0, 0, 0, 1, 1, 1);
-    putColor(collar, gi, DARK_STEEL_COLOR, fade);
+  // PLC stack light: one short mast + three lamp cylinders, all SHARED and
+  // all STATIC — see the "PLC stack light" block above `STACK_LAMP_LIT`.
+  // Written once here (layout/status-change driven), never touched per frame.
+  const mast = meshes.get("shared:mast") ?? null;
+  if (mast) {
+    putPart(
+      mast,
+      gi,
+      anim,
+      gi,
+      0,
+      h + STACK_MAST_HEIGHT * 0.5,
+      0,
+      0,
+      0,
+      0,
+      1,
+      STACK_MAST_HEIGHT,
+      1
+    );
+    putColor(mast, gi, DARK_STEEL_COLOR, fade);
   }
 
-  const beacon = meshes.get("shared:beacon") ?? null;
-  if (beacon) {
-    putPart(beacon, gi, anim, gi, 0, h + 0.35, 0, 0, 0, 0, 1, 1, 1);
-    const j = gi * 3;
-    // lit endpoint (b = 1)
-    SCRATCH_COLOR.set(status);
-    applyFade(fade);
-    anim.beaconRgb[j] = SCRATCH_COLOR.r;
-    anim.beaconRgb[j + 1] = SCRATCH_COLOR.g;
-    anim.beaconRgb[j + 2] = SCRATCH_COLOR.b;
-    // start at the running level so a machine with no runtime yet looks sane
-    beacon.setColorAt(gi, SCRATCH_COLOR);
-    // dark endpoint (b = 0) — faded AFTER darkening, so a filtered machine's
-    // blink collapses into the haze instead of turning into a black dot
-    SCRATCH_COLOR.set(status).multiplyScalar(BEACON_DARK);
-    applyFade(fade);
-    anim.beaconDarkRgb[j] = SCRATCH_COLOR.r;
-    anim.beaconDarkRgb[j + 1] = SCRATCH_COLOR.g;
-    anim.beaconDarkRgb[j + 2] = SCRATCH_COLOR.b;
+  const lit = STACK_LAMP_LIT[slot.machine.status] ?? STACK_LAMP_LIT.warning;
+  const lampBaseY = h + STACK_MAST_HEIGHT;
+  const lampStep = STACK_LAMP_HEIGHT + STACK_LAMP_GAP;
+  // bottom -> top: green, yellow, red
+  const lampSpecs: readonly [string, boolean, string, string][] = [
+    ["shared:lampGreen", lit[0], LIVE_FLOOR_THEME.stackLight.greenLit, LIVE_FLOOR_THEME.stackLight.greenDark],
+    ["shared:lampYellow", lit[1], LIVE_FLOOR_THEME.stackLight.yellowLit, LIVE_FLOOR_THEME.stackLight.yellowDark],
+    ["shared:lampRed", lit[2], LIVE_FLOOR_THEME.stackLight.redLit, LIVE_FLOOR_THEME.stackLight.redDark],
+  ];
+  for (let li2 = 0; li2 < lampSpecs.length; li2++) {
+    const [key, isLit, litColor, darkColor] = lampSpecs[li2];
+    const lamp = meshes.get(key) ?? null;
+    if (!lamp) continue;
+    const y = lampBaseY + STACK_LAMP_HEIGHT * 0.5 + li2 * lampStep;
+    putPart(lamp, gi, anim, gi, 0, y, 0, 0, 0, 0, 1, STACK_LAMP_HEIGHT, 1);
+    putColor(lamp, gi, isLit ? litColor : darkColor, fade);
   }
 
   const body = get("body");
+
+  // Outline shell colour only — its MATRIX is never written here. It shares
+  // the exact same instanceMatrix buffer object as `body` (wired up once in
+  // the mount effect below), so it moves/rotates/scales in perfect lockstep
+  // with the body every frame without this file ever touching it twice.
+  // Faded the same way the body's own tint fades, so a filtered-out machine's
+  // outline recedes into the haze instead of staying a hard black ring.
+  const outline = get("outline");
+  if (outline) putColor(outline, li, OUTLINE_COLOR, fade);
 
   switch (archetype) {
     case "cnc": {
@@ -1346,6 +1504,20 @@ function PartGeometry({ part }: { part: PartSpec }): ReactElement {
  * renders the exact contrast-checked colour rather than a compressed version.
  * The difference from the dark theme is that no multiplier feeding them may now
  * exceed 1 — see the LIGHT-THEME SIGNAL MODEL note.
+ *
+ * SIMS-STYLE FLATTEN (on top of the daylight retune above). The brief asks for
+ * form to read from crisp dark OUTLINES + flat saturated colour, NOT from
+ * specular highlights — "เห็นเส้นชัดๆ...ไม่ต้องทำให้มีแสงเงามากนัก". Since
+ * `SceneEnvironment` now feeds every standard material a procedural IBL
+ * (`environmentIntensity` 0.35), metalness is the knob that controls how much
+ * of that reflection shows up as a highlight: every kind below has metalness
+ * roughly HALVED again and roughness raised to match, so the env light still
+ * lightly rounds each part (it isn't removed — that stays out of this file's
+ * scope) but no longer produces a readable specular highlight competing with
+ * the outline for attention. The outline shell + flat instance-colour tinting
+ * (BODY_TINT et al) are what carry form and status now, per the documented
+ * luminance budget above `SceneLights` — this retune does not touch that
+ * budget, only how much of it a highlight can eat.
  */
 function PartMaterial({ kind }: { kind: PartMaterialKind }): ReactElement {
   switch (kind) {
@@ -1356,16 +1528,16 @@ function PartMaterial({ kind }: { kind: PartMaterialKind }): ReactElement {
       return (
         <meshStandardMaterial
           color={LIVE_FLOOR_THEME.neutral.white}
-          metalness={0.18}
-          roughness={0.72}
+          metalness={0.08}
+          roughness={0.85}
         />
       );
     case "metal":
       return (
         <meshStandardMaterial
           color={LIVE_FLOOR_THEME.neutral.white}
-          metalness={0.42}
-          roughness={0.34}
+          metalness={0.2}
+          roughness={0.55}
         />
       );
     case "steel":
@@ -1373,9 +1545,35 @@ function PartMaterial({ kind }: { kind: PartMaterialKind }): ReactElement {
       return (
         <meshStandardMaterial
           color={LIVE_FLOOR_THEME.neutral.white}
-          metalness={0.28}
-          roughness={0.52}
+          metalness={0.12}
+          roughness={0.7}
         />
+      );
+  }
+}
+
+/**
+ * Enlarged, unit-sized copy of a body part's geometry for the outline shell
+ * (see the "Sims-style outline" block above `OUTLINE_SCALE`). Scaling the
+ * geometry's own args (rather than the shared instance matrix) keeps the
+ * enlargement proportional to each machine's real w/h/d, since the matrix is
+ * reused byte-for-byte from the body mesh and must never be touched here.
+ */
+function OutlineGeometry({ part }: { part: PartSpec }): ReactElement {
+  const a = part.args;
+  switch (part.geom) {
+    case "cyl":
+      return (
+        <cylinderGeometry
+          args={[a[0] * OUTLINE_SCALE, a[1] * OUTLINE_SCALE, a[2] * OUTLINE_SCALE, a[3]]}
+        />
+      );
+    case "sphere":
+      return <sphereGeometry args={[a[0] * OUTLINE_SCALE, a[1], a[2]]} />;
+    case "box":
+    default:
+      return (
+        <boxGeometry args={[a[0] * OUTLINE_SCALE, a[1] * OUTLINE_SCALE, a[2] * OUTLINE_SCALE]} />
       );
   }
 }
@@ -1398,6 +1596,56 @@ function MachineInstancesInner({
   const frameAccRef = useRef(0);
   const hasRunRef = useRef(false);
   const decimateTickRef = useRef(0);
+
+  // -- one bounding sphere per hall (zone), built once off the layout -------
+  // This is the coarse volume the frame loop tests against instead of every
+  // individual machine: ~10-30 zone tests per tick versus ~1000 machine
+  // tests would defeat the purpose of culling in the first place.
+  const zoneCull = useMemo<ZoneCullMeta>(() => {
+    const zones = layout.zones;
+    const indexOf = new Map<string, number>();
+    const cx = new Float32Array(zones.length);
+    const cy = new Float32Array(zones.length);
+    const cz = new Float32Array(zones.length);
+    const radius = new Float32Array(zones.length);
+    const active = new Uint8Array(zones.length);
+    const culledElapsed = new Float32Array(zones.length);
+    // zone.id -> owning building's wallHeight, so each hall's sphere matches
+    // its ACTUAL height (buildings vary — e.g. a 14m decorative office block
+    // — not the fixed ZONE_HALL_HEIGHT guess). One-time O(buildings+zones)
+    // work, not a per-frame cost.
+    const wallHeightOf = new Map<string, number>();
+    for (const building of layout.buildings) {
+      for (const zoneId of building.zoneIds) wallHeightOf.set(zoneId, building.wallHeight);
+    }
+    for (let i = 0; i < zones.length; i++) {
+      const zone = zones[i];
+      indexOf.set(zone.id, i);
+      cx[i] = zone.x;
+      const hallHeight = wallHeightOf.get(zone.id) ?? ZONE_HALL_HEIGHT;
+      // Sphere is centred mid-height so it exactly circumscribes the hall's
+      // floor footprint x hallHeight box, not just the floor plane.
+      cy[i] = hallHeight / 2;
+      cz[i] = zone.z;
+      const exactRadius = 0.5 * Math.hypot(zone.width, zone.depth, hallHeight);
+      // Padded by ZONE_CULL_MARGIN_FACTOR — see that constant for why: keeps
+      // fast pans from freezing machines that are already back on screen.
+      radius[i] = exactRadius * (1 + ZONE_CULL_MARGIN_FACTOR);
+      // Every zone starts "active" so the very first executed tick (before
+      // any frustum test has run) writes every machine's matrix once — the
+      // same guarantee `hasRunRef` gives the FPS cap.
+      active[i] = 1;
+    }
+    return { indexOf, cx, cy, cz, radius, active, culledElapsed, count: zones.length };
+  }, [layout]);
+  // Beyond this camera distance, a hall's machines are close enough to
+  // "far" that the fine per-part articulation (arms/rams/spindles) would be
+  // imperceptible — see ANIM_LOD_DISTANCE_FACTOR for why it scales off the
+  // layout's own suggested camera distance instead of a fixed metre value.
+  const lodDistanceSq = useMemo(() => {
+    const d = layout.suggestedCameraDistance * ANIM_LOD_DISTANCE_FACTOR;
+    return d * d;
+  }, [layout]);
 
   // -- group slots by archetype, once ---------------------------------------
   const grouped = useMemo(() => {
@@ -1440,12 +1688,11 @@ function MachineInstancesInner({
       fade: new Float32Array(count),
       runtimes: new Array<MachineRuntime | undefined>(count),
       missing: 0,
-      beaconRgb: new Float32Array(count * 3),
-      beaconDarkRgb: new Float32Array(count * 3),
       glowRgb: new Float32Array(9),
       glowBaseRgb: new Float32Array(9),
       flash: new Float32Array(count),
       colorTimer: 0,
+      zoneOf: new Uint16Array(count),
     };
 
     // b = 1 endpoints: the saturated accent tokens.
@@ -1478,6 +1725,7 @@ function MachineInstancesInner({
         anim.h[gi] = slot.height;
         anim.fade[gi] =
           statusFilter !== "all" && slot.machine.status !== statusFilter ? FILTER_FADE : 0;
+        anim.zoneOf[gi] = zoneCull.indexOf.get(slot.zoneId) ?? 0;
 
         const runtime = simulation.getRuntime(slot.machine.id);
         anim.runtimes[gi] = runtime;
@@ -1512,8 +1760,28 @@ function MachineInstancesInner({
       }
     }
 
+    // -- outline shells: share the BODY's instanceMatrix object, don't copy --
+    // Reassigning `.instanceMatrix` to the same BufferAttribute instance body
+    // already writes into means every future `body.instanceMatrix.needsUpdate`
+    // (set every frame the body moves) is ALSO true for the outline, because
+    // it is literally the same object — no separate write path, no chance of
+    // the outline lagging the body by a frame, and the renderer's WebGL
+    // buffer cache (keyed by the attribute object) uploads it only once even
+    // though two InstancedMeshes now read it.
+    for (const arch of ARCHETYPE_ORDER) {
+      const bodyMesh = meshes.get(`${arch}:body`) ?? null;
+      const outlineMesh = meshes.get(`${arch}:outline`) ?? null;
+      if (!outlineMesh) continue;
+      if (bodyMesh) {
+        outlineMesh.instanceMatrix = bodyMesh.instanceMatrix;
+        outlineMesh.count = bodyMesh.count;
+      }
+      outlineMesh.frustumCulled = false;
+      if (outlineMesh.instanceColor) outlineMesh.instanceColor.needsUpdate = true;
+    }
+
     animRef.current = anim;
-  }, [ordered, grouped, count, statusFilter, simulation, lite]);
+  }, [ordered, grouped, count, statusFilter, simulation, lite, zoneCull]);
 
   // -- the single animation loop for every machine on the floor -------------
   useFrame((state, rawDelta) => {
@@ -1536,6 +1804,56 @@ function MachineInstancesInner({
     decimateTickRef.current = (decimateTickRef.current + 1) % 4;
     const decimateTick = decimateTickRef.current;
 
+    // -- per-zone visibility/LOD gate, same decimated cadence as the walk --
+    // One frustum test and one distance test per HALL (not per machine): the
+    // camera only moves once per executed tick from this loop's point of
+    // view, so recomputing here is exactly as fresh as everything else the
+    // walk writes this tick, at a cost of ~10-30 sphere tests instead of the
+    // ~1000 a per-machine test would cost.
+    {
+      const camera = state.camera;
+      CULL_VIEW_PROJ.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+      CULL_FRUSTUM.setFromProjectionMatrix(CULL_VIEW_PROJ);
+      const cx = zoneCull.cx;
+      const cy = zoneCull.cy;
+      const cz = zoneCull.cz;
+      const radius = zoneCull.radius;
+      const active = zoneCull.active;
+      const culledElapsed = zoneCull.culledElapsed;
+      const camX = camera.position.x;
+      const camY = camera.position.y;
+      const camZ = camera.position.z;
+      for (let zi = 0; zi < zoneCull.count; zi++) {
+        CULL_SPHERE.center.set(cx[zi], cy[zi], cz[zi]);
+        // `radius[zi]` already has ZONE_CULL_MARGIN_FACTOR baked in (see the
+        // zoneCull useMemo) — do not pad it again here.
+        CULL_SPHERE.radius = radius[zi];
+        let zoneIsActive: boolean;
+        if (!CULL_FRUSTUM.intersectsSphere(CULL_SPHERE)) {
+          zoneIsActive = false;
+        } else {
+          const dx = cx[zi] - camX;
+          const dy = cy[zi] - camY;
+          const dz = cz[zi] - camZ;
+          zoneIsActive = dx * dx + dy * dy + dz * dz <= lodDistanceSq;
+        }
+        if (zoneIsActive) {
+          // Consumed by the per-machine loop below this tick as a one-off
+          // flash catch-up, then must be zeroed for the NEXT tick — done
+          // there (not here) because the machine loop still needs this
+          // value once more after we overwrite `active[zi]`.
+          active[zi] = 1;
+        } else {
+          // Real time this hall has spent culled, accumulated at this
+          // decimated tick's own delta — NOT machine-walked, O(zones) only.
+          // This is what lets `flash` decay correctly in real time while
+          // the per-machine walk below is skipped for this zone.
+          culledElapsed[zi] += delta;
+          active[zi] = 0;
+        }
+      }
+    }
+
     const meshes = registryRef.current.meshes;
     const t = state.clock.elapsedTime;
 
@@ -1544,10 +1862,9 @@ function MachineInstancesInner({
     if (writeColor) anim.colorTimer = COLOR_INTERVAL;
 
     // Resolve every animated buffer ONCE per frame (never per machine).
-    const beacon = meshes.get("shared:beacon") ?? null;
-    const beaconAttr = beacon ? beacon.instanceColor : null;
-    const beaconArr = writeColor && beaconAttr ? beaconAttr.array : null;
-
+    // (the old beacon dome was resolved here too; it is now a static PLC
+    // stack light written once in `writeMachineParts` — see that block above
+    // `STACK_LAMP_LIT` — so there is nothing for this frame loop to touch.)
     const cncSpindle = meshes.get("cnc:spindle") ?? null;
     const cncArr = cncSpindle ? cncSpindle.instanceMatrix.array : null;
 
@@ -1588,8 +1905,6 @@ function MachineInstancesInner({
     const packPusher = meshes.get("packing:pusher") ?? null;
     const pusherArr = packPusher ? packPusher.instanceMatrix.array : null;
 
-    const rgb = anim.beaconRgb;
-    const rgbDark = anim.beaconDarkRgb;
     const glowRgb = anim.glowRgb;
     const glowBase = anim.glowBaseRgb;
     const flash = anim.flash;
@@ -1612,21 +1927,59 @@ function MachineInstancesInner({
 
     const scanPulse = 0.55 + 0.45 * Math.sin(t * 7.5);
 
+    const zoneActive = zoneCull.active;
+    const zoneCulledElapsed = zoneCull.culledElapsed;
+
     for (let i = 0; i < n; i++) {
+      // Visibility/LOD gate: the machine's hall is off-screen or far beyond
+      // ANIM_LOD_DISTANCE_FACTOR * suggestedCameraDistance. Its instances stay
+      // exactly where they were last written — they are either not rendered
+      // at all (frustum case, so nothing is visibly frozen) or too small on
+      // screen for the articulation to read (distance case). The moment its
+      // zone re-enters `zoneActive`, this same loop resumes writing this
+      // machine's CURRENT pose from the simulation's absolute `phase` /
+      // `cycleProgress` on the very next executed tick — that part really is
+      // stateless and needs no resync. `flash` is the one exception: it is
+      // genuinely incremental (only ever decays, or gets re-armed by a
+      // cycleTick — never derived fresh from an absolute value), so it is
+      // NOT safe to just skip here; a naive `continue` would freeze it at
+      // whatever value it had when the hall went out of view and replay it
+      // stale + too bright once the hall comes back. We do NOT fix this with
+      // a per-machine walk over culled machines (that would defeat the whole
+      // point of per-zone culling) — instead the cull-test block above
+      // tracks `culledElapsed` per ZONE (O(zones)), and the moment a zone
+      // flips back to active we apply that accumulated real time as a single
+      // catch-up decay below, once per machine, as part of this same loop
+      // pass that was going to touch the machine anyway.
+      if (!zoneActive[anim.zoneOf[i]]) continue;
+
       const runtime = anim.runtimes[i];
+      const zi = anim.zoneOf[i];
+      // Catch-up: real seconds this machine's zone spent culled since it was
+      // last active (0 if it was already active last tick, or on a freshly
+      // mounted layout). Folding it into this tick's decay keeps `flash`
+      // exactly what it would have been had the zone never been culled.
+      const catchUp = zoneCulledElapsed[zi];
+      // Zero it right after reading: this loop only reaches a machine whose
+      // zone is active, so the first machine of a just-reactivated zone
+      // consumes the whole accumulated catch-up and every later machine in
+      // the same zone (this tick or any future one) correctly sees 0 —
+      // without this the catch-up would be re-applied to every machine in
+      // the zone every tick forever, decaying `flash` far too fast.
+      if (catchUp !== 0) zoneCulledElapsed[zi] = 0;
 
       let f = flash[i];
       if (f > 0) {
-        f -= delta * FLASH_DECAY;
+        f -= (delta + catchUp) * FLASH_DECAY;
         if (f < 0) f = 0;
       }
 
-      // `level` is the beacon's position on the dark→saturated lerp, in [0, 1].
-      // It is NOT a brightness multiplier any more: on a pale floor "1.3" was a
-      // clipped white dot and "0.12" was the single most visible pixel on the
-      // machine, so the old down-blink read backwards. Both endpoints are now
-      // real colours, and the animation swings SATURATION + DARKNESS between them.
-      let level = BEACON_RUN;
+      // The old beacon read `activity` here to pick an idle-breathe / down-blink
+      // / maintenance-pulse curve (`level`). The stack light replacing it is
+      // status-driven and static (see `STACK_LAMP_LIT`), so that branch and
+      // its four BEACON_* rate/amplitude constants are gone — `activity` below
+      // is now only consulted for `running` (door/scan/bob motion) and the
+      // furnace/impact `f` flash, both pre-existing and still needed.
       let cp = 0;
       let spin = 0;
       let running = false;
@@ -1639,19 +1992,7 @@ function MachineInstancesInner({
         spin = runtime.phase * TAU;
         cp = runtime.cycleProgress;
         temp = runtime.tempC;
-        const activity = runtime.activity;
-        if (activity === "running") {
-          running = true;
-        } else if (activity === "idle" || activity === "setup") {
-          level =
-            BEACON_IDLE_MID +
-            BEACON_IDLE_AMP * Math.sin(t * BEACON_IDLE_RATE + runtime.phase * TAU);
-        } else if (activity === "down") {
-          level =
-            (t * BEACON_DOWN_RATE + i * 0.017) % 1 < 0.5 ? BEACON_DOWN_HI : BEACON_DOWN_LO;
-        } else {
-          level = BEACON_PULSE_MID + BEACON_PULSE_AMP * Math.sin(t * BEACON_PULSE_RATE + i * 0.11);
-        }
+        if (runtime.activity === "running") running = true;
       }
       flash[i] = f;
 
@@ -1885,17 +2226,16 @@ function MachineInstancesInner({
         default:
           break;
       }
+      // No beacon write here any more — the stack light is a static part,
+      // written once by `writeMachineParts` and never touched by this loop.
+    }
 
-      if (beaconArr !== null) {
-        // A cycleTick pushes `level` toward the saturated endpoint rather than
-        // adding brightness on top of it — hence BEACON_RUN sitting at 0.75, so
-        // a running machine still has somewhere to flash TO.
-        const b = level + (1 - level) * f * BEACON_FLASH_REACH;
-        const j = i * 3;
-        beaconArr[j] = rgbDark[j] + (rgb[j] - rgbDark[j]) * b;
-        beaconArr[j + 1] = rgbDark[j + 1] + (rgb[j + 1] - rgbDark[j + 1]) * b;
-        beaconArr[j + 2] = rgbDark[j + 2] + (rgb[j + 2] - rgbDark[j + 2]) * b;
-      }
+    // Zero the catch-up debt for every zone that is active as of this tick:
+    // any machine in it just consumed `zoneCulledElapsed[zi]` above, so the
+    // debt is fully paid off and must not be re-applied next tick. O(zones),
+    // same cost class as the cull test itself — not a per-machine walk.
+    for (let zi = 0; zi < zoneCull.count; zi++) {
+      if (zoneActive[zi]) zoneCulledElapsed[zi] = 0;
     }
 
     // -- flush only what actually changed ----------------------------------
@@ -1911,7 +2251,6 @@ function MachineInstancesInner({
     if (scanner) scanner.instanceMatrix.needsUpdate = true;
     if (scanline) scanline.instanceMatrix.needsUpdate = true;
     if (packPusher) packPusher.instanceMatrix.needsUpdate = true;
-    if (beaconArr !== null && beaconAttr) beaconAttr.needsUpdate = true;
     if (impactArr !== null && impactAttr) impactAttr.needsUpdate = true;
     if (glowArr !== null && glowAttr) glowAttr.needsUpdate = true;
     if (scanlineColorArr !== null && scanlineAttr) scanlineAttr.needsUpdate = true;
@@ -1975,7 +2314,8 @@ function MachineInstancesInner({
       {ARCHETYPE_ORDER.map((arch) => {
         const groupCount = grouped.groups[arch].length;
         if (groupCount === 0) return null;
-        return ARCHETYPE_PARTS[arch].map((part) => {
+        const bodyPart = ARCHETYPE_PARTS[arch].find((part) => part.id === "body");
+        const parts = ARCHETYPE_PARTS[arch].map((part) => {
           if (lite && part.liteDrop) return null;
           const instances = groupCount * (part.copies ?? 1);
           const pick = part.pick === true;
@@ -1997,6 +2337,41 @@ function MachineInstancesInner({
             </instancedMesh>
           );
         });
+        // One extra draw call per archetype (not per machine) for the
+        // Sims-style outline shell — see the block above `OUTLINE_SCALE`.
+        // `count` is set to `groupCount` here just so React/three allocate a
+        // correctly-sized (if temporary) instanceMatrix on construction; the
+        // mount effect above immediately replaces it with the body mesh's own
+        // instanceMatrix object, so this initial buffer is discarded and never
+        // written to directly.
+        //
+        // PERFORMANCE: dropped entirely in `lite` mode (auto-on above 250
+        // machines, i.e. exactly the ~973-machine floor the user is reporting
+        // stutter on). This is the single biggest win in this pass — the
+        // outline is a second full-geometry InstancedMesh per archetype with
+        // its own vertex + fill cost, roughly DOUBLING the vertex/fill load
+        // for every machine body it shadows. `lite` is also where every other
+        // "small decorative extra" part (`liteDrop`) already gets cut, so this
+        // keeps the outline consistent with the floor's existing quality knob
+        // instead of adding a second one. It stays on by default below the
+        // 250-machine threshold, where the crisp-outline look this file was
+        // built for is essentially free.
+        if (bodyPart && !lite) {
+          parts.push(
+            <instancedMesh
+              key={`${arch}-outline-${groupCount}`}
+              ref={(mesh) => {
+                registryRef.current.meshes.set(`${arch}:outline`, mesh);
+              }}
+              args={[undefined, undefined, groupCount]}
+              raycast={NULL_RAYCAST}
+            >
+              <OutlineGeometry part={bodyPart} />
+              <meshBasicMaterial color={OUTLINE_COLOR} side={THREE.BackSide} toneMapped={false} />
+            </instancedMesh>
+          );
+        }
+        return parts;
       })}
     </group>
   );
@@ -2379,13 +2754,25 @@ function SelectionMarker({ slot, lite }: { slot: FloorSlot; lite: boolean }) {
 // real headroom left before white. Raising any of these blows the floor out and
 // every pale machine merges into it.
 /** Uniform lift so deep interiors are never crushed; deliberately small. */
-const AMBIENT_INTENSITY = 0.12;
+const AMBIENT_INTENSITY = 0.08;
 /** Sky dome (pale blue above) over ground bounce (the floor colour below). */
-const HEMI_INTENSITY = 0.5;
+const HEMI_INTENSITY = 0.36;
 /** Warm sun. Direction only — a directionalLight ignores the distance. */
-const KEY_INTENSITY = 0.42;
+const KEY_INTENSITY = 0.38;
 /** Cool counter-fill from the opposite, low side: keeps away-faces from flattening. */
-const FILL_INTENSITY = 0.14;
+const FILL_INTENSITY = 0.12;
+/**
+ * scene.environmentIntensity multiplier for the procedural room-IBL below.
+ * This is what actually buys the reflections: it feeds `envMap` on every
+ * PBR material (metalness > 0), giving steel/chrome parts a directional,
+ * many-highlight look instead of the flat matte a light rig alone can ever
+ * produce. It ALSO adds diffuse IBL to everything else, which is why
+ * AMBIENT/HEMI/KEY/FILL above were all trimmed from their pre-IBL values —
+ * same total budget (brightest pixel still ~0.90 sRGB under
+ * NeutralToneMapping), just redistributed from four flat lights into one
+ * lit environment.
+ */
+const ENVIRONMENT_INTENSITY = 0.35;
 
 /**
  * Daylight rig. THE DARK-THEME RIG IS GONE: it was a 0.35 ambient plus two neon
@@ -2417,10 +2804,15 @@ const FILL_INTENSITY = 0.14;
  * rendered a full depth map for zero visible pixels. `<ContactShadows>` under
  * the machines provides the grounding cue instead.
  *
- * drei's `<Environment>` was considered and rejected: every `preset` resolves to
- * an HDR fetched from the pmndrs assets CDN, which this app cannot reach, and a
- * procedural `<Environment>` with children would add a cubemap render pass for
- * metals whose metalness we lowered anyway (see PartMaterial).
+ * drei's `<Environment preset=...>` was considered and rejected: every preset
+ * resolves to an HDR fetched from the pmndrs assets CDN, which this app cannot
+ * reach at all. Instead, `SceneEnvironment` below renders three's built-in
+ * `RoomEnvironment` (a small procedural room of soft-lit panels — no network,
+ * no extra dependency, ships inside `three/examples/jsm`) through a
+ * `PMREMGenerator`, ONCE, into `scene.environment`. That is what gives the
+ * metal/steel PartMaterial surfaces real reflections and depth instead of a
+ * flat metalness response — see ENVIRONMENT_INTENSITY above for how its
+ * contribution was budgeted against the four lights below.
  */
 function SceneLights() {
   return (
@@ -2443,6 +2835,57 @@ function SceneLights() {
       />
     </>
   );
+}
+
+/**
+ * Procedural IBL: renders three's `RoomEnvironment` through a `PMREMGenerator`
+ * once, on mount, and assigns the resulting cube-mip texture to
+ * `scene.environment`. No network fetch (unlike drei's `<Environment preset>`,
+ * see the block comment above `SceneLights`) and no new npm dependency —
+ * `RoomEnvironment` ships inside the already-installed `three` package.
+ *
+ * This runs exactly once per mount, not per frame: `fromScene()` renders the
+ * small room offscreen a single time, and the resulting PMREM texture is then
+ * just sampled by materials like any other envMap for free. Both the
+ * generator and its render target's texture are disposed on unmount/cleanup
+ * so this never leaks GPU memory across route changes or hot reloads.
+ */
+function SceneEnvironment() {
+  const { gl, scene } = useThree();
+
+  useEffect(() => {
+    const pmrem = new THREE.PMREMGenerator(gl);
+    const room = new RoomEnvironment();
+    const envRenderTarget = pmrem.fromScene(room, 0.04);
+    scene.environment = envRenderTarget.texture;
+    scene.environmentIntensity = ENVIRONMENT_INTENSITY;
+
+    // `fromScene()` renders synchronously, so `room` has already been
+    // consumed by the time it returns — safe to dispose immediately. `room`
+    // is a real THREE.Scene full of box meshes with their own geometries and
+    // materials; `pmrem.dispose()` only frees the PMREM generator's internal
+    // render targets, NOT a caller-supplied scene, so without this traversal
+    // every one of RoomEnvironment's meshes leaks on every mount (StrictMode
+    // double-mount, remount, or HMR).
+    room.traverse((object) => {
+      if (object instanceof THREE.Mesh) {
+        object.geometry.dispose();
+        if (Array.isArray(object.material)) {
+          object.material.forEach((material) => material.dispose());
+        } else {
+          object.material.dispose();
+        }
+      }
+    });
+
+    return () => {
+      scene.environment = null;
+      envRenderTarget.texture.dispose();
+      pmrem.dispose();
+    };
+  }, [gl, scene]);
+
+  return null;
 }
 
 // ---------------------------------------------------------------------------
@@ -2803,6 +3246,7 @@ function SceneContents({
           the close hall view, an attractive fade at the far end of the plant. */}
       <fogExp2 attach="fog" args={[FOG_COLOR, fogDensity]} />
       <SceneLights />
+      <SceneEnvironment />
       {/* The facility owns the site ground (grass at y=0.004, asphalt at 0.008)
           whenever there is anything to draw. FloorGround's own plane sits at
           y=-0.06 and its infinite Grid at y=0, and at the plant fit distance the
@@ -2819,7 +3263,7 @@ function SceneContents({
       {layout.zones.length > layout.buildings.length && <ZoneLabels zones={layout.zones} />}
 
       {/* building shell, racks/pillars/docks/office, painted aisles */}
-      <FacilityShell layout={layout} lite={lite} />
+      <FacilityShell layout={layout} lite={lite} cameraPreset={cameraPreset} />
       <ConveyorSystem layout={layout} simulation={sim} lite={lite} />
       <FloorTraffic layout={layout} lite={lite} />
 
@@ -2979,7 +3423,7 @@ export default function LiveFloor4DScene(props: LiveFloor4DSceneProps): ReactEle
   // Verified against the light rig's own budget (see SceneLights): the brightest
   // surface in the scene is the floor at ~0.87 linear, which is still inside the
   // curve's linear region — the pale floor cannot clip to pure white, and the
-  // `toneMapped={false}` accents (status strip, beacon, furnace, scan line) are
+  // `toneMapped={false}` accents (status strip, stack light, furnace, scan line) are
   // untouched by the curve either way. Exposure stays 1.0: the rig is already
   // budgeted to land the brightest surface below 1, and any exposure above 1
   // would simply undo that.

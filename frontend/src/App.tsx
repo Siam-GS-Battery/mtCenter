@@ -53,6 +53,7 @@ import MachineAdminView from "./components/views/MachineAdminView";
 import { SettingsModal } from "./components/SettingsModal";
 import { HelpModal } from "./components/HelpModal";
 import { AIAssistantDrawer } from "./components/AIAssistantDrawer";
+import AIAssistantToggleButton from "./components/AIAssistantToggleButton";
 import { CreateWorkOrderModal, PrefilledWorkOrderData } from "./components/CreateWorkOrderModal";
 import type { NotificationTarget } from "./components/TopBar";
 import { defaultDueDate } from "./lib/workOrderStatus";
@@ -972,6 +973,13 @@ export default function App() {
         onAutoCreateWorkOrder={handleAutoCreateWorkOrder}
         onOpenCreateWorkOrderModal={handleOpenCreateWorkOrderModal}
       />
+
+      {activeTab !== "chat" && (
+        <AIAssistantToggleButton
+          isOpen={isAiDrawerOpen}
+          onToggle={() => setIsAiDrawerOpen((prev) => !prev)}
+        />
+      )}
     </div>
   );
 }

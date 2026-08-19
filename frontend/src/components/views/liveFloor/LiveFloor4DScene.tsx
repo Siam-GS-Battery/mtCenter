@@ -32,7 +32,9 @@ import type {
 } from "../../../lib/floorLayout";
 import { createFloorSimulation } from "../../../lib/floorSimulation";
 import type { FloorSimulation, MachineRuntime } from "../../../lib/floorSimulation";
+import type { InspectionAgent } from "../../../lib/inspectionAgent";
 import { FacilityShell, ConveyorSystem, FloorTraffic } from "./LiveFloorFacility";
+import InspectorRobot from "./InspectorRobot";
 import { LIVE_FLOOR_THEME, statusColor } from "./liveFloorTheme";
 import type { Machine, MachineStatus } from "../../../types";
 
@@ -80,6 +82,19 @@ export interface LiveFloor4DSceneProps {
   onContextLost?: () => void;
   /** Fired when the browser restores the context and rendering resumes. */
   onContextRestored?: () => void;
+  /**
+   * หุ่นยนต์ตรวจสายการผลิต (โหมด Agent) — ฉากเป็นผู้ก้าวเวลาให้จาก render
+   * loop ของตัวเอง เหมือนที่ทำกับ `simulation` ผ่าน `SimulationStepper`
+   * เพื่อให้การเดินลื่นตามเฟรมจริง ส่วนพาเนลรายงานฝั่ง HUD อ่าน snapshot
+   * เดียวกันนี้ที่ 4Hz
+   */
+  inspector?: InspectionAgent | null;
+  /** false/undefined = ไม่แสดงหุ่นยนต์และไม่ก้าวเวลาให้เลย */
+  inspectorActive?: boolean;
+  /** true = ตัวหุ่นถูกเลือกอยู่ และกล้องตามตัวหุ่นไปตลอด */
+  inspectorFollow?: boolean;
+  /** ผู้ใช้คลิกที่ตัวหุ่นในฉาก */
+  onSelectInspector?: () => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -2904,12 +2919,16 @@ function SimulationStepper({ simulation }: { simulation: FloorSimulation }) {
 // Camera rig: smoothly lerps position/target toward preset + selection
 // ---------------------------------------------------------------------------
 
+/** Scratch vector for the follow-cam delta — one instance, never per frame. */
+const FOLLOW_DELTA = new THREE.Vector3();
+
 function CameraRig({
   focusKey,
   desiredPos,
   focusTarget,
   minDistance,
   maxDistance,
+  follow,
 }: {
   /** changes only on an explicit user intent (preset switch / new selection) */
   focusKey: string;
@@ -2917,6 +2936,13 @@ function CameraRig({
   focusTarget: THREE.Vector3;
   minDistance: number;
   maxDistance: number;
+  /**
+   * Returns the world point the camera should keep centred (the inspector
+   * robot), or null when nothing is being followed. A callback rather than a
+   * value because the robot moves every frame and the rig must not re-render
+   * the whole scene to learn where it went.
+   */
+  follow?: () => { x: number; z: number } | null;
 }) {
   const { camera } = useThree();
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
@@ -2955,6 +2981,30 @@ function CameraRig({
   // damping twice for every frame of a fly-to. Negative priorities do not switch
   // R3F to manual rendering (only priority > 0 does), so the loop is unchanged.
   useFrame((_, delta) => {
+    /**
+     * FOLLOW MODE — wins over the preset fly-to while it is on.
+     *
+     * The camera is moved by the SAME delta as the orbit target rather than
+     * being placed at a computed position: that keeps whatever angle, height
+     * and zoom the operator has dialled in, so following never fights a drag
+     * and never snaps the view to some canned angle. Easing the delta (instead
+     * of applying it whole) also means switching follow on from across the
+     * plant glides over instead of cutting.
+     */
+    const followPoint = follow?.();
+    if (followPoint) {
+      const controls = controlsRef.current;
+      if (controls) {
+        FOLLOW_DELTA.set(followPoint.x, controls.target.y, followPoint.z).sub(controls.target);
+        FOLLOW_DELTA.multiplyScalar(Math.min(1, delta * 3));
+        controls.target.add(FOLLOW_DELTA);
+        camera.position.add(FOLLOW_DELTA);
+      }
+      // An in-flight preset animation must not drag the camera off the robot.
+      animatingRef.current = false;
+      return;
+    }
+
     if (!animatingRef.current) return;
     const lerpFactor = Math.min(1, delta * 2.2);
     camera.position.lerp(desiredPos, lerpFactor);
@@ -2997,6 +3047,10 @@ function SceneContents({
   simulation,
   focusBuildingId,
   layout: providedLayout,
+  inspector,
+  inspectorActive,
+  inspectorFollow,
+  onSelectInspector,
   lite,
 }: LiveFloor4DSceneProps & { lite: boolean }) {
   // ONE layout instance per `machines` change: the caller's when supplied (the
@@ -3034,6 +3088,20 @@ function SceneContents({
   const handleHoverSlot = useCallback((slot: FloorSlot | null) => {
     setHoveredSlot(slot);
   }, []);
+
+  /**
+   * Follow-cam feed for `CameraRig`. A callback (read fresh every frame from
+   * the agent's own snapshot) rather than a prop value: the robot moves every
+   * frame, and turning that into React state would re-render this ~973-machine
+   * scene 60 times a second. Returning null is what switches following off.
+   */
+  const followInspector = useMemo(() => {
+    if (!inspector || !inspectorActive || !inspectorFollow) return undefined;
+    return () => {
+      const snap = inspector.snapshot();
+      return { x: snap.x, z: snap.z };
+    };
+  }, [inspector, inspectorActive, inspectorFollow]);
 
   const selectedSlot = useMemo(
     () => layout.slots.find((s) => s.machine.id === selectedMachineId) ?? null,
@@ -3278,6 +3346,18 @@ function SceneContents({
         onOpenMachine={onOpenMachine}
       />
 
+      {/* หุ่นยนต์ตรวจสายการผลิต — mount เฉพาะเมื่อเปิดโหมด Agent เท่านั้น
+          จะได้ไม่มี useFrame ส่วนเกินวิ่งอยู่ในโหมดดูผังปกติ */}
+      {inspector && inspectorActive && (
+        <InspectorRobot
+          agent={inspector}
+          active
+          highQuality={highQuality !== false && !lite}
+          selected={inspectorFollow === true}
+          onSelect={onSelectInspector}
+        />
+      )}
+
       {hoveredSlot && hoveredSlot.machine.id !== selectedMachineId && (
         <HoverHighlight slot={hoveredSlot} lite={lite} />
       )}
@@ -3324,6 +3404,7 @@ function SceneContents({
         focusTarget={focusTarget}
         minDistance={minDistance}
         maxDistance={maxDistance}
+        follow={followInspector}
       />
 
       {machines.length === 0 && (

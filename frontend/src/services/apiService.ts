@@ -634,8 +634,15 @@ export function createPartWithdrawal(
 }
 
 // ---- Manuals ----
-export function getManuals(): Promise<ManualDoc[]> {
-  return request<ManualDoc[]>("/api/manuals");
+export interface ManualListParams {
+  limit?: number;
+  offset?: number;
+  search?: string;
+  machineModel?: string;
+}
+
+export function getManuals(params: ManualListParams = {}): Promise<PaginatedResult<ManualDoc>> {
+  return requestPaginated<ManualDoc>(`/api/manuals${buildQuery(params)}`);
 }
 
 // createManual/updateManual/deleteManual hit the backend directly (base "",
@@ -958,8 +965,26 @@ export interface ReviewQueueResponse {
   totalCount: number;
 }
 
-export function getReviewQueue(actorId?: string): Promise<ReviewQueueResponse> {
-  return request<ReviewQueueResponse>("/api/knowledge/review-queue", { headers: withActor(actorId) });
+export interface ReviewQueueListParams {
+  limit?: number;
+  offset?: number;
+}
+
+/** ผลลัพธ์แบ่งหน้าของคิวรีวิว — `meta` มาจาก envelope ระดับบนสุด (เหมือน list อื่น ๆ)
+ * ส่วน `pendingCount`/`totalCount` ใน data ยังนับจากทั้งคิวเสมอ ไม่ใช่แค่หน้าที่ส่งมา */
+export function getReviewQueue(
+  params: ReviewQueueListParams = {},
+  actorId?: string
+): Promise<PaginatedResult<ReviewQueueItem> & { pendingCount: number; totalCount: number }> {
+  return requestEnvelope<ReviewQueueResponse>(
+    `/api/knowledge/review-queue${buildQuery(params)}`,
+    { headers: withActor(actorId) }
+  ).then((envelope) => ({
+    data: envelope.data.items,
+    meta: envelope.meta,
+    pendingCount: envelope.data.pendingCount,
+    totalCount: envelope.data.totalCount,
+  }));
 }
 
 /** Frame 2 — ร่างองค์ความรู้จากสิ่งที่ช่างบันทึกไว้ (ยังไม่เข้าคลัง) */
@@ -1044,8 +1069,29 @@ export interface KnowledgeOverview {
   articles: KnowledgeUsageRow[];
 }
 
-export function getKnowledgeOverview(actorId?: string): Promise<KnowledgeOverview> {
-  return request<KnowledgeOverview>("/api/knowledge/overview", { headers: withActor(actorId) });
+export interface KnowledgeOverviewParams {
+  limit?: number;
+  offset?: number;
+}
+
+export interface KnowledgeOverviewResult {
+  overview: KnowledgeOverview;
+  meta?: ApiListMeta;
+}
+
+/** `overview.articles` คือหน้าปัจจุบันเท่านั้น (ดูคอมเมนต์ backend/src/lib/knowledgeStats.ts) —
+ * ใช้ `meta` ({total, limit, offset}) คู่กับ `<Pagination>` เพื่อเลื่อนหน้า */
+export function getKnowledgeOverview(
+  params: KnowledgeOverviewParams = {},
+  actorId?: string
+): Promise<KnowledgeOverviewResult> {
+  return requestEnvelope<KnowledgeOverview>(
+    `/api/knowledge/overview${buildQuery(params)}`,
+    { headers: withActor(actorId) }
+  ).then((envelope) => ({
+    overview: envelope.data,
+    meta: envelope.meta,
+  }));
 }
 
 // ---- Auth ----

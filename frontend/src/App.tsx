@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   UserRole,
   UserProfile,
@@ -22,7 +22,6 @@ import {
   getWorkOrderStats,
   getSpareParts,
   getSparePartStats,
-  getManuals,
   createWorkOrder,
   updateWorkOrder,
   deleteWorkOrder,
@@ -91,7 +90,6 @@ export default function App() {
   const [activeMachine, setActiveMachine] = useState<Machine | null>(null);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [spareParts, setSpareParts] = useState<SparePart[]>([]);
-  const [manuals, setManuals] = useState<ManualDoc[]>([]);
   // Aggregate counts from the /stats endpoints — dashboards/KPI tiles must
   // read these instead of reducing over `machines`/`workOrders`/`spareParts`,
   // since those arrays are now paginated and no longer guaranteed to hold
@@ -225,7 +223,6 @@ export default function App() {
         Promise.allSettled([
           getWorkOrders({ limit: 100 }),
           getSpareParts({ limit: 100 }),
-          getManuals(),
           getMachineStats(),
           getWorkOrderStats(),
           getSparePartStats(),
@@ -233,7 +230,6 @@ export default function App() {
           ([
             workOrdersRes,
             sparePartsRes,
-            manualsRes,
             machineStatsRes,
             workOrderStatsRes,
             sparePartStatsRes,
@@ -254,17 +250,6 @@ export default function App() {
             } else {
               showToast(
                 `ไม่สามารถโหลดคลังอะไหล่ได้: ${toUserMessage(sparePartsRes.reason)}`,
-                "error"
-              );
-            }
-
-            if (manualsRes.status === "fulfilled") {
-              // A manual deleted while this snapshot was already in flight must
-              // not be resurrected by this wholesale assignment. See removedManualIdsRef.
-              setManuals(manualsRes.value.filter((m) => !removedManualIdsRef.current.has(m.id)));
-            } else {
-              showToast(
-                `ไม่สามารถโหลดคู่มือเครื่องจักรได้: ${toUserMessage(manualsRes.reason)}`,
                 "error"
               );
             }
@@ -558,43 +543,10 @@ export default function App() {
     [machines]
   );
 
-  // Refresh the manuals list so a newly uploaded manual appears immediately.
-  // Prefer refetching from the server; if that fails, fall back to appending
-  // the manual the upload screen already gave us so the view still updates.
-  //
-  // Uploads can overlap (user uploads a second manual before the first
-  // refetch resolves), and the two getManuals() responses can land out of
-  // order. A monotonically increasing request token — bumped before each
-  // refetch and checked before applying it — guards against a slower,
-  // older response clobbering the state a newer refetch already set.
-  const manualsRefreshSeq = useRef(0);
-
-  // A manual that has been deleted must never come back from a wholesale
-  // setManuals(...) applied from a snapshot fetched before the delete
-  // resolved (mount fetch, upload refetch). manualsRefreshSeq only orders
-  // refetch-vs-refetch — it knows nothing about deletions — so this is a
-  // second, independent guard: every id added here is filtered out of every
-  // wholesale manuals assignment, for the lifetime of the component.
-  const removedManualIdsRef = useRef<Set<string>>(new Set());
-
+  // ManualsView ดึงคู่มือของตัวเอง (server-side pagination/search) จึงไม่ต้องรีเฟรช
+  // รายการคู่มือระดับ App อีกต่อไป — แค่แจ้งผลด้วย toast เท่านั้น
   const handleManualUploaded = (manual: ManualDoc) => {
-    const seq = ++manualsRefreshSeq.current;
-    getManuals()
-      .then((freshManuals) => {
-        if (seq === manualsRefreshSeq.current) {
-          setManuals(freshManuals.filter((m) => !removedManualIdsRef.current.has(m.id)));
-        }
-        showToast(`อัปโหลดคู่มือ "${manual.title}" เรียบร้อยแล้ว`);
-      })
-      .catch(() => {
-        if (seq === manualsRefreshSeq.current && !removedManualIdsRef.current.has(manual.id)) {
-          setManuals((prev) => [manual, ...prev]);
-        }
-        showToast(
-          `อัปโหลดคู่มือ "${manual.title}" เรียบร้อยแล้ว แต่ไม่สามารถโหลดรายการคู่มือล่าสุดได้`,
-          "error"
-        );
-      });
+    showToast(`อัปโหลดคู่มือ "${manual.title}" เรียบร้อยแล้ว`);
   };
 
   // A create/update/delete/stock-adjust can shift the /stats numbers (total,
@@ -873,7 +825,6 @@ export default function App() {
 
           {activeTab === "manuals" && (
             <ManualsView
-              manuals={manuals}
               activeMachine={activeMachine ?? undefined}
               onAskAI={handleAskAIWithPrompt}
               // เฉพาะวิศวกร/หัวหน้างานที่มีสิทธิ์อัปโหลดคู่มือ (มีเมนู "อัปโหลดคู่มือ" ในแถบด้านข้าง) เท่านั้นที่เห็น
@@ -887,17 +838,6 @@ export default function App() {
               // แก้ไข/ลบคู่มือเป็นการกระทำทำลาย (destructive) — เฉพาะวิศวกรและหัวหน้างานเท่านั้นที่มีสิทธิ์
               // ช่างเทคนิคใช้คู่มือร่วมกันทั้งทีม จึงไม่ควรแก้ไขหรือลบคู่มือของทีมได้
               canManage={currentRole === "engineer" || currentRole === "supervisor"}
-              onDeleted={(id, title) => {
-                // ต้องเพิ่ม id ก่อน filter state เสมอ ไม่เช่นนั้น fetch ที่ยังลอยอยู่ในอากาศ
-                // (เริ่มก่อนลบ) อาจ setManuals(...) ทับด้วยรายการที่ยังมีคู่มือนี้อยู่
-                removedManualIdsRef.current.add(id);
-                setManuals((prev) => prev.filter((m) => m.id !== id));
-                showToast(`ลบคู่มือ "${title}" เรียบร้อยแล้ว`);
-              }}
-              onUpdated={(updated) => {
-                setManuals((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
-                showToast(`บันทึกการแก้ไขคู่มือ "${updated.title}" เรียบร้อยแล้ว`);
-              }}
             />
           )}
 
@@ -965,7 +905,7 @@ export default function App() {
           )}
 
           {activeTab === "reports" && (
-            <SupervisorReportsView workOrders={workOrders} machines={machines} />
+            <SupervisorReportsView machines={machines} />
           )}
 
           {activeTab === "parts_admin" && currentRole === "supervisor" && (

@@ -36,7 +36,12 @@ import {
   type KnowledgeDraft,
 } from "../../services/apiService";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "../ui/Modal";
+import { Pagination } from "../ui/Pagination";
 import { notifySaving, dismissSaving, notifyDone, notifyFailed } from "../../lib/swal";
+
+// จำนวนใบงานต่อหน้าในคิวรีวิว — ต้องตรงกับ default limit ของ backend
+// (backend/src/routes/knowledge.ts REVIEW_QUEUE_PAGING_DEFAULTS)
+const REVIEW_QUEUE_PAGE_SIZE = 20;
 
 interface KnowledgeReviewViewProps {
   /** ชื่อผู้ใช้ปัจจุบัน — บันทึกไว้กับความรู้ที่เขายืนยัน */
@@ -60,6 +65,8 @@ function formatDowntime(minutes: number | null): string {
 export const KnowledgeReviewView: React.FC<KnowledgeReviewViewProps> = ({ currentUserName }) => {
   const [items, setItems] = useState<ReviewQueueItem[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [offset, setOffset] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -73,13 +80,24 @@ export const KnowledgeReviewView: React.FC<KnowledgeReviewViewProps> = ({ curren
   const [editedContent, setEditedContent] = useState("");
   const [isConfirming, setIsConfirming] = useState(false);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (pageOffset: number) => {
     setIsLoading(true);
     setLoadError(null);
     try {
-      const data = await getReviewQueue();
-      setItems(data.items);
+      const data = await getReviewQueue({ limit: REVIEW_QUEUE_PAGE_SIZE, offset: pageOffset });
+      // งานถูกอนุมัติ/ลบออกจากคิวระหว่างที่ผู้ใช้อยู่หน้าท้าย ๆ อาจทำให้หน้านี้ว่างเปล่า
+      // ทั้งที่ยังมีงานค้างอยู่หน้าก่อนหน้า — ถอยกลับไปหน้าสุดท้ายที่มีข้อมูลจริงแทนที่จะ
+      // ค้างแสดงหน้าว่างเปล่า
+      if (data.data.length === 0 && pageOffset > 0 && data.meta && data.meta.total > 0) {
+        const lastOffset = Math.max(0, Math.floor((data.meta.total - 1) / REVIEW_QUEUE_PAGE_SIZE) * REVIEW_QUEUE_PAGE_SIZE);
+        if (lastOffset !== pageOffset) {
+          setOffset(lastOffset);
+          return;
+        }
+      }
+      setItems(data.data);
       setPendingCount(data.pendingCount);
+      setTotal(data.meta?.total ?? data.totalCount);
     } catch (err) {
       // ไม่กลืนเป็นลิสต์ว่าง: "ไม่มีงานค้าง" กับ "อ่านข้อมูลไม่ได้" ต่างกันคนละเรื่อง
       setLoadError(toUserMessage(err, "ดึงรายการใบงานรอรีวิวไม่สำเร็จ"));
@@ -90,8 +108,8 @@ export const KnowledgeReviewView: React.FC<KnowledgeReviewViewProps> = ({ curren
   }, []);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    void load(offset);
+  }, [load, offset]);
 
   const openDraft = async (item: ReviewQueueItem) => {
     setActiveItem(item);
@@ -137,7 +155,7 @@ export const KnowledgeReviewView: React.FC<KnowledgeReviewViewProps> = ({ curren
       dismissSaving();
       notifyDone("บันทึกความรู้เข้าคลังแล้ว");
       closeDraft();
-      await load();
+      await load(offset);
     } catch (err) {
       dismissSaving();
       notifyFailed(toUserMessage(err, "บันทึกความรู้เข้าคลังไม่สำเร็จ"));
@@ -170,7 +188,7 @@ export const KnowledgeReviewView: React.FC<KnowledgeReviewViewProps> = ({ curren
             </span>
           )}
           <button
-            onClick={() => void load()}
+            onClick={() => void load(offset)}
             disabled={isLoading}
             className="min-h-11 px-3 rounded-full border border-hairline text-ink-muted hover:text-ink hover:border-primary/40 text-sm inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
           >
@@ -288,6 +306,17 @@ export const KnowledgeReviewView: React.FC<KnowledgeReviewViewProps> = ({ curren
           );
         })}
       </div>
+
+      {total > 0 && (
+        <Pagination
+          offset={offset}
+          limit={REVIEW_QUEUE_PAGE_SIZE}
+          total={total}
+          onOffsetChange={setOffset}
+          isLoading={isLoading}
+          itemLabel="ใบ"
+        />
+      )}
 
       {/* ---------- Frame 2: รีวิวใบงานซ่อม ---------- */}
       {activeItem !== null && (

@@ -21,6 +21,11 @@ import {
   PencilLine,
 } from "lucide-react";
 import { getKnowledgeOverview, toUserMessage, type KnowledgeOverview } from "../../services/apiService";
+import { Pagination } from "../ui/Pagination";
+
+// จำนวนเรื่องความรู้ต่อหน้าในตาราง Frame 4 — ต้องตรงกับ default limit ของ backend
+// (backend/src/routes/knowledge.ts KNOWLEDGE_OVERVIEW_PAGING_DEFAULTS)
+const OVERVIEW_PAGE_SIZE = 20;
 
 function StatTile({
   label,
@@ -53,14 +58,18 @@ function StatTile({
 
 export const KnowledgeOverviewPanel: React.FC = () => {
   const [data, setData] = useState<KnowledgeOverview | null>(null);
+  const [total, setTotal] = useState(0);
+  const [offset, setOffset] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (pageOffset: number) => {
     setIsLoading(true);
     setError(null);
     try {
-      setData(await getKnowledgeOverview());
+      const { overview, meta } = await getKnowledgeOverview({ limit: OVERVIEW_PAGE_SIZE, offset: pageOffset });
+      setData(overview);
+      setTotal(meta?.total ?? overview.articles.length);
     } catch (err) {
       // ไม่แสดงเลข 0 เมื่ออ่านข้อมูลไม่ได้ — หน้านี้มีหน้าที่ยืนยันว่าความรู้ถูกใช้จริง
       // การโชว์ 0 ตอนระบบล่มจะสื่อผิดว่าไม่มีใครใช้ ซึ่งตรงข้ามกับความจริง
@@ -72,8 +81,8 @@ export const KnowledgeOverviewPanel: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    void load(offset);
+  }, [load, offset]);
 
   return (
     <section className="space-y-3">
@@ -83,7 +92,7 @@ export const KnowledgeOverviewPanel: React.FC = () => {
           ภาพรวมคลังความรู้ที่ยืนยันแล้ว
         </h3>
         <button
-          onClick={() => void load()}
+          onClick={() => void load(offset)}
           disabled={isLoading}
           className="min-h-11 px-3 rounded-full border border-hairline text-ink-muted hover:text-ink hover:border-primary/40 text-sm inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
         >
@@ -193,6 +202,17 @@ export const KnowledgeOverviewPanel: React.FC = () => {
                 </table>
               </div>
             </div>
+          )}
+
+          {total > 0 && (
+            <Pagination
+              offset={offset}
+              limit={OVERVIEW_PAGE_SIZE}
+              total={total}
+              onOffsetChange={setOffset}
+              isLoading={isLoading}
+              itemLabel="เรื่อง"
+            />
           )}
         </>
       )}

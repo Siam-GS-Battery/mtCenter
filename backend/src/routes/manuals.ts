@@ -2,13 +2,19 @@ import { randomUUID } from "node:crypto";
 import { Router } from "express";
 import { supabase } from "../lib/supabase.js";
 import { mapManual, type ManualRow } from "../lib/mappers.js";
-import { ApiError, asyncHandler, sendSuccess } from "../middleware/errorHandler.js";
+import { ApiError, asyncHandler, sendPaginated, sendSuccess } from "../middleware/errorHandler.js";
 import { requireRole } from "../middleware/requireRole.js";
 import { fetchManualSummary, indexManual } from "../lib/manualIndexer.js";
+import { buildIlikeOrClause, parsePaging } from "../lib/queryHelpers.js";
 
 const router = Router();
 
 const MAX_FILE_BYTES = 50 * 1024 * 1024;
+
+// คลังคู่มือกำลังจะมี ~26 เล่มขึ้นไปเรื่อย ๆ ตามที่อัปโหลดเพิ่ม — list เดิมไม่มี
+// limit/offset เลยและจะกลายเป็น query ไม่จำกัดขนาดเมื่อคลังโตขึ้น ใช้แพทเทิร์นเดียวกับ
+// spare-parts/machines: limit/offset + exact count + { data, meta }
+const MANUALS_PAGING_DEFAULTS = { defaultLimit: 20, maxLimit: 100 };
 
 const MANUAL_ADMIN_ROLES = ["engineer", "supervisor"] as const;
 const MANUAL_ADMIN_MESSAGE = "เฉพาะวิศวกรและหัวหน้างานเท่านั้นที่สามารถจัดการคลังคู่มือได้";
@@ -29,18 +35,31 @@ const FILE_PATH_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 
 router.get(
   "/",
-  asyncHandler(async (_req, res) => {
+  asyncHandler(async (req, res) => {
+    const { limit, offset } = parsePaging(req.query as Record<string, unknown>, MANUALS_PAGING_DEFAULTS);
+
+    let query = supabase.from("manuals").select(MANUAL_LIST_COLUMNS, { count: "exact" });
+
+    // ค้นหาที่ server ครอบคลุมคู่มือทั้งคลัง (เหมือน spare-parts) แทนการกรองแค่ใน
+    // batch ที่โหลดมาแล้วฝั่ง client — ครอบคลุมชื่อคู่มือและรุ่นเครื่องจักร
+    const search = typeof req.query.search === "string" ? req.query.search.trim() : "";
+    if (search) {
+      query = query.or(buildIlikeOrClause(["title", "machine_model"], search));
+    }
+
+    const machineModel = typeof req.query.machineModel === "string" ? req.query.machineModel.trim() : "";
+    if (machineModel) query = query.eq("machine_model", machineModel);
+
     // เรียงผลลัพธ์ให้ deterministic เสมอ (group ตามรุ่นเครื่อง แล้วตามชื่อคู่มือ)
     // เพราะ heap order ของ PostgREST ไม่คงที่ข้ามการ PATCH/reload และจะทำให้กริดการ์ด
     // สลับตำแหน่งโดยไม่มีเหตุผลให้ผู้ใช้เห็น
-    const { data, error } = await supabase
-      .from("manuals")
-      .select(MANUAL_LIST_COLUMNS)
+    const { data, error, count } = await query
       .order("machine_model", { ascending: true, nullsFirst: false })
-      .order("title", { ascending: true });
+      .order("title", { ascending: true })
+      .range(offset, offset + limit - 1);
     if (error) throw new ApiError(500, error.message);
 
-    sendSuccess(res, (data as ManualRow[]).map(mapManual));
+    sendPaginated(res, (data as ManualRow[]).map(mapManual), { total: count ?? 0, limit, offset });
   })
 );
 

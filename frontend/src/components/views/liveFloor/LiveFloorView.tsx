@@ -434,10 +434,22 @@ export default function LiveFloorView({
    * cannot collapse the box. Declared on this element — the shared ancestor of
    * both the canvas and the HUD — so the HUD panels' `backdrop-blur` still
    * samples the 3D scene behind them.
+   *
+   * Height: this view replaces the entire classic dashboard body (KPI cards,
+   * charts, registry) when active — SupervisorDashboardView renders nothing
+   * else below it in `floor4d` mode — so instead of a fixed `68vh` guess that
+   * left a lot of unused white space under it on tall screens, it fills the
+   * viewport down to its own top offset. That offset is the sum of the app
+   * shell's sticky header (`h-14` = 56px, see App.tsx), the page's own
+   * top+bottom padding (`p-4 md:p-8` = 32px/64px), the mode-switch header row
+   * above this view (~60px including its bottom border), and the `space-y-6`
+   * gap before this element (24px) — ~236px on desktop, a bit less on mobile
+   * where the calc simply leaves a little more slack. `min-h` keeps a 1366x768
+   * laptop (768 - 236 = 532px) usable without the container collapsing.
    */
   const containerClassName = isFullscreen
     ? "fixed inset-0 z-50 h-screen rounded-none overflow-hidden bg-[var(--lf-bg)] border border-[var(--lf-border)] [container-type:size]"
-    : "relative w-full h-[68vh] min-h-[520px] overflow-hidden rounded-[18px] border border-[var(--lf-border)] bg-[var(--lf-bg)] [container-type:size]";
+    : "relative w-full h-[calc(100vh-236px)] min-h-[560px] overflow-hidden rounded-[18px] border border-[var(--lf-border)] bg-[var(--lf-bg)] [container-type:size]";
 
   return (
     <div

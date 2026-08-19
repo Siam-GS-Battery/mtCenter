@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactElement } from "react";
+import { memo, useEffect, useMemo, useState, type ReactElement } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   ArrowLeft,
@@ -134,7 +134,31 @@ function useFadeAfter(delayMs: number): boolean {
   return visible;
 }
 
-export default function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
+/**
+ * Leaf node that owns the 1Hz clock tick itself, so re-rendering it every
+ * second no longer forces a reconciliation of the whole HUD tree (which sits
+ * alongside a heavy 3D canvas and a 2Hz simulation snapshot). Markup and Thai
+ * formatting are byte-identical to the inline block this replaced.
+ */
+const FloorClock = memo(function FloorClock(): ReactElement {
+  const now = useNow();
+  return (
+    <div className="hidden @min-[1088px]:block shrink-0 border-l border-[var(--lf-panel-border)] pl-3 ml-1 text-right">
+      <div className="text-[11px] font-mono tabular-nums tracking-wide">
+        {now.toLocaleTimeString("th-TH", { hour12: false })}
+      </div>
+      <div className="text-[9px] text-[var(--lf-text-muted)] leading-tight">
+        {now.toLocaleDateString("th-TH", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })}
+      </div>
+    </div>
+  );
+});
+
+function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
   const {
     machines,
     workOrders,
@@ -158,7 +182,6 @@ export default function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
     onFocusBuilding,
   } = props;
 
-  const now = useNow();
   const hintVisible = useFadeAfter(8000);
 
   const totalMachines = machines.length;
@@ -230,7 +253,7 @@ export default function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
           the KPI strip is pushed to the bottom by `mt-auto` whenever there is
           slack, which reproduces the previous bottom-left placement. */}
       <div
-        className={`hidden @min-[640px]:flex absolute top-4 left-4 bottom-4 z-10 w-64 max-w-[calc(100%-2rem)] flex-col gap-3 pointer-events-none overflow-y-auto overflow-x-hidden overscroll-contain ${HIDE_SCROLLBAR_CLASS}`}
+        className={`hidden @min-[640px]:flex absolute top-4 left-4 bottom-4 z-10 w-64 max-w-[calc(100%-2rem)] flex-col gap-3 pointer-events-none overflow-y-auto overflow-x-hidden overscroll-contain min-h-0 ${HIDE_SCROLLBAR_CLASS}`}
       >
         {/* overview / status filters — natural height, never shrinks */}
         <div
@@ -644,19 +667,10 @@ export default function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
             </div>
           </div>
           {/* clock — only once the container is wide enough that the bar's own
-              lane can hold it without truncating the branding line */}
-          <div className="hidden @min-[1088px]:block shrink-0 border-l border-[var(--lf-panel-border)] pl-3 ml-1 text-right">
-            <div className="text-[11px] font-mono tabular-nums tracking-wide">
-              {now.toLocaleTimeString("th-TH", { hour12: false })}
-            </div>
-            <div className="text-[9px] text-[var(--lf-text-muted)] leading-tight">
-              {now.toLocaleDateString("th-TH", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
-            </div>
-          </div>
+              lane can hold it without truncating the branding line. Owns its
+              own 1Hz tick (see `FloorClock`) so this timer no longer
+              re-renders the whole HUD tree every second. */}
+          <FloorClock />
         </div>
       </div>
 
@@ -926,3 +940,14 @@ export default function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
     </div>
   );
 }
+
+/**
+ * Memoized so a parent re-render that leaves every prop reference unchanged
+ * (e.g. an unrelated sibling state update) skips reconciling this whole
+ * heavy tree. Most props are event-handler callbacks and arrays that the
+ * caller only recreates when their underlying data actually changes, so the
+ * default shallow-prop comparator is safe here; `simSnapshot` legitimately
+ * changes every simulation tick and will still trigger a re-render then, as
+ * intended.
+ */
+export default memo(LiveFloorHUD);

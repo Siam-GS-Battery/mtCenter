@@ -9,7 +9,15 @@ import {
   type ReactElement,
 } from "react";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, Html, Grid, ContactShadows, RoundedBox } from "@react-three/drei";
+import {
+  OrbitControls,
+  Html,
+  Grid,
+  ContactShadows,
+  RoundedBox,
+  AdaptiveDpr,
+  AdaptiveEvents,
+} from "@react-three/drei";
 import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { buildFloorLayout, ARCHETYPE_LABELS } from "../../../lib/floorLayout";
@@ -1383,6 +1391,13 @@ function MachineInstancesInner({
 }: MachineInstancesProps) {
   const registryRef = useRef<MeshRegistry>({ meshes: new Map() });
   const animRef = useRef<FloorAnim | null>(null);
+  // FPS cap for the per-machine animation walk (~973 machines x 7 parts is not
+  // free): accumulate real delta and only run the full update once the
+  // budgeted interval has elapsed. `hasRunRef` forces the very first frame
+  // through unconditionally so every machine gets a matrix write on mount.
+  const frameAccRef = useRef(0);
+  const hasRunRef = useRef(false);
+  const decimateTickRef = useRef(0);
 
   // -- group slots by archetype, once ---------------------------------------
   const grouped = useMemo(() => {
@@ -1501,11 +1516,25 @@ function MachineInstancesInner({
   }, [ordered, grouped, count, statusFilter, simulation, lite]);
 
   // -- the single animation loop for every machine on the floor -------------
-  useFrame((state, delta) => {
+  useFrame((state, rawDelta) => {
     const anim = animRef.current;
     if (!anim) return;
     const n = anim.count;
     if (n === 0) return;
+
+    // FPS cap: skip the whole walk until the budgeted interval has elapsed.
+    // `lite` (auto-forced once machines.length > 250, i.e. our ~973-machine
+    // floor) caps at 30 Hz; the full-quality path caps at 60 Hz — both well
+    // above what the eye needs for these slow mechanical animations, and far
+    // cheaper than running every render frame.
+    frameAccRef.current += rawDelta;
+    const interval = lite ? 1 / 30 : 1 / 60;
+    if (hasRunRef.current && frameAccRef.current < interval) return;
+    const delta = frameAccRef.current;
+    frameAccRef.current = 0;
+    hasRunRef.current = true;
+    decimateTickRef.current = (decimateTickRef.current + 1) % 4;
+    const decimateTick = decimateTickRef.current;
 
     const meshes = registryRef.current.meshes;
     const t = state.clock.elapsedTime;
@@ -1629,6 +1658,14 @@ function MachineInstancesInner({
       // `vis` scales every accent's lerp position, so a filtered machine's
       // animated parts stay at their pale base colour instead of darkening.
       const vis = 1 - anim.fade[i];
+
+      // Cheap decimation: a machine that is already faded out (filtered by
+      // status) is barely visible, so its moving parts only need refreshing
+      // on every 4th executed tick rather than every one. Its beacon/base
+      // placement was already written once by the layout effect, so skipping
+      // frames here never leaves a part unplaced.
+      if (vis < 0.5 && (i & 3) !== decimateTick) continue;
+
       const li = anim.local[i];
       const cx = anim.cos[i];
       const sz = anim.sin[i];
@@ -2948,12 +2985,17 @@ export default function LiveFloor4DScene(props: LiveFloor4DSceneProps): ReactEle
   // would simply undo that.
   const gl = useMemo(
     () => ({
-      antialias: highQuality !== false,
+      // `lite` already folds in `highQuality === false`, so `!lite` alone
+      // implies highQuality wasn't explicitly turned off — no need to repeat
+      // the check (and TS's aliased-condition narrowing flags it as redundant).
+      antialias: !lite,
       powerPreference: "high-performance" as const,
+      stencil: false,
+      depth: true,
       toneMapping: THREE.NeutralToneMapping,
       toneMappingExposure: 1,
     }),
-    [highQuality]
+    [lite, highQuality]
   );
   const dpr = useMemo<[number, number]>(() => [1, lite ? 1.25 : 2], [lite]);
 
@@ -2981,6 +3023,11 @@ export default function LiveFloor4DScene(props: LiveFloor4DSceneProps): ReactEle
         onContextLost={onContextLost}
         onContextRestored={onContextRestored}
       />
+      {/* Drops resolution/event sampling while the camera is moving so the
+          ~973-machine floor doesn't have to redo full-res raster + hit-testing
+          mid-orbit; both restore automatically once the camera settles. */}
+      <AdaptiveDpr pixelated={false} />
+      <AdaptiveEvents />
       <SceneContents {...props} lite={lite} />
     </Canvas>
   );

@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Zap,
   QrCode,
   Bot,
   FileText,
@@ -20,6 +19,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { UserProfile, UserRole } from "../types";
+import PixelAILogo from "./PixelAILogo";
 
 const ROLE_LABELS: Record<UserRole, string> = {
   technician: "ช่างเทคนิค",
@@ -153,7 +153,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* 1. Brand block — bolt icon + "MT Center" */}
         <div className="h-14 flex items-center px-5 border-b border-white/10 shrink-0 bg-nav-black">
           <div className="flex items-center gap-2 overflow-hidden">
-            <Zap className="w-5 h-5 text-white shrink-0 fill-white" />
+            <PixelAILogo className="w-6 h-6 text-white shrink-0" />
             {(!isCollapsed || isMobileDrawerOpen) && (
               <span className="text-[15px] font-semibold text-white tracking-tight whitespace-nowrap">
                 MT Center

@@ -23,6 +23,7 @@ import {
   ThumbsDown,
 } from "lucide-react";
 import { Machine, UserRole, ChatMessage } from "../../types";
+import PixelAILogo from "../PixelAILogo";
 import { MicDictationButton } from "../MicDictationButton";
 import { aiChat, aiFeedback, type AiMode } from "../../services/apiService";
 import {
@@ -409,7 +410,7 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
             <div
               className={`rounded-full bg-primary/10 flex items-center justify-center mb-4 ${isPage ? "w-16 h-16" : "w-14 h-14"}`}
             >
-              <Sparkles className={isPage ? "w-8 h-8 text-primary" : "w-6 h-6 text-primary"} />
+              <PixelAILogo className={isPage ? "w-9 h-9 text-primary" : "w-7 h-7 text-primary"} />
             </div>
             <h3 className={`font-semibold text-ink ${isPage ? "text-lg" : "text-base"}`}>
               สวัสดีครับ
@@ -465,7 +466,7 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
                   <div
                     className={`rounded-full bg-primary text-white flex items-center justify-center shrink-0 ${isPage ? "w-8 h-8" : "w-7 h-7"}`}
                   >
-                    <Sparkles className={isPage ? "w-4 h-4" : "w-3.5 h-3.5"} />
+                    <PixelAILogo className={isPage ? "w-5 h-5" : "w-4 h-4"} />
                   </div>
 
                   <div className="min-w-0 flex-1">
@@ -680,7 +681,7 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
                 <div
                   className={`rounded-full bg-primary text-white flex items-center justify-center shrink-0 ${isPage ? "w-8 h-8" : "w-7 h-7"}`}
                 >
-                  <Sparkles className={isPage ? "w-4 h-4" : "w-3.5 h-3.5"} />
+                  <PixelAILogo className={isPage ? "w-5 h-5" : "w-4 h-4"} />
                 </div>
                 <div className="flex items-center gap-2 text-ink-muted text-sm">
                   <span className="flex items-center gap-1">

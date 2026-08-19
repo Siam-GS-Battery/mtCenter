@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import { Sparkles, RotateCcw, X, Maximize2, Cpu } from "lucide-react";
+import { RotateCcw, X, Maximize2, Cpu } from "lucide-react";
+import PixelAILogo from "./PixelAILogo";
 import { Machine, UserRole } from "../types";
 import {
   AssistantConversation,
@@ -80,7 +81,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
         <div className="px-4 py-3 bg-white border-b border-hairline flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white shrink-0">
-              <Sparkles className="w-4 h-4" />
+              <PixelAILogo className="w-5 h-5" />
             </div>
             <div className="min-w-0">
               <h3 className="text-sm font-semibold text-ink truncate">MT Center AI</h3>

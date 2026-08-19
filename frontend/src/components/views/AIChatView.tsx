@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Sparkles, RotateCcw, History, X } from "lucide-react";
+import { RotateCcw, History, X } from "lucide-react";
+import PixelAILogo from "../PixelAILogo";
 import { Machine, UserRole } from "../../types";
 import { getAiMode } from "../../services/apiService";
 import {
@@ -171,7 +172,7 @@ export const AIChatView: React.FC<AIChatViewProps> = ({
         <div className="flex items-center justify-between gap-3 py-4 shrink-0">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shrink-0">
-              <Sparkles className="w-4.5 h-4.5" />
+              <PixelAILogo className="w-5 h-5" />
             </div>
             <div className="min-w-0">
               <h2 className="font-semibold text-ink text-sm truncate">MT Center AI</h2>

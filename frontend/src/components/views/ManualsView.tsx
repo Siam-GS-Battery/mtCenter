@@ -29,6 +29,7 @@ import {
 } from "../../services/apiService";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "../ui/Modal";
 import { Pagination } from "../ui/Pagination";
+import { SkeletonCardGrid } from "../ui/Skeleton";
 import { MANUAL_CATEGORIES, CUSTOM_MODEL_OPTION } from "../../lib/manualCategories";
 import { detectTocPages } from "../../lib/manualToc";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";
@@ -633,10 +634,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
 
       {/* Manuals List Cards */}
       {manualsLoading && manuals.length === 0 && !manualsLoadError ? (
-        <div className="bg-white rounded-[18px] border border-hairline p-10 text-center space-y-3">
-          <Loader2 className="w-8 h-8 text-primary mx-auto animate-spin" />
-          <p className="text-[13px] text-ink-muted">กำลังโหลดคลังคู่มือ...</p>
-        </div>
+        <SkeletonCardGrid count={6} />
       ) : manualsTotal === 0 && !manualsLoadError ? (
         <div className="bg-white rounded-[18px] border border-hairline p-10 text-center space-y-2">
           <BookOpen className="w-10 h-10 text-ink-muted mx-auto" />

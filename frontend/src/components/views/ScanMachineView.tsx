@@ -45,6 +45,7 @@ import {
 } from "../../lib/format";
 import { getWorkOrders, toUserMessage } from "../../services/apiService";
 import { Pagination } from "../ui/Pagination";
+import { SkeletonList } from "../ui/Skeleton";
 import { GloveFriendlyCTA } from "../GloveFriendlyCTA";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "../ui/Modal";
 import { useQrScanner } from "../../hooks/useQrScanner";
@@ -1292,10 +1293,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
 
             <div className="max-h-96 overflow-y-auto pr-1 sm:pr-2 space-y-3 relative">
               {machineHistoryLoading && machineHistory.length === 0 && !machineHistoryError ? (
-                <div className="text-center py-10 space-y-2">
-                  <Loader2 className="w-6 h-6 text-primary mx-auto animate-spin" />
-                  <p className="text-xs text-ink-faint">กำลังโหลดประวัติการซ่อม...</p>
-                </div>
+                <SkeletonList count={5} />
               ) : machineHistory.length === 0 ? (
                 // 229 machines genuinely have no work order on record, and 3 have no
                 // code to look one up by. Both are a finished answer, not a failure —

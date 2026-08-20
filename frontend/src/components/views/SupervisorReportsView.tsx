@@ -21,6 +21,7 @@ import {
 } from "../../lib/pillStyles";
 import { getWorkOrders, getWorkOrderStats, toUserMessage } from "../../services/apiService";
 import { Pagination } from "../ui/Pagination";
+import { SkeletonStatCards, SkeletonTableRows, SkeletonList } from "../ui/Skeleton";
 
 interface SupervisorReportsViewProps {
   machines?: Machine[];
@@ -477,6 +478,9 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
       </div>
 
       {/* KPI Cards for Selected Month — computed only from the work orders in that month */}
+      {monthOrdersLoading && monthOrders.length === 0 ? (
+        <SkeletonStatCards count={4} />
+      ) : (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white p-4 rounded-[18px] border border-hairline">
           <span className="text-xs font-normal text-ink-faint block mb-1">ใบงานในเดือนนี้</span>
@@ -525,6 +529,7 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
           </div>
         </div>
       </div>
+      )}
 
       {/* Report Category Switcher */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4" role="tablist" aria-label="ประเภทรายงาน">
@@ -608,7 +613,9 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-divider">
-                  {pagedSummaryOrders.length > 0 ? (
+                  {monthOrdersLoading && pagedSummaryOrders.length === 0 ? (
+                    <SkeletonTableRows rows={8} cols={7} />
+                  ) : pagedSummaryOrders.length > 0 ? (
                     pagedSummaryOrders.map((wo) => (
                       <tr key={wo.id} className="hover:bg-parchment/80 transition-colors">
                         <td className="p-3 font-mono text-ink-muted">{wo.assignedDate || "—"}</td>
@@ -640,7 +647,11 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
 
             {/* Card list for mobile */}
             <div className="md:hidden rounded-[11px] border border-hairline overflow-hidden">
-              {pagedSummaryOrders.length > 0 ? (
+              {monthOrdersLoading && pagedSummaryOrders.length === 0 ? (
+                <div className="p-4">
+                  <SkeletonList count={5} />
+                </div>
+              ) : pagedSummaryOrders.length > 0 ? (
                 <div className="divide-y divide-divider">
                   {pagedSummaryOrders.map((wo) => (
                     <div key={wo.id} className="p-4 space-y-2.5">
@@ -702,7 +713,9 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-divider">
-                {priorityRows.length > 0 ? (
+                {monthOrdersLoading && priorityRows.length === 0 ? (
+                  <SkeletonTableRows rows={4} cols={4} />
+                ) : priorityRows.length > 0 ? (
                   priorityRows.map((r) => (
                     <tr key={r.priority} className="hover:bg-parchment/80 transition-colors">
                       <td className="p-3">
@@ -752,7 +765,9 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-divider">
-                {techRows.length > 0 ? (
+                {monthOrdersLoading && techRows.length === 0 ? (
+                  <SkeletonTableRows rows={5} cols={4} />
+                ) : techRows.length > 0 ? (
                   techRows.map((t) => (
                     <tr key={t.technician} className="hover:bg-parchment/80 transition-colors">
                       <td className="p-3 font-semibold text-ink">

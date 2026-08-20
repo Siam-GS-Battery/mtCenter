@@ -32,6 +32,7 @@ import {
 import { getWorkOrders, getCurrentUserId, toUserMessage } from "../../services/apiService";
 import { Pagination } from "../ui/Pagination";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";
+import { SkeletonTableRows, SkeletonCardGrid } from "../ui/Skeleton";
 
 interface AllWorkOrdersViewProps {
   currentUserRole?: UserRole;
@@ -266,14 +267,11 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
   };
 
   // ระหว่างโหลดครั้งแรก (ยังไม่เคยได้ผลลัพธ์จาก server เลยสักครั้ง) ต้องแสดง
-  // สถานะกำลังโหลด ไม่ใช่ "ไม่มีใบงาน" ซึ่งเป็นข้อสรุปที่ยังพิสูจน์ไม่ได้
-  const emptyState =
-    isLoading && workOrders.length === 0 && total === 0 && !loadError ? (
-      <div className="p-10 text-center space-y-3">
-        <Loader2 className="w-8 h-8 text-primary mx-auto animate-spin" />
-        <p className="text-[13px] text-ink-muted">กำลังโหลดใบงานซ่อมบำรุง...</p>
-      </div>
-    ) : hasNoWorkOrdersAtAll ? (
+  // สถานะกำลังโหลดแบบ skeleton (ดู isInitialLoading ด้านล่าง) ไม่ใช่ "ไม่มีใบงาน"
+  // ซึ่งเป็นข้อสรุปที่ยังพิสูจน์ไม่ได้
+  const isInitialLoading = isLoading && workOrders.length === 0 && total === 0 && !loadError;
+
+  const emptyState = hasNoWorkOrdersAtAll ? (
       <div className="p-10 text-center space-y-3">
         <FileText className="w-10 h-10 text-ink-muted mx-auto" />
         <p className="text-sm font-semibold text-ink">ยังไม่มีใบงานในระบบ</p>
@@ -455,7 +453,8 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-divider text-[13px]">
-              {filteredOrders.map((wo) => {
+              {isInitialLoading && <SkeletonTableRows rows={8} cols={9} />}
+              {!isInitialLoading && filteredOrders.map((wo) => {
                 const due = dueState(wo);
                 const late = isOverdue(wo);
 
@@ -509,11 +508,17 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
               })}
             </tbody>
           </table>
-          {filteredOrders.length === 0 && emptyState}
+          {!isInitialLoading && filteredOrders.length === 0 && emptyState}
         </div>
 
         {/* Card list for mobile */}
         <div className="md:hidden">
+          {isInitialLoading ? (
+            <div className="p-4">
+              <SkeletonCardGrid count={4} />
+            </div>
+          ) : (
+          <>
           <div className="flex items-center justify-between px-4 py-3 border-b border-hairline bg-parchment">
             <span className="text-xs font-semibold text-ink-muted">
               {filteredOrders.length} ใบงาน
@@ -580,6 +585,8 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
                 );
               })}
             </ul>
+          )}
+          </>
           )}
         </div>
       </div>

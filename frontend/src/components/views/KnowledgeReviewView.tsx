@@ -37,6 +37,7 @@ import {
 } from "../../services/apiService";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "../ui/Modal";
 import { Pagination } from "../ui/Pagination";
+import { SkeletonList } from "../ui/Skeleton";
 import { notifySaving, dismissSaving, notifyDone, notifyFailed } from "../../lib/swal";
 
 // จำนวนใบงานต่อหน้าในคิวรีวิว — ต้องตรงกับ default limit ของ backend
@@ -219,7 +220,9 @@ export const KnowledgeReviewView: React.FC<KnowledgeReviewViewProps> = ({ curren
         </div>
       )}
 
-      {isLoading && (
+      {isLoading && items.length === 0 && !loadError && <SkeletonList count={5} />}
+
+      {isLoading && items.length > 0 && (
         <div className="flex items-center gap-2 text-sm text-ink-muted py-8 justify-center">
           <Loader2 className="w-4 h-4 animate-spin" />
           <span>กำลังโหลดรายการ...</span>

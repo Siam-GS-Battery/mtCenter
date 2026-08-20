@@ -16,6 +16,7 @@ import { Pagination } from "../ui/Pagination";
 import { MACHINE_STATUS_LABELS, machineStatusLabel, machineStatusBadgeClass } from "../../lib/pillStyles";
 import { NO_DATA } from "../../lib/format";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";
+import { SkeletonTable, SkeletonCardGrid } from "../ui/Skeleton";
 
 // จำนวนรายการต่อหน้าของตาราง/การ์ดจัดการเครื่องจักร
 const PAGE_SIZE = 50;
@@ -460,10 +461,12 @@ export default function MachineAdminView({ actorId, onCreated, onUpdated, onDele
 
       {/* Empty state */}
       {isLoading && machines.length === 0 && !loadError ? (
-        <div className="bg-white rounded-[18px] border border-hairline p-10 text-center space-y-3">
-          <Loader2 className="w-8 h-8 text-primary mx-auto animate-spin" />
-          <p className="text-[13px] text-ink-muted">กำลังโหลดข้อมูลเครื่องจักร...</p>
-        </div>
+        <>
+          {/* Desktop table skeleton */}
+          <SkeletonTable rows={8} cols={7} className="hidden md:block" />
+          {/* Mobile card skeleton */}
+          <SkeletonCardGrid count={4} className="md:hidden grid-cols-1" />
+        </>
       ) : machines.length === 0 && !loadError ? (
         <div className="bg-white rounded-[18px] border border-hairline p-10 text-center space-y-2">
           <Cog className="w-10 h-10 text-ink-faint mx-auto" />

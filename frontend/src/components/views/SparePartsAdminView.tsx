@@ -30,6 +30,7 @@ import { Modal, ModalHeader, ModalBody, ModalFooter } from "../ui/Modal";
 import { Pagination } from "../ui/Pagination";
 import { sparePartStatusPillClass } from "../../lib/pillStyles";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";
+import { SkeletonTable, SkeletonCardGrid } from "../ui/Skeleton";
 
 // จำนวนรายการต่อหน้าของตาราง/การ์ดจัดการอะไหล่
 const PAGE_SIZE = 50;
@@ -641,10 +642,12 @@ export default function SparePartsAdminView(props: SparePartsAdminViewProps) {
 
       {/* Empty state */}
       {isLoading && spareParts.length === 0 && !loadError ? (
-        <div className="bg-white rounded-[18px] border border-hairline p-10 text-center space-y-3">
-          <Loader2 className="w-8 h-8 text-primary mx-auto animate-spin" />
-          <p className="text-[13px] text-ink-muted">กำลังโหลดคลังอะไหล่...</p>
-        </div>
+        <>
+          {/* Desktop table skeleton */}
+          <SkeletonTable rows={8} cols={8} className="hidden md:block" />
+          {/* Mobile card skeleton */}
+          <SkeletonCardGrid count={4} className="md:hidden grid-cols-1" />
+        </>
       ) : filteredParts.length === 0 && !loadError ? (
         <div className="bg-white rounded-[18px] border border-hairline p-10 text-center space-y-2">
           <Package className="w-10 h-10 text-ink-faint mx-auto" />

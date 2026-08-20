@@ -1595,6 +1595,42 @@ export function buildFloorLayout(machines: Machine[]): FloorLayout {
     if (placed) parkingPlaced += 1;
   }
 
+  // warehouse: ลังสินค้าทั้งหมดรวมเป็นคลัสเตอร์เดียว (เดิมกระจายอยู่ปลายไลน์ในโรง
+  // ซึ่งทับทางเดินหลักของ AGV ที่ปลายไลน์พอดี — ย้ายออกมารวมกันเป็นลานพักสินค้า
+  // จุดเดียวกลางแจ้งในแถบ APRON_GAP ที่ไม่มีถนน/อาคาร/ทางเดิน AGV ผ่าน และเสียบ
+  // ก่อนต้นไม้ริมลาน (apron tree) เพื่อให้คลัสเตอร์นี้ได้พื้นที่แน่นอนก่อน)
+  {
+    const cols = 3;
+    const rows = 2;
+    const spacing = 1.8;
+    const footprint = (cols - 1) * spacing + 1.6;
+    const whX = Math.min(
+      Math.max(contentWidth - footprint, footprint / 2),
+      contentWidth - footprint / 2
+    );
+    const whZ = apronTopZ + APRON_MARGIN + YARD_DEPTH + APRON_GAP / 2;
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const idx = row * cols + col;
+        const size = 1.2 + (hashString(`warehouse|${idx}|size`) % 4) * 0.1;
+        const stack = 1 + (hashString(`warehouse|${idx}|stack`) % 3);
+        tryPush(
+          {
+            id: `CRATE_WH_${idx}`,
+            kind: "crate",
+            x: whX + col * spacing,
+            z: whZ + (row - (rows - 1) / 2) * spacing,
+            rotationY: 0,
+            width: size,
+            depth: size,
+            height: size * stack,
+          },
+          { avoidBuildings: true, avoidRoads: true }
+        );
+      }
+    }
+  }
+
   // officeBlock: อาคารสำนักงาน (ของประดับฉากล้วนๆ) วางข้างแนวแกนประตูฝั่งที่มีที่ว่างมากกว่า
   // พร้อมลานพลาซ่าคั่นระหว่างตัวอาคารกับถนนทางเข้า และเสาธง/แนวรั้วต้นไม้รอบลาน
   {
@@ -1834,28 +1870,6 @@ export function buildFloorLayout(machines: Machine[]): FloorLayout {
     }
   }
 
-  // crate: ลังสินค้า 2–3 กองที่ปลายไลน์ (จำนวนคงที่ต่อไลน์จากแฮช id)
-  const crateCandidates: FloorProp[] = [];
-  for (const line of lines) {
-    const stacks = 2 + (hashString(line.id) % 2);
-    for (let i = 0; i < stacks; i++) {
-      const atEnd = i < 2;
-      const x = atEnd ? line.x2 + 1.4 : line.x1 - 1.4;
-      const z = line.z1 + (i % 2 === 0 ? -1.3 : 1.3);
-      const size = 1.2 + ((hashString(`${line.id}|${i}`) % 4) * 0.1);
-      crateCandidates.push({
-        id: `CRATE_${line.id}_${i}`,
-        kind: "crate",
-        x,
-        z,
-        rotationY: 0,
-        width: size,
-        depth: size,
-        height: size * (1 + (hashString(`${line.id}|h${i}`) % 3) * 0.4),
-      });
-    }
-  }
-
   // pillar: เสาโครงสร้างบนตะแกรงทุก ~12 ม. ภายในอาคารแต่ละหลัง
   // ข้ามจุดที่ทับสายพาน (ตัวเครื่องถูกกันด้วย machineIndex ใน tryPush อยู่แล้ว)
   const spineRects: Rect[] = lines.map((line) => ({
@@ -1921,17 +1935,12 @@ export function buildFloorLayout(machines: Machine[]): FloorLayout {
     }
   }
 
-  // ---- เพดานจำนวน prop: บาง tree → crate → pillar → lightPole ตามลำดับ -------
+  // ---- เพดานจำนวน prop: บาง tree → pillar → lightPole ตามลำดับ -------
   const budget = Math.max(0, PROP_CAP - fixedPropCount);
   const treeBudget = Math.min(treeCandidates.length, Math.round(budget * 0.28));
   for (const tree of thin(treeCandidates, treeBudget)) {
     tryPush(tree, { avoidBuildings: true, avoidRoads: true });
   }
-  const crateBudget = Math.min(
-    crateCandidates.length,
-    Math.round(Math.max(0, PROP_CAP - props.length) * 0.55)
-  );
-  for (const crate of thin(crateCandidates, crateBudget)) tryPush(crate);
   const pillarBudget = Math.max(
     0,
     Math.round(Math.max(0, PROP_CAP - props.length) * 0.7)

@@ -37,6 +37,19 @@ import { FacilityShell, ConveyorSystem, FloorTraffic } from "./LiveFloorFacility
 import InspectorRobot from "./InspectorRobot";
 import { LIVE_FLOOR_THEME, statusColor } from "./liveFloorTheme";
 import type { Machine, MachineStatus } from "../../../types";
+import {
+  basePlate,
+  ventGrille,
+  motorBlock,
+  pipeRun,
+  hopperCone,
+  rollerRow,
+  guardRail,
+  ladderRungs,
+  jointSphere,
+  controlConsole,
+  taperedLink,
+} from "./machineParts";
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -571,10 +584,10 @@ const ARCHETYPE_CODE: Record<MachineArchetype, number> = {
 
 const ARCHETYPE_SET = new Set<string>(ARCHETYPE_ORDER);
 
-type PartMaterialKind = "steel" | "dark" | "metal" | "flat" | "glow";
-type PartGeometryKind = "box" | "cyl" | "sphere" | "torus";
+export type PartMaterialKind = "steel" | "dark" | "metal" | "flat" | "glow";
+export type PartGeometryKind = "box" | "cyl" | "sphere" | "torus";
 
-interface PartSpec {
+export interface PartSpec {
   id: string;
   geom: PartGeometryKind;
   /** raw geometry args; unit-sized for parts that carry their size in the matrix scale */
@@ -594,6 +607,225 @@ interface PartSpec {
 
 const UNIT_BOX: readonly number[] = [1, 1, 1];
 
+// ---------------------------------------------------------------------------
+// Reusable "greeble" kits, built ONCE at module scope from machineParts.ts
+// helpers — never per machine, never per frame. Each kit's `.spec` (or
+// `[.spec, .spec]` for two-part kits) goes straight into ARCHETYPE_PARTS
+// below; its `.placement` / `.placements` fractions are read directly in the
+// archetype switch further down, multiplied by that machine's own w/h/d
+// exactly like every existing literal fraction in this file (e.g.
+// `w * PRESS_STROKE`). See machineParts.ts's file header for the full
+// fraction-of-footprint contract these numbers follow.
+// ---------------------------------------------------------------------------
+
+const [CNC_CONSOLE_HOUSING, CNC_CONSOLE_SCREEN] = controlConsole({
+  id: "console",
+  widthFrac: 0.2,
+  heightFrac: 0.5,
+  depthFrac: 0.3,
+  tiltRad: 0.3,
+  xFrac: 0.53,
+  yFrac: 0.36,
+  zFrac: 0.2,
+});
+const CNC_VENT = ventGrille({
+  id: "vent",
+  widthFrac: 0.5,
+  heightFrac: 0.3,
+  depthFrac: 0.02,
+  xFrac: 0,
+  yFrac: 0.75,
+  zFrac: -0.48,
+});
+const CNC_BASE = basePlate({ id: "base" });
+
+const PRESS_HYD_L = pipeRun({
+  id: "hydraulic",
+  axis: "y",
+  radiusFrac: 0.035,
+  lengthFrac: 0.7,
+  xFrac: -0.3,
+  yFrac: 0.55,
+  zFrac: -0.28,
+});
+const PRESS_HYD_R = pipeRun({
+  id: "hydraulic",
+  axis: "y",
+  radiusFrac: 0.035,
+  lengthFrac: 0.7,
+  xFrac: 0.3,
+  yFrac: 0.55,
+  zFrac: -0.28,
+});
+// Same spec (both tubes render off one InstancedMesh); one copy per tube.
+const PRESS_HYDRAULIC_SPEC: PartSpec = { ...PRESS_HYD_L.spec, copies: 2 };
+
+const [FURNACE_BURNER_HOUSING, FURNACE_BURNER_SHAFT] = motorBlock({
+  id: "burner",
+  bodyWidthFrac: 0.18,
+  bodyHeightFrac: 0.16,
+  bodyDepthFrac: 0.18,
+  xFrac: 0.49,
+  yFrac: 0.3,
+  zFrac: 0,
+  axis: "x",
+});
+const FURNACE_BASE = basePlate({ id: "furnaceBase" });
+
+const ASSEMBLY_HOPPER = hopperCone({
+  id: "hopper",
+  topRadiusFrac: 0.14,
+  taperRatio: 0.3,
+  heightFrac: 0.22,
+  xFrac: -0.38,
+  yFrac: 0.68,
+  zFrac: 0.36,
+});
+const ASSEMBLY_GUARDRAIL = guardRail({
+  id: "guardRail",
+  widthFrac: 0.86,
+  heightFrac: 0.1,
+  thicknessFrac: 0.02,
+  yFrac: 0.05,
+  edgeFrac: 0.46,
+});
+const ASSEMBLY_PEGS_SPEC: PartSpec = {
+  id: "peg",
+  geom: "cyl",
+  args: [1, 1, 1, 8],
+  mat: "dark",
+  copies: 2,
+  liteDrop: true,
+};
+const ASSEMBLY_PEG_PLACEMENTS = [
+  { x: -0.25, y: 0.98, z: -0.34, sx: 0.02, sy: 0.14, sz: 0.02 },
+  { x: 0.25, y: 0.98, z: -0.34, sx: 0.02, sy: 0.14, sz: 0.02 },
+] as const;
+
+// Tapered links replace the plain box lower/upper arm segments — the arm
+// sweep animator (case 4 below) drives their matrices directly every frame,
+// exactly as it already did for the box versions; only the geometry changed.
+const ROBOT_LOWER_LINK = taperedLink({ id: "lower", farRadiusRatio: 0.85, mat: "metal", animated: true });
+const ROBOT_UPPER_LINK = taperedLink({ id: "upper", farRadiusRatio: 0.88, mat: "metal", animated: true });
+const ROBOT_GRIPPER_SPEC = taperedLink({
+  id: "gripper",
+  farRadiusRatio: 0.3,
+  mat: "dark",
+  animated: true,
+  liteDrop: true,
+  segments: 6,
+});
+// yFrac hand-written as ROBOT_PED_H's literal (0.32) — that const is declared
+// further down with the other shape factors, after this kit block runs.
+// Shoulder/elbow joint spheres are what sell the articulated-arm silhouette
+// and are extremely cheap (one InstancedMesh per part shared across all
+// robot machines, 12x10 segments) — they must survive lite mode, unlike the
+// gripper/pedestal skirt greebles below.
+const ROBOT_SHOULDER = jointSphere({ id: "shoulderJoint", radiusFrac: 0.1, yFrac: 0.32, mat: "dark" });
+const ROBOT_ELBOW_SPEC = jointSphere({
+  id: "elbowJoint",
+  radiusFrac: 0.09,
+  mat: "dark",
+  animated: true,
+}).spec;
+const ROBOT_PEDESTAL_SKIRT: PartSpec = {
+  id: "pedestalSkirt",
+  geom: "torus",
+  args: [1, 0.28, 6, 10],
+  mat: "dark",
+  liteDrop: true,
+};
+
+const TANK_LID = hopperCone({
+  id: "lid",
+  topRadiusFrac: 0.32,
+  taperRatio: 0.15,
+  heightFrac: 0.16,
+  xFrac: 0,
+  yFrac: 0.94,
+  zFrac: 0,
+});
+const TANK_LADDER = ladderRungs({
+  id: "ladderRung",
+  rungCount: 4,
+  widthFrac: 0.16,
+  thicknessFrac: 0.02,
+  spanFrac: 0.5,
+  startYFrac: 0.15,
+  xFrac: 0.44,
+  zFrac: 0.44,
+});
+const TANK_INLET = pipeRun({
+  id: "inlet",
+  axis: "x",
+  radiusFrac: 0.045,
+  lengthFrac: 0.2,
+  xFrac: 0.45,
+  yFrac: 0.62,
+  zFrac: 0,
+});
+const TANK_LEGS_SPEC: PartSpec = {
+  id: "leg",
+  geom: "cyl",
+  args: [1, 1, 1, 8],
+  mat: "metal",
+  copies: 4,
+  liteDrop: true,
+};
+const TANK_LEG_PLACEMENTS = [
+  { x: -0.28, y: 0.06, z: -0.28, sx: 0.035, sy: 0.12, sz: 0.035 },
+  { x: 0.28, y: 0.06, z: -0.28, sx: 0.035, sy: 0.12, sz: 0.035 },
+  { x: -0.28, y: 0.06, z: 0.28, sx: 0.035, sy: 0.12, sz: 0.035 },
+  { x: 0.28, y: 0.06, z: 0.28, sx: 0.035, sy: 0.12, sz: 0.035 },
+] as const;
+
+const INSPECT_ROLLERS = rollerRow({
+  id: "topRoller",
+  count: 4,
+  radiusFrac: 0.04,
+  rollerLengthFrac: 0.7,
+  spanFrac: 0.6,
+  yFrac: 0.24,
+  zFrac: 0,
+});
+const [INSPECT_CONSOLE_HOUSING, INSPECT_CONSOLE_SCREEN] = controlConsole({
+  id: "postConsole",
+  widthFrac: 0.14,
+  heightFrac: 0.22,
+  depthFrac: 0.1,
+  tiltRad: 0.25,
+  xFrac: 0.42,
+  yFrac: 0.55,
+  zFrac: 0.12,
+});
+
+const PACK_ROLLERS = rollerRow({
+  id: "infeedRoller",
+  count: 4,
+  radiusFrac: 0.045,
+  rollerLengthFrac: 0.5,
+  spanFrac: 0.7,
+  yFrac: 0.1,
+  zFrac: -0.4,
+});
+const PACK_GUARDRAIL = guardRail({
+  id: "guardRail",
+  widthFrac: 0.9,
+  heightFrac: 0.14,
+  thicknessFrac: 0.02,
+  yFrac: 0.07,
+  edgeFrac: 0.46,
+});
+const PACK_HOPPER = hopperCone({
+  id: "hopper",
+  topRadiusFrac: 0.16,
+  taperRatio: 0.32,
+  heightFrac: 0.2,
+  xFrac: -0.34,
+  yFrac: 0.95,
+  zFrac: 0.02,
+});
+
 /**
  * Per-archetype part kits. Every machine also gets the shared plinth, status
  * strip and PLC stack light (mast + 3 lamps, all floor-wide instanced meshes,
@@ -602,41 +834,66 @@ const UNIT_BOX: readonly number[] = [1, 1, 1];
 const ARCHETYPE_PARTS: Record<MachineArchetype, readonly PartSpec[]> = {
   cnc: [
     { id: "body", geom: "box", args: UNIT_BOX, mat: "steel", pick: true },
-    { id: "console", geom: "box", args: UNIT_BOX, mat: "dark", liteDrop: true },
+    CNC_CONSOLE_HOUSING.spec,
+    CNC_CONSOLE_SCREEN.spec,
     { id: "spindle", geom: "cyl", args: [0.1, 0.13, 0.34, 10], mat: "metal", animated: true },
+    CNC_VENT.spec,
+    CNC_BASE.spec,
+    { id: "chipConveyor", geom: "box", args: UNIT_BOX, mat: "dark", liteDrop: true },
+    { id: "gauge", geom: "cyl", args: [1, 1, 1, 8], mat: "dark", liteDrop: true },
   ],
   press: [
     { id: "body", geom: "box", args: UNIT_BOX, mat: "steel", pick: true },
     { id: "frame", geom: "box", args: UNIT_BOX, mat: "dark", copies: 3 },
     { id: "ram", geom: "box", args: UNIT_BOX, mat: "metal", animated: true },
     { id: "impact", geom: "box", args: UNIT_BOX, mat: "glow", animatedColor: true, liteDrop: true },
+    { id: "bolster", geom: "box", args: UNIT_BOX, mat: "dark", liteDrop: true },
+    PRESS_HYDRAULIC_SPEC,
+    { id: "pendant", geom: "box", args: UNIT_BOX, mat: "dark", liteDrop: true },
   ],
   furnace: [
     { id: "body", geom: "box", args: UNIT_BOX, mat: "steel", pick: true },
     { id: "stack", geom: "cyl", args: [1, 1, 1, 8], mat: "dark", liteDrop: true },
     { id: "door", geom: "box", args: UNIT_BOX, mat: "metal", animated: true },
     { id: "glow", geom: "box", args: UNIT_BOX, mat: "glow", animatedColor: true, liteDrop: true },
+    { id: "duct2", geom: "cyl", args: [1, 1, 1, 8], mat: "dark", liteDrop: true },
+    { id: "stackRing", geom: "torus", args: [1, 0.16, 6, 10], mat: "dark", liteDrop: true },
+    FURNACE_BURNER_HOUSING.spec,
+    FURNACE_BURNER_SHAFT.spec,
+    FURNACE_BASE.spec,
   ],
   assembly: [
     { id: "body", geom: "box", args: UNIT_BOX, mat: "steel", pick: true },
     { id: "rack", geom: "box", args: UNIT_BOX, mat: "dark" },
     { id: "arm", geom: "box", args: [0.62, 0.07, 0.07], mat: "metal", animated: true },
+    { id: "lightBar", geom: "box", args: UNIT_BOX, mat: "metal", liteDrop: true },
+    ASSEMBLY_HOPPER.spec,
+    ASSEMBLY_PEGS_SPEC,
+    ASSEMBLY_GUARDRAIL.spec,
   ],
   robot: [
     { id: "body", geom: "cyl", args: [1, 1, 1, 10], mat: "steel", pick: true },
-    { id: "lower", geom: "box", args: UNIT_BOX, mat: "metal", animated: true },
-    { id: "upper", geom: "box", args: UNIT_BOX, mat: "metal", animated: true },
+    ROBOT_LOWER_LINK,
+    ROBOT_UPPER_LINK,
     { id: "wrist", geom: "cyl", args: [0.09, 0.09, 0.2, 8], mat: "dark", animated: true },
+    ROBOT_PEDESTAL_SKIRT,
+    ROBOT_SHOULDER.spec,
+    ROBOT_ELBOW_SPEC,
+    ROBOT_GRIPPER_SPEC,
   ],
   tank: [
     { id: "body", geom: "cyl", args: [1, 1, 1, 14], mat: "steel", pick: true },
     { id: "ring", geom: "torus", args: [1, 0.035, 6, 18], mat: "dark", liteDrop: true },
     { id: "paddle", geom: "box", args: [0.78, 0.06, 0.1], mat: "metal", animated: true },
     { id: "liquid", geom: "cyl", args: [1, 1, 1, 14], mat: "flat", animated: true },
+    TANK_LID.spec,
+    TANK_LADDER.spec,
+    TANK_INLET.spec,
+    TANK_LEGS_SPEC,
   ],
   inspection: [
     { id: "body", geom: "box", args: UNIT_BOX, mat: "steel", pick: true },
-    { id: "frame", geom: "box", args: UNIT_BOX, mat: "dark", copies: 3 },
+    { id: "frame", geom: "cyl", args: [1, 1, 1, 8], mat: "dark", copies: 3 },
     { id: "scanner", geom: "box", args: UNIT_BOX, mat: "metal", animated: true },
     {
       id: "scanline",
@@ -647,11 +904,18 @@ const ARCHETYPE_PARTS: Record<MachineArchetype, readonly PartSpec[]> = {
       animatedColor: true,
       liteDrop: true,
     },
+    INSPECT_ROLLERS.spec,
+    INSPECT_CONSOLE_HOUSING.spec,
+    INSPECT_CONSOLE_SCREEN.spec,
   ],
   packing: [
     { id: "body", geom: "box", args: UNIT_BOX, mat: "steel", pick: true },
     { id: "chute", geom: "box", args: UNIT_BOX, mat: "dark" },
     { id: "pusher", geom: "box", args: UNIT_BOX, mat: "metal", animated: true },
+    PACK_ROLLERS.spec,
+    PACK_GUARDRAIL.spec,
+    { id: "wrapRoll", geom: "cyl", args: [1, 1, 1, 8], mat: "steel", liteDrop: true },
+    PACK_HOPPER.spec,
   ],
 };
 
@@ -1102,29 +1366,44 @@ function writeMachineParts(
         putPart(body, li, anim, gi, 0, h * 0.45, 0, 0, 0, 0, w * 0.9, h * 0.9, d * 0.9);
         putTintedColor(body, li, STEEL_COLOR, status, BODY_TINT, fade);
       }
-      const console = lite ? null : get("console");
-      if (console) {
-        putPart(
-          console,
-          li,
-          anim,
-          gi,
-          w * 0.53,
-          h * 0.36,
-          d * 0.2,
-          0,
-          0,
-          0,
-          w * 0.2,
-          h * 0.5,
-          d * 0.32
-        );
-        putColor(console, li, DARK_STEEL_COLOR, fade);
+      const consoleHousing = lite ? null : get("consoleHousing");
+      if (consoleHousing) {
+        const p = CNC_CONSOLE_HOUSING.placement;
+        putPart(consoleHousing, li, anim, gi, w * p.x, h * p.y, d * p.z, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, h * p.sy, d * p.sz);
+        putColor(consoleHousing, li, DARK_STEEL_COLOR, fade);
+      }
+      const consoleScreen = lite ? null : get("consoleScreen");
+      if (consoleScreen) {
+        const p = CNC_CONSOLE_SCREEN.placement;
+        putPart(consoleScreen, li, anim, gi, w * p.x, h * p.y, d * p.z, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, h * p.sy, d * p.sz);
+        putColor(consoleScreen, li, OUTLINE_COLOR, fade);
       }
       const spindle = get("spindle");
       if (spindle) {
         putPart(spindle, li, anim, gi, 0, h * CNC_SPINDLE_Y, 0, 0, 0, 0, 1, 1, 1);
         putColor(spindle, li, STEEL_COLOR, fade);
+      }
+      const vent = lite ? null : get("vent");
+      if (vent) {
+        const p = CNC_VENT.placement;
+        putPart(vent, li, anim, gi, w * p.x, h * p.y, d * p.z, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, h * p.sy, d * p.sz);
+        putColor(vent, li, DARK_STEEL_COLOR, fade);
+      }
+      const base = lite ? null : get("base");
+      if (base) {
+        const p = CNC_BASE.placement;
+        putPart(base, li, anim, gi, w * p.x, h * p.y, d * p.z, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, h * p.sy, d * p.sz);
+        putColor(base, li, DARK_STEEL_COLOR, fade);
+      }
+      const chipConveyor = lite ? null : get("chipConveyor");
+      if (chipConveyor) {
+        putPart(chipConveyor, li, anim, gi, w * 0.15, h * 0.08, d * 0.48, 0, 0, 0.25, w * 0.5, h * 0.08, d * 0.22);
+        putColor(chipConveyor, li, DARK_STEEL_COLOR, fade);
+      }
+      const gauge = lite ? null : get("gauge");
+      if (gauge) {
+        putPart(gauge, li, anim, gi, -w * 0.15, h * 0.35, d * 0.47, Math.PI / 2, 0, 0, w * 0.05, d * 0.04, w * 0.05);
+        putColor(gauge, li, DARK_STEEL_COLOR, fade);
       }
       break;
     }
@@ -1174,6 +1453,27 @@ function writeMachineParts(
         SCRATCH_COLOR.set(IMPACT_GLOW_COLOR).lerp(SCRATCH_TINT.set(STEEL_COLOR), 1 - IMPACT_MIN);
         applyFade(fade);
         impact.setColorAt(li, SCRATCH_COLOR);
+      }
+      const bolster = lite ? null : get("bolster");
+      if (bolster) {
+        putPart(bolster, li, anim, gi, 0, h * 0.08, 0, 0, 0, 0, w * 0.62, h * 0.08, d * 0.62);
+        putColor(bolster, li, DARK_STEEL_COLOR, fade);
+      }
+      const hydraulic = lite ? null : get("hydraulic");
+      if (hydraulic) {
+        const o = li * 2;
+        for (const [k, hp] of [
+          [o, PRESS_HYD_L.placement],
+          [o + 1, PRESS_HYD_R.placement],
+        ] as const) {
+          putPart(hydraulic, k, anim, gi, w * hp.x, h * hp.y, d * hp.z, hp.rx ?? 0, hp.ry ?? 0, hp.rz ?? 0, w * hp.sx, h * hp.sy, d * hp.sz);
+          putColor(hydraulic, k, DARK_STEEL_COLOR, fade);
+        }
+      }
+      const pendant = lite ? null : get("pendant");
+      if (pendant) {
+        putPart(pendant, li, anim, gi, -w * 0.34, h * 0.35, d * 0.35, 0, 0, 0, w * 0.1, h * 0.14, d * 0.08);
+        putColor(pendant, li, DARK_STEEL_COLOR, fade);
       }
       break;
     }
@@ -1244,6 +1544,34 @@ function writeMachineParts(
         applyFade(fade);
         glow.setColorAt(li, SCRATCH_COLOR);
       }
+      const duct2 = lite ? null : get("duct2");
+      if (duct2) {
+        putPart(duct2, li, anim, gi, -w * 0.22, h * 0.92, d * 0.1, 0, 0, 0, w * 0.09, h * 0.5, d * 0.09);
+        putColor(duct2, li, DARK_STEEL_COLOR, fade);
+      }
+      const stackRing = lite ? null : get("stackRing");
+      if (stackRing) {
+        putPart(stackRing, li, anim, gi, w * 0.28, h * 1.02, -d * 0.3, Math.PI / 2, 0, 0, w * 0.14, w * 0.14, w * 0.14);
+        putColor(stackRing, li, DARK_STEEL_COLOR, fade);
+      }
+      const burnerHousing = lite ? null : get("burnerHousing");
+      if (burnerHousing) {
+        const p = FURNACE_BURNER_HOUSING.placement;
+        putPart(burnerHousing, li, anim, gi, w * p.x, h * p.y, d * p.z, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, h * p.sy, d * p.sz);
+        putColor(burnerHousing, li, STEEL_COLOR, fade);
+      }
+      const burnerShaft = lite ? null : get("burnerShaft");
+      if (burnerShaft) {
+        const p = FURNACE_BURNER_SHAFT.placement;
+        putPart(burnerShaft, li, anim, gi, w * p.x, h * p.y, d * p.z, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, h * p.sy, d * p.sz);
+        putColor(burnerShaft, li, DARK_STEEL_COLOR, fade);
+      }
+      const furnaceBase = lite ? null : get("furnaceBase");
+      if (furnaceBase) {
+        const p = FURNACE_BASE.placement;
+        putPart(furnaceBase, li, anim, gi, w * p.x, h * p.y, d * p.z, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, h * p.sy, d * p.sz);
+        putColor(furnaceBase, li, DARK_STEEL_COLOR, fade);
+      }
       break;
     }
 
@@ -1276,6 +1604,35 @@ function writeMachineParts(
         putPart(arm, li, anim, gi, ASSEMBLY_ARM_R, h * ASSEMBLY_ARM_Y, 0, 0, 0, 0, 1, 1, 1);
         putColor(arm, li, STEEL_COLOR, fade);
       }
+      const lightBar = lite ? null : get("lightBar");
+      if (lightBar) {
+        putPart(lightBar, li, anim, gi, 0, h * 1.02, 0, 0, 0, 0, w * 0.7, h * 0.04, d * 0.12);
+        putColor(lightBar, li, DARK_STEEL_COLOR, fade);
+      }
+      const hopper = lite ? null : get("hopper");
+      if (hopper) {
+        const p = ASSEMBLY_HOPPER.placement;
+        putPart(hopper, li, anim, gi, w * p.x, h * p.y, d * p.z, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, h * p.sy, d * p.sz);
+        putColor(hopper, li, STEEL_COLOR, fade);
+      }
+      const peg = lite ? null : get("peg");
+      if (peg) {
+        const o = li * 2;
+        for (let k = 0; k < ASSEMBLY_PEG_PLACEMENTS.length; k++) {
+          const p = ASSEMBLY_PEG_PLACEMENTS[k];
+          putPart(peg, o + k, anim, gi, w * p.x, h * p.y, d * p.z, 0, 0, 0, w * p.sx, h * p.sy, d * p.sz);
+          putColor(peg, o + k, DARK_STEEL_COLOR, fade);
+        }
+      }
+      const guardRailPart = lite ? null : get("guardRail");
+      if (guardRailPart) {
+        const o = li * 2;
+        for (let k = 0; k < ASSEMBLY_GUARDRAIL.placements.length; k++) {
+          const p = ASSEMBLY_GUARDRAIL.placements[k];
+          putPart(guardRailPart, o + k, anim, gi, w * p.x, h * p.y, d * p.z, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, h * p.sy, d * p.sz);
+          putColor(guardRailPart, o + k, DARK_STEEL_COLOR, fade);
+        }
+      }
       break;
     }
 
@@ -1302,6 +1659,34 @@ function writeMachineParts(
       if (wrist) {
         putPart(wrist, li, anim, gi, 0, pedH + l1 + l2, 0, 0, 0, 0, 1, 1, 1);
         putColor(wrist, li, DARK_STEEL_COLOR, fade);
+      }
+      const pedestalSkirt = lite ? null : get("pedestalSkirt");
+      if (pedestalSkirt) {
+        putPart(pedestalSkirt, li, anim, gi, 0, pedH * 0.16, 0, Math.PI / 2, 0, 0, w * 0.21, w * 0.21, w * 0.21);
+        putColor(pedestalSkirt, li, DARK_STEEL_COLOR, fade);
+      }
+      const shoulderJoint = get("shoulderJoint");
+      if (shoulderJoint) {
+        const p = ROBOT_SHOULDER.placement;
+        // sphere: use `w` uniformly on all three scale axes so it stays round
+        // instead of stretching with the machine's (usually taller) height.
+        putPart(shoulderJoint, li, anim, gi, w * p.x, h * p.y, d * p.z, 0, 0, 0, w * p.sx, w * p.sx, w * p.sx);
+        putColor(shoulderJoint, li, DARK_STEEL_COLOR, fade);
+      }
+      // elbowJoint / gripper: base pose only (straight arm, p1=p2=0), matching
+      // how lower/upper/wrist above are posed here for a machine with no
+      // runtime yet. The per-frame arm sweep (case 4 in the animator below)
+      // overwrites both every tick exactly like it already does for lower/
+      // upper/wrist.
+      const elbowJoint = get("elbowJoint");
+      if (elbowJoint) {
+        putPart(elbowJoint, li, anim, gi, 0, pedH + l1, 0, 0, 0, 0, w * 0.09, w * 0.09, w * 0.09);
+        putColor(elbowJoint, li, DARK_STEEL_COLOR, fade);
+      }
+      const gripper = lite ? null : get("gripper");
+      if (gripper) {
+        putPart(gripper, li, anim, gi, 0, pedH + l1 + l2 + h * 0.08, 0, 0, 0, 0, w * 0.06, h * 0.16, w * 0.06);
+        putColor(gripper, li, DARK_STEEL_COLOR, fade);
       }
       break;
     }
@@ -1355,6 +1740,48 @@ function writeMachineParts(
         );
         putTintedColor(liquid, li, LIVE_FLOOR_THEME.tankLiquidBase, status, LIQUID_TINT, fade);
       }
+      // The tank body/ring/paddle/liquid above all key off `radius` (the
+      // machine's own min(w,d)-based footprint), not raw w/d — the new parts
+      // below follow that same established convention for a consistent rig.
+      const lid = lite ? null : get("lid");
+      if (lid) {
+        putPart(lid, li, anim, gi, 0, h * 0.94, 0, 0, 0, 0, radius * 0.76, h * 0.16, radius * 0.76);
+        putColor(lid, li, DARK_STEEL_COLOR, fade);
+      }
+      const ladderRung = lite ? null : get("ladderRung");
+      if (ladderRung) {
+        const count = TANK_LADDER.placements.length;
+        const o = li * count;
+        for (let k = 0; k < count; k++) {
+          const p = TANK_LADDER.placements[k];
+          // Keep rungs at ~radius (flush against the shell) rather than 1.05x —
+          // the layout packer's footprint budget only reserves out to `radius`,
+          // so pushing further out risks visual collision with tightly packed neighbours.
+          putPart(ladderRung, o + k, anim, gi, radius * 1.01, h * p.y, 0, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, h * p.sy, d * p.sz);
+          putColor(ladderRung, o + k, DARK_STEEL_COLOR, fade);
+        }
+      }
+      const inlet = lite ? null : get("inlet");
+      if (inlet) {
+        const p = TANK_INLET.placement;
+        // Bulk of the pipe stays inside the footprint with only a short stub
+        // (~8% of radius) protruding, so it still reads as a pipe entering the
+        // shell without overshooting the packed footprint the layout budgets for.
+        putPart(inlet, li, anim, gi, radius * 1.08 - w * p.sy * 0.5, h * 0.62, 0, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, w * p.sy, d * p.sz);
+        putColor(inlet, li, DARK_STEEL_COLOR, fade);
+      }
+      const leg = lite ? null : get("leg");
+      if (leg) {
+        const count = TANK_LEG_PLACEMENTS.length;
+        const o = li * count;
+        for (let k = 0; k < count; k++) {
+          const p = TANK_LEG_PLACEMENTS[k];
+          const lx = radius * 0.6 * Math.sign(p.x || 1);
+          const lz = radius * 0.6 * Math.sign(p.z || 1);
+          putPart(leg, o + k, anim, gi, lx, h * p.y, lz, 0, 0, 0, w * p.sx, h * p.sy, d * p.sz);
+          putColor(leg, o + k, DARK_STEEL_COLOR, fade);
+        }
+      }
       break;
     }
 
@@ -1366,23 +1793,13 @@ function writeMachineParts(
       const frame = get("frame");
       if (frame) {
         const o = li * 3;
+        // two light-curtain posts (thin vertical cylinders) + a horizontal
+        // top beam — all three instances share the "frame" cyl geometry;
+        // the beam is laid on its side via `rz` (same axis-rotate convention
+        // as machineParts.ts's pipeRun/motorBlock "axis: x" case).
         putPart(frame, o, anim, gi, -w * 0.42, h * 0.5, 0, 0, 0, 0, 0.1, h * 0.86, 0.1);
         putPart(frame, o + 1, anim, gi, w * 0.42, h * 0.5, 0, 0, 0, 0, 0.1, h * 0.86, 0.1);
-        putPart(
-          frame,
-          o + 2,
-          anim,
-          gi,
-          0,
-          h * 0.94,
-          0,
-          0,
-          0,
-          0,
-          w * 0.9,
-          0.1,
-          d * 0.14
-        );
+        putPart(frame, o + 2, anim, gi, 0, h * 0.94, 0, 0, 0, Math.PI / 2, d * 0.07, w * 0.9, d * 0.07);
         putColor(frame, o, DARK_STEEL_COLOR, fade);
         putColor(frame, o + 1, DARK_STEEL_COLOR, fade);
         putColor(frame, o + 2, DARK_STEEL_COLOR, fade);
@@ -1415,6 +1832,28 @@ function writeMachineParts(
         SCRATCH_COLOR.set(SCANLINE_COLOR).lerp(FADE_COLOR, 1 - SCANLINE_IDLE);
         applyFade(fade);
         scanline.setColorAt(li, SCRATCH_COLOR);
+      }
+      const topRoller = lite ? null : get("topRoller");
+      if (topRoller) {
+        const count = INSPECT_ROLLERS.placements.length;
+        const o = li * count;
+        for (let k = 0; k < count; k++) {
+          const p = INSPECT_ROLLERS.placements[k];
+          putPart(topRoller, o + k, anim, gi, w * p.x, h * p.y, d * p.z, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, h * p.sy, d * p.sz);
+          putColor(topRoller, o + k, DARK_STEEL_COLOR, fade);
+        }
+      }
+      const postConsoleHousing = lite ? null : get("postConsoleHousing");
+      if (postConsoleHousing) {
+        const p = INSPECT_CONSOLE_HOUSING.placement;
+        putPart(postConsoleHousing, li, anim, gi, w * p.x, h * p.y, d * p.z, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, h * p.sy, d * p.sz);
+        putColor(postConsoleHousing, li, DARK_STEEL_COLOR, fade);
+      }
+      const postConsoleScreen = lite ? null : get("postConsoleScreen");
+      if (postConsoleScreen) {
+        const p = INSPECT_CONSOLE_SCREEN.placement;
+        putPart(postConsoleScreen, li, anim, gi, w * p.x, h * p.y, d * p.z, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, h * p.sy, d * p.sz);
+        putColor(postConsoleScreen, li, OUTLINE_COLOR, fade);
       }
       break;
     }
@@ -1461,6 +1900,37 @@ function writeMachineParts(
           d * 0.3
         );
         putColor(pusher, li, STEEL_COLOR, fade);
+      }
+      const infeedRoller = lite ? null : get("infeedRoller");
+      if (infeedRoller) {
+        const count = PACK_ROLLERS.placements.length;
+        const o = li * count;
+        for (let k = 0; k < count; k++) {
+          const p = PACK_ROLLERS.placements[k];
+          putPart(infeedRoller, o + k, anim, gi, w * p.x, h * p.y, d * p.z, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, h * p.sy, d * p.sz);
+          putColor(infeedRoller, o + k, DARK_STEEL_COLOR, fade);
+        }
+      }
+      const packGuardRail = lite ? null : get("guardRail");
+      if (packGuardRail) {
+        const count = PACK_GUARDRAIL.placements.length;
+        const o = li * count;
+        for (let k = 0; k < count; k++) {
+          const p = PACK_GUARDRAIL.placements[k];
+          putPart(packGuardRail, o + k, anim, gi, w * p.x, h * p.y, d * p.z, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, h * p.sy, d * p.sz);
+          putColor(packGuardRail, o + k, DARK_STEEL_COLOR, fade);
+        }
+      }
+      const wrapRoll = lite ? null : get("wrapRoll");
+      if (wrapRoll) {
+        putPart(wrapRoll, li, anim, gi, w * 0.4, h * 0.14, d * 0.4, Math.PI / 2, 0, 0, w * 0.09, h * 0.09, w * 0.09);
+        putColor(wrapRoll, li, STEEL_COLOR, fade);
+      }
+      const packHopper = lite ? null : get("hopper");
+      if (packHopper) {
+        const p = PACK_HOPPER.placement;
+        putPart(packHopper, li, anim, gi, w * p.x, h * p.y, d * p.z, p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, w * p.sx, h * p.sy, d * p.sz);
+        putColor(packHopper, li, STEEL_COLOR, fade);
       }
       break;
     }
@@ -1905,6 +2375,12 @@ function MachineInstancesInner({
     const upperArr = robotUpper ? robotUpper.instanceMatrix.array : null;
     const robotWrist = meshes.get("robot:wrist") ?? null;
     const wristArr = robotWrist ? robotWrist.instanceMatrix.array : null;
+    // both dropped in lite mode (liteDrop: true), so these resolve to null
+    // there exactly like the other lite-only buffers above — no extra cost.
+    const robotElbow = meshes.get("robot:elbowJoint") ?? null;
+    const elbowArr = robotElbow ? robotElbow.instanceMatrix.array : null;
+    const robotGripper = meshes.get("robot:gripper") ?? null;
+    const gripperArr = robotGripper ? robotGripper.instanceMatrix.array : null;
 
     const tankPaddle = meshes.get("tank:paddle") ?? null;
     const paddleArr = tankPaddle ? tankPaddle.instanceMatrix.array : null;
@@ -2153,11 +2629,12 @@ function MachineInstancesInner({
             OUT_MAT.multiplyMatrices(BASE_MAT, DUMMY.matrix);
             OUT_MAT.toArray(upperArr, li * 16);
           }
+          // shared by wrist + gripper below: both ride the same arm-tip point
+          const lz = elbowZ + l2 * s2;
+          const ly = elbowY + l2 * c2;
           if (wristArr !== null) {
             // wrist only spins about its own vertical axis, so a Y rotation
             // composes with the slot rotation and stays a direct element write
-            const lz = elbowZ + l2 * s2;
-            const ly = elbowY + l2 * c2;
             const ws = spin + cp * TAU * 2;
             const c = Math.cos(ws);
             const s = Math.sin(ws);
@@ -2171,6 +2648,29 @@ function MachineInstancesInner({
             wristArr[o + 12] = wx + sz * lz;
             wristArr[o + 13] = ly;
             wristArr[o + 14] = wz + cx * lz;
+          }
+          if (elbowArr !== null) {
+            // elbow joint sphere: pure translation, no local rotation needed
+            DUMMY.position.set(0, elbowY, elbowZ);
+            DUMMY.rotation.set(0, 0, 0);
+            DUMMY.scale.set(w * 0.09, w * 0.09, w * 0.09);
+            DUMMY.updateMatrix();
+            OUT_MAT.multiplyMatrices(BASE_MAT, DUMMY.matrix);
+            OUT_MAT.toArray(elbowArr, li * 16);
+          }
+          if (gripperArr !== null) {
+            // rigidly attached to the wrist tip, offset straight up along the
+            // wrist's own local Y, spinning with it. Unlike wristArr above,
+            // this part's geometry is UNIT-sized (taperedLink), so its scale
+            // must be baked into the matrix via DUMMY — a raw element poke
+            // (wristArr's style) would silently drop the scale every frame.
+            const ws = spin + cp * TAU * 2;
+            DUMMY.position.set(0, ly + h * 0.08, lz);
+            DUMMY.rotation.set(0, ws, 0);
+            DUMMY.scale.set(w * 0.06, h * 0.16, w * 0.06);
+            DUMMY.updateMatrix();
+            OUT_MAT.multiplyMatrices(BASE_MAT, DUMMY.matrix);
+            OUT_MAT.toArray(gripperArr, li * 16);
           }
           break;
         }
@@ -2262,6 +2762,8 @@ function MachineInstancesInner({
     if (robotLower) robotLower.instanceMatrix.needsUpdate = true;
     if (robotUpper) robotUpper.instanceMatrix.needsUpdate = true;
     if (robotWrist) robotWrist.instanceMatrix.needsUpdate = true;
+    if (robotElbow) robotElbow.instanceMatrix.needsUpdate = true;
+    if (robotGripper) robotGripper.instanceMatrix.needsUpdate = true;
     if (tankPaddle) tankPaddle.instanceMatrix.needsUpdate = true;
     if (tankLiquid) tankLiquid.instanceMatrix.needsUpdate = true;
     if (scanner) scanner.instanceMatrix.needsUpdate = true;

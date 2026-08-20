@@ -588,9 +588,6 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
           >
             <Boxes className="w-3.5 h-3.5" />
             <span>MT Center Live Floor · 4D</span>
-            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white/20 text-[10px] font-bold leading-none">
-              ใหม่
-            </span>
           </button>
         </div>
 

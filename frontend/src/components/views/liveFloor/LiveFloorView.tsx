@@ -309,6 +309,12 @@ export default function LiveFloorView({
    */
   const [inspectorMode, setInspectorMode] = useState(false);
   /**
+   * true = พาเนลคำสั่ง/แชตรายงานกำลังแสดงอยู่ แยกจาก `inspectorMode` โดย
+   * เจตนา: ผู้ใช้ต้องซ่อนพาเนลได้โดยไม่หยุดหุ่น (หุ่นยังเดินตรวจต่อเบื้องหลัง)
+   * ปิดหุ่นจริงต้องกดปุ่ม "ปิดหุ่นยนต์" ในพาเนล ซึ่งเรียก handleStopInspector
+   */
+  const [inspectorPanelOpen, setInspectorPanelOpen] = useState(false);
+  /**
    * true = กล้องเกาะติดตัวหุ่นไปตลอด (เปิดอัตโนมัติเมื่อคลิกที่ตัวหุ่นในฉาก)
    * โหมดนี้ขยับเฉพาะ "จุดที่กล้องเล็ง" ไปพร้อมหุ่น ไม่ยึดมุม/ระยะซูมที่ผู้ใช้
    * ตั้งไว้ — จะหมุนดูรอบตัวหุ่นระหว่างที่มันเดินอยู่ก็ยังได้
@@ -437,19 +443,48 @@ export default function LiveFloorView({
    * the whole-site overview.
    */
   /**
-   * เปิด/ปิดโหมด Agent การปิดจะสั่งหยุดรอบตรวจด้วย — ไม่ทิ้งหุ่นให้เดินอยู่
-   * เบื้องหลังโดยผู้ใช้มองไม่เห็น (บันทึกและรายงานเดิมยังอยู่ เปิดกลับมาแล้ว
-   * ดูรายงานรอบก่อนได้)
+   * เปิดโหมด Agent (mount หุ่น + เปิดพาเนล) หรือ "ซ่อน" พาเนลเฉยๆ — การซ่อนไม่
+   * หยุดรอบตรวจ หุ่นยังเดินต่อเบื้องหลัง ผู้ใช้กดปุ่มลอยเพื่อเรียกพาเนลกลับมา
+   * ดูได้ทุกเมื่อ ปิดหุ่นจริงต้องใช้ handleStopInspector
    */
   const handleToggleInspector = useCallback(() => {
     setInspectorMode((on) => {
       if (on) {
-        inspector.stop();
-        setInspectorFollow(false);
+        // พาเนลเปิดอยู่แล้ว → ปุ่มนี้แปลว่า "ซ่อน" ไม่ใช่ปิดหุ่น
+        setInspectorPanelOpen(false);
+        return on;
       }
-      return !on;
+      setInspectorPanelOpen(true);
+      return true;
     });
+  }, []);
+
+  /**
+   * ปิดหุ่นยนต์จริง: หยุดรอบตรวจ, เลิกกล้องตาม, เลิก mount ตัวหุ่น และซ่อน
+   * พาเนล (บันทึก/รายงานเดิมยังอยู่ เปิดกลับมาแล้วดูรายงานรอบก่อนได้)
+   */
+  const handleStopInspector = useCallback(() => {
+    inspector.stop();
+    setInspectorFollow(false);
+    setInspectorPanelOpen(false);
+    setInspectorMode(false);
   }, [inspector]);
+
+  /**
+   * ซ่อนพาเนลเฉยๆ โดยไม่แตะหุ่น (ใช้จากปุ่ม "ซ่อน" ในพาเนล)
+   */
+  const handleHideInspectorPanel = useCallback(() => {
+    setInspectorPanelOpen(false);
+  }, []);
+
+  /**
+   * เรียกพาเนลกลับมาแสดง ใช้กับปุ่มลอย "หุ่นยนต์กำลังตรวจ" ตอนหุ่นวิ่งอยู่
+   * แต่พาเนลถูกซ่อนไว้ (handleToggleInspector ใช้ไม่ได้ตรงนี้ เพราะมันจะตี
+   * ความว่าเปิดอยู่แล้ว = สั่งซ่อนซ้ำ กลายเป็นกดแล้วไม่มีอะไรเกิดขึ้น)
+   */
+  const handleReopenInspectorPanel = useCallback(() => {
+    setInspectorPanelOpen(true);
+  }, []);
 
   /**
    * คลิกที่ตัวหุ่นในฉาก = "จับตัวหุ่น": เปิดพาเนลรายงานถ้ายังปิดอยู่ แล้วให้
@@ -457,6 +492,7 @@ export default function LiveFloorView({
    */
   const handleSelectInspector = useCallback(() => {
     setInspectorMode(true);
+    setInspectorPanelOpen(true);
     setInspectorFollow((following) => !following);
   }, []);
 
@@ -568,23 +604,31 @@ export default function LiveFloorView({
 
         {/* โหมด Agent — ปุ่มเปิด และพาเนลแชตรายงาน ใช้จุดยึดเดียวกัน
             (ใต้แถบควบคุมกล้องมุมขวาบน) จึงไม่ทับพาเนลไหนของ HUD */}
-        {inspectorMode ? (
+        {inspectorMode && inspectorPanelOpen ? (
           <InspectorPanel
             agent={inspector}
             snapshot={inspectorSnapshot}
             onAskAI={onAskAI}
             follow={inspectorFollow}
             onToggleFollow={handleToggleFollow}
-            onClose={handleToggleInspector}
+            onClose={handleHideInspectorPanel}
+            onStop={handleStopInspector}
           />
         ) : (
           <button
             type="button"
-            onClick={handleToggleInspector}
+            onClick={inspectorMode ? handleReopenInspectorPanel : handleToggleInspector}
             className="absolute right-4 top-[76px] z-40 flex items-center gap-2 rounded-[14px] border border-[var(--lf-panel-border)] bg-[var(--lf-panel-bg)] px-3 py-2 text-[11.5px] font-bold text-[var(--lf-text)] shadow-[0_8px_24px_-12px_var(--lf-panel-glow)] backdrop-blur-md hover:bg-[var(--lf-accent-14)] transition-colors pointer-events-auto"
           >
             <PixelAILogo className="w-4 h-4 text-[var(--lf-accent)]" />
-            หุ่นยนต์เดินตรวจ
+            {inspectorMode ? (
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--lf-accent)] animate-pulse" />
+                หุ่นยนต์กำลังตรวจ
+              </span>
+            ) : (
+              "หุ่นยนต์เดินตรวจ"
+            )}
           </button>
         )}
       </div>

@@ -702,13 +702,41 @@ export function createInspectionAgent(
   let route: InspectionStop[] = planRoute(currentLayout, maxStops);
   let totalMachines = currentLayout.slots.length;
 
-  /** จุดตั้งต้น/จุดกลับมาสรุปรายงาน — ขอบไซต์ด้านหน้า (ใกล้ประตูโรงงาน) */
+  /**
+   * จุดตั้งต้น/จุดกลับมาสรุปรายงาน — ป้ายชื่อโรง (sign) หน้าอาคารผลิตหลัก
+   * (อาคารที่มีจำนวนเครื่องจักรมากที่สุด) แทนที่จะเป็นขอบไซต์หน้าประตูโรงงาน
+   * เดิม เพื่อให้หุ่นเริ่ม/จบรอบตรงหน้าตึกที่มันจะเดินเข้าไปตรวจจริง ๆ
+   */
   let homeX = 0;
   let homeZ = 0;
+  /** ทิศที่หุ่นหันตอนอยู่บ้าน — หันเข้าหาตัวอาคาร (ทิศ +Z จากป้ายหน้าโรง) */
+  let homeYaw = 0;
   function recomputeHome() {
-    homeX = 0;
-    homeZ = Math.max(6, currentLayout.site.depth / 2 - 4);
-    // ดึงจุดตั้งต้นเข้ามาอยู่บนโครงข่ายทางเดิน (ถนนหน้าไซต์) — ถ้าปล่อยให้
+    // อาคารผลิตหลัก = อาคารที่มีเครื่องจักรเยอะที่สุดในผังปัจจุบัน
+    const productionBuilding = currentLayout.buildings.reduce<
+      (typeof currentLayout.buildings)[number] | null
+    >((best, b) => (best === null || b.machineCount > best.machineCount ? b : best), null);
+
+    if (productionBuilding) {
+      // ป้ายชื่อโรง (kind: "sign") ถูกวางไว้ที่ขอบด้าน -Z ของอาคารนั้นพอดี
+      // (ดู floorLayout.ts: `SIGN_${hall.id}`) — ถ้ามีป้ายจริงให้ยืนหน้าป้าย
+      const sign = currentLayout.props.find((p) => p.id === `SIGN_${productionBuilding.id}`);
+      if (sign) {
+        homeX = sign.x;
+        homeZ = sign.z + 1; // ยืนถัดจากป้ายเล็กน้อย ไม่ทับป้าย
+      } else {
+        // ไม่มีป้ายชัดเจน → ใช้ขอบด้านหน้า/ทางเข้าของอาคารผลิตแทน
+        homeX = productionBuilding.x;
+        homeZ = productionBuilding.z - productionBuilding.depth / 2;
+      }
+      homeYaw = 0; // หันเข้าหาตัวอาคาร (ทิศ +Z)
+    } else {
+      // ไม่มีอาคารเลย (ผังว่าง) — สำรองกลับไปที่ขอบไซต์ด้านหน้าเหมือนเดิม
+      homeX = 0;
+      homeZ = Math.max(6, currentLayout.site.depth / 2 - 4);
+      homeYaw = Math.PI;
+    }
+    // ดึงจุดตั้งต้นเข้ามาอยู่บนโครงข่ายทางเดิน (ถนน/ทางเดินหน้าโรง) — ถ้าปล่อยให้
     // ลอยอยู่กลางลานหญ้า ทั้งขาออกและขากลับจะเริ่ม/จบด้วยการเดินตัดพื้นที่
     // ที่ไม่ใช่ทางเดิน ซึ่งเป็นอาการเดียวกับที่กราฟนี้มีไว้เพื่อกำจัด
     const node = navGraph?.nearest(homeX, homeZ) ?? -1;
@@ -728,7 +756,7 @@ export function createInspectionAgent(
 
   let x = homeX;
   let z = homeZ;
-  let yaw = Math.PI;
+  let yaw = homeYaw;
   let stride = 0;
   let distance = 0;
 
@@ -1008,7 +1036,7 @@ export function createInspectionAgent(
       bubble = null;
       x = homeX;
       z = homeZ;
-      yaw = Math.PI;
+      yaw = homeYaw;
       writeSnapshot();
     },
     setSpeedScale(scale) {
@@ -1031,6 +1059,7 @@ export function createInspectionAgent(
         route = planRoute(currentLayout, maxStops);
         x = homeX;
         z = homeZ;
+        yaw = homeYaw;
       }
       writeSnapshot();
     },

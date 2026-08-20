@@ -73,8 +73,10 @@ export interface InspectorPanelProps {
   /** true = กล้องกำลังเกาะติดตัวหุ่นอยู่ */
   follow: boolean;
   onToggleFollow: () => void;
-  /** ปิดพาเนล (กลับไปโหมดดูผังเฉยๆ) */
+  /** ซ่อนพาเนลเฉยๆ (หุ่นยังเดินตรวจต่อเบื้องหลัง) */
   onClose: () => void;
+  /** ปิดหุ่นยนต์จริง — สั่งหยุดรอบตรวจและเลิก mount ตัวหุ่นในฉาก */
+  onStop: () => void;
 }
 
 function fmtClock(seconds: number): string {
@@ -269,6 +271,7 @@ export default function InspectorPanel({
   follow,
   onToggleFollow,
   onClose,
+  onStop,
 }: InspectorPanelProps) {
   const [scope, setScope] = useState<InspectionScope>("hourly");
   const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(2);
@@ -333,13 +336,26 @@ export default function InspectorPanel({
               )}
             </p>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="shrink-0 text-[10.5px] font-semibold text-[var(--lf-text-muted)] hover:text-[var(--lf-danger)] transition-colors"
-          >
-            ปิด
-          </button>
+          <div className="shrink-0 flex flex-col items-stretch gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              title="ซ่อนแผงนี้ชั่วคราว (หุ่นยนต์ยังทำงานต่อ)"
+              aria-label="ซ่อนแผงนี้ชั่วคราว"
+              className="min-h-[32px] rounded-[8px] px-3 text-[10.5px] font-semibold text-[var(--lf-text-muted)] bg-[var(--lf-box-bg)] hover:bg-[var(--lf-accent-14)] hover:text-[var(--lf-accent)] transition-colors"
+            >
+              ซ่อน
+            </button>
+            <button
+              type="button"
+              onClick={onStop}
+              title="ปิดการทำงานของหุ่นยนต์ตรวจสายการผลิต"
+              aria-label="ปิดหุ่นยนต์ตรวจสายการผลิต"
+              className="min-h-[32px] rounded-[8px] border border-[var(--lf-danger-40)] bg-[var(--lf-danger-14)] px-3 text-[10.5px] font-bold text-[var(--lf-danger)] hover:bg-[var(--lf-danger-26)] transition-colors"
+            >
+              ปิดหุ่นยนต์
+            </button>
+          </div>
         </div>
 
         {/* กล้องตามหุ่น — ปุ่มเดียวกับที่คลิกตัวหุ่นในฉากแล้วได้ผลเหมือนกัน */}

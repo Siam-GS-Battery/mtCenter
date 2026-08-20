@@ -26,6 +26,7 @@ import {
 import { Machine, WorkOrder, MachineStats, WorkOrderStats, UserProfile } from "../../types";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "../ui/Modal";
 import { Pagination } from "../ui/Pagination";
+import { SkeletonCardGrid, SkeletonList } from "../ui/Skeleton";
 import { MachineSelect } from "../MachineSelect";
 import { TelemetryTrendCard } from "./TelemetryTrendCard";
 import LiveFloorView from "./liveFloor/LiveFloorView";
@@ -853,10 +854,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
         )}
 
         {registryLoading && registryMachines.length === 0 ? (
-          <div className="p-8 text-center space-y-2">
-            <Loader2 className="w-6 h-6 text-primary mx-auto animate-spin" />
-            <p className="text-xs text-ink-faint">กำลังโหลดทะเบียนเครื่องจักร...</p>
-          </div>
+          <SkeletonCardGrid count={REGISTRY_PAGE_SIZE} className="grid-cols-1 md:grid-cols-2 lg:grid-cols-2" />
         ) : registryMachines.length === 0 ? (
           <p className="text-sm text-ink-faint text-center py-8">ไม่มีเครื่องจักรในสถานะนี้</p>
         ) : (
@@ -1068,9 +1066,8 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
               )}
 
               {machineHistoryLoading && machineHistory.length === 0 && !machineHistoryError ? (
-                <div className="p-6 text-center rounded-[11px] border border-hairline space-y-2">
-                  <Loader2 className="w-6 h-6 text-primary mx-auto animate-spin" />
-                  <p className="text-xs text-ink-faint">กำลังโหลดประวัติการซ่อม...</p>
+                <div className="p-3.5 rounded-[11px] border border-hairline">
+                  <SkeletonList count={5} />
                 </div>
               ) : machineHistory.length === 0 && !machineHistoryError ? (
                 // Distinguish "this machine has no repairs" from "we cannot look

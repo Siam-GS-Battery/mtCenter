@@ -35,6 +35,7 @@ import { getWorkOrders, toUserMessage } from "../../services/apiService";
 import { notifyFailed } from "../../lib/swal";
 import type { WorkOrderListParams } from "../../services/apiService";
 import { Pagination } from "../ui/Pagination";
+import { SkeletonCardGrid } from "../ui/Skeleton";
 
 interface MyWorkOrdersViewProps {
   currentUserRole: UserRole;
@@ -485,10 +486,7 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
         {/* Loading state — only while there is nothing on screen yet, so a
             background refetch (e.g. after saving progress) doesn't flash. */}
         {isLoading && workOrders.length === 0 && !loadError ? (
-          <div className="bg-white rounded-[18px] border border-hairline p-10 flex flex-col items-center text-center space-y-3">
-            <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            <p className="text-sm text-ink-muted">กำลังโหลดใบงานของคุณ...</p>
-          </div>
+          <SkeletonCardGrid count={6} />
         ) : (
           <>
             {/* Empty State */}

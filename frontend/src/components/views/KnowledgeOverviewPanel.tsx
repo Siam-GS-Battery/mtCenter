@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { getKnowledgeOverview, toUserMessage, type KnowledgeOverview } from "../../services/apiService";
 import { Pagination } from "../ui/Pagination";
+import { SkeletonStatCards } from "../ui/Skeleton";
 
 // จำนวนเรื่องความรู้ต่อหน้าในตาราง Frame 4 — ต้องตรงกับ default limit ของ backend
 // (backend/src/routes/knowledge.ts KNOWLEDGE_OVERVIEW_PAGING_DEFAULTS)
@@ -101,7 +102,9 @@ export const KnowledgeOverviewPanel: React.FC = () => {
         </button>
       </div>
 
-      {isLoading && (
+      {isLoading && !data && <SkeletonStatCards count={5} />}
+
+      {isLoading && data && (
         <div className="flex items-center gap-2 text-sm text-ink-muted py-6 justify-center">
           <Loader2 className="w-4 h-4 animate-spin" />
           <span>กำลังโหลดสถิติ...</span>

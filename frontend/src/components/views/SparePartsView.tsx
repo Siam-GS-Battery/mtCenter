@@ -23,6 +23,7 @@ import { Pagination } from "../ui/Pagination";
 import { getSpareParts, toUserMessage } from "../../services/apiService";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";
 import { isMissing, orDash } from "../../lib/format";
+import { SkeletonCardGrid } from "../ui/Skeleton";
 
 interface SparePartsViewProps {
   onAskAI: (prompt: string) => void;
@@ -331,10 +332,7 @@ export const SparePartsView: React.FC<SparePartsViewProps> = ({
 
       {/* Spare Parts Grid */}
       {isLoading && parts.length === 0 && !loadError ? (
-        <div className="bg-white rounded-[18px] border border-hairline p-10 text-center space-y-3">
-          <Loader2 className="w-8 h-8 text-primary mx-auto animate-spin" />
-          <p className="text-[13px] text-ink-muted">กำลังโหลดคลังอะไหล่...</p>
-        </div>
+        <SkeletonCardGrid count={6} />
       ) : filteredParts.length === 0 && !loadError ? (
         <div className="bg-white rounded-[18px] border border-hairline p-10 text-center space-y-2">
           <SearchX className="w-10 h-10 text-ink-faint mx-auto" />

@@ -14,6 +14,7 @@ import { WorkOrder, UserRole, WorkOrderStep, WorkOrderAttachment } from "../../t
 import { WorkOrderDetailModal } from "../WorkOrderDetailModal";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "../ui/Modal";
 import { Pagination } from "../ui/Pagination";
+import { SkeletonList } from "../ui/Skeleton";
 import {
   getWorkOrders,
   getWorkOrderAttachments,
@@ -205,10 +206,7 @@ export const PendingReviewView: React.FC<PendingReviewViewProps> = ({
       )}
 
       {isLoading && pendingReviews.length === 0 && !loadError ? (
-        <div className="bg-white rounded-[18px] border border-hairline p-12 text-center space-y-3">
-          <Loader2 className="w-10 h-10 text-primary mx-auto animate-spin" />
-          <p className="text-sm text-ink-muted">กำลังโหลดใบงานรอตรวจสอบ...</p>
-        </div>
+        <SkeletonList count={5} />
       ) : pendingReviews.length === 0 && !loadError ? (
         <div className="bg-white rounded-[18px] border border-hairline p-12 text-center space-y-3">
           <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />

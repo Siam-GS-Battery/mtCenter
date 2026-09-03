@@ -22,7 +22,7 @@ const getGenAI = () => {
     httpOptions: {
       headers: {
         "User-Agent": "aistudio-build",
-      },
+      }
     },
   });
 };

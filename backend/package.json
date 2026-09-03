@@ -20,6 +20,7 @@
     "seed:passwords": "tsx scripts/seed-passwords.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.120.0",
     "@google/genai": "^2.4.0",
     "@supabase/supabase-js": "^2.45.4",
     "bcryptjs": "^3.0.3",

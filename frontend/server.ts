@@ -11,7 +11,12 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
-app.use(express.json({ limit: "20mb" }));
+// Do NOT add express.json()/body-parser middleware here: it would drain the
+// request body stream before vite's /api proxy (see vite.config.ts) forwards
+// the request to the backend, leaving the backend waiting on a body that
+// never arrives — this caused every POST with a body to hang and time out
+// with 408. This dev server never reads req.body itself (it only mounts
+// vite middlewares and serves the SPA), so no body parser belongs here.
 
 async function startServer() {
   const vite = await createViteServer({

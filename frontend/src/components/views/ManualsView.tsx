@@ -35,6 +35,43 @@ import { detectTocPages } from "../../lib/manualToc";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";
 import type { Components } from "react-markdown";
 
+/** ป้ายสถานะการแปลง PDF → Markdown ด้วย OCR — แสดงเฉพาะตอนกำลังทำงาน/ล้มเหลว
+ * เพราะ "done"/null ไม่มีอะไรต้องเตือนผู้ใช้ */
+const OcrStatusBadge: React.FC<{ ocrStatus: ManualDoc["ocrStatus"] }> = ({ ocrStatus }) => {
+  if (ocrStatus === "pending" || ocrStatus === "processing") {
+    return (
+      <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full">
+        <Loader2 className="w-3 h-3 animate-spin" />
+        กำลังแปลง…
+      </span>
+    );
+  }
+  if (ocrStatus === "failed") {
+    return (
+      <span className="inline-flex items-center gap-1 text-xs font-semibold text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full">
+        <AlertCircle className="w-3 h-3" />
+        แปลงไม่สำเร็จ
+      </span>
+    );
+  }
+  return null;
+};
+
+/** ป้าย "ฉบับร่าง รอตรวจ" — คู่มือที่แปลงเสร็จแล้ว (ocrStatus === "done") แต่ผู้ใช้ยังไม่ได้ตรวจ/บันทึก
+ * เนื้อหา Markdown ที่แก้ไข (markdownApproved === false) ใช้สไตล์ pill เดียวกับ OcrStatusBadge ด้านบน */
+const DraftApprovalBadge: React.FC<{ ocrStatus: ManualDoc["ocrStatus"]; markdownApproved?: boolean }> = ({
+  ocrStatus,
+  markdownApproved,
+}) => {
+  if (ocrStatus !== "done" || markdownApproved !== false) return null;
+  return (
+    <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full">
+      <AlertCircle className="w-3 h-3" />
+      ฉบับร่าง รอตรวจ
+    </span>
+  );
+};
+
 interface ManualsViewProps {
   /** เครื่องจักรที่กำลังทำงานอยู่ (จาก TopBar) — เปิดใช้ตัวกรองคู่มือเฉพาะรุ่นของเครื่องนี้ */
   activeMachine?: Machine;
@@ -51,7 +88,9 @@ interface ManualsViewProps {
   onUpdated?: (manual: ManualDoc) => void;
 }
 
-const markdownComponents: Components = {
+/** ตัวปรับแต่งการเรนเดอร์ Markdown ที่ใช้ทั้งหน้าต่างอ่านคู่มือ (ด้านล่าง) และตัวแก้ไขฉบับร่าง
+ * (MarkdownDraftEditor) — export ไว้ให้ที่อื่น import ไปใช้ซ้ำ แทนการเขียนสไตล์ซ้ำหรือเพิ่มไลบรารีใหม่ */
+export const markdownComponents: Components = {
   // TopBar renders the page's only <h1>. A heading inside a manual is a
   // section of that page's content, so it starts at <h2> however the document
   // was written.
@@ -690,6 +729,9 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
                     {doc.pagesCount > 0 ? ` · ${doc.pagesCount} หน้า` : ""}
                   </span>
                 </div>
+
+                <OcrStatusBadge ocrStatus={doc.ocrStatus} />
+                <DraftApprovalBadge ocrStatus={doc.ocrStatus} markdownApproved={doc.markdownApproved} />
 
                 <h3 className="font-semibold text-ink text-sm leading-snug">
                   {doc.title}

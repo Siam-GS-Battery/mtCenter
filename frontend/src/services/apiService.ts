@@ -788,11 +788,85 @@ export function getManualFileUrl(id: string): Promise<{ url: string }> {
   return request<{ url: string }>(`/api/manuals/${encodeURIComponent(id)}/file`);
 }
 
+export type OcrStatus = "pending" | "processing" | "done" | "failed" | "skipped" | null;
+
+export interface ManualOcrStatus {
+  id: string;
+  ocrStatus: OcrStatus;
+  ocrError: string | null;
+  ocrStartedAt: string | null;
+  ocrCompletedAt: string | null;
+  ocrPages: number | null;
+  hasMarkdown: boolean;
+}
+
+/** ดึงสถานะการแปลง PDF → Markdown ด้วย OCR ล่าสุดของคู่มือเล่มนี้ — ต้อง login
+ * และไม่ถูกแคช (ใช้สำหรับ polling ระหว่างที่ background job กำลังทำงาน) */
+export function getManualOcrStatus(id: string): Promise<ManualOcrStatus> {
+  return request<ManualOcrStatus>(`/api/manuals/${encodeURIComponent(id)}/ocr-status`);
+}
+
+/** สั่งลองแปลง PDF → Markdown อีกครั้ง (เฉพาะแอดมิน) — คืนสถานะ "pending" ทันที
+ * ถ้า backend ตอบ 409 หมายความว่ากำลังแปลงอยู่แล้ว */
+export function retryManualOcr(id: string, actorId?: string): Promise<{ id: string; ocrStatus: OcrStatus }> {
+  return request<{ id: string; ocrStatus: OcrStatus }>(
+    `/api/manuals/${encodeURIComponent(id)}/ocr`,
+    {
+      method: "POST",
+      headers: withActor(actorId),
+    },
+    ""
+  );
+}
+
 export async function getManualContent(id: string): Promise<string | null> {
   const { markdownContent } = await request<{ markdownContent: string | null }>(
     `/api/manuals/${encodeURIComponent(id)}/content`
   );
   return markdownContent ?? null;
+}
+
+/** ผลลัพธ์ของ GET /api/manuals/:id/content — เหมือน getManualContent() แต่คงฟิลด์ markdownApproved/
+ * ocrStatus ไว้ด้วย เพราะตัวแก้ไขฉบับร่าง (MarkdownDraftEditor) ต้องรู้ว่าเนื้อหาที่ดึงมาผ่านการตรวจ
+ * แล้วหรือยัง ไม่ใช่แค่ตัวเนื้อหาอย่างเดียวแบบ getManualContent() เดิม */
+export interface ManualContentDetail {
+  id: string;
+  markdownContent: string | null;
+  markdownApproved: boolean;
+  ocrStatus: OcrStatus;
+}
+
+/** ดึงเนื้อหา Markdown ปัจจุบันของคู่มือเล่มนี้พร้อมสถานะการตรวจสอบ — endpoint นี้ตอบแบบ no-store
+ * เสมอ (เนื้อหาอาจถูกแก้ไขบันทึกทับได้ตลอด) */
+export function getManualContentDetail(id: string): Promise<ManualContentDetail> {
+  return request<ManualContentDetail>(`/api/manuals/${encodeURIComponent(id)}/content`);
+}
+
+/** ผลลัพธ์ของ PUT /api/manuals/:id/content — คู่มือที่อัปเดตแล้วพร้อมสถานะการตรวจสอบล่าสุด
+ * `warning` ไม่ใช่ error ที่ทำให้การบันทึกล้มเหลว (เนื้อหาบันทึกสำเร็จแล้ว) แต่บอกปัญหาที่ไม่ร้ายแรง
+ * ระหว่างเก็บไฟล์/ดัชนีอื่น ๆ ที่ backend เจอ */
+export interface SaveManualContentResult extends ManualDoc {
+  markdownApproved: boolean;
+  warning?: string;
+}
+
+/** บันทึกเนื้อหา Markdown ที่ผู้ใช้แก้ไขแล้ว — ค่าเริ่มต้นของ `approve` (undefined) ให้ backend
+ * ตีความเป็น true (ยืนยันเป็นฉบับทางการ) ส่ง `false` เพื่อบันทึกเป็นฉบับร่างเท่านั้น */
+export function saveManualContent(
+  id: string,
+  markdown: string,
+  approve?: boolean,
+  actorId?: string
+): Promise<SaveManualContentResult> {
+  return request<SaveManualContentResult>(
+    `/api/manuals/${encodeURIComponent(id)}/content`,
+    {
+      method: "PUT",
+      headers: withActor(actorId),
+      body: JSON.stringify(approve === undefined ? { markdown } : { markdown, approve }),
+    },
+    ""
+  );
 }
 
 // ---- AI ----

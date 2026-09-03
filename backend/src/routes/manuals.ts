@@ -6,6 +6,7 @@ import { ApiError, asyncHandler, sendPaginated, sendSuccess } from "../middlewar
 import { requireRole } from "../middleware/requireRole.js";
 import { fetchManualSummary, indexManual } from "../lib/manualIndexer.js";
 import { buildIlikeOrClause, parsePaging } from "../lib/queryHelpers.js";
+import { queueManualOcr, type OcrStatus } from "../lib/pdfOcr.js";
 
 const router = Router();
 
@@ -26,7 +27,27 @@ const requireManualAdmin = requireRole([...MANUAL_ADMIN_ROLES], MANUAL_ADMIN_MES
 // ของ list บวมขึ้นโดยไม่จำเป็น ฝั่ง client ที่ต้องการเนื้อหาจริงให้ดึงแยกผ่าน
 // GET /api/manuals/:id/content แทน
 const MANUAL_LIST_COLUMNS =
-  "id,title,machine_model,category,upload_date,uploaded_by,file_size,pages_count,ai_indexed,tags,created_at,file_path,has_markdown";
+  "id,title,machine_model,category,upload_date,uploaded_by,file_size,pages_count,ai_indexed,tags,created_at,file_path,has_markdown,ocr_status,ocr_error,markdown_approved";
+
+// mapManual (lib/mappers.ts) ยังไม่รู้จักคอลัมน์ OCR ที่เพิ่งเพิ่มเข้ามา — ต่อท้าย
+// ocrStatus/ocrError/markdownApproved เข้าไปในผลลัพธ์ตรงนี้แทนที่จะแก้ mapManual โดยตรง
+// เพื่อจำกัดผลกระทบของฟีเจอร์ OCR ไว้แค่ไฟล์นี้ ManualRow (mappers.ts) ยังไม่มี ocr_status/
+// ocr_error/markdown_approved ในนิยาม type จึงต้อง intersect เพิ่มตรงนี้ตอนรับ row ที่
+// select คอลัมน์เหล่านี้มาแล้ว
+type ManualRowWithOcr = ManualRow & {
+  ocr_status?: string | null;
+  ocr_error?: string | null;
+  markdown_approved?: boolean | null;
+};
+
+function withOcrFields(row: ManualRowWithOcr) {
+  return {
+    ...mapManual(row),
+    ocrStatus: (row.ocr_status ?? null) as OcrStatus | null,
+    ocrError: row.ocr_error ?? null,
+    markdownApproved: (row.markdown_approved ?? false) as boolean,
+  };
+}
 
 // path ที่เซิร์ฟเวอร์ออกให้เองจาก POST /upload-url จะมีรูปแบบนี้เท่านั้น
 // (${randomUUID()}.pdf) ห้ามรับ filePath ที่ผู้เรียกส่งมาแบบอื่นเด็ดขาด เพราะจะถูก
@@ -59,7 +80,7 @@ router.get(
       .range(offset, offset + limit - 1);
     if (error) throw new ApiError(500, error.message);
 
-    sendPaginated(res, (data as ManualRow[]).map(mapManual), { total: count ?? 0, limit, offset });
+    sendPaginated(res, (data as ManualRowWithOcr[]).map(withOcrFields), { total: count ?? 0, limit, offset });
   })
 );
 
@@ -184,7 +205,23 @@ router.post(
     // แยกต่างหาก: list object ทั้งหมดใน bucket "manuals" แล้วลบ object ที่มีอายุ
     // เกิน 24 ชม. และชื่อไม่ตรงกับ manuals.file_path ใด ๆ ในตาราง
 
-    sendSuccess(res, mapManual(data as ManualRow), 201);
+    // คู่มือที่มีไฟล์ PDF แต่ยังไม่มี markdown_content (กรณีปกติของการอัปโหลดใหม่ผ่าน
+    // /upload-url) ให้เริ่ม OCR เป็นงานเบื้องหลังทันที โดยไม่รอผลลัพธ์ก่อนตอบ response
+    // เพื่อให้ frontend สามารถเริ่ม poll GET /:id/ocr-status ได้จาก ocrStatus ที่ส่งกลับ
+    // ไปพร้อมกันนี้ — ถ้าไม่มี file_path หรือมี markdown_content อยู่แล้ว ไม่ต้อง OCR
+    const createdRow = data as ManualRowWithOcr;
+    const hasMarkdownAlready = typeof row.markdown_content === "string" && row.markdown_content.trim().length > 0;
+    let ocrStatus: OcrStatus | null = null;
+    if (createdRow.file_path && !hasMarkdownAlready) {
+      queueManualOcr(createdRow.id);
+      ocrStatus = "pending";
+    }
+
+    sendSuccess(
+      res,
+      { ...mapManual(createdRow), ocrStatus, ocrError: null, markdownApproved: createdRow.markdown_approved ?? false },
+      201
+    );
   })
 );
 
@@ -300,7 +337,7 @@ router.patch(
       .single();
     if (error) throw new ApiError(500, error.message);
 
-    sendSuccess(res, mapManual(data as ManualRow));
+    sendSuccess(res, withOcrFields(data as ManualRowWithOcr));
   })
 );
 
@@ -343,19 +380,163 @@ router.get(
 
     const { data, error } = await supabase
       .from("manuals")
-      .select("id,markdown_content")
+      .select("id,markdown_content,markdown_approved,ocr_status")
       .eq("id", id)
       .maybeSingle();
     if (error) throw new ApiError(500, error.message);
     if (!data) throw new ApiError(404, "ไม่พบคู่มือที่ระบุ");
 
-    // เนื้อหา Markdown ของคู่มือถือว่า immutable หลังอัปโหลด (filePath/เนื้อหาไม่ได้
-    // อยู่ใน ALLOWED_PATCH_KEYS ของ PATCH /:id ด้านบน — ดูคอมเมนต์ราว L246-251) จึง
-    // cache ฝั่ง client ได้อย่างปลอดภัยแบบสั้น ๆ เพื่อลดการดึงซ้ำของ payload ที่อาจมี
-    // ขนาดหลาย MB
-    res.setHeader("Cache-Control", "private, max-age=300");
+    // เนื้อหา Markdown เดี๋ยวนี้เป็น draft ที่แก้ไขได้ผ่าน PUT /:id/content ด้านล่าง
+    // (ไม่ immutable แบบเดิมอีกแล้ว) ห้าม cache เด็ดขาด เพราะระหว่างที่ผู้ใช้เปิด editor
+    // แบบ side-by-side อยู่ อาจมีการ save ทับเนื้อหาเดิมได้ตลอดเวลา การ cache ไว้จะทำให้
+    // เห็นเนื้อหาเก่าที่ไม่ตรงกับที่ถูก save ล่าสุด
+    res.setHeader("Cache-Control", "no-store");
 
-    sendSuccess(res, { markdownContent: data.markdown_content ?? null });
+    sendSuccess(res, {
+      markdownContent: data.markdown_content ?? null,
+      markdownApproved: data.markdown_approved ?? false,
+      ocrStatus: data.ocr_status ?? null,
+    });
+  })
+);
+
+// บันทึก/แก้ไขเนื้อหา Markdown ของคู่มือ (draft ที่ได้จาก OCR หรือพิมพ์เอง) ผู้ใช้แก้ไขใน
+// editor แบบ side-by-side แล้วเรียก endpoint นี้เพื่อ save — ค่า default คือ "approve"
+// เนื้อหาที่ save ไปด้วย (approve: false ชัดเจนเท่านั้นถึงจะยังเป็น draft ต่อ) ป้องกันด้วย
+// requireManualAdmin เช่นเดียวกับ endpoint เขียนข้อมูลอื่น ๆ ในไฟล์นี้
+router.put(
+  "/:id/content",
+  requireManualAdmin,
+  asyncHandler(async (req, res) => {
+    const id = typeof req.params.id === "string" ? req.params.id.trim() : "";
+    if (id.length === 0) throw new ApiError(400, "กรุณาระบุ id ของคู่มือ");
+
+    const body = req.body ?? {};
+
+    if (typeof body.markdown !== "string" || body.markdown.trim().length === 0) {
+      throw new ApiError(400, "กรุณาระบุเนื้อหา markdown เป็นข้อความที่ไม่ว่างเปล่า");
+    }
+
+    if (body.markdown.length > 2_000_000) {
+      throw new ApiError(400, "เนื้อหา markdown มีขนาดใหญ่เกินไป (จำกัดไว้ที่ 2,000,000 ตัวอักษร)");
+    }
+
+    if (body.approve !== undefined && typeof body.approve !== "boolean") {
+      throw new ApiError(400, "approve ต้องเป็นค่า true/false");
+    }
+
+    const { data, error } = await supabase
+      .from("manuals")
+      .select("id,file_path,markdown_path")
+      .eq("id", id)
+      .maybeSingle();
+    if (error) throw new ApiError(500, error.message);
+    if (!data) throw new ApiError(404, "ไม่พบคู่มือที่ระบุ");
+
+    const markdownApproved = body.approve !== false;
+
+    const update: Record<string, unknown> = {
+      markdown_content: body.markdown,
+      markdown_approved: markdownApproved,
+    };
+
+    // markdown_path เดิมของแถวนี้ ถ้ามีอยู่แล้วให้ใช้ต่อ ไม่งั้น derive จาก file_path
+    // (แทนที่ .pdf ท้ายด้วย .md) แล้ว persist path ที่ derive ได้ลงฐานข้อมูลไปด้วย
+    let markdownPath: string | null = data.markdown_path ?? null;
+    if (!markdownPath && data.file_path) {
+      markdownPath = data.file_path.replace(/\.pdf$/i, ".md");
+      update.markdown_path = markdownPath;
+    }
+
+    const { data: updatedRow, error: updateError } = await supabase
+      .from("manuals")
+      .update(update)
+      .eq("id", id)
+      .select(MANUAL_LIST_COLUMNS)
+      .single();
+    if (updateError) throw new ApiError(500, updateError.message);
+
+    const responseBody: Record<string, unknown> = { ...withOcrFields(updatedRow as ManualRowWithOcr) };
+
+    // อัปโหลดไฟล์ .md ทับใน storage เป็น best-effort เท่านั้น — ไม่ให้ความล้มเหลวของ
+    // storage มาทำให้ทั้ง request fail เพราะข้อมูล "จริง" (markdown_content ในตาราง)
+    // ถูกบันทึกสำเร็จไปแล้ว ผู้ใช้ยังคงอ่าน/แก้ไขเนื้อหาต่อได้ผ่าน DB ปกติ
+    if (markdownPath) {
+      try {
+        const { error: uploadError } = await supabase.storage
+          .from("manuals")
+          .upload(markdownPath, Buffer.from(body.markdown, "utf8"), {
+            contentType: "text/markdown",
+            upsert: true,
+          });
+        if (uploadError) {
+          responseBody.warning = `บันทึกลงฐานข้อมูลสำเร็จ แต่ไม่สามารถอัปเดตไฟล์ .md ใน storage ได้: ${uploadError.message}`;
+        }
+      } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        responseBody.warning = `บันทึกลงฐานข้อมูลสำเร็จ แต่ไม่สามารถอัปเดตไฟล์ .md ใน storage ได้: ${message}`;
+      }
+    }
+
+    sendSuccess(res, responseBody);
+  })
+);
+
+// ให้ frontend poll สถานะ OCR พื้นหลังของคู่มือเล่มหนึ่ง (queue โดย POST / ตอนสร้าง
+// หรือสั่งใหม่ผ่าน POST /:id/ocr ด้านล่าง) endpoint นี้ต้องไม่ถูก cache เพราะถูก poll
+// ซ้ำ ๆ ระหว่างที่ OCR กำลังทำงานอยู่ — ใช้ auth ระดับเดียวกับ GET /:id/content (ทุกคน
+// ที่ login แล้วอ่านได้ ไม่จำกัดแค่ engineer/supervisor)
+router.get(
+  "/:id/ocr-status",
+  asyncHandler(async (req, res) => {
+    const id = typeof req.params.id === "string" ? req.params.id.trim() : "";
+    if (id.length === 0) throw new ApiError(400, "กรุณาระบุ id ของคู่มือ");
+
+    const { data, error } = await supabase
+      .from("manuals")
+      .select("id,ocr_status,ocr_error,ocr_started_at,ocr_completed_at,ocr_pages,has_markdown")
+      .eq("id", id)
+      .maybeSingle();
+    if (error) throw new ApiError(500, error.message);
+    if (!data) throw new ApiError(404, "ไม่พบคู่มือที่ระบุ");
+
+    res.setHeader("Cache-Control", "no-store");
+
+    sendSuccess(res, {
+      id: data.id,
+      ocrStatus: (data.ocr_status ?? null) as OcrStatus | null,
+      ocrError: data.ocr_error ?? null,
+      ocrStartedAt: data.ocr_started_at ?? null,
+      ocrCompletedAt: data.ocr_completed_at ?? null,
+      ocrPages: data.ocr_pages ?? null,
+      hasMarkdown: data.has_markdown ?? false,
+    });
+  })
+);
+
+// สั่ง OCR ใหม่/ซ้ำสำหรับคู่มือเล่มเดียว (เช่น รอบก่อนล้มเหลว หรือต้องการรัน OCR ซ้ำ)
+// ป้องกันด้วย requireManualAdmin เช่นเดียวกับ POST /:id/index ด้านล่าง เพราะเป็นการสั่ง
+// งานเบื้องหลังที่กินทรัพยากรจริง ปล่อยให้เรียกได้อิสระเท่ากับเปิดช่องให้ถล่มคิวได้
+router.post(
+  "/:id/ocr",
+  requireManualAdmin,
+  asyncHandler(async (req, res) => {
+    const id = typeof req.params.id === "string" ? req.params.id.trim() : "";
+    if (id.length === 0) throw new ApiError(400, "กรุณาระบุ id ของคู่มือ");
+
+    const { data, error } = await supabase
+      .from("manuals")
+      .select("id,file_path,ocr_status")
+      .eq("id", id)
+      .maybeSingle();
+    if (error) throw new ApiError(500, error.message);
+    if (!data) throw new ApiError(404, "ไม่พบคู่มือที่ระบุ");
+    if (!data.file_path) throw new ApiError(400, "คู่มือเล่มนี้ยังไม่มีไฟล์ PDF แนบอยู่ในระบบ จึงไม่สามารถ OCR ได้");
+    if (data.ocr_status === "processing") throw new ApiError(409, "คู่มือเล่มนี้กำลังอยู่ระหว่าง OCR อยู่แล้ว");
+
+    queueManualOcr(id);
+
+    sendSuccess(res, { id, ocrStatus: "pending" as OcrStatus }, 202);
   })
 );
 

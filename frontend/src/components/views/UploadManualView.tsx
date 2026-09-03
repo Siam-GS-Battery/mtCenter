@@ -6,15 +6,22 @@ import {
   BookOpen,
   CheckCircle2,
   Loader2,
+  XCircle,
+  FileSearch,
 } from "lucide-react";
 import { ManualDoc } from "../../types";
 import {
   requestManualUploadUrl,
   uploadManualFile,
   createManual,
+  retryManualOcr,
   toUserMessage,
 } from "../../services/apiService";
 import { MANUAL_CATEGORIES, CUSTOM_MODEL_OPTION } from "../../lib/manualCategories";
+import { useManualOcrStatus } from "../../hooks/useManualOcrStatus";
+
+type ManualOcrStatusHookResult = ReturnType<typeof useManualOcrStatus>;
+import { ManualContentPanel } from "../manuals/ManualContentPanel";
 
 interface UploadManualViewProps {
   onGoToManuals?: () => void;
@@ -53,6 +60,105 @@ const STATUS_LABELS: Record<Exclude<UploadStatus, "done" | "error">, string | nu
   saving: "กำลังบันทึกข้อมูลคู่มือ...",
 };
 
+/** ป้ายสถานะ + ปุ่มลองใหม่สำหรับการแปลง PDF → Markdown ด้วย AI ที่รันเป็น background
+ * job หลังบันทึกคู่มือสำเร็จ — poll ผ่าน useManualOcrStatus จนกว่าจะจบสถานะ */
+const OcrProgressPanel: React.FC<{
+  manualId: string;
+  ocrStatusResult: ManualOcrStatusHookResult;
+}> = ({ manualId, ocrStatusResult }) => {
+  const { status, error, timedOut, resumePolling } = ocrStatusResult;
+  const [retrying, setRetrying] = useState(false);
+  const [retryError, setRetryError] = useState<string | null>(null);
+
+  const handleRetry = async () => {
+    setRetrying(true);
+    setRetryError(null);
+    try {
+      // ไม่ส่ง actorId — retryManualOcr() ใช้ currentUserId ที่ AuthContext set ไว้อยู่แล้ว
+      // เหมือนกับ createManual()/updateManual() ด้านบนในไฟล์นี้
+      await retryManualOcr(manualId);
+      resumePolling();
+    } catch (err) {
+      setRetryError(toUserMessage(err, "สั่งลองแปลงใหม่ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง"));
+    } finally {
+      setRetrying(false);
+    }
+  };
+
+  const ocrStatus = status?.ocrStatus ?? null;
+
+  if (!ocrStatus && !error) {
+    // ยังไม่มีข้อมูลสถานะแรก (กำลังเรียกครั้งแรก) หรือคู่มือนี้ไม่มี job OCR เลย (skipped/null)
+    return null;
+  }
+
+  return (
+    <div className="border-t border-emerald-200 pt-4 mt-1 space-y-2">
+      {(ocrStatus === "pending" || ocrStatus === "processing") && !timedOut && (
+        <div className="flex items-center gap-2 text-[13px] font-semibold text-emerald-900">
+          <Loader2 className="w-4 h-4 text-emerald-700 animate-spin" />
+          <span>
+            {ocrStatus === "pending"
+              ? "รอแปลงเป็น Markdown"
+              : "กำลังอ่านไฟล์ PDF ด้วย AI…"}
+          </span>
+        </div>
+      )}
+
+      {timedOut && (ocrStatus === "pending" || ocrStatus === "processing") && (
+        <div className="flex items-center gap-2 text-[13px] font-semibold text-amber-800">
+          <AlertCircle className="w-4 h-4 text-amber-700 shrink-0" />
+          <span>ใช้เวลานานกว่าปกติ กรุณากลับมาตรวจสอบอีกครั้งในภายหลัง</span>
+        </div>
+      )}
+
+      {ocrStatus === "done" && (
+        <div className="flex items-center gap-2 text-[13px] font-semibold text-emerald-900">
+          <FileSearch className="w-4 h-4 text-emerald-700" />
+          <span>
+            แปลงเป็น Markdown สำเร็จ
+            {status?.ocrPages ? ` (${status.ocrPages} หน้า)` : ""}
+          </span>
+        </div>
+      )}
+
+      {ocrStatus === "skipped" && (
+        <div className="flex items-center gap-2 text-[13px] font-semibold text-ink-muted">
+          <FileSearch className="w-4 h-4 text-ink-muted" />
+          <span>ข้ามการแปลง</span>
+        </div>
+      )}
+
+      {ocrStatus === "failed" && (
+        <div className="space-y-2">
+          <div className="flex items-start gap-2 text-[13px] font-semibold text-rose-900">
+            <XCircle className="w-4 h-4 text-rose-700 shrink-0 mt-0.5" />
+            <div>
+              <p>แปลงไม่สำเร็จ</p>
+              {status?.ocrError && (
+                <p className="text-xs text-rose-800 font-normal mt-0.5">{status.ocrError}</p>
+              )}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleRetry}
+            disabled={retrying}
+            className="px-3.5 min-h-9 py-1.5 rounded-full bg-white border border-rose-200 text-rose-800 text-xs font-semibold hover:bg-rose-50 cursor-pointer active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {retrying ? "กำลังสั่งลองใหม่..." : "ลองแปลงอีกครั้ง"}
+          </button>
+          {retryError && <p className="text-xs text-rose-800">{retryError}</p>}
+        </div>
+      )}
+
+      {error && (
+        <p className="text-xs text-amber-800">ไม่สามารถตรวจสอบสถานะการแปลงไฟล์ได้: {error}</p>
+      )}
+    </div>
+  );
+};
+
 export const UploadManualView: React.FC<UploadManualViewProps> = ({
   onGoToManuals,
   machineModels,
@@ -72,6 +178,9 @@ export const UploadManualView: React.FC<UploadManualViewProps> = ({
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [progress, setProgress] = useState(0);
   const [savedManual, setSavedManual] = useState<ManualDoc | null>(null);
+  // แผงตรวจสอบเนื้อหา Markdown ทางขวา — ผู้ใช้ปิดได้เอง (ดู ManualContentPanel) รีเซ็ตเป็นเปิดใหม่
+  // ทุกครั้งที่อัปโหลดไฟล์รอบใหม่ (ดู handleFile/handleReset ด้านล่าง)
+  const [contentPanelOpen, setContentPanelOpen] = useState(true);
 
   const isSubmitting =
     status === "requesting" || status === "uploading" || status === "saving";
@@ -121,6 +230,7 @@ export const UploadManualView: React.FC<UploadManualViewProps> = ({
     setStatus("idle");
     setProgress(0);
     setSavedManual(null);
+    setContentPanelOpen(true);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,6 +265,7 @@ export const UploadManualView: React.FC<UploadManualViewProps> = ({
     setStatus("idle");
     setProgress(0);
     setSavedManual(null);
+    setContentPanelOpen(true);
   };
 
   // ปุ่มส่งไฟล์เปิดใช้งานได้ทันทีที่มีไฟล์ค้างอยู่และไม่ได้กำลังส่งอยู่แล้ว
@@ -248,8 +359,34 @@ export const UploadManualView: React.FC<UploadManualViewProps> = ({
     }
   };
 
+  // แสดงแผงตรวจสอบเนื้อหาด้านขวาตั้งแต่บันทึกคู่มือสำเร็จ (savedManual มีค่า) แม้ OCR ยังไม่เสร็จ
+  // เพื่อให้ผู้ใช้เห็นล่วงหน้าว่าผลลัพธ์จะไปโผล่ที่ไหน — จนกว่าจะปิดแผงเอง (contentPanelOpen)
+  const showContentPanel = !!savedManual && contentPanelOpen;
+
+  // เจ้าเดียวที่ poll สถานะ OCR ของคู่มือเล่มนี้ — ยกขึ้นมาไว้ที่ parent ร่วมนี้เพื่อไม่ให้
+  // OcrProgressPanel และ ManualContentPanel poll ซ้ำกันสองรอบพร้อมกัน (เดิมแต่ละฝั่งเรียก
+  // useManualOcrStatus เอง) ส่ง null เมื่อยังไม่มี savedManual เพื่อปิดการ poll
+  const ocrStatusResult = useManualOcrStatus(savedManual?.id ?? null);
+
   return (
-    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-6">
+    <div className="p-4 md:p-8 max-w-7xl mx-auto">
+      <div
+        className={
+          showContentPanel
+            ? "grid grid-cols-1 lg:grid-cols-2 gap-6 items-start"
+            : "max-w-4xl mx-auto space-y-6"
+        }
+      >
+        <div className={showContentPanel ? "space-y-6" : "space-y-6"}>
+          {savedManual && !contentPanelOpen && (
+            <button
+              type="button"
+              onClick={() => setContentPanelOpen(true)}
+              className="min-h-9 px-4 py-1.5 rounded-full bg-white border border-divider text-ink-muted text-xs font-semibold hover:bg-parchment cursor-pointer active:scale-95"
+            >
+              แสดงแผงตรวจสอบเนื้อหา Markdown
+            </button>
+          )}
       {/* Upload Dropzone Card */}
       {!stagedFile && (
         <div
@@ -326,6 +463,8 @@ export const UploadManualView: React.FC<UploadManualViewProps> = ({
               </p>
             </div>
           </div>
+
+          <OcrProgressPanel manualId={savedManual.id} ocrStatusResult={ocrStatusResult} />
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <button
@@ -565,6 +704,17 @@ export const UploadManualView: React.FC<UploadManualViewProps> = ({
           </div>
         </div>
       )}
+        </div>
+
+        {showContentPanel && savedManual && (
+          <ManualContentPanel
+            manualId={savedManual.id}
+            title={savedManual.title}
+            onClose={() => setContentPanelOpen(false)}
+            ocrStatus={ocrStatusResult.status}
+          />
+        )}
+      </div>
     </div>
   );
 };

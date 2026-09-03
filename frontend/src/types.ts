@@ -303,6 +303,14 @@ export interface ManualDoc {
   hasMarkdown?: boolean;
   markdownContent?: string;
   filePath?: string;
+  /** สถานะการแปลง PDF → Markdown ด้วย OCR ที่รันเป็น background job — ไม่มีใน
+   * คู่มือเก่าที่ยังไม่เคยผ่านขั้นตอนนี้ จึงเป็น optional/null ได้ */
+  ocrStatus?: "pending" | "processing" | "done" | "failed" | "skipped" | null;
+  ocrError?: string | null;
+  /** true เมื่อฉบับ Markdown ปัจจุบันผ่านการตรวจสอบ/บันทึกโดยผู้ใช้แล้ว — false หมายถึงยังเป็น
+   * ฉบับร่างจาก AI ที่ยังไม่มีใครยืนยัน (ดู PUT /api/manuals/:id/content) undefined สำหรับคู่มือเก่าที่
+   * backend รุ่นก่อนหน้ายังไม่ส่งฟิลด์นี้มา */
+  markdownApproved?: boolean;
 }
 
 export interface ChatMessage {

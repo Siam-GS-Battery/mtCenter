@@ -45,51 +45,49 @@ export function AiChatHistoryPanel({
 }: AiChatHistoryPanelProps) {
   return (
     <div className={`flex flex-col ${className ?? ""}`}>
-      <div className="flex items-center justify-between gap-2 mb-2.5">
-        <span className="text-[13px] font-semibold text-ink">ประวัติการแชต</span>
-        <button
-          type="button"
-          onClick={onNewChat}
-          className="min-h-11 px-4 py-2.5 rounded-full bg-primary hover:bg-primary-focus text-white font-semibold text-[13px] flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
-        >
-          <Plus size={16} />
-          แชตใหม่
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={onNewChat}
+        className="w-full mb-3 px-3 py-2 rounded-lg border border-hairline text-ink text-[13px] font-medium flex items-center justify-center gap-1.5 cursor-pointer hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+      >
+        <Plus size={16} />
+        แชตใหม่
+      </button>
+
+      <span className="text-xs uppercase tracking-wide text-ink-muted mb-2 px-1">
+        ประวัติการแชต
+      </span>
 
       {sessions.length === 0 ? (
-        <div className="rounded-[18px] border border-hairline bg-white p-3.5 text-center">
-          <p className="text-[13px] text-ink-muted">ยังไม่มีประวัติการแชต</p>
-          <p className="text-[12px] text-ink-muted mt-1">กดปุ่ม “แชตใหม่” เพื่อเริ่มการสนทนา</p>
-        </div>
+        <p className="text-[13px] text-ink-muted text-center mt-4">ยังไม่มีประวัติการแชต</p>
       ) : (
-        <ul className="flex flex-col gap-2 overflow-y-auto max-h-[60vh] pr-0.5">
+        <ul className="flex flex-col gap-0.5 overflow-y-auto max-h-[60vh] pr-0.5">
           {sessions.map((session) => {
             const isActive = session.id === activeSessionId;
             const machineLabel = machineLabelById?.(session.machineId) ?? null;
-            const meta = [machineLabel, formatSessionTimestamp(session.updatedAt)]
-              .filter(Boolean)
-              .join(" · ");
+            const timestamp = formatSessionTimestamp(session.updatedAt);
 
             return (
               <li key={session.id}>
                 <div
-                  className={`w-full rounded-[18px] border p-3.5 flex items-center gap-2.5 transition-colors ${
-                    isActive
-                      ? "border-primary/40 bg-divider"
-                      : "border-hairline bg-white hover:bg-pearl"
+                  className={`group w-full rounded-lg p-2.5 flex items-center gap-2 transition-colors ${
+                    isActive ? "bg-ink/5" : "hover:bg-ink/5"
                   }`}
                 >
                   <button
                     type="button"
                     onClick={() => onSelectSession(session.id)}
-                    className="flex-1 min-w-0 flex items-center gap-2.5 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60 rounded-[11px]"
+                    className="flex-1 min-w-0 flex items-center gap-2 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60 rounded-lg"
                   >
-                    <MessageSquare size={16} className="flex-shrink-0 text-ink-muted" />
+                    <MessageSquare size={15} className="flex-shrink-0 text-ink-muted" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-semibold text-ink truncate">{session.title}</p>
-                      {meta && (
-                        <p className="text-[12px] text-ink-muted truncate">{meta}</p>
+                      <p className="text-sm text-ink truncate">{session.title}</p>
+                      {(machineLabel || timestamp) && (
+                        <p className="text-xs text-ink-muted truncate">
+                          {machineLabel && timestamp
+                            ? `${machineLabel} · ${timestamp}`
+                            : machineLabel ?? timestamp}
+                        </p>
                       )}
                     </div>
                   </button>
@@ -100,9 +98,9 @@ export function AiChatHistoryPanel({
                       event.stopPropagation();
                       onDeleteSession(session.id);
                     }}
-                    className="flex-shrink-0 rounded-[11px] p-2 text-ink-muted hover:text-red-600 hover:bg-pearl transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                    className="flex-shrink-0 rounded-lg p-1.5 text-ink-muted hover:text-red-600 hover:bg-pearl transition-colors cursor-pointer opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
                   >
-                    <Trash2 size={15} />
+                    <Trash2 size={14} />
                   </button>
                 </div>
               </li>

@@ -10,7 +10,6 @@ import {
 import type { WorkOrderPrefill } from "../../lib/aiActions";
 import { useAiChatSessions } from "../../hooks/useAiChatSessions";
 import { AiChatHistoryPanel } from "../ai/AiChatHistoryPanel";
-import { MachineSelect } from "../MachineSelect";
 
 interface AIChatViewProps {
   /** null = ไม่มีเครื่องจักรเลือกอยู่ — แชทจะตอบแบบภาพรวมทั้งฟลีตแทน */
@@ -166,13 +165,54 @@ export const AIChatView: React.FC<AIChatViewProps> = ({
   }, [initialPrompt]);
 
   return (
-    <div className="bg-parchment h-[calc(100vh-5rem)] flex flex-col">
-      <div className="max-w-6xl mx-auto w-full flex flex-col h-full px-4 md:px-0">
+    <div className="bg-parchment h-[calc(100vh-5rem)] flex">
+      {/* Desktop history sidebar */}
+      <div className="hidden lg:flex w-64 shrink-0 flex-col border-r border-hairline overflow-y-auto">
+        <AiChatHistoryPanel
+          sessions={sessions}
+          activeSessionId={activeSessionId}
+          onSelectSession={handleSelectSession}
+          onNewChat={handleNewChat}
+          onDeleteSession={handleDeleteSession}
+          machineLabelById={machineLabelById}
+          className="p-3"
+        />
+      </div>
+
+      {/* Mobile history panel — overlay behind a toggle */}
+      {historyOpenMobile && (
+        <div className="lg:hidden fixed inset-0 z-50 flex">
+          <div
+            className="absolute inset-0 bg-black/30"
+            onClick={() => setHistoryOpenMobile(false)}
+          />
+          <div className="relative bg-parchment w-[85%] max-w-xs h-full overflow-y-auto p-4 shadow-2xl">
+            <button
+              onClick={() => setHistoryOpenMobile(false)}
+              aria-label="ปิดประวัติการแชต"
+              className="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center text-ink-muted hover:bg-white cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <AiChatHistoryPanel
+              sessions={sessions}
+              activeSessionId={activeSessionId}
+              onSelectSession={handleSelectSession}
+              onNewChat={handleNewChat}
+              onDeleteSession={handleDeleteSession}
+              machineLabelById={machineLabelById}
+              className="pt-8"
+            />
+          </div>
+        </div>
+      )}
+
+      <div className="flex-1 min-w-0 flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between gap-3 py-4 shrink-0">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shrink-0">
-              <PixelAILogo className="w-5 h-5" />
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-hairline shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center shrink-0">
+              <PixelAILogo className="w-4 h-4" />
             </div>
             <div className="min-w-0">
               <h2 className="font-semibold text-ink text-sm truncate">MT Center AI</h2>
@@ -184,24 +224,24 @@ export const AIChatView: React.FC<AIChatViewProps> = ({
                 {aiMode === "mock" && (
                   <span
                     title="ตอบจากกฎเกณฑ์และข้อมูลจริงในฐานข้อมูล ไม่ได้เรียกโมเดลภาษา"
-                    className="ml-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-semibold shrink-0"
+                    className="ml-1 px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-semibold shrink-0"
                   >
-                    โหมดสาธิต (กฎ + ข้อมูลจริง)
+                    โหมดสาธิต
                   </span>
                 )}
-                <span className="hidden sm:inline-flex ml-2 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold truncate">
+                <span className="hidden sm:inline-flex ml-1 px-1.5 py-0.5 rounded-full bg-ink/5 text-ink-muted text-xs truncate">
                   {selectedMachine ? `${selectedMachine.code} · ${selectedMachine.name}` : "ภาพรวมเครื่องจักรทั้งหมด"}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1 shrink-0">
             <button
               onClick={() => setHistoryOpenMobile((v) => !v)}
               aria-label="ประวัติการแชต"
               title="ประวัติการแชต"
-              className="lg:hidden w-11 h-11 rounded-full text-ink-muted hover:text-ink hover:bg-white transition-colors cursor-pointer flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+              className="lg:hidden w-9 h-9 rounded-full text-ink-muted hover:text-ink hover:bg-ink/5 transition-colors cursor-pointer flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
             >
               <History className="w-4 h-4" />
             </button>
@@ -209,67 +249,15 @@ export const AIChatView: React.FC<AIChatViewProps> = ({
               onClick={handleNewChat}
               aria-label="เริ่มการสนทนาใหม่"
               title="เริ่มการสนทนาใหม่"
-              className="w-11 h-11 rounded-full text-ink-muted hover:text-ink hover:bg-white transition-colors cursor-pointer flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+              className="w-9 h-9 rounded-full text-ink-muted hover:text-ink hover:bg-ink/5 transition-colors cursor-pointer flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        <div className="flex-1 min-h-0 flex gap-4 pb-4">
-          {/* Desktop history panel */}
-          <div className="hidden lg:block w-72 shrink-0 overflow-y-auto">
-            <AiChatHistoryPanel
-              sessions={sessions}
-              activeSessionId={activeSessionId}
-              onSelectSession={handleSelectSession}
-              onNewChat={handleNewChat}
-              onDeleteSession={handleDeleteSession}
-              machineLabelById={machineLabelById}
-            />
-          </div>
-
-          {/* Mobile history panel — overlay behind a toggle */}
-          {historyOpenMobile && (
-            <div className="lg:hidden fixed inset-0 z-50 flex">
-              <div
-                className="absolute inset-0 bg-black/30"
-                onClick={() => setHistoryOpenMobile(false)}
-              />
-              <div className="relative bg-divider w-[85%] max-w-xs h-full overflow-y-auto p-4 shadow-2xl">
-                <button
-                  onClick={() => setHistoryOpenMobile(false)}
-                  aria-label="ปิดประวัติการแชต"
-                  className="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center text-ink-muted hover:bg-white cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-                <AiChatHistoryPanel
-                  sessions={sessions}
-                  activeSessionId={activeSessionId}
-                  onSelectSession={handleSelectSession}
-                  onNewChat={handleNewChat}
-                  onDeleteSession={handleDeleteSession}
-                  machineLabelById={machineLabelById}
-                  className="pt-8"
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="flex-1 min-w-0 min-h-0 flex flex-col">
-            <MachineSelect
-              machines={machines}
-              activeMachine={selectedMachine}
-              onSelectMachine={handleSelectMachineForChat}
-              label="เครื่องจักรที่ต้องการถาม"
-              placeholder="ไม่ระบุเครื่องจักร (ถามแบบทั่วไป)"
-              className="mb-3 shrink-0"
-              allowClear
-              clearLabel="ไม่ระบุเครื่องจักร (ถามแบบทั่วไป)"
-              onClear={handleClearMachineForChat}
-            />
-
+        <div className="flex-1 min-h-0 flex flex-col overflow-y-auto">
+          <div className="mx-auto w-full max-w-3xl px-4 flex-1 min-h-0 flex flex-col">
             <AssistantConversation
               chat={chat}
               activeMachine={selectedMachine}
@@ -277,6 +265,10 @@ export const AIChatView: React.FC<AIChatViewProps> = ({
               variant="page"
               onAutoCreateWorkOrder={onAutoCreateWorkOrder}
               onOpenCreateWorkOrderModal={onOpenCreateWorkOrderModal}
+              machines={machines}
+              onSelectMachineForChat={(machine) =>
+                machine ? handleSelectMachineForChat(machine) : handleClearMachineForChat()
+              }
             />
           </div>
         </div>

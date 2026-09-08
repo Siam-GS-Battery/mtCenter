@@ -22,10 +22,13 @@ import {
   ShieldCheck,
   ThumbsUp,
   ThumbsDown,
+  Plus,
+  X,
 } from "lucide-react";
 import { Machine, UserRole, ChatMessage } from "../../types";
 import PixelAILogo from "../PixelAILogo";
 import { MicDictationButton } from "../MicDictationButton";
+import { MachineAttachMenu } from "./MachineAttachMenu";
 import { aiChat, aiFeedback, type AiMode } from "../../services/apiService";
 import {
   hasWorkOrderAction,
@@ -307,6 +310,13 @@ interface AssistantConversationProps {
   onOpenCreateWorkOrderModal?: (prefilled: WorkOrderPrefill) => void;
   /** เรียกหลังผู้ใช้สั่งสร้างใบงาน/เปิดฟอร์ม — drawer ใช้ปิดตัวเองไม่ให้บังใบงาน */
   onAfterAction?: () => void;
+  /**
+   * รายชื่อเครื่องจักรทั้งหมด — ใช้กับปุ่ม "+" แนบเครื่องจักรในคอมโพสเซอร์
+   * (แสดงเฉพาะ variant="page" เท่านั้น — drawer มีบริบทเครื่องจักรอยู่แล้วที่อื่น)
+   */
+  machines?: Machine[];
+  /** เลือกเครื่องจักรจากตัวเลือก "+" แนบเครื่องจักร */
+  onSelectMachineForChat?: (machine: Machine | null) => void;
 }
 
 export const AssistantConversation: React.FC<AssistantConversationProps> = ({
@@ -317,6 +327,8 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
   onAutoCreateWorkOrder,
   onOpenCreateWorkOrderModal,
   onAfterAction,
+  machines,
+  onSelectMachineForChat,
 }) => {
   const isPage = variant === "page";
   const { messages, isLoading, failedPrompts, send, retry } = chat;
@@ -332,6 +344,30 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
 
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const machinePickerRef = useRef<HTMLDivElement>(null);
+  const [isMachinePickerOpen, setIsMachinePickerOpen] = useState(false);
+
+  // ปิด popover แนบเครื่องจักรเมื่อคลิกนอกกล่อง หรือกด Escape
+  useEffect(() => {
+    if (!isMachinePickerOpen) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        machinePickerRef.current &&
+        !machinePickerRef.current.contains(event.target as Node)
+      ) {
+        setIsMachinePickerOpen(false);
+      }
+    };
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsMachinePickerOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isMachinePickerOpen]);
 
   const presetQuestions = buildPresetQuestions(activeMachine);
   const presetIcons = [Thermometer, Wrench, ClipboardList, ShieldCheck];
@@ -407,21 +443,21 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
           // คลาสสิก: เนื้อหาที่ล้นจากการจัดกึ่งกลางถูก "หนีบ" เท่า ๆ กันทั้งบนล่าง จนเลื่อนไปสุดปุ่มบนๆ
           // ไม่ได้ (เห็น/กดได้แค่ 2 ปุ่มแรก) — เอา justify-center ออก ให้ไหลจากบนลงล่างตามปกติ
           // แทน เนื้อหาสั้นยังดูกึ่งกลางได้ด้วย min-h-full + py
-          <div className="min-h-full flex flex-col items-center text-center px-2 py-8">
+          <div className={`min-h-full flex flex-col items-center justify-center text-center px-2 py-8 ${isPage ? "mx-auto w-full max-w-3xl" : ""}`}>
             <div
-              className={`rounded-full bg-primary/10 flex items-center justify-center mb-4 ${isPage ? "w-16 h-16" : "w-14 h-14"}`}
+              className={`rounded-full bg-primary/10 flex items-center justify-center mb-3 ${isPage ? "w-14 h-14" : "w-12 h-12"}`}
             >
-              <PixelAILogo className={isPage ? "w-9 h-9 text-primary" : "w-7 h-7 text-primary"} />
+              <PixelAILogo className={isPage ? "w-8 h-8 text-primary" : "w-6 h-6 text-primary"} />
             </div>
-            <h3 className={`font-semibold text-ink ${isPage ? "text-lg" : "text-base"}`}>
+            <h3 className={`font-semibold text-ink ${isPage ? "text-2xl" : "text-base"}`}>
               สวัสดีครับ
             </h3>
-            <p className="text-sm text-ink-muted mt-1 mb-6">
+            <p className="text-sm text-ink-muted mt-1 mb-5">
               มีอะไรให้ช่วยเรื่องงานซ่อมบำรุงไหมครับ
             </p>
 
             <div
-              className={`w-full ${isPage ? "grid grid-cols-1 sm:grid-cols-2 gap-3" : "flex flex-col gap-2"}`}
+              className={`w-full ${isPage ? "grid grid-cols-1 lg:grid-cols-2 gap-2" : "flex flex-col gap-2"}`}
             >
               {presetQuestions.map((q, idx) => {
                 const Icon = presetIcons[idx % presetIcons.length] ?? Sparkles;
@@ -430,22 +466,22 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
                     key={idx}
                     onClick={() => send(q)}
                     disabled={isLoading}
-                    className="min-h-11 rounded-[18px] border border-hairline bg-white hover:border-primary/40 p-3.5 text-left flex items-start gap-2.5 transition-colors cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                    className="min-h-11 rounded-xl border border-hairline/60 bg-white hover:border-hairline hover:bg-ink/[0.03] px-3.5 py-2.5 text-left flex items-center gap-2.5 transition-colors cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
                   >
-                    <Icon className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm text-ink-muted">{q}</span>
+                    <Icon className="w-4 h-4 text-ink-muted shrink-0" />
+                    <span className="text-sm text-ink">{q}</span>
                   </button>
                 );
               })}
             </div>
           </div>
         ) : (
-          <div className={isPage ? "space-y-6 md:space-y-8 py-2 pb-4" : "space-y-5"}>
+          <div className={`${isPage ? "mx-auto w-full max-w-3xl space-y-6 py-2 pb-4" : "space-y-5"}`}>
             {messages.map((msg) => {
               if (msg.sender === "user") {
                 return (
                   <div key={msg.id} className="flex justify-end">
-                    <div className="bg-primary text-white rounded-[18px] px-4 py-2.5 max-w-[85%] text-sm leading-relaxed whitespace-pre-wrap break-words">
+                    <div className="rounded-2xl bg-primary/10 text-ink px-4 py-2.5 max-w-[85%] ml-auto text-sm leading-relaxed whitespace-pre-wrap break-words">
                       {msg.text}
                     </div>
                   </div>
@@ -487,7 +523,7 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
                     )}
 
                     <div
-                      className={`text-sm text-ink break-words ${isPage ? "leading-7" : "leading-6"}`}
+                      className={`text-sm text-ink leading-relaxed break-words`}
                     >
                       <ReactMarkdown components={chatMarkdownComponents} remarkPlugins={[remarkGfm]}>
                         {formatChatMarkdown(msg.text)}
@@ -702,65 +738,113 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
 
       {/* Composer */}
       <div
-        className={`shrink-0 ${isPage ? "pb-4 pt-2 bg-white" : "bg-white border-t border-hairline p-3"}`}
+        className={`shrink-0 ${isPage ? "pb-4 pt-2 bg-parchment" : "bg-white border-t border-hairline p-3"}`}
       >
-        {hasUserMessage && (
-          <div className="flex flex-nowrap items-center gap-2 overflow-x-auto overflow-y-hidden -mx-4 px-4 pb-2 scrollbar-none">
-            {presetQuestions.map((q, idx) => (
-              <button
-                key={idx}
-                onClick={() => send(q)}
-                disabled={isLoading}
-                className="min-h-11 px-4 py-2 rounded-full border border-hairline bg-white hover:border-primary/40 hover:text-primary text-[13px] text-ink-muted whitespace-nowrap transition-colors cursor-pointer shrink-0 active:scale-95 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-        )}
+        <div className={isPage ? "mx-auto w-full max-w-3xl" : ""}>
+          {hasUserMessage && !isPage && (
+            <div className="flex flex-nowrap items-center gap-2 overflow-x-auto overflow-y-hidden -mx-4 px-4 pb-2 scrollbar-none">
+              {presetQuestions.map((q, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => send(q)}
+                  disabled={isLoading}
+                  className="min-h-11 px-4 py-2 rounded-full border border-hairline bg-white hover:border-primary/40 hover:text-primary text-[13px] text-ink-muted transition-colors cursor-pointer active:scale-95 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60 whitespace-nowrap shrink-0"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+          )}
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}
-          className="flex items-center gap-2 rounded-full border border-hairline bg-white focus-within:border-primary focus-within:ring-2 focus-within:ring-primary-focus/40 px-2 py-2 transition-all"
-        >
-          <MicDictationButton
-            currentValue={inputPrompt}
-            onTranscript={(text) => setInputPrompt((prev) => `${prev}${text}`)}
-            className="flex-row! items-center!"
-          />
-
-          <textarea
-            ref={textareaRef}
-            rows={1}
-            value={inputPrompt}
-            onChange={(e) => setInputPrompt(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit();
-              }
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
             }}
-            aria-label="พิมพ์คำถามถึงผู้ช่วย AI"
-            placeholder="พิมพ์คำถาม เช่น วิธีถอดประกอบ Spindle Bearing, รหัสข้อผิดพลาด Err-E304..."
-            className="flex-1 bg-transparent outline-none resize-none text-sm text-ink placeholder:text-ink-muted py-2 max-h-30 leading-6"
-          />
-
-          <button
-            type="submit"
-            disabled={!inputPrompt.trim() || isLoading}
-            aria-label="ส่งคำถาม"
-            className="w-11 h-11 rounded-full bg-primary hover:bg-primary-focus text-white disabled:bg-divider disabled:text-ink-muted flex items-center justify-center shrink-0 transition-colors cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+            className="relative rounded-2xl border border-hairline bg-white shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10 px-3 pt-2.5 pb-2 transition-all"
           >
-            <ArrowUp className="w-5 h-5" />
-          </button>
-        </form>
+            {isPage && activeMachine && (
+              <div className="mb-2">
+                <span className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 px-2 py-1 text-xs text-ink">
+                  <span className="font-semibold">{activeMachine.code}</span>
+                  <span className="truncate max-w-[10rem]">{activeMachine.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => onSelectMachineForChat?.(null)}
+                    aria-label="ยกเลิกการแนบเครื่องจักร"
+                    className="ml-0.5 text-ink-muted hover:text-ink cursor-pointer"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              </div>
+            )}
 
-        <p className="text-xs text-ink-muted text-center mt-2">
-          AI อาจให้ข้อมูลคลาดเคลื่อน โปรดตรวจสอบก่อนปฏิบัติงานจริง
-        </p>
+            <textarea
+              ref={textareaRef}
+              rows={1}
+              value={inputPrompt}
+              onChange={(e) => setInputPrompt(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit();
+                }
+              }}
+              aria-label="พิมพ์คำถามถึงผู้ช่วย AI"
+              placeholder="พิมพ์คำถาม เช่น วิธีถอดประกอบ Spindle Bearing, รหัสข้อผิดพลาด Err-E304..."
+              className="w-full resize-none bg-transparent outline-none border-0 focus:outline-none focus:ring-0 focus-visible:outline-none text-sm text-ink placeholder:text-ink-muted max-h-30 leading-6"
+            />
+
+            <div className="flex items-center justify-between mt-1.5">
+              <div className="flex items-center gap-1">
+                {isPage && machines && (
+                  <div className="relative" ref={machinePickerRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsMachinePickerOpen((v) => !v)}
+                      aria-label="แนบเครื่องจักร"
+                      title="แนบเครื่องจักร"
+                      className="rounded-full h-8 w-8 text-ink-muted hover:bg-ink/5 flex items-center justify-center cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+
+                    {isMachinePickerOpen && (
+                      <div className="absolute bottom-full mb-2 left-0 z-30">
+                        <MachineAttachMenu
+                          machines={machines}
+                          activeMachineId={activeMachine?.id ?? null}
+                          onSelect={(m) => onSelectMachineForChat?.(m)}
+                          onClose={() => setIsMachinePickerOpen(false)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <MicDictationButton
+                  currentValue={inputPrompt}
+                  onTranscript={(text) => setInputPrompt((prev) => `${prev}${text}`)}
+                  className="flex-row! items-center!"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={!inputPrompt.trim() || isLoading}
+                aria-label="ส่งคำถาม"
+                className="w-9 h-9 rounded-full bg-primary hover:bg-primary-focus text-white disabled:opacity-40 disabled:bg-primary flex items-center justify-center shrink-0 transition-colors cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+              >
+                <ArrowUp className="w-4 h-4" />
+              </button>
+            </div>
+          </form>
+
+          <p className="text-xs text-ink-muted text-center mt-2">
+            AI อาจให้ข้อมูลคลาดเคลื่อน โปรดตรวจสอบก่อนปฏิบัติงานจริง
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -20,12 +20,21 @@ const modalCustomClass = {
   actions: "gap-3",
 };
 
+// Toasts get a bounded, wrapping width so a long filename (no spaces to break
+// on) can't stretch the popup and force a horizontal scrollbar — see swal.ts
+// callers that pass long user-supplied titles (e.g. manual/document names).
+const toastCustomClass = {
+  popup: "max-w-sm w-[min(22rem,calc(100vw-2rem))] overflow-hidden",
+  title: "whitespace-normal break-words text-start leading-snug text-sm",
+};
+
 const toastMixin = Swal.mixin({
   toast: true,
   position: "top-end",
   showConfirmButton: false,
   showClass: { popup: "" },
   hideClass: { popup: "" },
+  customClass: toastCustomClass,
   didOpen: (el) => {
     el.addEventListener("mouseenter", Swal.stopTimer);
     el.addEventListener("mouseleave", Swal.resumeTimer);

@@ -14,6 +14,7 @@
     "mock:machine": "tsx scripts/mock-machine.ts",
     "mock:abnormal": "tsx scripts/mock-abnormal-machine.ts",
     "mock:history": "tsx scripts/mock-repair-history.ts",
+    "mock:demo-telemetry": "tsx scripts/mock-demo-telemetry.ts",
     "index:manuals": "tsx scripts/index-manuals.ts",
     "check:intents": "tsx scripts/check-intents.ts",
     "seed:review-queue": "tsx scripts/seed-review-queue.ts",

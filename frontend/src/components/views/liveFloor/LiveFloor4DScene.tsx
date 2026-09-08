@@ -96,6 +96,15 @@ export interface LiveFloor4DSceneProps {
   /** Fired when the browser restores the context and rendering resumes. */
   onContextRestored?: () => void;
   /**
+   * true while the machine-detail modal is open above this canvas. drei's
+   * `<Html>` portals into the canvas's own DOM container, escaping the app's
+   * stacking context, so the floating name cards on the hover/selection
+   * markers would otherwise always paint over a `position:fixed` modal
+   * regardless of z-index. Hides only the `<Html>` labels — the 3D
+   * highlight/selection geometry stays mounted and visible.
+   */
+  hideLabels?: boolean;
+  /**
    * หุ่นยนต์ตรวจสายการผลิต (โหมด Agent) — ฉากเป็นผู้ก้าวเวลาให้จาก render
    * loop ของตัวเอง เหมือนที่ทำกับ `simulation` ผ่าน `SimulationStepper`
    * เพื่อให้การเดินลื่นตามเฟรมจริง ส่วนพาเนลรายงานฝั่ง HUD อ่าน snapshot
@@ -3145,17 +3154,31 @@ function DetailedMachine({
   );
 }
 
-function HoverHighlight({ slot, lite }: { slot: FloorSlot; lite: boolean }) {
+function HoverHighlight({
+  slot,
+  lite,
+  hideLabel,
+}: {
+  slot: FloorSlot;
+  lite: boolean;
+  hideLabel?: boolean;
+}) {
   const { machine, height } = slot;
   const color = statusColor(machine.status);
   const archLabel = ARCHETYPE_LABELS[slot.archetype] ?? "";
   return (
     <group position={[slot.x, 0, slot.z]} rotation={[0, slot.rotationY, 0]}>
       <DetailedMachine slot={slot} color={color} lite={lite} highlight={HOVER_TINT} />
+      {!hideLabel && (
       <Html
         position={[0, height + 0.6, 0]}
         distanceFactor={10}
         occlude={false}
+        // Defensive floor: even if a caller forgets to pass `hideLabel` while
+        // the detail modal is open, this keeps the card below the modal's
+        // `z-50` fixed overlay (see Modal.tsx) instead of relying solely on
+        // the flag above.
+        zIndexRange={[40, 0]}
         style={{ pointerEvents: "none" }}
       >
         {/* light card: white glass, app ink, hairline status border, soft shadow */}
@@ -3180,6 +3203,7 @@ function HoverHighlight({ slot, lite }: { slot: FloorSlot; lite: boolean }) {
           <div style={{ color, fontWeight: 600 }}>{STATUS_LABEL_TH[machine.status]}</div>
         </div>
       </Html>
+      )}
     </group>
   );
 }
@@ -3188,7 +3212,15 @@ function HoverHighlight({ slot, lite }: { slot: FloorSlot; lite: boolean }) {
 // Selection marker: detailed body + rotating ring + light column + callout
 // ---------------------------------------------------------------------------
 
-function SelectionMarker({ slot, lite }: { slot: FloorSlot; lite: boolean }) {
+function SelectionMarker({
+  slot,
+  lite,
+  hideLabel,
+}: {
+  slot: FloorSlot;
+  lite: boolean;
+  hideLabel?: boolean;
+}) {
   const ringRef = useRef<THREE.Mesh>(null);
   const { machine, height } = slot;
   const color = statusColor(machine.status);
@@ -3220,10 +3252,14 @@ function SelectionMarker({ slot, lite }: { slot: FloorSlot; lite: boolean }) {
         <meshBasicMaterial color={ACCENT_COLOR} toneMapped={false} transparent opacity={0.55} />
       </mesh>
 
+      {!hideLabel && (
       <Html
         position={[0, height + 1.1, 0]}
         distanceFactor={9}
         occlude={false}
+        // Defensive floor: keeps this card below the modal's `z-50` fixed
+        // overlay (Modal.tsx) even if `hideLabel` is ever missed.
+        zIndexRange={[40, 0]}
         style={{ pointerEvents: "none" }}
       >
         {/* light card: the dark-glass panel + outer cyan glow become white glass,
@@ -3254,6 +3290,7 @@ function SelectionMarker({ slot, lite }: { slot: FloorSlot; lite: boolean }) {
           </div>
         </div>
       </Html>
+      )}
     </group>
   );
 }
@@ -3554,6 +3591,7 @@ function SceneContents({
   inspectorFollow,
   onSelectInspector,
   lite,
+  hideLabels,
 }: LiveFloor4DSceneProps & { lite: boolean }) {
   // ONE layout instance per `machines` change: the caller's when supplied (the
   // view builds it so its HUD can list the buildings), otherwise built here so
@@ -3861,9 +3899,11 @@ function SceneContents({
       )}
 
       {hoveredSlot && hoveredSlot.machine.id !== selectedMachineId && (
-        <HoverHighlight slot={hoveredSlot} lite={lite} />
+        <HoverHighlight slot={hoveredSlot} lite={lite} hideLabel={hideLabels === true} />
       )}
-      {selectedSlot && <SelectionMarker slot={selectedSlot} lite={lite} />}
+      {selectedSlot && (
+        <SelectionMarker slot={selectedSlot} lite={lite} hideLabel={hideLabels === true} />
+      )}
 
       {highQuality !== false && !lite && (
         <ContactShadows

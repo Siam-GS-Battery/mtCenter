@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { Loader2, MonitorX, RotateCcw } from "lucide-react";
-import { Machine, MachineStatus, WorkOrder } from "../../../types";
+import { Machine, MachineStats, MachineStatus, WorkOrder } from "../../../types";
 import { buildFloorLayout } from "../../../lib/floorLayout";
 import { useFloorSimulation } from "../../../lib/floorSimulation";
 import { useInspectionAgent } from "../../../lib/inspectionAgent";
@@ -62,10 +62,23 @@ const LiveFloor4DScene = React.lazy(() => import("./LiveFloor4DScene"));
 
 export interface LiveFloorViewProps {
   machines: Machine[];
+  /**
+   * Aggregate machine counts from GET /api/machines/stats, same source of
+   * truth the classic dashboard uses. `machines` here is the parent's own
+   * (paginated, up to 1000 rows) list, so the HUD's "พร้อมใช้งาน %" KPI must
+   * prefer this over counting `machines` directly to avoid drifting from the
+   * dashboard's number. `null`/omitted falls back to counting `machines`.
+   */
+  machineStats?: MachineStats | null;
   workOrders: WorkOrder[];
   onOpenMachineDetail: (machine: Machine) => void;
   onExit: () => void;
   onAskAI?: (prompt: string) => void;
+  /** true while the machine-detail modal (owned by the parent dashboard) is open.
+   * Passed down to the 3D scene so its floating `<Html>` name labels hide instead
+   * of painting on top of the modal (drei's Html escapes the app's stacking
+   * context and would otherwise always sit above it). */
+  detailOpen?: boolean;
 }
 
 /**
@@ -286,10 +299,12 @@ function SceneLoadingFallback() {
 
 export default function LiveFloorView({
   machines,
+  machineStats,
   workOrders,
   onOpenMachineDetail,
   onExit,
   onAskAI,
+  detailOpen = false,
 }: LiveFloorViewProps) {
   const [statusFilter, setStatusFilter] = useState<MachineStatus | "all">("all");
   const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
@@ -568,6 +583,7 @@ export default function LiveFloorView({
                   onSelectInspector={handleSelectInspector}
                   onContextLost={handleContextLost}
                   onContextRestored={handleContextRestored}
+                  hideLabels={detailOpen}
                 />
               </Suspense>
             </SceneErrorBoundary>
@@ -581,6 +597,7 @@ export default function LiveFloorView({
 
         <LiveFloorHUD
           machines={machines}
+          machineStats={machineStats}
           workOrders={workOrders}
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}

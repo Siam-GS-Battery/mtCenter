@@ -252,6 +252,20 @@ const MANUALS: readonly ManualSpec[] = [
     category: "General",
     tags: ["ABB", "OmniCore", "robot", "RAPID", "programming"],
   },
+  {
+    file: "all-000-machine-manual.md",
+    title: "คู่มือบำรุงรักษาทั่วไป (All Machines) ALL-000",
+    machineModel: "ALL-000",
+    category: "คู่มือซ่อมบำรุงและแก้ไขปัญหา",
+    tags: ["ทุกเครื่องจักร", "บำรุงรักษาเชิงป้องกัน", "PM", "ความปลอดภัย", "LOTO"],
+  },
+  {
+    file: "gr-1141-machine-manual.md",
+    title: "คู่มือเครื่องจักร GR-1141",
+    machineModel: "GR-1141",
+    category: "คู่มือซ่อมบำรุงและแก้ไขปัญหา",
+    tags: ["GR-1141", "บำรุงรักษาเชิงป้องกัน", "แก้ไขปัญหา", "อะไหล่"],
+  },
 ];
 
 // Sanity-check the hardcoded catalog against the allowed category set —

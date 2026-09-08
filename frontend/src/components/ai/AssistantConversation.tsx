@@ -6,6 +6,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import type { Components } from "react-markdown";
 import {
   ArrowUp,
@@ -488,7 +489,7 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
                     <div
                       className={`text-sm text-ink break-words ${isPage ? "leading-7" : "leading-6"}`}
                     >
-                      <ReactMarkdown components={chatMarkdownComponents}>
+                      <ReactMarkdown components={chatMarkdownComponents} remarkPlugins={[remarkGfm]}>
                         {formatChatMarkdown(msg.text)}
                       </ReactMarkdown>
                     </div>

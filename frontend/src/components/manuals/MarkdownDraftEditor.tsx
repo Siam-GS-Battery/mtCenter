@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { AlertCircle, CheckCircle2, Eye, FileEdit, Loader2 } from "lucide-react";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";
 import { useMarkdownDraftEditor } from "../../hooks/useMarkdownDraftEditor";
@@ -109,7 +110,7 @@ export const MarkdownDraftEditor: React.FC<MarkdownDraftEditorProps> = ({
             </div>
           )}
           <div className="text-xs sm:text-sm leading-relaxed text-ink-muted">
-            <ReactMarkdown components={markdownComponents}>{debouncedMarkdown}</ReactMarkdown>
+            <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{debouncedMarkdown}</ReactMarkdown>
           </div>
         </div>
       </div>

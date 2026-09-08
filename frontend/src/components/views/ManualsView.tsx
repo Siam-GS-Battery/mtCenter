@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   BookOpen,
   Search,
@@ -938,7 +939,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
                       </button>
                     </div>
                   )}
-                  <ReactMarkdown components={markdownComponents}>
+                  <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
                     {visibleMarkdown ?? ""}
                   </ReactMarkdown>
                   <div className="text-center pt-3 pb-1 mt-3 border-t border-hairline space-y-2">
@@ -964,7 +965,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
                 </div>
               ) : activeContent.length > FALLBACK_CHAR_LIMIT && !showFullFallback ? (
                 <div className="text-xs sm:text-sm leading-relaxed text-ink-muted">
-                  <ReactMarkdown components={markdownComponents}>
+                  <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
                     {visibleMarkdown ?? ""}
                   </ReactMarkdown>
                   <div className="text-center pt-3 pb-1 mt-3 border-t border-hairline">
@@ -978,7 +979,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
                 </div>
               ) : (
                 <div className="text-xs sm:text-sm leading-relaxed text-ink-muted">
-                  <ReactMarkdown components={markdownComponents}>
+                  <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
                     {visibleMarkdown ?? ""}
                   </ReactMarkdown>
                 </div>

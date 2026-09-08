@@ -101,7 +101,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
                 }}
                 title="ขยายเต็มหน้าจอ"
                 aria-label="เปิดผู้ช่วย AI แบบเต็มหน้าจอ"
-                className="h-11 w-11 rounded-full hover:bg-parchment text-ink-muted flex items-center justify-center transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                className="h-11 w-11 rounded-full hover:bg-primary/5 text-ink-muted flex items-center justify-center transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
               >
                 <Maximize2 className="w-4 h-4" />
               </button>
@@ -111,7 +111,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
               onClick={chat.reset}
               title="เริ่มการสนทนาใหม่"
               aria-label="เริ่มการสนทนาใหม่"
-              className="h-11 w-11 rounded-full hover:bg-parchment text-ink-muted flex items-center justify-center transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+              className="h-11 w-11 rounded-full hover:bg-primary/5 text-ink-muted flex items-center justify-center transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
@@ -120,7 +120,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
               onClick={onClose}
               title="ปิดผู้ช่วยด้านข้าง"
               aria-label="ปิดผู้ช่วยด้านข้าง"
-              className="h-11 w-11 rounded-full hover:bg-parchment text-ink-muted flex items-center justify-center transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+              className="h-11 w-11 rounded-full hover:bg-primary/5 text-ink-muted flex items-center justify-center transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
             >
               <X className="w-5 h-5" />
             </button>

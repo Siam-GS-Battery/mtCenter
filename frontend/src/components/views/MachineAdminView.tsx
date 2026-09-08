@@ -49,15 +49,15 @@ const labelClass = "block text-[13px] font-semibold text-ink mb-1.5";
 const primaryBtnClass =
   "min-h-11 px-5 py-2.5 rounded-full bg-primary hover:bg-primary-focus text-white font-semibold text-xs cursor-pointer active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-primary-focus/40 disabled:opacity-60 disabled:cursor-not-allowed";
 const secondaryBtnClass =
-  "min-h-11 px-5 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-parchment font-semibold text-xs cursor-pointer active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-primary-focus/40 disabled:opacity-60 disabled:cursor-not-allowed";
+  "min-h-11 px-5 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-primary/5 font-semibold text-xs cursor-pointer active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-primary-focus/40 disabled:opacity-60 disabled:cursor-not-allowed";
 const destructiveBtnClass =
   "min-h-11 px-5 py-2.5 rounded-[11px] bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs cursor-pointer active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-rose-400/40 disabled:opacity-60 disabled:cursor-not-allowed";
 const iconBtnClass =
-  "min-h-11 min-w-11 p-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-parchment cursor-pointer active:scale-95 transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-focus/40";
+  "min-h-11 min-w-11 p-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-primary/5 cursor-pointer active:scale-95 transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-focus/40";
 // เวอร์ชันแคบกว่าของ iconBtnClass สำหรับคอลัมน์ "จัดการ" ในตารางเดสก์ท็อป — คงความสูง 44px
 // (พื้นที่แตะยังผ่านเกณฑ์) แต่ลดความกว้างเพื่อให้ปุ่มสองปุ่มพอดีกับคอลัมน์ที่แคบลง
 const tableIconBtnClass =
-  "h-11 w-9 shrink-0 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-parchment cursor-pointer active:scale-95 transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-focus/40";
+  "h-11 w-9 shrink-0 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-primary/5 cursor-pointer active:scale-95 transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-focus/40";
 
 function InlineError({ message }: { message: string }) {
   return (
@@ -503,7 +503,7 @@ export default function MachineAdminView({ actorId, onCreated, onUpdated, onDele
                   <col className="w-[12%]" />
                 </colgroup>
                 <thead>
-                  <tr className="bg-parchment border-b border-hairline text-xs font-semibold text-ink-muted">
+                  <tr className="bg-divider border-b border-hairline text-xs font-semibold text-ink-muted">
                     <th className="px-3 py-2.5 whitespace-nowrap">รหัส</th>
                     <th className="px-3 py-2.5">ชื่อเครื่องจักร</th>
                     <th className="px-3 py-2.5">รุ่น</th>
@@ -515,7 +515,7 @@ export default function MachineAdminView({ actorId, onCreated, onUpdated, onDele
                 </thead>
                 <tbody className="divide-y divide-divider text-[13px]">
                   {machines.map((machine) => (
-                    <tr key={machine.id} className="hover:bg-parchment transition-colors">
+                    <tr key={machine.id} className="hover:bg-primary/5 transition-colors">
                       <td className="px-3 py-2.5 font-mono text-ink-muted truncate" title={machine.code ?? undefined}>
                         {machine.code ?? NO_DATA}
                       </td>
@@ -581,11 +581,11 @@ export default function MachineAdminView({ actorId, onCreated, onUpdated, onDele
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-[13px]">
-                  <div className="p-2.5 rounded-[11px] bg-parchment border border-hairline">
+                  <div className="p-2.5 rounded-[11px] bg-divider border border-hairline">
                     <span className="text-xs text-ink-muted block">ตำแหน่ง</span>
                     <span className="text-ink truncate block">{machine.location ?? NO_DATA}</span>
                   </div>
-                  <div className="p-2.5 rounded-[11px] bg-parchment border border-hairline">
+                  <div className="p-2.5 rounded-[11px] bg-divider border border-hairline">
                     <span className="text-xs text-ink-muted block">หน่วยงาน</span>
                     <span className="text-ink truncate block">{machine.departmentCode ?? NO_DATA}</span>
                   </div>

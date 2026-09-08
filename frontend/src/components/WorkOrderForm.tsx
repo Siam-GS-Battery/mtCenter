@@ -764,7 +764,7 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
 
           {/* Machine condition — all four states, with the readings behind them */}
           {machine && evaluation && (
-            <div className="rounded-[14px] bg-parchment p-3.5 space-y-2">
+            <div className="rounded-[14px] bg-divider p-3.5 space-y-2">
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-ink-muted">
                 <span className={machineStatusBadgeClass(machine.status)}>
                   {machineStatusLabel(machine.status)}
@@ -826,7 +826,7 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
                     className={`px-3.5 rounded-full border text-xs flex items-center gap-1.5 cursor-pointer transition-all active:scale-95 ${TAP} ${
                       selected
                         ? "bg-amber-100 text-amber-900 border-amber-300 font-semibold"
-                        : "bg-white text-ink-muted border-hairline hover:bg-parchment"
+                        : "bg-white text-ink-muted border-hairline hover:bg-primary/5"
                     }`}
                   >
                     {selected ? (
@@ -1012,7 +1012,7 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
                                 type="button"
                                 onClick={() => decrementOrRemovePart(part.id)}
                                 aria-label={`ลดจำนวน ${part.name}`}
-                                className="w-11 h-11 text-ink-muted hover:bg-parchment font-semibold cursor-pointer flex items-center justify-center"
+                                className="w-11 h-11 text-ink-muted hover:bg-primary/5 font-semibold cursor-pointer flex items-center justify-center"
                               >
                                 −
                               </button>
@@ -1089,7 +1089,7 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
                             type="button"
                             onClick={() => changeQty(item.id, -1)}
                             aria-label={`ลดจำนวน ${item.name}`}
-                            className="w-11 h-11 text-ink-muted hover:bg-parchment font-semibold cursor-pointer flex items-center justify-center"
+                            className="w-11 h-11 text-ink-muted hover:bg-primary/5 font-semibold cursor-pointer flex items-center justify-center"
                           >
                             −
                           </button>
@@ -1100,7 +1100,7 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
                             type="button"
                             onClick={() => changeQty(item.id, 1)}
                             aria-label={`เพิ่มจำนวน ${item.name}`}
-                            className="w-11 h-11 text-ink-muted hover:bg-parchment font-semibold cursor-pointer flex items-center justify-center"
+                            className="w-11 h-11 text-ink-muted hover:bg-primary/5 font-semibold cursor-pointer flex items-center justify-center"
                           >
                             +
                           </button>
@@ -1172,7 +1172,7 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
                             ? "bg-primary/10 border-primary text-primary"
                             : outOfStock
                             ? "bg-white border-rose-200 text-ink-muted hover:bg-rose-50"
-                            : "bg-white border-hairline text-ink-muted hover:bg-parchment"
+                            : "bg-white border-hairline text-ink-muted hover:bg-primary/5"
                         }`}
                       >
                         <span className="min-w-0">
@@ -1215,7 +1215,7 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
                   {steps.map((step, idx) => (
                     <li
                       key={step}
-                      className="flex items-center justify-between gap-2 p-3 rounded-[14px] bg-parchment text-xs text-ink-muted"
+                      className="flex items-center justify-between gap-2 p-3 rounded-[14px] bg-divider text-xs text-ink-muted"
                     >
                       <span className="flex items-start gap-2.5">
                         <span className="w-6 h-6 rounded-full bg-white text-primary font-semibold flex items-center justify-center text-[11px] shrink-0 tabular-nums">
@@ -1247,8 +1247,8 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
                       disabled={added}
                       className={`px-3.5 rounded-full border text-xs flex items-center gap-1.5 transition-all ${TAP} ${
                         added
-                          ? "bg-parchment text-ink-faint border-hairline cursor-default"
-                          : "bg-white text-ink-muted border-hairline hover:bg-parchment cursor-pointer active:scale-95"
+                          ? "bg-divider text-ink-faint border-hairline cursor-default"
+                          : "bg-white text-ink-muted border-hairline hover:bg-primary/5 cursor-pointer active:scale-95"
                       }`}
                     >
                       {added ? (
@@ -1284,7 +1284,7 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
                     addStep(newStep);
                     setNewStep("");
                   }}
-                  className={`px-5 rounded-full bg-parchment hover:bg-divider text-ink font-semibold text-xs flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all shrink-0 ${TAP}`}
+                  className={`px-5 rounded-full bg-divider hover:bg-primary/5 text-ink font-semibold text-xs flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all shrink-0 ${TAP}`}
                 >
                   <Plus className="w-4 h-4" />
                   <span>เพิ่ม</span>
@@ -1299,7 +1299,7 @@ export const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
         <button
           type="button"
           onClick={onCancel}
-          className={`w-full sm:w-auto px-6 rounded-full bg-pearl text-ink-muted border border-divider hover:bg-parchment font-semibold text-sm cursor-pointer active:scale-95 transition-all ${TAP}`}
+          className={`w-full sm:w-auto px-6 rounded-full bg-pearl text-ink-muted border border-divider hover:bg-primary/5 font-semibold text-sm cursor-pointer active:scale-95 transition-all ${TAP}`}
         >
           ยกเลิก
         </button>
@@ -1391,7 +1391,7 @@ export function DiscardChangesDialog(props: {
         <button
           type="button"
           onClick={onKeepEditing}
-          className="w-full sm:w-auto px-6 min-h-11 rounded-full bg-pearl text-ink-muted border border-divider hover:bg-parchment font-semibold text-sm cursor-pointer active:scale-95 transition-all"
+          className="w-full sm:w-auto px-6 min-h-11 rounded-full bg-pearl text-ink-muted border border-divider hover:bg-primary/5 font-semibold text-sm cursor-pointer active:scale-95 transition-all"
         >
           กรอกต่อ
         </button>

@@ -260,7 +260,7 @@ export const SparePartsView: React.FC<SparePartsViewProps> = ({
               className={`inline-flex items-center gap-2 px-4 min-h-11 rounded-full text-[13px] font-semibold border transition-colors cursor-pointer active:scale-95 ${
                 onlyForActiveMachine
                   ? "bg-primary text-white border-primary"
-                  : "bg-white text-ink-muted border-hairline hover:bg-parchment"
+                  : "bg-white text-ink-muted border-hairline hover:bg-primary/5"
               }`}
             >
               <Wrench className="w-4 h-4" />
@@ -290,7 +290,7 @@ export const SparePartsView: React.FC<SparePartsViewProps> = ({
       {drafts.length > 0 && (
         <div className="bg-white border border-hairline rounded-[18px] p-4 space-y-3">
           <div className="flex items-start gap-3">
-            <div className="p-2 rounded-full bg-parchment text-ink-muted border border-divider shrink-0">
+            <div className="p-2 rounded-full bg-divider text-ink-muted border border-divider shrink-0">
               <ClipboardList className="w-4 h-4" />
             </div>
             <div className="text-[13px] text-ink-muted leading-relaxed">
@@ -320,7 +320,7 @@ export const SparePartsView: React.FC<SparePartsViewProps> = ({
                 <button
                   onClick={() => removeDraft(draft.id)}
                   aria-label={`ลบร่างขอเบิก ${draft.partName}`}
-                  className="p-2.5 min-h-11 min-w-11 flex items-center justify-center rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-parchment cursor-pointer active:scale-95"
+                  className="p-2.5 min-h-11 min-w-11 flex items-center justify-center rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-primary/5 cursor-pointer active:scale-95"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -347,7 +347,7 @@ export const SparePartsView: React.FC<SparePartsViewProps> = ({
               setOnlyForActiveMachine(false);
               setOffset(0);
             }}
-            className="mt-1 px-4 min-h-11 rounded-full bg-pearl border border-divider text-ink-muted text-[13px] font-semibold hover:bg-parchment cursor-pointer active:scale-95"
+            className="mt-1 px-4 min-h-11 rounded-full bg-pearl border border-divider text-ink-muted text-[13px] font-semibold hover:bg-primary/5 cursor-pointer active:scale-95"
           >
             ล้างตัวกรอง
           </button>
@@ -400,7 +400,7 @@ export const SparePartsView: React.FC<SparePartsViewProps> = ({
 
                   {/* สต็อก + ราคาต่อหน่วย */}
                   <div className="grid grid-cols-2 gap-2">
-                    <div className="p-2.5 rounded-[11px] bg-parchment border border-hairline">
+                    <div className="p-2.5 rounded-[11px] bg-divider border border-hairline">
                       <span className="text-xs text-ink-muted block">
                         จำนวนคงเหลือ
                       </span>
@@ -411,7 +411,7 @@ export const SparePartsView: React.FC<SparePartsViewProps> = ({
                         </span>
                       </span>
                     </div>
-                    <div className="p-2.5 rounded-[11px] bg-parchment border border-hairline">
+                    <div className="p-2.5 rounded-[11px] bg-divider border border-hairline">
                       <span className="text-xs text-ink-muted block">
                         ราคาต่อหน่วย
                       </span>
@@ -476,7 +476,7 @@ export const SparePartsView: React.FC<SparePartsViewProps> = ({
                       )
                     }
                     aria-label={`ถาม AI วิธีเปลี่ยนอะไหล่ ${part.name}`}
-                    className="p-2.5 min-h-11 min-w-11 flex items-center justify-center rounded-[11px] bg-pearl border border-divider hover:bg-parchment cursor-pointer transition-colors active:scale-95"
+                    className="p-2.5 min-h-11 min-w-11 flex items-center justify-center rounded-[11px] bg-pearl border border-divider hover:bg-primary/5 cursor-pointer transition-colors active:scale-95"
                     title="ถาม AI วิธีเปลี่ยนอะไหล่นี้"
                   >
                     <Sparkles className="w-4 h-4 text-primary" />
@@ -525,7 +525,7 @@ export const SparePartsView: React.FC<SparePartsViewProps> = ({
           {requestStep === "form" && (
             <>
               <ModalBody className="space-y-4">
-                <div className="p-3 bg-parchment rounded-[11px] text-[13px] space-y-1">
+                <div className="p-3 bg-divider rounded-[11px] text-[13px] space-y-1">
                   <div className="font-semibold text-ink">{requestedPart.name}</div>
                   <div className="text-ink-muted font-mono">{requestedPart.code}</div>
                   <div className="text-primary">ตำแหน่ง: {orDash(requestedPart.locationRack)}</div>
@@ -549,7 +549,7 @@ export const SparePartsView: React.FC<SparePartsViewProps> = ({
                     onChange={(e) => setRequestQty(Number(e.target.value))}
                     min={1}
                     max={requestedPart.stockQuantity}
-                    className="w-full bg-parchment border border-hairline rounded-full px-4 min-h-11 text-sm font-semibold text-ink focus:outline-none focus:ring-2 focus:ring-primary-focus/40"
+                    className="w-full bg-divider border border-hairline rounded-full px-4 min-h-11 text-sm font-semibold text-ink focus:outline-none focus:ring-2 focus:ring-primary-focus/40"
                   />
                   {!qtyValid ? (
                     <p className="text-xs text-rose-700 font-semibold">
@@ -566,7 +566,7 @@ export const SparePartsView: React.FC<SparePartsViewProps> = ({
               <ModalFooter>
                 <button
                   onClick={closeRequestModal}
-                  className="w-full sm:w-auto min-h-11 px-4 rounded-[11px] bg-pearl border border-divider text-ink-muted font-semibold text-[13px] hover:bg-parchment active:scale-95"
+                  className="w-full sm:w-auto min-h-11 px-4 rounded-[11px] bg-pearl border border-divider text-ink-muted font-semibold text-[13px] hover:bg-primary/5 active:scale-95"
                 >
                   ยกเลิก
                 </button>
@@ -584,7 +584,7 @@ export const SparePartsView: React.FC<SparePartsViewProps> = ({
           {requestStep === "confirm" && (
             <>
               <ModalBody className="space-y-4">
-                <div className="p-3 bg-parchment rounded-[11px] text-[13px] space-y-2">
+                <div className="p-3 bg-divider rounded-[11px] text-[13px] space-y-2">
                   <div className="font-semibold text-ink">{requestedPart.name}</div>
                   <div className="text-ink-muted font-mono">{requestedPart.code}</div>
                   <div className="grid grid-cols-3 gap-2 pt-2 border-t border-divider text-center">
@@ -638,7 +638,7 @@ export const SparePartsView: React.FC<SparePartsViewProps> = ({
               <ModalFooter>
                 <button
                   onClick={() => setRequestStep("form")}
-                  className="w-full sm:w-auto min-h-11 px-4 rounded-[11px] bg-pearl border border-divider text-ink-muted font-semibold text-[13px] hover:bg-parchment active:scale-95"
+                  className="w-full sm:w-auto min-h-11 px-4 rounded-[11px] bg-pearl border border-divider text-ink-muted font-semibold text-[13px] hover:bg-primary/5 active:scale-95"
                 >
                   กลับไปแก้ไข
                 </button>
@@ -656,7 +656,7 @@ export const SparePartsView: React.FC<SparePartsViewProps> = ({
             <>
               <ModalBody className="space-y-3 py-6">
                 <div className="flex items-start gap-3">
-                  <div className="p-2.5 rounded-full bg-parchment text-ink-muted border border-divider shrink-0">
+                  <div className="p-2.5 rounded-full bg-divider text-ink-muted border border-divider shrink-0">
                     <ClipboardList className="w-5 h-5" />
                   </div>
                   <div className="text-[13px] text-ink-muted leading-relaxed">
@@ -670,7 +670,7 @@ export const SparePartsView: React.FC<SparePartsViewProps> = ({
                   </div>
                 </div>
 
-                <div className="p-3 rounded-[11px] bg-parchment border border-hairline text-[13px] text-ink-muted leading-relaxed">
+                <div className="p-3 rounded-[11px] bg-divider border border-hairline text-[13px] text-ink-muted leading-relaxed">
                   <span className="font-semibold text-ink block mb-0.5">
                     ขั้นตอนถัดไป
                   </span>

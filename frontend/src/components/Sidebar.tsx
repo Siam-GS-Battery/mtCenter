@@ -140,7 +140,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         id="app-sidebar"
         className={`
           fixed lg:static top-0 bottom-0 left-0 z-50
-          bg-nav-black border-r border-white/10
+          bg-white shadow-sidebar
           flex flex-col h-full transition-all duration-300 ease-in-out select-none
           ${isCollapsed ? "w-[72px]" : "w-[260px]"}
           ${
@@ -151,11 +151,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         `}
       >
         {/* 1. Brand block — bolt icon + "MT Center" */}
-        <div className="h-14 flex items-center px-5 border-b border-white/10 shrink-0 bg-nav-black">
+        <div className="h-14 flex items-center px-5 border-b border-hairline shrink-0 bg-white">
           <div className="flex items-center gap-2 overflow-hidden">
-            <PixelAILogo className="w-6 h-6 text-white shrink-0" />
+            <PixelAILogo className="w-6 h-6 text-primary shrink-0" />
             {(!isCollapsed || isMobileDrawerOpen) && (
-              <span className="text-[15px] font-semibold text-white tracking-tight whitespace-nowrap">
+              <span className="text-[15px] font-semibold text-ink tracking-tight whitespace-nowrap">
                 MT Center
               </span>
             )}
@@ -163,19 +163,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* 2. User card */}
-        <div className="p-4 border-b border-white/10 bg-nav-black shrink-0">
+        <div className="p-4 border-b border-hairline bg-white shrink-0">
           <div className="flex items-center space-x-3">
             {/* Avatar Circle */}
-            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20 text-white font-semibold text-sm shrink-0">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 text-primary font-semibold text-sm shrink-0">
               {currentUser.initials}
             </div>
 
             {(!isCollapsed || isMobileDrawerOpen) && (
               <div className="flex flex-col min-w-0">
-                <span className="text-[14px] font-semibold text-white truncate">
+                <span className="text-[14px] font-semibold text-ink truncate">
                   {currentUser.name}
                 </span>
-                <span className="text-xs text-white/70 truncate">
+                <span className="text-xs text-ink-faint truncate">
                   {ROLE_LABELS[currentUser.role]} · รหัส {currentUser.employeeId}
                 </span>
               </div>
@@ -207,8 +207,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   relative w-full flex items-center justify-between px-3 min-h-11 rounded-lg text-[13px] transition-all cursor-pointer group
                   ${
                     isActive
-                      ? "bg-white/10 text-white font-semibold"
-                      : "text-white/60 hover:bg-white/5 hover:text-white"
+                      ? "bg-primary/10 text-primary font-semibold"
+                      : "text-ink-faint hover:bg-primary/5 hover:text-ink"
                   }
                   ${isIconOnly ? "justify-center px-0" : ""}
                 `}
@@ -216,7 +216,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="flex items-center">
                   <Icon
                     className={`w-[18px] h-[18px] shrink-0 ${isIconOnly ? "" : "mr-3"} ${
-                      isActive ? "text-white" : "text-white/50 group-hover:text-white"
+                      isActive ? "text-primary" : "text-ink-faint group-hover:text-ink"
                     }`}
                   />
                   {!isIconOnly && (
@@ -243,18 +243,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
 
         {/* 4. Secondary Nav & Collapse */}
-        <div className="mt-auto border-t border-white/10 px-3 py-4 space-y-1 shrink-0">
+        <div className="mt-auto border-t border-hairline px-3 py-4 space-y-1 shrink-0">
           <button
             onClick={onOpenSettings}
             aria-label="ตั้งค่า"
             className={`
-              w-full flex items-center px-3 min-h-11 text-white/60 rounded-lg hover:bg-white/5 hover:text-white cursor-pointer transition-colors
+              w-full flex items-center px-3 min-h-11 text-ink-faint rounded-lg hover:bg-primary/5 hover:text-ink cursor-pointer transition-colors
               ${isCollapsed && !isMobileDrawerOpen ? "justify-center px-0" : ""}
             `}
             title={isCollapsed && !isMobileDrawerOpen ? "ตั้งค่า" : undefined}
           >
             <Settings
-              className={`w-[18px] h-[18px] shrink-0 text-white/50 ${
+              className={`w-[18px] h-[18px] shrink-0 text-ink-faint ${
                 isCollapsed && !isMobileDrawerOpen ? "" : "mr-3"
               }`}
             />
@@ -267,13 +267,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick={onOpenHelp}
             aria-label="ช่วยเหลือ"
             className={`
-              w-full flex items-center px-3 min-h-11 text-white/60 rounded-lg hover:bg-white/5 hover:text-white cursor-pointer transition-colors
+              w-full flex items-center px-3 min-h-11 text-ink-faint rounded-lg hover:bg-primary/5 hover:text-ink cursor-pointer transition-colors
               ${isCollapsed && !isMobileDrawerOpen ? "justify-center px-0" : ""}
             `}
             title={isCollapsed && !isMobileDrawerOpen ? "ช่วยเหลือ" : undefined}
           >
             <HelpCircle
-              className={`w-[18px] h-[18px] shrink-0 text-white/50 ${
+              className={`w-[18px] h-[18px] shrink-0 text-ink-faint ${
                 isCollapsed && !isMobileDrawerOpen ? "" : "mr-3"
               }`}
             />
@@ -286,13 +286,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick={onLogout}
             aria-label="ออกจากระบบ"
             className={`
-              w-full flex items-center px-3 min-h-11 text-white/60 rounded-lg hover:bg-white/5 hover:text-white cursor-pointer transition-colors
+              w-full flex items-center px-3 min-h-11 text-ink-faint rounded-lg hover:bg-primary/5 hover:text-ink cursor-pointer transition-colors
               ${isCollapsed && !isMobileDrawerOpen ? "justify-center px-0" : ""}
             `}
             title={isCollapsed && !isMobileDrawerOpen ? "ออกจากระบบ" : undefined}
           >
             <LogOut
-              className={`w-[18px] h-[18px] shrink-0 text-white/50 ${
+              className={`w-[18px] h-[18px] shrink-0 text-ink-faint ${
                 isCollapsed && !isMobileDrawerOpen ? "" : "mr-3"
               }`}
             />
@@ -301,10 +301,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
           </button>
 
-          <div className="pt-2 justify-center text-white/50 hidden md:flex">
+          <div className="pt-2 justify-center text-ink-faint hidden md:flex">
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors cursor-pointer text-white/50 hover:text-white"
+              className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-primary/5 transition-colors cursor-pointer text-ink-faint hover:text-ink"
               aria-label={isCollapsed ? "ขยายเมนู" : "ย่อเมนู"}
               title={isCollapsed ? "ขยายเมนู" : "ย่อเมนู"}
             >

@@ -461,7 +461,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
 
         {/* Machine Identity Info Card */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-1">
-          <div className="bg-parchment p-3.5 rounded-[18px] border border-divider">
+          <div className="bg-divider p-3.5 rounded-[18px] border border-divider">
             <span className="text-xs font-semibold text-ink-faint block">
               รหัสและชื่อเครื่องจักร
             </span>
@@ -473,7 +473,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
             </span>
           </div>
 
-          <div className="bg-parchment p-3.5 rounded-[18px] border border-divider">
+          <div className="bg-divider p-3.5 rounded-[18px] border border-divider">
             <span className="text-xs font-semibold text-ink-faint block">
               ตำแหน่งติดตั้ง
             </span>
@@ -492,7 +492,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
             </span>
           </div>
 
-          <div className="bg-parchment p-3.5 rounded-[18px] border border-divider">
+          <div className="bg-divider p-3.5 rounded-[18px] border border-divider">
             <span className="text-xs font-semibold text-ink-faint block">
               สถานะการทำงานปัจจุบัน
             </span>
@@ -512,7 +512,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
               date — real, derived from this machine's own work orders. The hours
               card comes back on its own if a runtime counter is ever wired up. */}
           {readings.operatingHours ? (
-            <div className="bg-parchment p-3.5 rounded-[18px] border border-divider flex flex-col justify-between">
+            <div className="bg-divider p-3.5 rounded-[18px] border border-divider flex flex-col justify-between">
               <span className="text-xs font-semibold text-ink-faint block">
                 ชั่วโมงสะสมเครื่อง
               </span>
@@ -525,7 +525,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
               </span>
             </div>
           ) : (
-            <div className="bg-parchment p-3.5 rounded-[18px] border border-divider flex flex-col justify-between">
+            <div className="bg-divider p-3.5 rounded-[18px] border border-divider flex flex-col justify-between">
               <span className="text-xs font-semibold text-ink-faint block">
                 ซ่อมบำรุงล่าสุด
               </span>
@@ -815,7 +815,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
       <div
         role="tablist"
         aria-label="มุมมองข้อมูลเครื่องจักร"
-        className="flex items-center gap-1.5 bg-parchment p-1 rounded-full self-start w-fit"
+        className="flex items-center gap-1.5 bg-divider p-1 rounded-full self-start w-fit"
       >
         <button
           role="tab"
@@ -1104,7 +1104,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
                         to a "—" would claim the sensor was checked and passed, so
                         say plainly that nothing was measured. */}
                     {activeMachine.spindleTemp == null ? (
-                      <span className="text-ink-faint font-semibold bg-parchment px-2 py-0.5 rounded">
+                      <span className="text-ink-faint font-semibold bg-divider px-2 py-0.5 rounded">
                         {NO_DATA_TH}
                       </span>
                     ) : (
@@ -1133,7 +1133,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
                     {/* Same reasoning as the spindle card above: no reading is not
                         a passing reading. */}
                     {activeMachine.vibrationMms == null ? (
-                      <span className="text-ink-faint font-semibold bg-parchment px-2 py-0.5 rounded">
+                      <span className="text-ink-faint font-semibold bg-divider px-2 py-0.5 rounded">
                         {NO_DATA_TH}
                       </span>
                     ) : (
@@ -1183,7 +1183,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
                   </div>
                 ) : (
                   <div
-                    className="w-full bg-parchment rounded-full h-2 overflow-hidden"
+                    className="w-full bg-divider rounded-full h-2 overflow-hidden"
                     role="progressbar"
                     aria-valuenow={activeMachine.healthScore}
                     aria-valuemin={0}
@@ -1273,7 +1273,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
 
               {/* The count is the server's `meta.total`, not the number of rows on
                   screen — those differ as soon as a machine outgrows one page. */}
-              <span className="text-xs font-semibold text-ink-muted bg-parchment border border-divider px-3 py-1.5 rounded-full self-start sm:self-auto flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-ink-muted bg-divider border border-divider px-3 py-1.5 rounded-full self-start sm:self-auto flex items-center gap-1.5">
                 {machineHistoryLoading && (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
                 )}
@@ -1334,7 +1334,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
                       )}
                     </div>
 
-                    <div className="p-3.5 sm:p-4 rounded-[18px] border border-divider bg-parchment">
+                    <div className="p-3.5 sm:p-4 rounded-[18px] border border-divider bg-divider">
                       <div className="flex items-center justify-between gap-2 flex-wrap mb-1.5">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-mono text-xs sm:text-sm font-semibold text-primary">
@@ -1451,7 +1451,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
           `}</style>
 
           {/* Modal Header */}
-          <ModalHeader className="bg-parchment border-hairline">
+          <ModalHeader className="bg-divider border-hairline">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 rounded-full bg-primary text-white">
@@ -1470,7 +1470,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
               <button
                 onClick={closeQrModal}
                 aria-label="ปิดหน้าต่าง"
-                className="p-2 rounded-full text-ink-faint hover:text-ink-muted hover:bg-parchment transition-colors cursor-pointer shrink-0"
+                className="p-2 rounded-full text-ink-faint hover:text-ink-muted hover:bg-primary/5 transition-colors cursor-pointer shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1586,7 +1586,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
             {manualEntryOpen && (
               <form
                 onSubmit={handleManualCodeSubmit}
-                className="w-full rounded-[18px] bg-parchment border border-hairline p-4 space-y-3"
+                className="w-full rounded-[18px] bg-divider border border-hairline p-4 space-y-3"
               >
                 <div>
                   <span className="text-xs font-semibold text-ink block mb-1.5">
@@ -1624,7 +1624,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
                       setManualEmptyError(false);
                       setScanNotFoundText(null);
                     }}
-                    className="flex-1 py-2.5 rounded-full border border-hairline bg-white hover:bg-parchment text-ink-muted font-semibold text-xs cursor-pointer active:scale-95 transition-all"
+                    className="flex-1 py-2.5 rounded-full border border-hairline bg-white hover:bg-primary/5 text-ink-muted font-semibold text-xs cursor-pointer active:scale-95 transition-all"
                   >
                     ยกเลิก
                   </button>
@@ -1696,7 +1696,7 @@ export const ScanMachineView: React.FC<ScanMachineViewProps> = ({
           <ModalFooter className="border-divider">
             <button
               onClick={closeQrModal}
-              className="w-full py-3.5 rounded-full border border-hairline bg-white hover:bg-parchment text-ink-muted font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+              className="w-full py-3.5 rounded-full border border-hairline bg-white hover:bg-primary/5 text-ink-muted font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
             >
               <X className="w-4 h-4" />
               <span>ปิดหน้าต่าง</span>

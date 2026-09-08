@@ -591,7 +591,7 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
               onChange={(e) => setSearchTable(e.target.value)}
               placeholder="ค้นหาในตาราง"
               aria-label="ค้นหาในตารางรายงาน"
-              className="w-full bg-parchment border border-hairline rounded-full pl-9 pr-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-[44px]"
+              className="w-full bg-divider border border-hairline rounded-full pl-9 pr-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-[44px]"
             />
           </div>
         </div>
@@ -601,7 +601,7 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
             {/* Table for desktop */}
             <div className="hidden md:block overflow-x-auto rounded-[11px] border border-hairline">
               <table className="w-full text-left text-xs">
-                <thead className="bg-parchment text-ink-faint font-semibold border-b border-hairline">
+                <thead className="bg-divider text-ink-faint font-semibold border-b border-hairline">
                   <tr>
                     <th className="p-3">วันที่มอบหมาย</th>
                     <th className="p-3">รหัสใบงาน</th>
@@ -617,7 +617,7 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
                     <SkeletonTableRows rows={8} cols={7} />
                   ) : pagedSummaryOrders.length > 0 ? (
                     pagedSummaryOrders.map((wo) => (
-                      <tr key={wo.id} className="hover:bg-parchment/80 transition-colors">
+                      <tr key={wo.id} className="hover:bg-primary/5 transition-colors">
                         <td className="p-3 font-mono text-ink-muted">{wo.assignedDate || "—"}</td>
                         <td className="p-3 font-mono font-semibold text-primary">{wo.code}</td>
                         <td className="p-3 font-semibold text-ink">{machineLabelOf(wo)}</td>
@@ -704,7 +704,7 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
         {selectedReportType === "priority" && (
           <div className="overflow-x-auto rounded-[11px] border border-hairline">
             <table className="w-full text-left text-xs">
-              <thead className="bg-parchment text-ink-faint font-semibold border-b border-hairline">
+              <thead className="bg-divider text-ink-faint font-semibold border-b border-hairline">
                 <tr>
                   <th className="p-3">ระดับความสำคัญ</th>
                   <th className="p-3 text-center">จำนวนงาน</th>
@@ -717,14 +717,14 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
                   <SkeletonTableRows rows={4} cols={4} />
                 ) : priorityRows.length > 0 ? (
                   priorityRows.map((r) => (
-                    <tr key={r.priority} className="hover:bg-parchment/80 transition-colors">
+                    <tr key={r.priority} className="hover:bg-primary/5 transition-colors">
                       <td className="p-3">
                         <span className={priorityPillClass(r.priority)}>{priorityLabel(r.priority)}</span>
                       </td>
                       <td className="p-3 text-center font-semibold text-ink">{r.jobs} งาน</td>
                       <td className="p-3 text-center">
                         <div
-                          className="w-full bg-parchment rounded-full h-2 relative"
+                          className="w-full bg-divider rounded-full h-2 relative"
                           role="progressbar"
                           aria-valuenow={r.sharePct}
                           aria-valuemin={0}
@@ -756,7 +756,7 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
         {selectedReportType === "tech" && (
           <div className="overflow-x-auto rounded-[11px] border border-hairline">
             <table className="w-full text-left text-xs">
-              <thead className="bg-parchment text-ink-faint font-semibold border-b border-hairline">
+              <thead className="bg-divider text-ink-faint font-semibold border-b border-hairline">
                 <tr>
                   <th className="p-3">ช่างเทคนิค</th>
                   <th className="p-3 text-center">จำนวนงาน</th>
@@ -769,7 +769,7 @@ export const SupervisorReportsView: React.FC<SupervisorReportsViewProps> = ({
                   <SkeletonTableRows rows={5} cols={4} />
                 ) : techRows.length > 0 ? (
                   techRows.map((t) => (
-                    <tr key={t.technician} className="hover:bg-parchment/80 transition-colors">
+                    <tr key={t.technician} className="hover:bg-primary/5 transition-colors">
                       <td className="p-3 font-semibold text-ink">
                         <span className="flex items-center gap-2">
                           <UserCheck className="w-4 h-4 text-primary" aria-hidden="true" />

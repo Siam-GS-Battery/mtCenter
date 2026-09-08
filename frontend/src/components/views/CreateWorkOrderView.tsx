@@ -59,7 +59,7 @@ export const CreateWorkOrderView: React.FC<CreateWorkOrderViewProps> = ({
               `ช่วยแนะนำการกรอกใบงานแจ้งซ่อมสำหรับเครื่อง ${activeMachine.code} (${activeMachine.name}) รวมถึงอาการที่พบบ่อยและอะไหล่ที่ควรเตรียม`
             )
           }
-          className="shrink-0 self-start px-5 min-h-11 rounded-full bg-white hover:bg-parchment text-ink-muted border border-hairline text-xs font-semibold flex items-center gap-2 transition-all active:scale-95 cursor-pointer"
+          className="shrink-0 self-start px-5 min-h-11 rounded-full bg-white hover:bg-primary/5 text-ink-muted border border-hairline text-xs font-semibold flex items-center gap-2 transition-all active:scale-95 cursor-pointer"
         >
           <Sparkles className="w-4 h-4 text-primary shrink-0" />
           <span>ให้ AI ช่วยยกร่าง</span>

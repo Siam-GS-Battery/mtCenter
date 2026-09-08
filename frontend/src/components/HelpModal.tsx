@@ -23,7 +23,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
 
       <ModalBody>
         <div className="space-y-3 text-xs text-ink-muted leading-relaxed">
-          <div className="p-3 bg-parchment rounded-[11px] border-0 space-y-1.5">
+          <div className="p-3 bg-divider rounded-[11px] border-0 space-y-1.5">
             <div className="font-semibold text-ink flex items-center gap-1.5">
               <ClipboardList className="w-4 h-4 text-primary" />
               <span>ขั้นตอนของใบงานซ่อม</span>
@@ -41,7 +41,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
             </p>
           </div>
 
-          <div className="p-3 bg-parchment rounded-[11px] border-0 space-y-1.5">
+          <div className="p-3 bg-divider rounded-[11px] border-0 space-y-1.5">
             <div className="font-semibold text-ink flex items-center gap-1.5">
               <QrCode className="w-4 h-4 text-emerald-600" />
               <span>การสแกนเครื่องจักร</span>
@@ -54,7 +54,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
             </p>
           </div>
 
-          <div className="p-3 bg-parchment rounded-[11px] border-0 space-y-1.5">
+          <div className="p-3 bg-divider rounded-[11px] border-0 space-y-1.5">
             <div className="font-semibold text-ink flex items-center gap-1.5">
               <Package className="w-4 h-4 text-amber-700" />
               <span>การเบิกอะไหล่</span>

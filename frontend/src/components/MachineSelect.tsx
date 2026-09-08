@@ -278,7 +278,7 @@ export const MachineSelect: React.FC<MachineSelectProps> = ({
             ? `${label} (เครื่องปัจจุบัน ${activeMachine.code ?? NO_DATA})`
             : label
         }
-        className="w-full min-h-[56px] flex items-center justify-between gap-2 px-3 py-2 rounded-[11px] border border-hairline bg-white hover:bg-parchment transition-colors cursor-pointer"
+        className="w-full min-h-[56px] flex items-center justify-between gap-2 px-3 py-2 rounded-[11px] border border-hairline bg-white hover:bg-primary/5 transition-colors cursor-pointer"
       >
         <div className="flex items-center gap-2 min-w-0">
           {activeMachine ? (
@@ -309,7 +309,7 @@ export const MachineSelect: React.FC<MachineSelectProps> = ({
 
       {isOpen && (
         <div
-          className="absolute z-45 w-full mt-1.5 bg-parchment rounded-[11px] shadow-2xl border border-hairline overflow-hidden"
+          className="absolute z-45 w-full mt-1.5 bg-divider rounded-[11px] shadow-2xl border border-hairline overflow-hidden"
         >
           <div className="p-2 border-b border-hairline bg-white">
             <div className="relative">
@@ -324,7 +324,7 @@ export const MachineSelect: React.FC<MachineSelectProps> = ({
                 }}
                 onKeyDown={handleInputKeyDown}
                 placeholder="ค้นหารหัส / ชื่อ / ตำแหน่ง"
-                className="w-full pl-8 pr-2 py-2 text-sm rounded-lg border border-hairline bg-parchment text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary-focus"
+                className="w-full pl-8 pr-2 py-2 text-sm rounded-lg border border-hairline bg-divider text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary-focus"
               />
             </div>
 
@@ -340,7 +340,7 @@ export const MachineSelect: React.FC<MachineSelectProps> = ({
                   className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer ${
                     statusFilter === f.value
                       ? "bg-primary text-white"
-                      : "bg-parchment text-ink-muted hover:bg-chip-translucent border border-hairline"
+                      : "bg-divider text-ink-muted hover:bg-chip-translucent border border-hairline"
                   }`}
                 >
                   {f.label} ({statusCounts[f.value]})
@@ -376,7 +376,7 @@ export const MachineSelect: React.FC<MachineSelectProps> = ({
               <div role="group" aria-label="ล่าสุด">
                 <div
                   aria-hidden="true"
-                  className="sticky top-0 z-10 px-3 py-1 text-[11px] font-semibold text-ink-faint bg-parchment uppercase tracking-wide"
+                  className="sticky top-0 z-10 px-3 py-1 text-[11px] font-semibold text-ink-faint bg-divider uppercase tracking-wide"
                 >
                   ล่าสุด
                 </div>
@@ -388,7 +388,7 @@ export const MachineSelect: React.FC<MachineSelectProps> = ({
               <div role="group" aria-label={`ทั้งหมด (${filtered.length})`}>
                 <div
                   aria-hidden="true"
-                  className="sticky top-0 z-10 px-3 py-1 text-[11px] font-semibold text-ink-faint bg-parchment uppercase tracking-wide"
+                  className="sticky top-0 z-10 px-3 py-1 text-[11px] font-semibold text-ink-faint bg-divider uppercase tracking-wide"
                 >
                   ทั้งหมด ({filtered.length})
                 </div>

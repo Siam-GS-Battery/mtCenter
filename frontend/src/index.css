@@ -4,19 +4,32 @@
   --font-sans: "IBM Plex Sans Thai", "IBM Plex Sans", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 
   /* MT Center design tokens — colors */
-  --color-primary: #0066cc;
-  --color-primary-focus: #0071e3;
+  --color-primary: #2860e8;
+  --color-primary-focus: #4e83fd;
   --color-primary-on-dark: #2997ff;
   --color-ink: #1d1d1f;
   --color-ink-muted: #333333;
-  --color-ink-faint: #7a7a7a;
-  --color-hairline: #e0e0e0;
-  --color-divider: #f0f0f0;
+  --color-ink-faint: #6b6b6b;
+  --color-hairline: #c9cbd3;
+  --color-divider: #f2f3f5;
   --color-canvas: #ffffff;
-  --color-parchment: #f5f5f7;
-  --color-pearl: #fafafc;
+  --color-parchment: #ffffff;
+  --color-pearl: #ffffff;
   --color-nav-black: #000000;
   --color-chip-translucent: #d2d2d7;
+  --color-chip-yellow: #fff3c9;
+  --color-chip-green: #d9f5e3;
+  --color-chip-pink: #ffe0e0;
+  --color-chip-purple: #e8e3ff;
+
+  /* MT Center design tokens — shadows */
+  --shadow-card: 0 2px 12px rgba(40,96,232,0.08);
+  --shadow-sidebar: 1px 0 0 #d8dce6, 4px 0 16px rgba(40,96,232,0.08);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 body {

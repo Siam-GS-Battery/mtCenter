@@ -98,7 +98,7 @@ export const ChangePasswordScreen: React.FC = () => {
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full min-h-11 pl-3.5 pr-10 rounded-[11px] border border-hairline bg-parchment text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary disabled:opacity-60"
+                className="w-full min-h-11 pl-3.5 pr-10 rounded-[11px] border border-hairline bg-divider text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary disabled:opacity-60"
               />
               <PasswordVisibilityToggle
                 visible={showCurrentPassword}
@@ -120,7 +120,7 @@ export const ChangePasswordScreen: React.FC = () => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full min-h-11 pl-3.5 pr-10 rounded-[11px] border border-hairline bg-parchment text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary disabled:opacity-60"
+                className="w-full min-h-11 pl-3.5 pr-10 rounded-[11px] border border-hairline bg-divider text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary disabled:opacity-60"
                 placeholder="อย่างน้อย 8 ตัวอักษร"
               />
               <PasswordVisibilityToggle
@@ -143,7 +143,7 @@ export const ChangePasswordScreen: React.FC = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full min-h-11 pl-3.5 pr-10 rounded-[11px] border border-hairline bg-parchment text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary disabled:opacity-60"
+                className="w-full min-h-11 pl-3.5 pr-10 rounded-[11px] border border-hairline bg-divider text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary disabled:opacity-60"
               />
               <PasswordVisibilityToggle
                 visible={showConfirmPassword}

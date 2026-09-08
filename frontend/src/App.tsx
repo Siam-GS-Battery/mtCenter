@@ -710,7 +710,7 @@ export default function App() {
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <button
                 onClick={() => setIsMobileDrawerOpen(true)}
-                className="lg:hidden min-w-11 min-h-11 -ml-1.5 flex items-center justify-center rounded-lg text-ink-muted hover:bg-parchment active:scale-95 transition-all cursor-pointer shrink-0"
+                className="lg:hidden min-w-11 min-h-11 -ml-1.5 flex items-center justify-center rounded-lg text-ink-muted hover:bg-primary/5 active:scale-95 transition-all cursor-pointer shrink-0"
                 title="เปิดเมนูด้านข้าง"
                 id="mobile-hamburger-btn"
               >

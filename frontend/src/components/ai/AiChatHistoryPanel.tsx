@@ -76,7 +76,7 @@ export function AiChatHistoryPanel({
                 <div
                   className={`w-full rounded-[18px] border p-3.5 flex items-center gap-2.5 transition-colors ${
                     isActive
-                      ? "border-primary/40 bg-parchment"
+                      ? "border-primary/40 bg-divider"
                       : "border-hairline bg-white hover:bg-pearl"
                   }`}
                 >

@@ -301,7 +301,7 @@ export const PendingReviewView: React.FC<PendingReviewViewProps> = ({
             <button
               onClick={() => setApproveWO(null)}
               disabled={isApproving}
-              className="w-full sm:w-auto px-6 min-h-11 rounded-full bg-pearl text-ink-muted border border-divider hover:bg-parchment font-semibold text-sm cursor-pointer active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-6 min-h-11 rounded-full bg-pearl text-ink-muted border border-divider hover:bg-primary/5 font-semibold text-sm cursor-pointer active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
             >
               ยกเลิก
             </button>
@@ -361,7 +361,7 @@ export const PendingReviewView: React.FC<PendingReviewViewProps> = ({
             <button
               onClick={() => setReviseWO(null)}
               disabled={isRevising}
-              className="w-full sm:w-auto px-6 min-h-11 rounded-full bg-pearl text-ink-muted border border-divider hover:bg-parchment font-semibold text-sm cursor-pointer active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-6 min-h-11 rounded-full bg-pearl text-ink-muted border border-divider hover:bg-primary/5 font-semibold text-sm cursor-pointer active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
             >
               ยกเลิก
             </button>
@@ -464,7 +464,7 @@ function ReviewCard(props: {
 
         <button
           onClick={onOpenDetail}
-          className="px-5 min-h-11 rounded-full bg-pearl hover:bg-parchment text-ink-muted border border-divider text-sm font-semibold flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all"
+          className="px-5 min-h-11 rounded-full bg-pearl hover:bg-primary/5 text-ink-muted border border-divider text-sm font-semibold flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all"
         >
           <Eye className="w-4 h-4 shrink-0 text-primary" />
           <span>ดูรายละเอียด</span>

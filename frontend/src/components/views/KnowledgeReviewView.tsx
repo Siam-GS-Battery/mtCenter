@@ -200,7 +200,7 @@ export const KnowledgeReviewView: React.FC<KnowledgeReviewViewProps> = ({ curren
       </div>
 
       {/* อธิบายเกณฑ์การจัดลำดับ — Frame 1 บังคับว่าต้องอธิบายได้กับผู้จัดการ */}
-      <div className="rounded-[18px] border border-hairline bg-parchment p-3 text-xs text-ink-muted flex gap-2">
+      <div className="rounded-[18px] border border-hairline bg-divider p-3 text-xs text-ink-muted flex gap-2">
         <Info className="w-4 h-4 shrink-0 mt-0.5 text-primary" />
         <span>
           เรียงลำดับด้วยกฎที่ตรวจสอบได้ ไม่ใช่การจัดอันดับด้วย AI — คิดจากสภาพเครื่องตามเกณฑ์
@@ -358,7 +358,7 @@ export const KnowledgeReviewView: React.FC<KnowledgeReviewViewProps> = ({ curren
                   <FileText className="w-4 h-4 text-primary" />
                   สิ่งที่ช่างบันทึกไว้
                 </h4>
-                <dl className="rounded-[11px] bg-parchment border border-hairline p-3 text-[13px] space-y-2">
+                <dl className="rounded-[11px] bg-divider border border-hairline p-3 text-[13px] space-y-2">
                   <div>
                     <dt className="font-semibold text-ink">อาการ</dt>
                     <dd className="text-ink-muted whitespace-pre-line">{draft.technicianReport.symptoms}</dd>
@@ -425,7 +425,7 @@ export const KnowledgeReviewView: React.FC<KnowledgeReviewViewProps> = ({ curren
         <ModalFooter>
           <button
             onClick={closeDraft}
-            className="min-h-11 px-4 rounded-[11px] bg-pearl hover:bg-parchment text-ink-muted font-semibold text-sm border border-divider cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+            className="min-h-11 px-4 rounded-[11px] bg-pearl hover:bg-primary/5 text-ink-muted font-semibold text-sm border border-divider cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
           >
             ยกเลิก
           </button>

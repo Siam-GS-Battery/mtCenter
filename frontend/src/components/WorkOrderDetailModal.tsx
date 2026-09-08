@@ -671,7 +671,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
           )}
 
           {/* Info Cards Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-parchment p-4 rounded-[11px] border-0 text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-divider p-4 rounded-[11px] border-0 text-xs">
             <div>
               <span className="text-[10px] font-semibold text-ink-faint block mb-0.5">
                 เครื่องจักร
@@ -733,7 +733,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
           <div
             role="tablist"
             aria-label="ส่วนต่าง ๆ ของใบงาน"
-            className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-parchment p-1 rounded-[11px]"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-divider p-1 rounded-[11px]"
           >
             {TAB_IDS.map((tab, index) => (
               <button
@@ -769,7 +769,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
                 <h4 className="text-xs font-semibold text-ink-faint">
                   รายละเอียดใบงานและสภาพปัญหาที่พบ
                 </h4>
-                <p className="text-xs text-ink bg-parchment p-4 rounded-[11px] border-0 leading-relaxed font-normal">
+                <p className="text-xs text-ink bg-divider p-4 rounded-[11px] border-0 leading-relaxed font-normal">
                   {workOrder.description}
                 </p>
               </div>
@@ -800,14 +800,14 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
                   <h4 className="text-xs font-semibold text-ink-faint">
                     บันทึกข้อสังเกตจากช่าง
                   </h4>
-                  <p className="text-xs text-ink bg-parchment p-4 rounded-[11px] border-0 leading-relaxed font-normal">
+                  <p className="text-xs text-ink bg-divider p-4 rounded-[11px] border-0 leading-relaxed font-normal">
                     {workOrder.technicianNote}
                   </p>
                 </div>
               )}
 
               {/* Progress Overview Bar */}
-              <div className="p-4 rounded-[11px] bg-parchment border-0 space-y-2">
+              <div className="p-4 rounded-[11px] bg-divider border-0 space-y-2">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-semibold text-ink-muted" id={`${idBase}-progress-label`}>
                     ความคืบหน้าการปฏิบัติงาน
@@ -861,7 +861,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
               </div>
 
               {totalStepsCount === 0 ? (
-                <div className="p-5 bg-parchment rounded-[11px] space-y-2 text-xs">
+                <div className="p-5 bg-divider rounded-[11px] space-y-2 text-xs">
                   <p className="font-semibold text-ink">ใบงานนี้ยังไม่มีขั้นตอนปฏิบัติงาน</p>
                   <p className="text-ink-muted leading-relaxed">
                     เพิ่มขั้นตอนที่จะลงมือทำจริงด้านล่าง ระบบจะบันทึกชื่อผู้เพิ่มไว้กับทุกขั้นตอน
@@ -892,7 +892,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
                           } ${
                             isChecked
                               ? "bg-primary/10 border-primary/40 text-primary font-semibold"
-                              : "bg-parchment border-hairline text-ink-muted hover:bg-divider"
+                              : "bg-divider border-hairline text-ink-muted hover:bg-divider"
                           }`}
                         >
                           <span className="min-w-0">
@@ -968,7 +968,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
                   บันทึกข้อสังเกตเพิ่มเติม / หมายเหตุของช่าง
                 </h4>
                 {isEngineerOrSupervisor ? (
-                  <p className="text-xs text-ink bg-parchment p-4 rounded-[11px] border-0 leading-relaxed font-normal">
+                  <p className="text-xs text-ink bg-divider p-4 rounded-[11px] border-0 leading-relaxed font-normal">
                     {trimmedNote || NO_DATA_TH}
                   </p>
                 ) : (
@@ -1007,7 +1007,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
               </h4>
 
               {workOrder.requestedParts && workOrder.requestedParts.length > 0 ? (
-                <div className="bg-parchment rounded-[11px] border-0 overflow-x-auto">
+                <div className="bg-divider rounded-[11px] border-0 overflow-x-auto">
                   <table className="w-full min-w-[640px] text-left border-collapse text-xs">
                     <thead>
                       <tr className="bg-divider border-b border-hairline text-[10px] font-semibold text-ink-faint">
@@ -1044,7 +1044,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
                                   isPartIssued(part.status)
                                     ? "bg-emerald-100 text-emerald-800"
                                     : part.status == null
-                                      ? "bg-parchment text-ink-faint"
+                                      ? "bg-divider text-ink-faint"
                                       : "bg-amber-100 text-amber-800"
                                 }`}
                               >
@@ -1111,7 +1111,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
                   </table>
                 </div>
               ) : (
-                <div className="p-6 bg-parchment rounded-[11px] border-0 text-center text-xs text-ink-faint">
+                <div className="p-6 bg-divider rounded-[11px] border-0 text-center text-xs text-ink-faint">
                   ไม่มีการเบิกชิ้นส่วนอะไหล่เพิ่มเติมในใบงานนี้
                 </div>
               )}
@@ -1121,7 +1121,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
               </h4>
 
               {withdrawalsLoading ? (
-                <div className="p-6 bg-parchment rounded-[11px] border-0 text-center text-xs text-ink-faint">
+                <div className="p-6 bg-divider rounded-[11px] border-0 text-center text-xs text-ink-faint">
                   กำลังโหลดประวัติการเบิกอะไหล่...
                 </div>
               ) : withdrawalsError ? (
@@ -1130,7 +1130,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
                   <span>{withdrawalsError}</span>
                 </div>
               ) : actualWithdrawals.length > 0 ? (
-                <div className="bg-parchment rounded-[11px] border-0 overflow-x-auto">
+                <div className="bg-divider rounded-[11px] border-0 overflow-x-auto">
                   <table className="w-full min-w-[640px] text-left border-collapse text-xs">
                     <thead>
                       <tr className="bg-divider border-b border-hairline text-[10px] font-semibold text-ink-faint">
@@ -1176,7 +1176,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
                   </table>
                 </div>
               ) : (
-                <div className="p-6 bg-parchment rounded-[11px] border-0 text-center text-xs text-ink-faint">
+                <div className="p-6 bg-divider rounded-[11px] border-0 text-center text-xs text-ink-faint">
                   ยังไม่มีการเบิกอะไหล่สำหรับใบงานนี้
                 </div>
               )}
@@ -1205,7 +1205,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
                   <ShieldCheck className="w-9 h-9 text-emerald-600 shrink-0" />
                 </div>
               ) : (
-                <div className="p-4 rounded-[11px] bg-parchment border border-hairline flex items-center justify-between text-ink-muted">
+                <div className="p-4 rounded-[11px] bg-divider border border-hairline flex items-center justify-between text-ink-muted">
                   <div className="space-y-1">
                     <span className="text-xs font-semibold text-ink-faint block">
                       คะแนนตรวจสอบความถูกต้องและความปลอดภัยโดย AI
@@ -1234,7 +1234,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
               </h4>
 
               {attachmentsLoading ? (
-                <div className="p-6 bg-parchment rounded-[11px] border-0 text-center text-xs text-ink-faint">
+                <div className="p-6 bg-divider rounded-[11px] border-0 text-center text-xs text-ink-faint">
                   กำลังโหลดรายการเอกสารแนบ...
                 </div>
               ) : attachmentsError ? (
@@ -1243,7 +1243,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
                   <span>{attachmentsError}</span>
                 </div>
               ) : attachments.length === 0 ? (
-                <div className="p-5 bg-parchment rounded-[11px] text-xs text-ink-muted">
+                <div className="p-5 bg-divider rounded-[11px] text-xs text-ink-muted">
                   ยังไม่มีเอกสารแนบสำหรับใบงานนี้
                 </div>
               ) : (
@@ -1251,7 +1251,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
                   {attachments.map((att) => (
                     <li
                       key={att.id}
-                      className="p-3.5 rounded-[11px] border border-hairline bg-parchment flex items-center justify-between gap-3"
+                      className="p-3.5 rounded-[11px] border border-hairline bg-divider flex items-center justify-between gap-3"
                     >
                       <div className="min-w-0">
                         <span className="block text-xs font-semibold text-ink truncate">
@@ -1461,7 +1461,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
             <h3 className="text-base font-semibold text-ink">ยืนยันการอนุมัติปิดใบงาน</h3>
           </ModalHeader>
           <ModalBody className="space-y-3 text-xs">
-            <div className="bg-parchment p-4 rounded-[11px] space-y-1.5">
+            <div className="bg-divider p-4 rounded-[11px] space-y-1.5">
               <div>
                 <span className="text-ink-faint">ใบงาน: </span>
                 <span className="font-semibold text-ink">{workOrder.code} — {workOrder.title}</span>
@@ -1568,7 +1568,7 @@ export const WorkOrderDetailModal: React.FC<WorkOrderDetailModalProps> = ({
             <h3 className="text-base font-semibold text-ink">ยืนยันการลบใบงาน</h3>
           </ModalHeader>
           <ModalBody className="space-y-3 text-xs">
-            <div className="bg-parchment p-4 rounded-[11px] space-y-1.5">
+            <div className="bg-divider p-4 rounded-[11px] space-y-1.5">
               <div>
                 <span className="text-ink-faint">ใบงาน: </span>
                 <span className="font-semibold text-ink">{workOrder.code} — {workOrder.title}</span>

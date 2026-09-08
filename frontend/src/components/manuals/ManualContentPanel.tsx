@@ -71,7 +71,7 @@ export const ManualContentPanel: React.FC<ManualContentPanelProps> = ({
         <button
           type="button"
           onClick={handleClose}
-          className="p-1.5 rounded-full hover:bg-parchment text-ink-muted cursor-pointer shrink-0"
+          className="p-1.5 rounded-full hover:bg-primary/5 text-ink-muted cursor-pointer shrink-0"
           aria-label="ปิดแผงตรวจสอบเนื้อหา"
         >
           <X className="w-4 h-4" />

@@ -37,10 +37,10 @@ export const MicDictationButton: React.FC<MicDictationButtonProps> = ({
         title={supported ? undefined : "เบราว์เซอร์นี้ไม่รองรับการพูดเพื่อกรอกข้อความ"}
         className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 cursor-pointer transition-all active:scale-95 shadow-sm ${
           !supported
-            ? "bg-parchment text-ink-faint cursor-not-allowed opacity-60"
+            ? "bg-divider text-ink-faint cursor-not-allowed opacity-60"
             : listening
             ? "bg-rose-600 text-white animate-pulse"
-            : "bg-white text-ink-muted border border-hairline hover:bg-parchment"
+            : "bg-white text-ink-muted border border-hairline hover:bg-primary/5"
         }`}
       >
         {listening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}

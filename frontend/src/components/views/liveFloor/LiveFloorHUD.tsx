@@ -12,10 +12,11 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import type { Machine, MachineStatus, WorkOrder } from "../../../types";
+import type { Machine, MachineStats, MachineStatus, WorkOrder } from "../../../types";
 import type { FloorBuilding } from "../../../lib/floorLayout";
 import { machineStatusLabel } from "../../../lib/pillStyles";
 import { formatDecimal, formatWithUnit } from "../../../lib/format";
+import { computeReadyRate, deriveMachineCounts } from "../../../lib/machineAvailability";
 import {
   ACTIVITY_LABELS,
   type FloorSimulationSnapshot,
@@ -29,6 +30,15 @@ export type FloorCameraPreset = "line" | "plant" | "top" | "eye";
 
 export interface LiveFloorHUDProps {
   machines: Machine[]; // unfiltered, for counts
+  /**
+   * Aggregate machine counts from GET /api/machines/stats — same source of
+   * truth as the classic Supervisor Dashboard's KPI tiles. `machines` above
+   * is the parent's own (paginated, up to 1000 rows) list and can no longer
+   * be trusted for the fleet-wide total, so "พร้อมใช้งาน %" prefers this when
+   * present and only falls back to counting `machines` while stats haven't
+   * loaded yet.
+   */
+  machineStats?: MachineStats | null;
   workOrders: WorkOrder[]; // for the open-job KPI
   statusFilter: MachineStatus | "all";
   onStatusFilterChange: (next: MachineStatus | "all") => void;
@@ -161,6 +171,7 @@ const FloorClock = memo(function FloorClock(): ReactElement {
 function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
   const {
     machines,
+    machineStats,
     workOrders,
     statusFilter,
     onStatusFilterChange,
@@ -184,27 +195,30 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
 
   const hintVisible = useFadeAfter(8000);
 
-  const totalMachines = machines.length;
+  // "พร้อมใช้งาน %" และยอดนับรายสถานะต้องใช้สูตร/แหล่งข้อมูลเดียวกับ Supervisor
+  // Dashboard เสมอ — `machines` ที่หน้านี้ได้รับอาจเป็นแค่ส่วนหนึ่งของ fleet
+  // (แบ่งหน้าสูงสุด 1000 แถวจาก parent) จึงต้องใช้ machineStats (aggregate จาก
+  // server) เป็นหลัก และนับจาก machines เป็นตัวสำรองเมื่อ machineStats ยังไม่โหลด
+  const {
+    total: totalMachines,
+    normal: normalCount,
+    warning: warningCount,
+    error: errorCount,
+    maintenance: maintenanceCount,
+  } = useMemo(() => deriveMachineCounts(machines, machineStats), [machines, machineStats]);
 
-  const statusCounts = useMemo(() => {
-    const counts: Record<MachineStatus, number> = {
-      normal: 0,
-      warning: 0,
-      error: 0,
-      maintenance: 0,
-    };
-    for (const m of machines) {
-      counts[m.status] = (counts[m.status] ?? 0) + 1;
-    }
-    return counts;
-  }, [machines]);
+  const statusCounts: Record<MachineStatus, number> = {
+    normal: normalCount,
+    warning: warningCount,
+    error: errorCount,
+    maintenance: maintenanceCount,
+  };
 
-  const normalCount = statusCounts.normal;
-  const warningCount = statusCounts.warning;
-  const errorCount = statusCounts.error;
-
-  const readyRatePct =
-    totalMachines > 0 ? (normalCount / totalMachines) * 100 : null;
+  const readyRatePct = computeReadyRate({
+    total: totalMachines,
+    normal: normalCount,
+    warning: warningCount,
+  });
 
   const openWorkOrders = useMemo(
     () => workOrders.filter((wo) => wo.status !== "completed").length,

@@ -15,6 +15,15 @@ import {
   CalendarClock,
   LayoutGrid,
   Boxes,
+  Gauge,
+  Timer,
+  Zap,
+  Droplet,
+  Wind,
+  ArrowUp,
+  ArrowDown,
+  BookOpen,
+  ExternalLink,
 } from "lucide-react";
 import {
   PieChart,
@@ -23,19 +32,22 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Machine, WorkOrder, MachineStats, WorkOrderStats, UserProfile } from "../../types";
+import { Machine, WorkOrder, MachineStats, WorkOrderStats, UserProfile, ManualDoc } from "../../types";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "../ui/Modal";
 import { Pagination } from "../ui/Pagination";
 import { SkeletonCardGrid, SkeletonList } from "../ui/Skeleton";
 import { MachineSelect } from "../MachineSelect";
 import { TelemetryTrendCard } from "./TelemetryTrendCard";
+import { MachineMetricsChart } from "./MachineMetricsChart";
 import LiveFloorView from "./liveFloor/LiveFloorView";
-import { getMachines, getWorkOrders, toUserMessage } from "../../services/apiService";
+import { getMachines, getWorkOrders, getManuals, getManualFileUrl, toUserMessage } from "../../services/apiService";
+import { getMachineMetricsMock } from "../../lib/machineMetricsMock";
 import {
   machineStatusLabel,
   machineStatusBadgeClass,
 } from "../../lib/pillStyles";
 import { workOrderDisplayDate } from "../../lib/workOrderStatus";
+import { computeReadyRate, deriveMachineCounts } from "../../lib/machineAvailability";
 import {
   SPINDLE_TEMP_WARNING,
   VIBRATION_WARNING,
@@ -75,6 +87,19 @@ const MODAL_GRID_COLS: Record<number, string> = {
   4: "sm:grid-cols-4",
   5: "sm:grid-cols-3 lg:grid-cols-5",
 };
+
+/** สีตามเกณฑ์ OEE/องค์ประกอบ (>=85 เขียว, >=60 เหลือง, ต่ำกว่า แดง) — ใช้กับ OEE/Availability/Performance/Quality */
+function oeeTextClass(value: number): string {
+  if (value >= 85) return "text-emerald-600";
+  if (value >= 60) return "text-amber-600";
+  return "text-rose-600";
+}
+
+function oeeBarClass(value: number): string {
+  if (value >= 85) return "bg-emerald-500";
+  if (value >= 60) return "bg-amber-500";
+  return "bg-rose-500";
+}
 
 /**
  * Health score colour.
@@ -209,7 +234,7 @@ const MachineCard = React.memo(function MachineCard({
 
       {/* Metrics Grid — sensor cells appear only when real readings exist */}
       <div
-        className={`grid ${METRIC_GRID_COLS[metricCellCount]} gap-2 bg-parchment p-3 rounded-[11px] border border-divider text-xs mb-3`}
+        className={`grid ${METRIC_GRID_COLS[metricCellCount]} gap-2 bg-divider p-3 rounded-[11px] border border-divider text-xs mb-3`}
       >
         {fleetReadings.spindleTemp && (
           <div>
@@ -323,20 +348,19 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
     reviewWorkOrders,
     completionRate,
   } = useMemo(() => {
-    const totalMachines = machineStats?.total ?? machines.length;
-    const normalMachines =
-      machineStats?.byStatus?.normal ?? machines.filter((m) => m.status === "normal").length;
-    const warningMachines =
-      machineStats?.byStatus?.warning ?? machines.filter((m) => m.status === "warning").length;
-    const errorMachines =
-      machineStats?.byStatus?.error ?? machines.filter((m) => m.status === "error").length;
-    const maintenanceMachines =
-      machineStats?.byStatus?.maintenance ?? machines.filter((m) => m.status === "maintenance").length;
+    const {
+      total: totalMachines,
+      normal: normalMachines,
+      warning: warningMachines,
+      error: errorMachines,
+      maintenance: maintenanceMachines,
+    } = deriveMachineCounts(machines, machineStats);
 
-    const readyRate =
-      totalMachines > 0
-        ? ((normalMachines + warningMachines) / totalMachines) * 100
-        : null;
+    const readyRate = computeReadyRate({
+      total: totalMachines,
+      normal: normalMachines,
+      warning: warningMachines,
+    });
 
     const totalWorkOrders = workOrderStats?.total ?? workOrders.length;
     const completedWorkOrders =
@@ -489,6 +513,52 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
     setMachineHistoryOffset(0);
   }, [selectedMachine?.id]);
 
+  // คู่มือเครื่องจักรที่ตรงกับรุ่นของเครื่องที่เลือก — ดึงเฉพาะตอนเปิด modal เพื่อไม่ให้
+  // โหลดคู่มือทั้งคลังทุกครั้งที่ dashboard เปิด เครื่องที่ไม่มี model บันทึกไว้จะข้ามการดึงเลย
+  const [machineManuals, setMachineManuals] = useState<ManualDoc[]>([]);
+  const [machineManualsLoading, setMachineManualsLoading] = useState(false);
+  const [machineManualsError, setMachineManualsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const model = selectedMachine?.model?.trim();
+    if (!model) {
+      setMachineManuals([]);
+      setMachineManualsError(null);
+      setMachineManualsLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setMachineManualsLoading(true);
+    setMachineManualsError(null);
+    getManuals({ machineModel: model, limit: 10 })
+      .then((res) => {
+        if (cancelled) return;
+        setMachineManuals(res.data);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setMachineManualsError(toUserMessage(err, "ไม่สามารถโหลดคู่มือเครื่องจักรได้"));
+      })
+      .finally(() => {
+        if (!cancelled) setMachineManualsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedMachine?.model]);
+
+  const handleOpenManualFile = async (doc: ManualDoc) => {
+    const win = window.open("", "_blank");
+    if (!win) return;
+    try {
+      const { url } = await getManualFileUrl(doc.id);
+      win.opener = null;
+      win.location.replace(url);
+    } catch {
+      win.close();
+    }
+  };
+
   // `machineCode` is the ONLY thing narrowing this query, and `buildQuery` drops
   // params that are undefined (see services/apiService.ts). Passing
   // `selectedMachine.code ?? undefined` for one of the 3 machines with no code on
@@ -537,6 +607,13 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
   }, [selectedMachine?.id, selectedMachineCode, machineHistoryOffset]);
 
   const selectedEvaluation = selectedMachine ? evaluateMachine(selectedMachine) : null;
+
+  // ตัวชี้วัด OEE / cycle time / พลังงาน / ประวัติ error — ข้อมูลตัวอย่าง (mock)
+  // deterministic ตาม machine.id ดู frontend/src/lib/machineMetricsMock.ts
+  const selectedMetrics = useMemo(
+    () => (selectedMachine ? getMachineMetricsMock(selectedMachine) : null),
+    [selectedMachine]
+  );
 
   // Cards in the detail modal: health score and the maintenance dates always
   // render (both derived from real repair history); the three sensor cards join
@@ -604,10 +681,12 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
       {viewMode === "floor4d" && (
         <LiveFloorView
           machines={machines}
+          machineStats={machineStats}
           workOrders={workOrders}
           onOpenMachineDetail={handleCardSelect}
           onExit={() => setViewMode("classic")}
           onAskAI={onAskAI}
+          detailOpen={selectedMachine !== null}
         />
       )}
 
@@ -785,7 +864,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
                 onClick={() => setStatusFilter((f) => (f === item.key ? "all" : item.key))}
                 disabled={item.value === 0}
                 className={`w-full min-h-[36px] flex items-center justify-between text-xs px-2 py-1.5 rounded-[11px] transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 ${
-                  statusFilter === item.key ? "bg-parchment" : "hover:bg-parchment"
+                  statusFilter === item.key ? "bg-primary/10" : "hover:bg-primary/5"
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -814,7 +893,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
             {statusFilter !== "all" && (
               <button
                 onClick={() => setStatusFilter("all")}
-                className="text-xs font-semibold text-ink-muted bg-pearl hover:bg-parchment px-3 py-1.5 rounded-full border border-divider cursor-pointer"
+                className="text-xs font-semibold text-ink-muted bg-pearl hover:bg-primary/5 px-3 py-1.5 rounded-full border border-divider cursor-pointer"
               >
                 ล้างตัวกรอง
               </button>
@@ -945,7 +1024,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
             <div className="space-y-2">
               <div className={`grid grid-cols-2 gap-3 ${MODAL_GRID_COLS[detailCardCount]}`}>
                 {selectedMachine.spindleTemp != null && (
-                  <div className="p-3.5 rounded-[18px] bg-parchment border border-hairline">
+                  <div className="p-3.5 rounded-[18px] bg-divider border border-hairline">
                     <span className="text-xs font-semibold text-ink-faint block mb-1">
                       อุณหภูมิ Spindle
                     </span>
@@ -963,7 +1042,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
                 )}
 
                 {selectedMachine.vibrationMms != null && (
-                  <div className="p-3.5 rounded-[18px] bg-parchment border border-hairline">
+                  <div className="p-3.5 rounded-[18px] bg-divider border border-hairline">
                     <span className="text-xs font-semibold text-ink-faint block mb-1">
                       ความสั่นสะเทือน
                     </span>
@@ -980,7 +1059,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
                   </div>
                 )}
 
-                <div className="p-3.5 rounded-[18px] bg-parchment border border-hairline">
+                <div className="p-3.5 rounded-[18px] bg-divider border border-hairline">
                   <span className="text-xs font-semibold text-ink-faint block mb-1">
                     คะแนนสุขภาพเครื่อง
                   </span>
@@ -1001,7 +1080,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
                 </div>
 
                 {selectedMachine.operatingHours != null && (
-                  <div className="p-3.5 rounded-[18px] bg-parchment border border-hairline">
+                  <div className="p-3.5 rounded-[18px] bg-divider border border-hairline">
                     <span className="text-xs font-semibold text-ink-faint block mb-1">
                       ชั่วโมงการทำงาน
                     </span>
@@ -1019,7 +1098,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
                   className={`p-3.5 rounded-[18px] border ${
                     isOverdueDate(selectedMachine.nextMaintenance)
                       ? "bg-amber-50 border-amber-200"
-                      : "bg-parchment border-hairline"
+                      : "bg-divider border-hairline"
                   }`}
                 >
                   <span className="text-xs font-semibold text-ink-faint block mb-1">
@@ -1044,6 +1123,203 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
                 </div>
               </div>
             </div>
+
+            {/* ประสิทธิภาพ — OEE + Cycle Time (mock/demo) */}
+            {selectedMetrics && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between border-b border-divider pb-2">
+                  <h4 className="font-semibold text-sm text-ink flex items-center gap-2">
+                    <Gauge className="w-4 h-4 text-primary" />
+                    <span>ประสิทธิภาพ (OEE)</span>
+                  </h4>
+                  <span className="text-[10px] text-ink-faint font-medium">ข้อมูลตัวอย่าง</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="p-3.5 rounded-[18px] bg-divider border border-hairline sm:col-span-1 col-span-2">
+                    <span className="text-xs font-semibold text-ink-faint block mb-1">OEE รวม</span>
+                    <span className={`text-2xl font-bold tracking-[-0.02em] ${oeeTextClass(selectedMetrics.oee.oee)}`}>
+                      {selectedMetrics.oee.oee}%
+                    </span>
+                  </div>
+                  {[
+                    { label: "Availability", value: selectedMetrics.oee.availability },
+                    { label: "Performance", value: selectedMetrics.oee.performance },
+                    { label: "Quality", value: selectedMetrics.oee.quality },
+                  ].map((item) => (
+                    <div key={item.label} className="p-3.5 rounded-[18px] bg-divider border border-hairline">
+                      <span className="text-xs font-semibold text-ink-faint block mb-1">{item.label}</span>
+                      <span className={`text-lg font-semibold tracking-[-0.02em] ${oeeTextClass(item.value)}`}>
+                        {item.value}%
+                      </span>
+                      <div className="h-1.5 rounded-full bg-white/60 mt-2 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${oeeBarClass(item.value)}`}
+                          style={{ width: `${Math.min(100, Math.max(0, item.value))}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Cycle Time */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="p-3.5 rounded-[18px] bg-divider border border-hairline">
+                    <span className="text-xs font-semibold text-ink-faint mb-1 flex items-center gap-1">
+                      <Timer className="w-3.5 h-3.5" /> รอบเวลาจริง
+                    </span>
+                    <span className="text-lg font-semibold text-ink">{selectedMetrics.cycleTime.actualSec} วิ</span>
+                  </div>
+                  <div className="p-3.5 rounded-[18px] bg-divider border border-hairline">
+                    <span className="text-xs font-semibold text-ink-faint block mb-1">รอบเวลามาตรฐาน</span>
+                    <span className="text-lg font-semibold text-ink">{selectedMetrics.cycleTime.standardSec} วิ</span>
+                  </div>
+                  <div className="p-3.5 rounded-[18px] bg-divider border border-hairline">
+                    <span className="text-xs font-semibold text-ink-faint block mb-1">ส่วนต่างจากมาตรฐาน</span>
+                    <span
+                      className={`text-lg font-semibold ${
+                        selectedMetrics.cycleTime.deviationPct > 5 ? "text-rose-600" : "text-ink"
+                      }`}
+                    >
+                      {selectedMetrics.cycleTime.deviationPct > 0 ? "+" : ""}
+                      {selectedMetrics.cycleTime.deviationPct}%
+                    </span>
+                  </div>
+                  <div className="p-3.5 rounded-[18px] bg-divider border border-hairline">
+                    <span className="text-xs font-semibold text-ink-faint block mb-1">ชิ้นงาน/ชม.</span>
+                    <span className="text-lg font-semibold text-ink">{selectedMetrics.cycleTime.partsPerHour}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* การใช้พลังงาน (mock/demo) */}
+            {selectedMetrics && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between border-b border-divider pb-2">
+                  <h4 className="font-semibold text-sm text-ink flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-primary" />
+                    <span>การใช้พลังงาน</span>
+                  </h4>
+                  <span className="text-[10px] text-ink-faint font-medium">ข้อมูลตัวอย่าง</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {selectedMetrics.energy.map((e) => {
+                    const ENERGY_ICONS: Record<string, React.ReactNode> = {
+                      electrical: <Zap className="w-3.5 h-3.5" />,
+                      ro: <Droplet className="w-3.5 h-3.5" />,
+                      coolant: <Droplet className="w-3.5 h-3.5" />,
+                      air: <Wind className="w-3.5 h-3.5" />,
+                    };
+                    const worse = e.changePct > 0;
+                    return (
+                      <div key={e.kind} className="p-3.5 rounded-[18px] bg-divider border border-hairline">
+                        <span className="text-xs font-semibold text-ink-faint mb-1 flex items-center gap-1">
+                          {ENERGY_ICONS[e.kind]}
+                          {e.label}
+                        </span>
+                        <span className="text-lg font-semibold text-ink block">
+                          {e.value} {e.unit}
+                        </span>
+                        <span
+                          className={`text-xs font-semibold flex items-center gap-1 mt-1 ${
+                            worse ? "text-rose-600" : "text-emerald-600"
+                          }`}
+                        >
+                          {worse ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
+                          {Math.abs(e.changePct)}% จากช่วงก่อนหน้า
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* กราฟแนวโน้ม 24 ชม. / 7 วัน (mock/demo) */}
+            {selectedMachine && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between border-b border-divider pb-2">
+                  <h4 className="font-semibold text-sm text-ink flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-primary" />
+                    <span>กราฟแนวโน้ม</span>
+                  </h4>
+                  <span className="text-[10px] text-ink-faint font-medium">ข้อมูลตัวอย่าง</span>
+                </div>
+                <MachineMetricsChart machine={selectedMachine} />
+              </div>
+            )}
+
+            {/* ประวัติ Error / Error code (mock/demo) */}
+            {selectedMetrics && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between border-b border-divider pb-2">
+                  <h4 className="font-semibold text-sm text-ink flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-primary" />
+                    <span>ประวัติ Error / Error code</span>
+                  </h4>
+                  <span className="text-[10px] text-ink-faint font-medium">ข้อมูลตัวอย่าง</span>
+                </div>
+                <div className="overflow-x-auto rounded-[11px] border border-hairline">
+                  <table className="w-full min-w-[560px] text-left text-xs">
+                    <thead className="bg-divider text-ink-faint font-semibold border-b border-hairline">
+                      <tr>
+                        <th className="p-3">Error code</th>
+                        <th className="p-3">รายละเอียด</th>
+                        <th className="p-3">ความรุนแรง</th>
+                        <th className="p-3">เวลาที่เกิด</th>
+                        <th className="p-3">หยุดเครื่อง (นาที)</th>
+                        <th className="p-3">สถานะ</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-divider">
+                      {selectedMetrics.errorHistory.map((err) => {
+                        const isActive = selectedMachine?.activeErrorCode === err.code && !err.resolved;
+                        const severityClass =
+                          err.severity === "critical"
+                            ? "bg-rose-100 text-rose-800"
+                            : err.severity === "warning"
+                            ? "bg-amber-100 text-amber-800"
+                            : "bg-blue-100 text-blue-800";
+                        const severityLabel =
+                          err.severity === "critical" ? "วิกฤต" : err.severity === "warning" ? "เฝ้าระวัง" : "แจ้งเตือน";
+                        return (
+                          <tr key={err.id} className={isActive ? "bg-rose-50" : "hover:bg-primary/5"}>
+                            <td className="p-3 font-mono font-semibold text-ink">{err.code}</td>
+                            <td className="p-3 text-ink">{err.description}</td>
+                            <td className="p-3">
+                              <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${severityClass}`}>
+                                {severityLabel}
+                              </span>
+                            </td>
+                            <td className="p-3 font-mono text-ink-muted whitespace-nowrap">
+                              {new Date(err.occurredAt).toLocaleString("th-TH", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "2-digit",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </td>
+                            <td className="p-3 text-ink-muted">{err.durationMin}</td>
+                            <td className="p-3">
+                              {err.resolved ? (
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-700">
+                                  แก้ไขแล้ว
+                                </span>
+                              ) : (
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-rose-100 text-rose-700">
+                                  ยังไม่แก้ไข
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
             {/* HISTORICAL RECORD LOGS */}
             <div className="space-y-3">
@@ -1083,7 +1359,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
                   {/* Table for desktop */}
                   <div className="hidden md:block overflow-x-auto rounded-[11px] border border-hairline">
                     <table className="w-full min-w-[640px] text-left text-xs">
-                      <thead className="bg-parchment text-ink-faint font-semibold border-b border-hairline">
+                      <thead className="bg-divider text-ink-faint font-semibold border-b border-hairline">
                         <tr>
                           <th className="p-3">วันที่</th>
                           <th className="p-3">รหัสใบงาน</th>
@@ -1094,7 +1370,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
                       </thead>
                       <tbody className="divide-y divide-divider">
                         {machineHistory.map((wo) => (
-                          <tr key={wo.id} className="hover:bg-parchment">
+                          <tr key={wo.id} className="hover:bg-primary/5">
                             {/* The repair date, not the import timestamp — see
                                 workOrderDisplayDate. Also the field the server
                                 sorts these rows by, so date and order agree. */}
@@ -1159,6 +1435,60 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
                 />
               )}
             </div>
+
+            {/* คู่มือเครื่องจักร */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between border-b border-divider pb-2">
+                <h4 className="font-semibold text-sm text-ink flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-primary" />
+                  <span>คู่มือเครื่องจักร</span>
+                  {machineManualsLoading && (
+                    <Loader2 className="w-3.5 h-3.5 text-ink-faint animate-spin" aria-label="กำลังโหลด" />
+                  )}
+                </h4>
+              </div>
+
+              {!selectedMachine?.model ? (
+                <p className="p-6 text-center text-ink-faint text-xs rounded-[11px] border border-hairline">
+                  เครื่องนี้ไม่มีรุ่นเครื่องบันทึกไว้ จึงยังค้นหาคู่มือที่ตรงกันให้ไม่ได้
+                </p>
+              ) : machineManualsError ? (
+                <div className="p-3.5 rounded-[11px] bg-rose-50 border border-rose-200 text-xs text-rose-900 flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-rose-700 shrink-0 mt-0.5" />
+                  <span>{machineManualsError}</span>
+                </div>
+              ) : machineManualsLoading && machineManuals.length === 0 ? (
+                <div className="p-3.5 rounded-[11px] border border-hairline">
+                  <SkeletonList count={2} />
+                </div>
+              ) : machineManuals.length === 0 ? (
+                <p className="p-6 text-center text-ink-faint text-xs rounded-[11px] border border-hairline">
+                  ยังไม่มีคู่มือสำหรับรุ่นนี้
+                </p>
+              ) : (
+                <div className="divide-y divide-divider rounded-[11px] border border-hairline overflow-hidden">
+                  {machineManuals.map((doc) => (
+                    <div key={doc.id} className="p-3.5 flex items-center justify-between gap-3 bg-white">
+                      <div className="min-w-0">
+                        <p className="text-sm text-ink font-medium truncate">{doc.title}</p>
+                        <p className="text-xs text-ink-faint">
+                          {doc.category}
+                          {doc.pagesCount > 0 ? ` · ${doc.pagesCount} หน้า` : ""}
+                          {doc.aiIndexed ? " · จัดทำดัชนี AI แล้ว" : ""}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleOpenManualFile(doc)}
+                        className="shrink-0 min-h-[36px] px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>เปิดคู่มือ</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </ModalBody>
 
           {/* Action Footer */}
@@ -1193,7 +1523,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
 
             <button
               onClick={() => setSelectedMachine(null)}
-              className="w-full sm:w-auto min-h-[44px] px-4 py-2.5 rounded-[11px] bg-pearl hover:bg-parchment text-ink-muted text-xs font-semibold border border-divider cursor-pointer active:scale-95"
+              className="w-full sm:w-auto min-h-[44px] px-4 py-2.5 rounded-[11px] bg-pearl hover:bg-primary/5 text-ink-muted text-xs font-semibold border border-divider cursor-pointer active:scale-95"
             >
               ปิดหน้าต่าง
             </button>

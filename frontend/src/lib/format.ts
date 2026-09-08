@@ -18,6 +18,14 @@ export const NO_DATA = "—";
 /** Thai wording for places where a bare dash reads as ambiguous. */
 export const NO_DATA_TH = "ไม่มีข้อมูล";
 
+/** Truncates long, unspaced strings (filenames, titles) so UI like toasts stays
+ *  a sane width — SweetAlert2/flex layouts can only wrap on spaces, so a single
+ *  long word still overflows unless it's shortened first. Appends "…" when cut. */
+export function truncateText(value: string, maxLength: number = 40): string {
+  if (value.length <= maxLength) return value;
+  return `${value.slice(0, maxLength).trimEnd()}…`;
+}
+
 /**
  * Why a machine has no condition index.
  *

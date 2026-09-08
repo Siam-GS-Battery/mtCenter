@@ -19,6 +19,7 @@ import {
 } from "../../services/apiService";
 import { MANUAL_CATEGORIES, CUSTOM_MODEL_OPTION } from "../../lib/manualCategories";
 import { useManualOcrStatus } from "../../hooks/useManualOcrStatus";
+import { OcrProgressBar } from "../manuals/OcrProgressBar";
 
 type ManualOcrStatusHookResult = ReturnType<typeof useManualOcrStatus>;
 import { ManualContentPanel } from "../manuals/ManualContentPanel";
@@ -95,14 +96,11 @@ const OcrProgressPanel: React.FC<{
   return (
     <div className="border-t border-emerald-200 pt-4 mt-1 space-y-2">
       {(ocrStatus === "pending" || ocrStatus === "processing") && !timedOut && (
-        <div className="flex items-center gap-2 text-[13px] font-semibold text-emerald-900">
-          <Loader2 className="w-4 h-4 text-emerald-700 animate-spin" />
-          <span>
-            {ocrStatus === "pending"
-              ? "รอแปลงเป็น Markdown"
-              : "กำลังอ่านไฟล์ PDF ด้วย AI…"}
-          </span>
-        </div>
+        <OcrProgressBar
+          ocrStatus={ocrStatus}
+          ocrStartedAt={status?.ocrStartedAt ?? null}
+          variant="compact"
+        />
       )}
 
       {timedOut && (ocrStatus === "pending" || ocrStatus === "processing") && (
@@ -369,15 +367,9 @@ export const UploadManualView: React.FC<UploadManualViewProps> = ({
   const ocrStatusResult = useManualOcrStatus(savedManual?.id ?? null);
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto">
-      <div
-        className={
-          showContentPanel
-            ? "grid grid-cols-1 lg:grid-cols-2 gap-6 items-start"
-            : "max-w-4xl mx-auto space-y-6"
-        }
-      >
-        <div className={showContentPanel ? "space-y-6" : "space-y-6"}>
+    <div className={showContentPanel ? "p-4 md:p-8 max-w-[1600px] mx-auto" : "p-4 md:p-8 max-w-7xl mx-auto"}>
+      <div className={showContentPanel ? "flex flex-col gap-6" : "max-w-4xl mx-auto space-y-6"}>
+        <div className="space-y-6">
           {savedManual && !contentPanelOpen && (
             <button
               type="button"

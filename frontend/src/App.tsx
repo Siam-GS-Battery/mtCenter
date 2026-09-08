@@ -14,6 +14,7 @@ import {
 // no Excel workbook feeds it) — MOCK_KB_ARTICLES is the one deliberate
 // exception that keeps using fixture data. See data/mockData.ts.
 import { MOCK_KB_ARTICLES, KnowledgeArticle } from "./data/mockData";
+import { truncateText } from "./lib/format";
 import {
   getUsers,
   getMachines,
@@ -547,7 +548,7 @@ export default function App() {
   // ManualsView ดึงคู่มือของตัวเอง (server-side pagination/search) จึงไม่ต้องรีเฟรช
   // รายการคู่มือระดับ App อีกต่อไป — แค่แจ้งผลด้วย toast เท่านั้น
   const handleManualUploaded = (manual: ManualDoc) => {
-    showToast(`อัปโหลดคู่มือ "${manual.title}" เรียบร้อยแล้ว`);
+    showToast(`อัปโหลดคู่มือ "${truncateText(manual.title)}" เรียบร้อยแล้ว`);
   };
 
   // A create/update/delete/stock-adjust can shift the /stats numbers (total,

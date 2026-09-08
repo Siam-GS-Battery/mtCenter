@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Machine, WorkOrder, UserRole, WorkOrderStats, SparePart, UserProfile } from "../../types";
 import { WorkOrderDetailModal } from "../WorkOrderDetailModal";
+import { WorkOrderDescription } from "../work-orders/WorkOrderDescription";
 import { EditWorkOrderModal } from "../EditWorkOrderModal";
 import { MachineSelect } from "../MachineSelect";
 import { Pencil, Trash2 } from "lucide-react";
@@ -31,7 +32,7 @@ import {
   dueState,
   overdueCardClass,
 } from "../../lib/workOrderStatus";
-import { getWorkOrders, toUserMessage } from "../../services/apiService";
+import { getWorkOrders, getWorkOrderStats, toUserMessage } from "../../services/apiService";
 import { notifyFailed } from "../../lib/swal";
 import type { WorkOrderListParams } from "../../services/apiService";
 import { Pagination } from "../ui/Pagination";
@@ -113,6 +114,14 @@ function buildRecentMonthOptions(count = 12): { value: string; label: string }[]
 }
 
 const MONTH_OPTIONS = buildRecentMonthOptions();
+
+/**
+ * Viewing scope for this page — "mine" is the original behaviour (server-scoped
+ * to `currentAssigneeKey`); "machine" is the new cross-technician view, scoped
+ * to a single machine picked from the `MachineSelect` dropdown instead, showing
+ * every technician's work orders for that machine.
+ */
+type WorkOrderScope = { kind: "mine" } | { kind: "machine"; machine: Machine };
 
 /** ช่วงวันที่ (from/to แบบ YYYY-MM-DD) ของเดือนที่เลือก ใช้กรองบน
  * assigned_date ฝั่ง server (เหมือนที่ AllWorkOrdersView ใช้) — คืนค่า
@@ -208,6 +217,20 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
   const [editingWO, setEditingWO] = useState<WorkOrder | null>(null);
   const [deletingWO, setDeletingWO] = useState<WorkOrder | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [scope, setScope] = useState<WorkOrderScope>({ kind: "mine" });
+  // สถิติ (นับ/แท็บ) เฉพาะตอน scope เป็น "machine" — ดึงแยกที่นี่ด้วย
+  // ?machineCode= เพราะ myWorkOrderStats (prop จาก App.tsx) scope ด้วย
+  // assignedTo ของผู้ใช้ปัจจุบันเท่านั้น ใช้กับมุมมองนี้ไม่ได้
+  const [machineScopeStats, setMachineScopeStats] = useState<WorkOrderStats | null>(null);
+
+  // ผู้ใช้ปัจจุบัน (สำหรับเทียบว่าใบงานเป็นของตัวเองหรือไม่ ใน scope "machine")
+  const currentUserKey = currentUser?.id ?? currentAssigneeKey;
+
+  // ความปลอดภัย: เมื่อดูใบงานของ "เครื่อง" (ข้ามช่างทุกคน) ใบงานที่ไม่ใช่ของ
+  // ผู้ใช้ปัจจุบันต้องดูได้อย่างเดียว (ปุ่ม "แก้ไข"/"ลบ" ต้องไม่แสดง) ไม่ว่า
+  // บทบาทจะเป็นอะไรก็ตาม — ต่างจาก scope "mine" ที่ไม่มีข้อจำกัดนี้
+  const actionsAllowed = (wo: WorkOrder) =>
+    scope.kind !== "machine" || (!!currentUserKey && wo.assignedTo === currentUserKey);
 
   // สิทธิ์แก้ไข/ลบ: engineer/supervisor แก้ไข/ลบได้ทุกใบงาน, technician
   // แก้ไข/ลบได้เฉพาะใบงานที่ตัวเองเป็นผู้รับผิดชอบหรือผู้ขอ (จับคู่ด้วย
@@ -243,17 +266,28 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
   // และรีเซ็ต offset กลับหน้าแรกทุกครั้งที่เปลี่ยนแท็บ เช่นเดียวกับตอนเปลี่ยนผู้ใช้
   useEffect(() => {
     setOffset(0);
-  }, [currentAssigneeKey, activeFilter, closedMonth]);
+  }, [currentAssigneeKey, activeFilter, closedMonth, scope]);
 
   // แท็บ "ปิดงานแล้ว" ใช้หน้าเล็กกว่า (CLOSED_PAGE_SIZE) เพราะสะสมงานเก่าไว้
   // มาก การเทหน้าทั้งหมดแบบแท็บอื่น (PAGE_SIZE = 200) จะรกหน้าจอโดยไม่จำเป็น
   const effectivePageSize = activeFilter === "completed" ? CLOSED_PAGE_SIZE : PAGE_SIZE;
 
   const fetchPage = useCallback(() => {
-    if (!currentAssigneeKey) {
+    // scope "machine" ไม่ผูกกับ currentAssigneeKey เลย — ต้องใช้งานได้แม้
+    // ค่านี้ว่าง (เช่น ผู้ใช้ยังไม่ผูก profile) เพราะต้องการดูใบงานของช่างทุกคน
+    if (scope.kind === "mine" && !currentAssigneeKey) {
       setWorkOrders([]);
       setTotal(0);
       setIsLoading(false);
+      return () => {};
+    }
+
+    if (scope.kind === "machine" && !scope.machine.code) {
+      // ไม่มีรหัสเครื่องให้กรอง — กันไม่ให้ query กว้างเกินขอบเขตของ scope นี้
+      setWorkOrders([]);
+      setTotal(0);
+      setIsLoading(false);
+      setLoadError("เครื่องจักรนี้ไม่มีรหัสเครื่อง จึงไม่สามารถแสดงใบงานแยกตามเครื่องได้");
       return () => {};
     }
 
@@ -263,10 +297,15 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
 
     const tabQuery = TAB_QUERY[activeFilter] ?? {};
     const dateRange = activeFilter === "completed" ? monthRange(closedMonth) : {};
+    const scopeQuery: Pick<WorkOrderListParams, "assignedTo" | "machineCode"> =
+      scope.kind === "machine"
+        ? { machineCode: scope.machine.code ?? undefined }
+        : { assignedTo: currentAssigneeKey };
+
     getWorkOrders({
-      assignedTo: currentAssigneeKey,
       limit: effectivePageSize,
       offset,
+      ...scopeQuery,
       ...tabQuery,
       ...dateRange,
     })
@@ -286,9 +325,30 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [currentAssigneeKey, offset, activeFilter, closedMonth, effectivePageSize]);
+  }, [currentAssigneeKey, offset, activeFilter, closedMonth, effectivePageSize, scope]);
 
   useEffect(() => fetchPage(), [fetchPage]);
+
+  // ตัวเลข/แท็บ (badge) ของ scope "machine" ต้องมาจาก endpoint เดียวกันกับที่
+  // ใช้แสดงรายการ (scope ด้วย machineCode เดียวกัน) ไม่ใช่ myWorkOrderStats
+  // (prop จาก App.tsx ซึ่ง scope ด้วย assignedTo ของผู้ใช้ปัจจุบันเท่านั้น)
+  useEffect(() => {
+    if (scope.kind !== "machine" || !scope.machine.code) {
+      setMachineScopeStats(null);
+      return;
+    }
+    let cancelled = false;
+    getWorkOrderStats({ machineCode: scope.machine.code })
+      .then((stats) => {
+        if (!cancelled) setMachineScopeStats(stats);
+      })
+      .catch(() => {
+        if (!cancelled) setMachineScopeStats(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [scope]);
 
   const handleModalUpdate = async (updatedWO: WorkOrder) => {
     // onUpdateWorkOrder is App.tsx's handleUpdateWorkOrder, which already
@@ -321,12 +381,16 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
     (wo.machineId === activeMachine.id ||
       (Boolean(activeMachine.code) && wo.machineCode === activeMachine.code));
 
+  // ตัวกรอง "เฉพาะเครื่อง" (chip ด้านล่าง) มีไว้กรอง activeMachine (เครื่องที่
+  // TopBar กำลังทำงานอยู่) ซ้อนทับ scope "mine" เท่านั้น — ใน scope "machine"
+  // server กรองตาม machineCode ของเครื่องที่เลือกให้แล้ว การกรองซ้ำที่นี่ด้วย
+  // activeMachine (คนละตัวแปรกัน) จะยิ่งซ่อนผลลัพธ์โดยไม่ตั้งใจ จึงข้ามไป
   const machineScoped = useMemo(
     () =>
-      onlyActiveMachine && activeMachine
+      scope.kind === "mine" && onlyActiveMachine && activeMachine
         ? workOrders.filter(belongsToActiveMachine)
         : workOrders,
-    [workOrders, onlyActiveMachine, activeMachine]
+    [workOrders, onlyActiveMachine, activeMachine, scope]
   );
 
   const hiddenByMachineFilter = workOrders.length - machineScoped.length;
@@ -334,7 +398,9 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
   // เลยกำหนด: ตัวเลขบนแท็บมาจาก myWorkOrderStats.overdue (prop จาก App.tsx,
   // scope เดียวกับ badge) ไม่ใช่นับจาก workOrders ที่โหลดมาเฉพาะหน้านี้ —
   // ไม่งั้นตัวเลขจะไม่ตรงกับ badge อีกครั้งเมื่อช่างมีใบงานเกิน PAGE_SIZE
-  const overdueCount = myWorkOrderStats?.overdue ?? 0;
+  // ใน scope "machine" ใช้ machineScopeStats (scope ด้วย machineCode เดียวกัน) แทน
+  const overdueCount =
+    scope.kind === "machine" ? machineScopeStats?.overdue ?? 0 : myWorkOrderStats?.overdue ?? 0;
 
   // เรียงตามความเร่งด่วนเท่านั้น — การกรองตามแท็บ (status/overdue) ทำที่ server
   // แล้วใน fetchPage ข้างต้น ไม่ต้องกรองซ้ำที่นี่
@@ -375,14 +441,38 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
           <div className="max-w-md">
             <MachineSelect
               machines={machines}
-              activeMachine={onlyActiveMachine ? (activeMachine ?? null) : null}
+              activeMachine={scope.kind === "machine" ? scope.machine : null}
               onSelectMachine={(m) => {
+                // ยังคงแจ้ง App.tsx ว่าเปลี่ยนเครื่องที่กำลังทำงานอยู่ (sync กับ
+                // TopBar) เหมือนเดิม — แต่หน้านี้เปลี่ยนไปดูใบงานของ "เครื่อง"
+                // นั้นแทน (ทุกช่าง) ไม่ใช่กรองเฉพาะใบงานของตัวเองอีกต่อไป
                 onSelectMachine?.(m);
-                setOnlyActiveMachine(true);
+                setScope({ kind: "machine", machine: m });
                 setOffset(0);
               }}
               label="กรองตามเครื่องจักร"
             />
+          </div>
+        )}
+
+        {scope.kind === "machine" && (
+          <div className="flex flex-wrap items-center justify-between gap-2 bg-white border border-divider rounded-[14px] px-4 py-3 shadow-sm">
+            <div>
+              <p className="text-sm font-semibold text-ink">
+                ใบงานของเครื่อง {scope.machine.code} · {scope.machine.name}
+              </p>
+              <p className="text-xs text-ink-muted">แสดงใบงานของช่างทุกคน</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setScope({ kind: "mine" });
+                setOffset(0);
+              }}
+              className="min-h-9 px-3 py-1.5 rounded-full bg-divider hover:bg-primary/10 text-ink-muted text-[13px] font-semibold cursor-pointer transition-colors"
+            >
+              ← กลับไปงานของฉัน
+            </button>
           </div>
         )}
 
@@ -446,7 +536,7 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
           </div>
         )}
 
-        {activeMachine && (
+        {scope.kind === "mine" && activeMachine && (
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
@@ -517,7 +607,7 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
             return (
               <div
                 key={wo.id}
-                className={`rounded-[18px] border p-5 hover:border-primary/40 transition-colors flex flex-col justify-between space-y-4 ${overdueCardClass(due)}`}
+                className={`rounded-[18px] border p-5 hover:border-primary/40 transition-colors flex flex-col justify-between space-y-4 min-w-0 ${overdueCardClass(due)}`}
               >
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -551,9 +641,7 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
                     </span>
                   </div>
 
-                  <p className="text-[13px] text-ink-muted line-clamp-2 mt-2 bg-divider p-2.5 rounded-[11px]">
-                    {wo.description}
-                  </p>
+                  <WorkOrderDescription description={wo.description} className="mt-2" />
                 </div>
 
                 {/* Progress & Actions */}
@@ -608,7 +696,7 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
                       <Sparkles className="w-5 h-5 text-primary" />
                     </button>
 
-                    {canMutate(wo) && (
+                    {canMutate(wo) && actionsAllowed(wo) && (
                       <button
                         onClick={() => setEditingWO(wo)}
                         aria-label={`แก้ไขใบงาน ${wo.code}`}
@@ -620,7 +708,7 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
                       </button>
                     )}
 
-                    {onDeleteWorkOrder && canDelete(wo) && (
+                    {onDeleteWorkOrder && canDelete(wo) && actionsAllowed(wo) && (
                       <button
                         onClick={() => setDeletingWO(wo)}
                         aria-label={`ลบใบงาน ${wo.code}`}
@@ -676,9 +764,13 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
         currentUserRole={currentUserRole}
         currentUserName={currentUserName}
         currentUserId={currentUser?.id}
-        onUpdateWorkOrder={handleModalUpdate}
+        // scope "machine" อนุญาตให้ดูใบงานของช่างทุกคนได้ แต่ต้องไม่แก้ไข/
+        // อัปเดตขั้นตอนของใบงานที่ไม่ใช่ของตัวเอง — WorkOrderDetailModal เอง
+        // ไม่มี prop สำหรับปิดการแก้ไข checklist แยกจาก canDelete จึงต้องกัน
+        // ที่นี่โดยไม่ส่ง onUpdateWorkOrder เข้าไปเลยเมื่อ actionsAllowed เป็น false
+        onUpdateWorkOrder={selectedWO && actionsAllowed(selectedWO) ? handleModalUpdate : undefined}
         onDeleteWorkOrder={onDeleteWorkOrder}
-        canDelete={selectedWO ? canDelete(selectedWO) : false}
+        canDelete={selectedWO ? canDelete(selectedWO) && actionsAllowed(selectedWO) : false}
         onAskAI={onAskAI}
         onStockChanged={onStockChanged}
       />

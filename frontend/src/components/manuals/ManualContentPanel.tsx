@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { AlertCircle, FileSearch, Loader2, X } from "lucide-react";
 import { ManualOcrStatus, getManualContentDetail, ManualContentDetail, toUserMessage } from "../../services/apiService";
 import { MarkdownDraftEditor } from "./MarkdownDraftEditor";
+import { OcrProgressBar } from "./OcrProgressBar";
 
 interface ManualContentPanelProps {
   manualId: string;
@@ -62,7 +63,7 @@ export const ManualContentPanel: React.FC<ManualContentPanelProps> = ({
   };
 
   return (
-    <div className="bg-white border border-hairline rounded-[18px] flex flex-col h-[70vh] lg:h-[calc(100vh-8rem)] lg:sticky lg:top-4 overflow-hidden">
+    <div className="bg-white border border-hairline rounded-[18px] flex flex-col h-[70vh] lg:h-[calc(100vh-16rem)] min-h-[520px] overflow-hidden">
       <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-hairline shrink-0">
         <div className="min-w-0">
           <h4 className="text-sm font-semibold text-ink truncate">ตรวจสอบเนื้อหา Markdown</h4>
@@ -97,12 +98,11 @@ export const ManualContentPanel: React.FC<ManualContentPanelProps> = ({
                 </>
               ) : (
                 <>
-                  <Loader2 className="w-8 h-8 text-primary mx-auto animate-spin" />
-                  <p className="text-sm font-semibold text-ink">
-                    {ocrStatus === "processing"
-                      ? "กำลังอ่านไฟล์ PDF ด้วย AI…"
-                      : "รอแปลงเป็น Markdown…"}
-                  </p>
+                  <OcrProgressBar
+                    ocrStatus={ocrStatus}
+                    ocrStartedAt={ocrStatusResult?.ocrStartedAt ?? null}
+                    variant="large"
+                  />
                   <p className="text-xs text-ink-muted">
                     ตัวแก้ไขฉบับร่างจะเปิดขึ้นที่นี่โดยอัตโนมัติเมื่อแปลงเสร็จ
                   </p>

@@ -236,7 +236,7 @@ export const AIChatView: React.FC<AIChatViewProps> = ({
                 className="absolute inset-0 bg-black/30"
                 onClick={() => setHistoryOpenMobile(false)}
               />
-              <div className="relative bg-parchment w-[85%] max-w-xs h-full overflow-y-auto p-4 shadow-2xl">
+              <div className="relative bg-divider w-[85%] max-w-xs h-full overflow-y-auto p-4 shadow-2xl">
                 <button
                   onClick={() => setHistoryOpenMobile(false)}
                   aria-label="ปิดประวัติการแชต"

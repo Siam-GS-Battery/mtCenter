@@ -114,15 +114,15 @@ const labelClass = "block text-[13px] font-semibold text-ink mb-1.5";
 const primaryBtnClass =
   "min-h-11 px-5 py-2.5 rounded-full bg-primary hover:bg-primary-focus text-white font-semibold text-xs cursor-pointer active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-primary-focus/40 disabled:opacity-60 disabled:cursor-not-allowed";
 const secondaryBtnClass =
-  "min-h-11 px-5 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-parchment font-semibold text-xs cursor-pointer active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-primary-focus/40 disabled:opacity-60 disabled:cursor-not-allowed";
+  "min-h-11 px-5 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-primary/5 font-semibold text-xs cursor-pointer active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-primary-focus/40 disabled:opacity-60 disabled:cursor-not-allowed";
 const destructiveBtnClass =
   "min-h-11 px-5 py-2.5 rounded-[11px] bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs cursor-pointer active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-rose-400/40 disabled:opacity-60 disabled:cursor-not-allowed";
 const iconBtnClass =
-  "min-h-11 min-w-11 p-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-parchment cursor-pointer active:scale-95 transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-focus/40";
+  "min-h-11 min-w-11 p-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-primary/5 cursor-pointer active:scale-95 transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-focus/40";
 // เวอร์ชันแคบกว่าของ iconBtnClass สำหรับคอลัมน์ "จัดการ" ในตารางเดสก์ท็อป — คงความสูง 44px
 // (พื้นที่แตะยังผ่านเกณฑ์) แต่ลดความกว้างเพื่อให้ปุ่มสามทั้งชุดพอดีกับคอลัมน์ ~12% ที่แคบลง
 const tableIconBtnClass =
-  "h-11 w-9 shrink-0 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-parchment cursor-pointer active:scale-95 transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-focus/40";
+  "h-11 w-9 shrink-0 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-primary/5 cursor-pointer active:scale-95 transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-focus/40";
 
 function InlineError({ message }: { message: string }) {
   return (
@@ -685,7 +685,7 @@ export default function SparePartsAdminView(props: SparePartsAdminViewProps) {
                   <col className="w-[12%]" />
                 </colgroup>
                 <thead>
-                  <tr className="bg-parchment border-b border-hairline text-xs font-semibold text-ink-muted">
+                  <tr className="bg-divider border-b border-hairline text-xs font-semibold text-ink-muted">
                     <th className="px-3 py-2.5 whitespace-nowrap">รหัส</th>
                     <th className="px-3 py-2.5">ชื่ออะไหล่</th>
                     <th className="px-3 py-2.5">หมวดหมู่</th>
@@ -698,7 +698,7 @@ export default function SparePartsAdminView(props: SparePartsAdminViewProps) {
                 </thead>
                 <tbody className="divide-y divide-divider text-[13px]">
                   {filteredParts.map((part) => (
-                    <tr key={part.id} className="hover:bg-parchment transition-colors">
+                    <tr key={part.id} className="hover:bg-primary/5 transition-colors">
                       <td className="px-3 py-2.5 font-mono text-ink-muted truncate" title={part.code}>{part.code}</td>
                       <td className="px-3 py-2.5 text-ink font-semibold line-clamp-2" title={part.name}>
                         {part.name}
@@ -779,18 +779,18 @@ export default function SparePartsAdminView(props: SparePartsAdminViewProps) {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-[13px]">
-                  <div className="p-2.5 rounded-[11px] bg-parchment border border-hairline">
+                  <div className="p-2.5 rounded-[11px] bg-divider border border-hairline">
                     <span className="text-xs text-ink-muted block">คงเหลือ</span>
                     <span className={"tabular-nums " + stockTextClass(part)}>
                       {part.stockQuantity} {part.unit || "ชิ้น"}
                     </span>
                     <span className="block text-[11px] text-ink-faint">จุดสั่งซื้อ {part.minThreshold}</span>
                   </div>
-                  <div className="p-2.5 rounded-[11px] bg-parchment border border-hairline">
+                  <div className="p-2.5 rounded-[11px] bg-divider border border-hairline">
                     <span className="text-xs text-ink-muted block">ราคา/หน่วย</span>
                     <span className="text-ink tabular-nums">{baht(part.unitPriceTHB)}</span>
                   </div>
-                  <div className="p-2.5 rounded-[11px] bg-parchment border border-hairline flex items-start gap-1.5">
+                  <div className="p-2.5 rounded-[11px] bg-divider border border-hairline flex items-start gap-1.5">
                     <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
                     <span className="text-ink truncate">
                       {part.locationRack || <span className="text-ink-faint">-</span>}
@@ -1061,7 +1061,7 @@ export default function SparePartsAdminView(props: SparePartsAdminViewProps) {
           </ModalHeader>
 
           <ModalBody className="space-y-4">
-            <div className="p-3 bg-parchment rounded-[11px] text-[13px] space-y-1">
+            <div className="p-3 bg-divider rounded-[11px] text-[13px] space-y-1">
               <div className="font-semibold text-ink">{stockPart.name}</div>
               <div className="text-ink-muted font-mono">{stockPart.code}</div>
               <div className="text-ink-muted">
@@ -1078,7 +1078,7 @@ export default function SparePartsAdminView(props: SparePartsAdminViewProps) {
                 className={`flex-1 min-h-11 px-3 rounded-[11px] border font-semibold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all disabled:opacity-60 ${
                   stockDirection === "in"
                     ? "bg-emerald-600 border-emerald-700 text-white"
-                    : "bg-white border-hairline text-ink-muted hover:bg-parchment"
+                    : "bg-white border-hairline text-ink-muted hover:bg-primary/5"
                 }`}
               >
                 <ArrowDownCircle className="w-4 h-4" />
@@ -1092,7 +1092,7 @@ export default function SparePartsAdminView(props: SparePartsAdminViewProps) {
                 className={`flex-1 min-h-11 px-3 rounded-[11px] border font-semibold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all disabled:opacity-60 ${
                   stockDirection === "out"
                     ? "bg-rose-600 border-rose-700 text-white"
-                    : "bg-white border-hairline text-ink-muted hover:bg-parchment"
+                    : "bg-white border-hairline text-ink-muted hover:bg-primary/5"
                 }`}
               >
                 <ArrowUpCircle className="w-4 h-4" />

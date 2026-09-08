@@ -157,7 +157,7 @@ export const KnowledgeOverviewPanel: React.FC = () => {
               {/* ตารางเลื่อนในกล่องของตัวเอง ไม่ให้หน้าเลื่อนแนวนอนทั้งหน้า */}
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-parchment text-ink-muted text-xs">
+                  <thead className="bg-divider text-ink-muted text-xs">
                     <tr>
                       <th className="text-left font-semibold px-3 py-2">ความรู้</th>
                       <th className="text-left font-semibold px-3 py-2 whitespace-nowrap">ใบงานต้นทาง</th>

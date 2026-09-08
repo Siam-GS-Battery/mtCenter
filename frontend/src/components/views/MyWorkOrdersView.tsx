@@ -389,7 +389,7 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
         <div
           role="tablist"
           aria-label="กรองใบงานตามสถานะ"
-          className="flex flex-wrap items-center gap-1 bg-parchment p-1 rounded-full self-start"
+          className="flex flex-wrap items-center gap-1 bg-divider p-1 rounded-full self-start"
         >
           {FILTER_TABS.map((tab, index) => {
             const isActive = activeFilter === tab.id;
@@ -492,7 +492,7 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
             {/* Empty State */}
             {filteredOrders.length === 0 && (
               <div className="bg-white rounded-[18px] border border-hairline p-10 flex flex-col items-center text-center space-y-3">
-                <div className="p-4 rounded-full bg-parchment text-ink-muted">
+                <div className="p-4 rounded-full bg-divider text-ink-muted">
                   <EmptyIcon className="w-8 h-8" />
                 </div>
                 <p className="text-sm font-semibold text-ink">
@@ -551,7 +551,7 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
                     </span>
                   </div>
 
-                  <p className="text-[13px] text-ink-muted line-clamp-2 mt-2 bg-parchment/80 p-2.5 rounded-[11px]">
+                  <p className="text-[13px] text-ink-muted line-clamp-2 mt-2 bg-divider p-2.5 rounded-[11px]">
                     {wo.description}
                   </p>
                 </div>
@@ -588,7 +588,7 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
                     ) : (
                       <button
                         onClick={() => handleOpenDetailModal(wo)}
-                        className="flex-1 min-h-11 py-2.5 rounded-[11px] bg-pearl hover:bg-parchment text-ink-muted text-[13px] font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition-colors active:scale-95 border border-divider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                        className="flex-1 min-h-11 py-2.5 rounded-[11px] bg-pearl hover:bg-primary/5 text-ink-muted text-[13px] font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition-colors active:scale-95 border border-divider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
                       >
                         <Eye className="w-4 h-4 text-primary" />
                         <span>ดูรายละเอียด</span>
@@ -602,7 +602,7 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
                         )
                       }
                       aria-label={`ถามผู้ช่วย AI เกี่ยวกับใบงาน ${wo.code}`}
-                      className="w-11 h-11 shrink-0 rounded-[11px] bg-pearl hover:bg-parchment text-ink-muted cursor-pointer transition-colors border border-divider flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                      className="w-11 h-11 shrink-0 rounded-[11px] bg-pearl hover:bg-primary/5 text-ink-muted cursor-pointer transition-colors border border-divider flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
                       title="ถามผู้ช่วย AI สำหรับงานนี้"
                     >
                       <Sparkles className="w-5 h-5 text-primary" />
@@ -612,7 +612,7 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
                       <button
                         onClick={() => setEditingWO(wo)}
                         aria-label={`แก้ไขใบงาน ${wo.code}`}
-                        className="min-h-11 px-3 shrink-0 rounded-[11px] bg-pearl hover:bg-parchment text-ink-muted text-[13px] font-semibold cursor-pointer transition-colors border border-divider flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                        className="min-h-11 px-3 shrink-0 rounded-[11px] bg-pearl hover:bg-primary/5 text-ink-muted text-[13px] font-semibold cursor-pointer transition-colors border border-divider flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
                         title="แก้ไข"
                       >
                         <Pencil className="w-4 h-4 text-primary" />
@@ -722,7 +722,7 @@ export const MyWorkOrdersView: React.FC<MyWorkOrdersViewProps> = ({
               <button
                 onClick={() => setDeletingWO(null)}
                 disabled={isDeleting}
-                className="min-h-11 px-4 rounded-full bg-pearl hover:bg-parchment text-ink-muted text-[13px] font-semibold cursor-pointer transition-colors border border-divider disabled:opacity-60"
+                className="min-h-11 px-4 rounded-full bg-pearl hover:bg-primary/5 text-ink-muted text-[13px] font-semibold cursor-pointer transition-colors border border-divider disabled:opacity-60"
               >
                 ยกเลิก
               </button>

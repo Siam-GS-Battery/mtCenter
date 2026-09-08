@@ -98,7 +98,7 @@ export const MarkdownDraftEditor: React.FC<MarkdownDraftEditorProps> = ({
         </div>
 
         <div
-          className={`md:w-1/2 min-h-0 overflow-auto p-4 bg-parchment/40 ${
+          className={`md:w-1/2 min-h-0 overflow-auto p-4 bg-divider ${
             mobileView === "preview" ? "flex" : "hidden md:flex"
           } flex-col`}
         >
@@ -153,7 +153,7 @@ const DraftEditorToolbar: React.FC<DraftEditorToolbarProps> = ({
           type="button"
           onClick={onSaveDraft}
           disabled={saving}
-          className="px-3.5 min-h-9 py-1.5 rounded-full bg-white border border-hairline text-ink-muted text-xs font-semibold hover:bg-parchment cursor-pointer active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-3.5 min-h-9 py-1.5 rounded-full bg-white border border-hairline text-ink-muted text-xs font-semibold hover:bg-primary/5 cursor-pointer active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           บันทึกฉบับร่าง
         </button>

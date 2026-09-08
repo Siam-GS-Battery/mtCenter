@@ -382,7 +382,7 @@ export const UploadManualView: React.FC<UploadManualViewProps> = ({
             <button
               type="button"
               onClick={() => setContentPanelOpen(true)}
-              className="min-h-9 px-4 py-1.5 rounded-full bg-white border border-divider text-ink-muted text-xs font-semibold hover:bg-parchment cursor-pointer active:scale-95"
+              className="min-h-9 px-4 py-1.5 rounded-full bg-white border border-divider text-ink-muted text-xs font-semibold hover:bg-primary/5 cursor-pointer active:scale-95"
             >
               แสดงแผงตรวจสอบเนื้อหา Markdown
             </button>
@@ -478,7 +478,7 @@ export const UploadManualView: React.FC<UploadManualViewProps> = ({
               <button
                 type="button"
                 onClick={onGoToManuals}
-                className="px-4 min-h-11 py-2.5 rounded-[11px] bg-white border border-divider text-ink-muted text-[13px] font-semibold hover:bg-parchment flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all"
+                className="px-4 min-h-11 py-2.5 rounded-[11px] bg-white border border-divider text-ink-muted text-[13px] font-semibold hover:bg-primary/5 flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all"
               >
                 <BookOpen className="w-4 h-4" />
                 <span>ดูคู่มือที่มีอยู่แล้วในคลัง</span>
@@ -492,7 +492,7 @@ export const UploadManualView: React.FC<UploadManualViewProps> = ({
       {stagedFile && status !== "done" && (
         <div className="bg-white border border-hairline p-5 rounded-[18px] space-y-5">
           <div className="flex items-start gap-3">
-            <div className="p-2.5 rounded-full bg-parchment text-primary border border-divider shrink-0">
+            <div className="p-2.5 rounded-full bg-divider text-primary border border-divider shrink-0">
               <FileText className="w-5 h-5" />
             </div>
             <div className="min-w-0">
@@ -645,7 +645,7 @@ export const UploadManualView: React.FC<UploadManualViewProps> = ({
                     aria-valuenow={progress}
                     aria-valuemin={0}
                     aria-valuemax={100}
-                    className="w-full h-2 rounded-full bg-parchment overflow-hidden"
+                    className="w-full h-2 rounded-full bg-divider overflow-hidden"
                   >
                     <div
                       className="h-full bg-primary transition-all"
@@ -686,7 +686,7 @@ export const UploadManualView: React.FC<UploadManualViewProps> = ({
               type="button"
               onClick={handleReset}
               disabled={isSubmitting}
-              className="px-4 min-h-11 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted text-[13px] font-semibold hover:bg-parchment cursor-pointer active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 min-h-11 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted text-[13px] font-semibold hover:bg-primary/5 cursor-pointer active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               ตรวจสอบไฟล์อื่น
             </button>
@@ -695,7 +695,7 @@ export const UploadManualView: React.FC<UploadManualViewProps> = ({
                 type="button"
                 onClick={onGoToManuals}
                 disabled={isSubmitting}
-                className="px-4 min-h-11 py-2.5 rounded-[11px] bg-white border border-divider text-ink-muted text-[13px] font-semibold hover:bg-parchment flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 min-h-11 py-2.5 rounded-[11px] bg-white border border-divider text-ink-muted text-[13px] font-semibold hover:bg-primary/5 flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <BookOpen className="w-4 h-4" />
                 <span>ดูคู่มือที่มีอยู่แล้วในคลัง</span>

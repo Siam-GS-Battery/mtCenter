@@ -136,7 +136,7 @@ export const markdownComponents: Components = {
     </div>
   ),
   th: ({ children }) => (
-    <th className="border border-hairline bg-parchment px-2.5 py-2 text-left font-semibold text-ink-muted">
+    <th className="border border-hairline bg-divider px-2.5 py-2 text-left font-semibold text-ink-muted">
       {children}
     </th>
   ),
@@ -144,7 +144,7 @@ export const markdownComponents: Components = {
     <td className="border border-hairline px-2.5 py-2 text-ink-muted">{children}</td>
   ),
   pre: ({ children }) => (
-    <pre className="overflow-x-auto bg-parchment text-ink-muted rounded-[11px] p-4 text-xs mb-3">
+    <pre className="overflow-x-auto bg-divider text-ink-muted rounded-[11px] p-4 text-xs mb-3">
       {children}
     </pre>
   ),
@@ -153,7 +153,7 @@ export const markdownComponents: Components = {
       return <code className={className}>{children}</code>;
     }
     return (
-      <code className="bg-parchment text-primary rounded px-1 py-0.5 text-[0.85em] font-mono">
+      <code className="bg-divider text-primary rounded px-1 py-0.5 text-[0.85em] font-mono">
         {children}
       </code>
     );
@@ -694,7 +694,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
               </p>
               <button
                 onClick={() => setOnlyActiveMachine(false)}
-                className="mt-1 min-h-11 px-4 py-2.5 rounded-full bg-pearl border border-divider text-ink-muted text-[13px] font-semibold hover:bg-parchment cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                className="mt-1 min-h-11 px-4 py-2.5 rounded-full bg-pearl border border-divider text-ink-muted text-[13px] font-semibold hover:bg-primary/5 cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
               >
                 ปิดตัวกรองเฉพาะเครื่อง
               </button>
@@ -705,7 +705,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
               <p className="text-xs text-ink-muted">ลองใช้ชื่อรุ่นเครื่องหรือคำค้นหาอื่น</p>
               <button
                 onClick={() => setSearchQuery("")}
-                className="mt-1 min-h-11 px-4 py-2.5 rounded-full bg-pearl border border-divider text-ink-muted text-[13px] font-semibold hover:bg-parchment cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                className="mt-1 min-h-11 px-4 py-2.5 rounded-full bg-pearl border border-divider text-ink-muted text-[13px] font-semibold hover:bg-primary/5 cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
               >
                 ล้างคำค้นหา
               </button>
@@ -758,7 +758,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
                   {doc.tags.map((tag, i) => (
                     <span
                       key={i}
-                      className="inline-flex items-center gap-1 text-xs bg-parchment text-ink-muted px-2 py-0.5 rounded-full font-normal"
+                      className="inline-flex items-center gap-1 text-xs bg-divider text-ink-muted px-2 py-0.5 rounded-full font-normal"
                     >
                       <Tag className="w-2.5 h-2.5 text-ink-muted" />
                       {tag}
@@ -770,7 +770,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
               <div className="pt-3 border-t border-divider flex items-center justify-between gap-2 flex-wrap">
                 <button
                   onClick={() => setSelectedDoc(doc)}
-                  className="px-3 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-parchment text-[13px] font-semibold flex items-center gap-1.5 cursor-pointer flex-1 justify-center active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11"
+                  className="px-3 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-primary/5 text-[13px] font-semibold flex items-center gap-1.5 cursor-pointer flex-1 justify-center active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11"
                 >
                   <Eye className="w-3.5 h-3.5 text-primary" />
                   <span>อ่านคู่มือ</span>
@@ -780,7 +780,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
                   <button
                     onClick={() => handleOpenFile(doc)}
                     disabled={loadingFileIds.has(doc.id)}
-                    className="px-3 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-parchment text-[13px] font-semibold flex items-center gap-1.5 cursor-pointer flex-1 justify-center active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11 disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="px-3 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-primary/5 text-[13px] font-semibold flex items-center gap-1.5 cursor-pointer flex-1 justify-center active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     <FileText className="w-3.5 h-3.5 text-primary" />
                     <span>{loadingFileIds.has(doc.id) ? "กำลังเปิดไฟล์..." : "เปิดไฟล์ PDF"}</span>
@@ -805,7 +805,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
                 <div className="flex items-center gap-2 flex-wrap">
                   <button
                     onClick={() => openEditModal(doc)}
-                    className="px-3 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-parchment text-[13px] font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11"
+                    className="px-3 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted hover:bg-primary/5 text-[13px] font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11"
                   >
                     <Pencil className="w-3.5 h-3.5 text-ink-muted" />
                     <span>แก้ไข</span>
@@ -885,7 +885,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
 
           <ModalBody>
             {isContentLoading ? (
-              <div className="bg-parchment text-ink-muted p-8 rounded-[18px] text-center space-y-3 my-4 border border-hairline">
+              <div className="bg-divider text-ink-muted p-8 rounded-[18px] text-center space-y-3 my-4 border border-hairline">
                 <Loader2 className="w-10 h-10 text-primary mx-auto animate-spin" />
                 <p className="text-sm text-ink-muted">กำลังโหลดเนื้อหาคู่มือ…</p>
               </div>
@@ -955,7 +955,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
                             Math.min(n + DEFAULT_VISIBLE_PAGES, effectivePageCount)
                           )
                         }
-                        className="min-h-11 px-4 py-2 rounded-full bg-pearl border border-divider text-ink-muted hover:bg-parchment text-[13px] font-semibold cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                        className="min-h-11 px-4 py-2 rounded-full bg-pearl border border-divider text-ink-muted hover:bg-primary/5 text-[13px] font-semibold cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
                       >
                         โหลดเพิ่ม (เหลืออีก {effectivePageCount - visiblePageCount} หน้า)
                       </button>
@@ -970,7 +970,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
                   <div className="text-center pt-3 pb-1 mt-3 border-t border-hairline">
                     <button
                       onClick={() => setShowFullFallback(true)}
-                      className="min-h-11 px-4 py-2 rounded-full bg-pearl border border-divider text-ink-muted hover:bg-parchment text-[13px] font-semibold cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                      className="min-h-11 px-4 py-2 rounded-full bg-pearl border border-divider text-ink-muted hover:bg-primary/5 text-[13px] font-semibold cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
                     >
                       แสดงทั้งหมด
                     </button>
@@ -984,7 +984,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
                 </div>
               )
             ) : (
-              <div className="bg-parchment text-ink-muted p-8 rounded-[18px] text-center space-y-3 my-4 border border-hairline">
+              <div className="bg-divider text-ink-muted p-8 rounded-[18px] text-center space-y-3 my-4 border border-hairline">
                 <BookOpen className="w-12 h-12 text-primary mx-auto" />
                 <div className="text-sm font-semibold text-ink">
                   คู่มือนี้ยังไม่มีเนื้อหาข้อความสำหรับแสดงผล
@@ -1033,7 +1033,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
             <button
               onClick={() => handleCopyMarkdown(activeContent ?? undefined)}
               disabled={isContentLoading || !activeContent}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-[11px] bg-pearl border border-divider hover:bg-parchment text-ink-muted font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-[11px] bg-pearl border border-divider hover:bg-primary/5 text-ink-muted font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-ink-muted" />}
               <span>{copied ? "คัดลอกแล้ว" : "คัดลอกเนื้อหา"}</span>
@@ -1042,14 +1042,14 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
             <div className="flex items-center gap-2.5 w-full sm:w-auto">
               <button
                 onClick={() => setSelectedDoc(null)}
-                className="flex-1 sm:flex-initial px-5 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted font-semibold text-xs hover:bg-parchment cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11"
+                className="flex-1 sm:flex-initial px-5 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted font-semibold text-xs hover:bg-primary/5 cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11"
               >
                 ปิดหน้าต่าง
               </button>
               {canManage && (
                 <button
                   onClick={() => openEditModal(selectedDoc)}
-                  className="flex-1 sm:flex-initial px-5 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted font-semibold text-xs hover:bg-parchment cursor-pointer active:scale-95 transition-all flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11"
+                  className="flex-1 sm:flex-initial px-5 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted font-semibold text-xs hover:bg-primary/5 cursor-pointer active:scale-95 transition-all flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11"
                 >
                   <Pencil className="w-4 h-4 text-ink-muted" />
                   <span>แก้ไข</span>
@@ -1068,7 +1068,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
                 <button
                   onClick={() => handleOpenFile(selectedDoc)}
                   disabled={loadingFileIds.has(selectedDoc.id)}
-                  className="flex-1 sm:flex-initial px-5 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted font-semibold text-xs hover:bg-parchment cursor-pointer active:scale-95 transition-all flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="flex-1 sm:flex-initial px-5 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted font-semibold text-xs hover:bg-primary/5 cursor-pointer active:scale-95 transition-all flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   <FileText className="w-4 h-4 text-primary" />
                   <span>{loadingFileIds.has(selectedDoc.id) ? "กำลังเปิดไฟล์..." : "เปิดไฟล์ PDF"}</span>
@@ -1136,7 +1136,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
                 setDeleteError(null);
               }}
               disabled={deleteLoading}
-              className="flex-1 sm:flex-initial px-5 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted font-semibold text-xs hover:bg-parchment cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="flex-1 sm:flex-initial px-5 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted font-semibold text-xs hover:bg-primary/5 cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               ยกเลิก
             </button>
@@ -1311,7 +1311,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
                 setEditError(null);
               }}
               disabled={editLoading}
-              className="flex-1 sm:flex-initial px-5 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted font-semibold text-xs hover:bg-parchment cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="flex-1 sm:flex-initial px-5 py-2.5 rounded-[11px] bg-pearl border border-divider text-ink-muted font-semibold text-xs hover:bg-primary/5 cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               ยกเลิก
             </button>

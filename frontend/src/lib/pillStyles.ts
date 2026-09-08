@@ -61,7 +61,7 @@ export const PRIORITY_LABELS: Record<WorkOrderPriority, string> = {
 const PRIORITY_COLORS: Record<WorkOrderPriority, string> = {
   high: "bg-rose-100 text-rose-900",
   medium: "bg-amber-100 text-amber-900",
-  low: "bg-parchment text-ink-muted",
+  low: "bg-divider text-ink-muted",
 };
 
 /** Filled version of the same ramp, for a selected choice in a form. */
@@ -88,7 +88,7 @@ export function priorityPillClass(priority: string): string {
  */
 export function priorityChoiceClass(priority: string, isSelected: boolean): string {
   if (!isSelected) {
-    return "bg-white text-ink-muted border-hairline hover:bg-parchment";
+    return "bg-white text-ink-muted border-hairline hover:bg-primary/5";
   }
   const colorClasses =
     PRIORITY_SELECTED_COLORS[priority as WorkOrderPriority] ??

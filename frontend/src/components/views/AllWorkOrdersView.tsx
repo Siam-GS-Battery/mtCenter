@@ -286,7 +286,7 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
         {hasActiveFilters && (
           <button
             onClick={clearFilters}
-            className="min-h-11 px-4 py-2 rounded-full bg-pearl hover:bg-parchment text-ink-muted border border-divider text-[13px] font-semibold cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+            className="min-h-11 px-4 py-2 rounded-full bg-pearl hover:bg-primary/5 text-ink-muted border border-divider text-[13px] font-semibold cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
           >
             ล้างคำค้นและตัวกรอง
           </button>
@@ -298,7 +298,7 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
     <div className="p-4 md:p-8 max-w-[1600px] mx-auto space-y-6">
       {/* Summary — the page title itself lives in the top bar */}
       <div className="flex flex-wrap items-center gap-2 pb-3 border-b border-hairline">
-        <div className="text-[13px] text-ink-muted bg-parchment px-3.5 py-1.5 rounded-full">
+        <div className="text-[13px] text-ink-muted bg-divider px-3.5 py-1.5 rounded-full">
           รวมทั้งสิ้น <span className="font-semibold text-ink">{total.toLocaleString("th-TH")} ใบงาน</span>
         </div>
         {overdueCount > 0 && (
@@ -432,7 +432,7 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
               รายการใบงานซ่อมบำรุงทั้งหมด เรียงตาม{SORT_LABELS[sortKey]}
             </caption>
             <thead>
-              <tr className="bg-parchment border-b border-hairline text-xs font-semibold text-ink-muted">
+              <tr className="bg-divider border-b border-hairline text-xs font-semibold text-ink-muted">
                 <th className="px-3 py-3">รหัสใบงาน</th>
                 <th className="px-3 py-3">ชื่องานซ่อม</th>
                 <th className="px-3 py-3">เครื่องจักร</th>
@@ -461,7 +461,7 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
                 return (
                   <tr
                     key={wo.id}
-                    className={`transition-colors ${late ? "bg-rose-50/60 hover:bg-rose-50" : "hover:bg-parchment"}`}
+                    className={`transition-colors ${late ? "bg-rose-50/60 hover:bg-rose-50" : "hover:bg-primary/5"}`}
                   >
                     <td className="px-3 py-3">
                       <button
@@ -519,7 +519,7 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
             </div>
           ) : (
           <>
-          <div className="flex items-center justify-between px-4 py-3 border-b border-hairline bg-parchment">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-hairline bg-divider">
             <span className="text-xs font-semibold text-ink-muted">
               {filteredOrders.length} ใบงาน
             </span>

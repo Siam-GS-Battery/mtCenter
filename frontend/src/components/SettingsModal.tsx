@@ -26,7 +26,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
       <ModalBody className="space-y-5">
         {/* User Card Info */}
-        <div className="p-4 bg-parchment rounded-[11px] border-0 flex items-center gap-3">
+        <div className="p-4 bg-divider rounded-[11px] border-0 flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-primary/15 text-primary font-semibold text-base flex items-center justify-center">
             {currentUser.initials}
           </div>

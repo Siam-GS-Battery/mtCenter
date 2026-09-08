@@ -59,7 +59,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           onClick={() => onOffsetChange(Math.max(0, offset - limit))}
           disabled={!canPrev}
           aria-label="หน้าก่อนหน้า"
-          className="min-h-11 px-4 inline-flex items-center justify-center gap-1 rounded-full bg-pearl border border-divider text-ink-muted text-[13px] font-semibold hover:bg-parchment cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          className="min-h-11 px-4 inline-flex items-center justify-center gap-1 rounded-full bg-pearl border border-divider text-ink-muted text-[13px] font-semibold hover:bg-primary/5 cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
         >
           <ChevronLeft className="w-4 h-4" />
           <span className="hidden sm:inline">ก่อนหน้า</span>
@@ -69,7 +69,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           onClick={() => onOffsetChange(offset + limit)}
           disabled={!canNext}
           aria-label="หน้าถัดไป"
-          className="min-h-11 px-4 inline-flex items-center justify-center gap-1 rounded-full bg-pearl border border-divider text-ink-muted text-[13px] font-semibold hover:bg-parchment cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          className="min-h-11 px-4 inline-flex items-center justify-center gap-1 rounded-full bg-pearl border border-divider text-ink-muted text-[13px] font-semibold hover:bg-primary/5 cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
         >
           <span className="hidden sm:inline">ถัดไป</span>
           <ChevronRight className="w-4 h-4" />

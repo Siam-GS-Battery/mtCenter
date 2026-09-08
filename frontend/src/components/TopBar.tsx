@@ -192,7 +192,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         {/* Hamburger icon (mobile < 1024px only) */}
         <button
           onClick={onOpenMobileSidebar}
-          className="lg:hidden min-w-11 min-h-11 -ml-1.5 flex items-center justify-center rounded-lg text-ink-muted hover:bg-parchment active:scale-95 transition-all cursor-pointer shrink-0"
+          className="lg:hidden min-w-11 min-h-11 -ml-1.5 flex items-center justify-center rounded-lg text-ink-muted hover:bg-primary/5 active:scale-95 transition-all cursor-pointer shrink-0"
           title="เปิดเมนูด้านข้าง"
           id="mobile-hamburger-btn"
         >
@@ -282,7 +282,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         key={alert.id}
                         type="button"
                         onClick={() => handleAlertActivate(alert)}
-                        className="w-full text-left p-3 min-h-11 hover:bg-parchment transition-colors flex items-start gap-2.5 cursor-pointer"
+                        className="w-full text-left p-3 min-h-11 hover:bg-primary/5 transition-colors flex items-start gap-2.5 cursor-pointer"
                       >
                         {body}
                       </button>

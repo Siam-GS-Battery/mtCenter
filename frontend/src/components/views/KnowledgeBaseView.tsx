@@ -48,7 +48,7 @@ const markdownComponents: Components = {
     </div>
   ),
   th: ({ children }) => (
-    <th className="border border-hairline bg-parchment px-2.5 py-2 text-left font-semibold text-ink-muted">
+    <th className="border border-hairline bg-divider px-2.5 py-2 text-left font-semibold text-ink-muted">
       {children}
     </th>
   ),
@@ -56,7 +56,7 @@ const markdownComponents: Components = {
     <td className="border border-hairline px-2.5 py-2 text-ink-muted">{children}</td>
   ),
   code: ({ children }) => (
-    <code className="bg-parchment text-primary rounded px-1 py-0.5 text-[0.85em] font-mono">
+    <code className="bg-divider text-primary rounded px-1 py-0.5 text-[0.85em] font-mono">
       {children}
     </code>
   ),
@@ -114,7 +114,7 @@ export const KnowledgeBaseView: React.FC<KnowledgeBaseViewProps> = ({
               </p>
               <button
                 onClick={() => setSearchQuery("")}
-                className="mt-1 min-h-11 px-4 py-2.5 rounded-full bg-pearl border border-divider text-ink-muted text-[13px] font-semibold hover:bg-parchment cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40"
+                className="mt-1 min-h-11 px-4 py-2.5 rounded-full bg-pearl border border-divider text-ink-muted text-[13px] font-semibold hover:bg-primary/5 cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40"
               >
                 ล้างคำค้นหา
               </button>
@@ -148,7 +148,7 @@ export const KnowledgeBaseView: React.FC<KnowledgeBaseViewProps> = ({
                 {item.title}
               </h3>
 
-              <p className="text-[13px] text-ink-muted leading-relaxed bg-parchment p-3 rounded-[11px]">
+              <p className="text-[13px] text-ink-muted leading-relaxed bg-divider p-3 rounded-[11px]">
                 {item.summary}
               </p>
 
@@ -157,7 +157,7 @@ export const KnowledgeBaseView: React.FC<KnowledgeBaseViewProps> = ({
                   {item.tags.map((tag, i) => (
                     <span
                       key={i}
-                      className="text-xs bg-parchment text-ink-muted px-2 py-0.5 rounded-full"
+                      className="text-xs bg-divider text-ink-muted px-2 py-0.5 rounded-full"
                     >
                       #{tag}
                     </span>
@@ -209,7 +209,7 @@ export const KnowledgeBaseView: React.FC<KnowledgeBaseViewProps> = ({
                 onAskAI(`ช่วยสรุปบทความความรู้เรื่อง "${openArticle.title}"`);
                 setOpenArticle(null);
               }}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-[11px] bg-pearl border border-divider hover:bg-parchment text-ink-muted font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-[11px] bg-pearl border border-divider hover:bg-primary/5 text-ink-muted font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11"
             >
               <Sparkles className="w-4 h-4 text-primary" />
               <span>ให้ AI สรุป</span>

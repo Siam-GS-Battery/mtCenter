@@ -75,12 +75,12 @@ const chatMarkdownComponents: Components = {
   h2: ({ children }) => <p className="font-semibold text-ink mb-2">{children}</p>,
   h3: ({ children }) => <p className="font-semibold text-ink mb-2">{children}</p>,
   code: ({ children }) => (
-    <code className="bg-parchment text-primary rounded px-1 py-0.5 text-[0.85em] font-mono">
+    <code className="bg-divider text-primary rounded px-1 py-0.5 text-[0.85em] font-mono">
       {children}
     </code>
   ),
   pre: ({ children }) => (
-    <pre className="overflow-x-auto bg-parchment text-ink-muted rounded-[11px] p-3 text-xs mb-2">
+    <pre className="overflow-x-auto bg-divider text-ink-muted rounded-[11px] p-3 text-xs mb-2">
       {children}
     </pre>
   ),
@@ -396,7 +396,7 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
     <div className="flex-1 min-h-0 flex flex-col">
       {/* Conversation */}
       <div
-        className={`flex-1 overflow-y-auto ${isPage ? "" : "bg-parchment px-4 py-4"}`}
+        className={`flex-1 overflow-y-auto ${isPage ? "" : "bg-divider px-4 py-4"}`}
         aria-live="polite"
         aria-busy={isLoading}
       >
@@ -507,7 +507,7 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
 
                     {/* ไม่มีเครื่องจักรเลือกอยู่ — บอกให้เลือก/สแกนเครื่องก่อน แทนปุ่มสร้างใบงาน */}
                     {showActionCard && !activeMachine && (
-                      <div className="mt-3 rounded-[18px] border border-hairline bg-parchment p-3 text-xs text-ink-muted">
+                      <div className="mt-3 rounded-[18px] border border-hairline bg-divider p-3 text-xs text-ink-muted">
                         กรุณาเลือกหรือสแกนเครื่องจักรก่อนเพื่อเปิดใบงานซ่อม
                       </div>
                     )}
@@ -583,7 +583,7 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
                               </button>
                               <button
                                 onClick={() => setConfirmingActionId(null)}
-                                className="min-h-11 px-4 py-2.5 rounded-[11px] bg-pearl hover:bg-parchment text-ink-muted font-semibold text-[13px] border border-divider flex items-center justify-center cursor-pointer active:scale-95 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                                className="min-h-11 px-4 py-2.5 rounded-[11px] bg-pearl hover:bg-primary/5 text-ink-muted font-semibold text-[13px] border border-divider flex items-center justify-center cursor-pointer active:scale-95 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
                               >
                                 ยกเลิก
                               </button>
@@ -603,7 +603,7 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
 
                             <button
                               onClick={() => runAction(onOpenCreateWorkOrderModal, prefill)}
-                              className="min-h-11 px-4 py-2.5 rounded-[11px] bg-pearl hover:bg-parchment text-ink-muted font-semibold text-[13px] border border-divider flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                              className="min-h-11 px-4 py-2.5 rounded-[11px] bg-pearl hover:bg-primary/5 text-ink-muted font-semibold text-[13px] border border-divider flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
                             >
                               <ClipboardList className="w-4 h-4" />
                               <span>เปิดแบบฟอร์มตรวจสอบก่อนส่ง</span>
@@ -701,7 +701,7 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
 
       {/* Composer */}
       <div
-        className={`shrink-0 ${isPage ? "pb-4 pt-2 bg-parchment" : "bg-white border-t border-hairline p-3"}`}
+        className={`shrink-0 ${isPage ? "pb-4 pt-2 bg-white" : "bg-white border-t border-hairline p-3"}`}
       >
         {hasUserMessage && (
           <div className="flex flex-nowrap items-center gap-2 overflow-x-auto overflow-y-hidden -mx-4 px-4 pb-2 scrollbar-none">
@@ -751,7 +751,7 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
             type="submit"
             disabled={!inputPrompt.trim() || isLoading}
             aria-label="ส่งคำถาม"
-            className="w-11 h-11 rounded-full bg-primary hover:bg-primary-focus text-white disabled:bg-parchment disabled:text-ink-muted flex items-center justify-center shrink-0 transition-colors cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+            className="w-11 h-11 rounded-full bg-primary hover:bg-primary-focus text-white disabled:bg-divider disabled:text-ink-muted flex items-center justify-center shrink-0 transition-colors cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
           >
             <ArrowUp className="w-5 h-5" />
           </button>

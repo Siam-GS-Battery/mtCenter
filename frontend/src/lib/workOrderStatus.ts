@@ -231,9 +231,9 @@ export function duePillClass(state: DueState): string {
     overdue: "bg-rose-100 text-rose-900",
     due_today: "bg-amber-100 text-amber-900",
     due_soon: "bg-amber-50 text-amber-900",
-    scheduled: "bg-parchment text-ink-muted",
-    closed: "bg-parchment text-ink-muted",
-    no_due_date: "bg-parchment text-ink-muted",
+    scheduled: "bg-divider text-ink-muted",
+    closed: "bg-divider text-ink-muted",
+    no_due_date: "bg-divider text-ink-muted",
   };
   return pillBase + " " + colors[state];
 }

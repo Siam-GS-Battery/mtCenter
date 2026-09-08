@@ -61,7 +61,7 @@ export const LoginPage: React.FC = () => {
                 value={employeeId}
                 onChange={(e) => setEmployeeId(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full min-h-11 pl-10 pr-3.5 rounded-[11px] border border-hairline bg-parchment text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary disabled:opacity-60"
+                className="w-full min-h-11 pl-10 pr-3.5 rounded-[11px] border border-hairline bg-divider text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary disabled:opacity-60"
                 placeholder="เช่น 12345"
               />
             </div>
@@ -80,7 +80,7 @@ export const LoginPage: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full min-h-11 pl-10 pr-10 rounded-[11px] border border-hairline bg-parchment text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary disabled:opacity-60"
+                className="w-full min-h-11 pl-10 pr-10 rounded-[11px] border border-hairline bg-divider text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary disabled:opacity-60"
                 placeholder="รหัสผ่าน"
               />
               <button

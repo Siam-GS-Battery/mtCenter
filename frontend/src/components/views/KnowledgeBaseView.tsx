@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import type { Components } from "react-markdown";
 import { BookOpen, Search, Sparkles, ChevronRight, SearchX } from "lucide-react";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "../ui/Modal";
@@ -197,7 +198,7 @@ export const KnowledgeBaseView: React.FC<KnowledgeBaseViewProps> = ({
 
           <ModalBody>
             <div className="text-xs sm:text-sm leading-relaxed text-ink-muted">
-              <ReactMarkdown components={markdownComponents}>
+              <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
                 {openArticle.content}
               </ReactMarkdown>
             </div>

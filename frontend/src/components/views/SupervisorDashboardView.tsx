@@ -24,7 +24,13 @@ import {
   ArrowDown,
   BookOpen,
   ExternalLink,
+  FileCode,
+  ChevronDown,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { markdownComponents } from "./ManualsView";
+import { MANUAL_CATEGORIES } from "../../lib/manualCategories";
 import {
   PieChart,
   Pie,
@@ -40,7 +46,14 @@ import { MachineSelect } from "../MachineSelect";
 import { TelemetryTrendCard } from "./TelemetryTrendCard";
 import { MachineMetricsChart } from "./MachineMetricsChart";
 import LiveFloorView from "./liveFloor/LiveFloorView";
-import { getMachines, getWorkOrders, getManuals, getManualFileUrl, toUserMessage } from "../../services/apiService";
+import {
+  getMachines,
+  getWorkOrders,
+  getManuals,
+  getManualFileUrl,
+  getManualContent,
+  toUserMessage,
+} from "../../services/apiService";
 import { getMachineMetricsMock } from "../../lib/machineMetricsMock";
 import {
   machineStatusLabel,
@@ -513,15 +526,46 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
     setMachineHistoryOffset(0);
   }, [selectedMachine?.id]);
 
-  // คู่มือเครื่องจักรที่ตรงกับรุ่นของเครื่องที่เลือก — ดึงเฉพาะตอนเปิด modal เพื่อไม่ให้
-  // โหลดคู่มือทั้งคลังทุกครั้งที่ dashboard เปิด เครื่องที่ไม่มี model บันทึกไว้จะข้ามการดึงเลย
+  // คู่มือเครื่องจักรที่ตรงกับเครื่องที่เลือก — ดึงเฉพาะตอนเปิด modal เพื่อไม่ให้โหลดคู่มือทั้งคลัง
+  // ทุกครั้งที่ dashboard เปิด คู่มือบางเล่มระบุ machineModel เป็น "รุ่น" (model) ปกติ แต่บางเล่ม
+  // (นำเข้าใหม่) ระบุเป็น "รหัสเครื่อง" (code) แทน และมีคู่มือทั่วไปประจำโรงงานที่ผูกกับค่าคงที่
+  // "ALL-000" จึงต้องยิง getManuals แยกทีละค่าแล้วรวมผลลัพธ์ ไม่ใช่ยิงครั้งเดียวด้วย model อย่างเดียว
+  const GENERAL_MANUAL_MACHINE_MODEL = "ALL-000";
   const [machineManuals, setMachineManuals] = useState<ManualDoc[]>([]);
   const [machineManualsLoading, setMachineManualsLoading] = useState(false);
   const [machineManualsError, setMachineManualsError] = useState<string | null>(null);
+  // กลุ่มหมวดหมู่คู่มือที่กำลังกางอยู่ (แบบ accordion — เปิดได้ทีละกลุ่ม)
+  const [expandedManualCategory, setExpandedManualCategory] = useState<string | null>(null);
+  const UNCATEGORIZED_MANUAL_LABEL = "อื่นๆ";
+  const getManualCategoryLabel = (category?: string | null) => {
+    const trimmed = category?.trim();
+    if (!trimmed) return UNCATEGORIZED_MANUAL_LABEL;
+    return MANUAL_CATEGORIES.find((c) => c.value === trimmed)?.label ?? trimmed;
+  };
+  const machineManualGroups = useMemo(() => {
+    const groups = new Map<string, ManualDoc[]>();
+    for (const doc of machineManuals) {
+      const label = getManualCategoryLabel(doc.category);
+      if (!groups.has(label)) groups.set(label, []);
+      groups.get(label)!.push(doc);
+    }
+    return Array.from(groups.entries()).map(([label, docs]) => ({ label, docs }));
+  }, [machineManuals]);
+
+  // เปิดเครื่องใหม่ (หรือคู่มือโหลดเสร็จ) -> กางกลุ่มหมวดหมู่แรกให้อัตโนมัติ
+  useEffect(() => {
+    setExpandedManualCategory(machineManualGroups[0]?.label ?? null);
+  }, [selectedMachine?.id, machineManualGroups]);
 
   useEffect(() => {
-    const model = selectedMachine?.model?.trim();
-    if (!model) {
+    const candidates = Array.from(
+      new Set(
+        [selectedMachine?.model, selectedMachine?.code, GENERAL_MANUAL_MACHINE_MODEL]
+          .map((v) => v?.trim())
+          .filter((v): v is string => !!v)
+      )
+    );
+    if (candidates.length === 0) {
       setMachineManuals([]);
       setMachineManualsError(null);
       setMachineManualsLoading(false);
@@ -530,10 +574,23 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
     let cancelled = false;
     setMachineManualsLoading(true);
     setMachineManualsError(null);
-    getManuals({ machineModel: model, limit: 10 })
-      .then((res) => {
+    Promise.all(candidates.map((machineModel) => getManuals({ machineModel, limit: 10 })))
+      .then((results) => {
         if (cancelled) return;
-        setMachineManuals(res.data);
+        const merged = new Map<string, ManualDoc>();
+        // เก็บลำดับที่ยิงมา (model, code, ALL-000) ไว้ก่อน แล้วค่อยจัดเรียงคู่มือเฉพาะเครื่อง
+        // (model/code) มาก่อนคู่มือทั่วไป (ALL-000) ทีหลัง เพื่อให้ผู้ใช้เห็นของเครื่องนี้ก่อนเสมอ
+        for (const res of results) {
+          for (const doc of res.data) {
+            if (!merged.has(doc.id)) merged.set(doc.id, doc);
+          }
+        }
+        const sorted = Array.from(merged.values()).sort((a, b) => {
+          const aGeneral = a.machineModel === GENERAL_MANUAL_MACHINE_MODEL ? 1 : 0;
+          const bGeneral = b.machineModel === GENERAL_MANUAL_MACHINE_MODEL ? 1 : 0;
+          return aGeneral - bGeneral;
+        });
+        setMachineManuals(sorted);
       })
       .catch((err) => {
         if (cancelled) return;
@@ -545,7 +602,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
     return () => {
       cancelled = true;
     };
-  }, [selectedMachine?.model]);
+  }, [selectedMachine?.model, selectedMachine?.code]);
 
   const handleOpenManualFile = async (doc: ManualDoc) => {
     const win = window.open("", "_blank");
@@ -556,6 +613,46 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
       win.location.replace(url);
     } catch {
       win.close();
+    }
+  };
+
+  // คู่มือที่นำเข้าใหม่บางเล่มมีแต่ Markdown ไม่มีไฟล์ PDF (filePath เป็น null) — เปิดในหน้าต่างนี้แทน
+  // การเปิดแท็บใหม่ (ซึ่งใช้ไม่ได้เพราะไม่มีไฟล์ให้เปิด)
+  const [manualMarkdownDoc, setManualMarkdownDoc] = useState<ManualDoc | null>(null);
+  const [manualMarkdownContent, setManualMarkdownContent] = useState<string | null>(null);
+  const [manualMarkdownLoading, setManualMarkdownLoading] = useState(false);
+  const [manualMarkdownError, setManualMarkdownError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!manualMarkdownDoc) return;
+    let cancelled = false;
+    setManualMarkdownLoading(true);
+    setManualMarkdownError(null);
+    setManualMarkdownContent(null);
+    getManualContent(manualMarkdownDoc.id)
+      .then((content) => {
+        if (cancelled) return;
+        setManualMarkdownContent(content ?? "");
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setManualMarkdownError(toUserMessage(err, "ไม่สามารถโหลดเนื้อหาคู่มือได้"));
+      })
+      .finally(() => {
+        if (!cancelled) setManualMarkdownLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [manualMarkdownDoc]);
+
+  const handleOpenManual = (doc: ManualDoc) => {
+    if (doc.hasMarkdown) {
+      setManualMarkdownDoc(doc);
+      return;
+    }
+    if (doc.filePath) {
+      handleOpenManualFile(doc);
     }
   };
 
@@ -1448,11 +1545,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
                 </h4>
               </div>
 
-              {!selectedMachine?.model ? (
-                <p className="p-6 text-center text-ink-faint text-xs rounded-[11px] border border-hairline">
-                  เครื่องนี้ไม่มีรุ่นเครื่องบันทึกไว้ จึงยังค้นหาคู่มือที่ตรงกันให้ไม่ได้
-                </p>
-              ) : machineManualsError ? (
+              {machineManualsError ? (
                 <div className="p-3.5 rounded-[11px] bg-rose-50 border border-rose-200 text-xs text-rose-900 flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 text-rose-700 shrink-0 mt-0.5" />
                   <span>{machineManualsError}</span>
@@ -1466,26 +1559,66 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
                   ยังไม่มีคู่มือสำหรับรุ่นนี้
                 </p>
               ) : (
-                <div className="divide-y divide-divider rounded-[11px] border border-hairline overflow-hidden">
-                  {machineManuals.map((doc) => (
-                    <div key={doc.id} className="p-3.5 flex items-center justify-between gap-3 bg-white">
-                      <div className="min-w-0">
-                        <p className="text-sm text-ink font-medium truncate">{doc.title}</p>
-                        <p className="text-xs text-ink-faint">
-                          {doc.category}
-                          {doc.pagesCount > 0 ? ` · ${doc.pagesCount} หน้า` : ""}
-                          {doc.aiIndexed ? " · จัดทำดัชนี AI แล้ว" : ""}
-                        </p>
+                <div className="space-y-2">
+                  {machineManualGroups.map((group) => {
+                    const isExpanded = expandedManualCategory === group.label;
+                    return (
+                      <div key={group.label} className="rounded-[11px] border border-hairline overflow-hidden">
+                        <button
+                          type="button"
+                          aria-expanded={isExpanded}
+                          onClick={() =>
+                            setExpandedManualCategory((prev) => (prev === group.label ? null : group.label))
+                          }
+                          className="w-full min-h-[44px] px-3.5 py-2.5 flex items-center justify-between gap-3 bg-pearl hover:bg-primary/5 cursor-pointer transition-all"
+                        >
+                          <span className="text-sm font-semibold text-ink truncate">{group.label}</span>
+                          <span className="shrink-0 flex items-center gap-2">
+                            <span className="text-[11px] font-semibold text-ink-faint bg-divider px-2 py-0.5 rounded-full">
+                              {group.docs.length} เล่ม
+                            </span>
+                            <ChevronDown
+                              className={`w-4 h-4 text-ink-faint transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                            />
+                          </span>
+                        </button>
+                        {isExpanded && (
+                          <div className="divide-y divide-divider border-t border-hairline">
+                            {group.docs.map((doc) => {
+                              const isGeneral = doc.machineModel === GENERAL_MANUAL_MACHINE_MODEL;
+                              const canOpen = doc.hasMarkdown || !!doc.filePath;
+                              return (
+                                <div key={doc.id} className="p-3.5 flex items-center justify-between gap-3 bg-white">
+                                  <div className="min-w-0">
+                                    <p className="text-sm text-ink font-medium truncate flex items-center gap-1.5">
+                                      <span className="truncate">{doc.title}</span>
+                                      {isGeneral && (
+                                        <span className="shrink-0 text-[11px] font-semibold text-ink-faint bg-divider px-2 py-0.5 rounded-full">
+                                          คู่มือทั่วไป
+                                        </span>
+                                      )}
+                                    </p>
+                                    <p className="text-xs text-ink-faint">
+                                      {doc.pagesCount > 0 ? `${doc.pagesCount} หน้า` : ""}
+                                      {doc.aiIndexed ? " · จัดทำดัชนี AI แล้ว" : ""}
+                                    </p>
+                                  </div>
+                                  <button
+                                    onClick={() => handleOpenManual(doc)}
+                                    disabled={!canOpen}
+                                    className="shrink-0 min-h-[36px] px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    <ExternalLink className="w-3.5 h-3.5" />
+                                    <span>เปิดคู่มือ</span>
+                                  </button>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
-                      <button
-                        onClick={() => handleOpenManualFile(doc)}
-                        className="shrink-0 min-h-[36px] px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        <span>เปิดคู่มือ</span>
-                      </button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -1528,6 +1661,43 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
               ปิดหน้าต่าง
             </button>
           </ModalFooter>
+        </Modal>
+      )}
+
+      {/* หน้าต่างอ่านคู่มือที่มีแต่ Markdown (ไม่มีไฟล์ PDF ให้เปิดแท็บใหม่) — เรนเดอร์ด้วย
+          markdownComponents ชุดเดียวกับหน้าคลังคู่มือ (ManualsView) เพื่อให้สไตล์ตรงกัน */}
+      {manualMarkdownDoc && (
+        <Modal size="xl" onClose={() => setManualMarkdownDoc(null)}>
+          <ModalHeader onClose={() => setManualMarkdownDoc(null)}>
+            <div className="space-y-1">
+              <span className="text-xs font-semibold text-primary flex items-center gap-1">
+                <FileCode className="w-3.5 h-3.5" />
+                {manualMarkdownDoc.category}
+              </span>
+              <h3 className="text-lg sm:text-xl font-semibold text-ink leading-snug">
+                {manualMarkdownDoc.title}
+              </h3>
+            </div>
+          </ModalHeader>
+          <ModalBody>
+            {manualMarkdownLoading ? (
+              <div className="bg-divider text-ink-muted p-8 rounded-[18px] text-center space-y-3 my-4 border border-hairline">
+                <Loader2 className="w-10 h-10 text-primary mx-auto animate-spin" />
+                <p className="text-sm text-ink-muted">กำลังโหลดเนื้อหาคู่มือ…</p>
+              </div>
+            ) : manualMarkdownError ? (
+              <div className="bg-rose-50 border border-rose-200 p-8 rounded-[18px] text-center space-y-3 my-4">
+                <AlertTriangle className="w-10 h-10 text-rose-700 mx-auto" />
+                <p className="text-sm font-semibold text-rose-900">{manualMarkdownError}</p>
+              </div>
+            ) : (
+              <div className="text-xs sm:text-sm leading-relaxed text-ink-muted">
+                <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
+                  {manualMarkdownContent ?? ""}
+                </ReactMarkdown>
+              </div>
+            )}
+          </ModalBody>
         </Modal>
       )}
     </div>

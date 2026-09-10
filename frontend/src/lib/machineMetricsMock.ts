@@ -253,12 +253,12 @@ export function getMachineMetricsMock(machine: Machine): MachineMetricsMock {
 
 export type TrendMetric = "oee" | "cycleTime" | "energyElectrical" | "spindleTemp" | "vibration";
 
-export const TREND_METRIC_LABELS: Record<TrendMetric, { label: string; unit: string }> = {
-  oee: { label: "OEE", unit: "%" },
-  cycleTime: { label: "รอบเวลาทำงาน (Cycle Time)", unit: "วินาที" },
-  energyElectrical: { label: "การใช้ไฟฟ้า", unit: "kWh" },
-  spindleTemp: { label: "อุณหภูมิสปินเดิล", unit: "°C" },
-  vibration: { label: "ค่าการสั่นสะเทือน", unit: "mm/s" },
+export const TREND_METRIC_LABELS: Record<TrendMetric, { label: string; unit: string; shortLabel: string }> = {
+  oee: { label: "OEE", unit: "%", shortLabel: "OEE" },
+  cycleTime: { label: "รอบเวลาทำงาน (Cycle Time)", unit: "วินาที", shortLabel: "Cycle Time" },
+  energyElectrical: { label: "การใช้ไฟฟ้า", unit: "kWh", shortLabel: "การใช้ไฟฟ้า" },
+  spindleTemp: { label: "อุณหภูมิสปินเดิล", unit: "°C", shortLabel: "อุณหภูมิสปินเดิล" },
+  vibration: { label: "ค่าการสั่นสะเทือน", unit: "mm/s", shortLabel: "การสั่นสะเทือน" },
 };
 
 const THAI_DAY_LABELS = ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."];

@@ -111,29 +111,47 @@ const OEE_RANGE_BY_STATUS: Record<Machine["status"], [number, number]> = {
   normal: [94, 98],
   warning: [92.5, 95],
   error: [35, 55],
-  maintenance: [92.5, 94.5],
+  // เครื่องที่กำลังซ่อมบำรุง: oee ต่ำกว่าปกติ/warning ชัดเจน แต่ยังสูงกว่า error
+  // เพราะสาเหตุคือเครื่องหยุดทำงาน (availability ต่ำ) ไม่ใช่คุณภาพ/ประสิทธิภาพแย่
+  maintenance: [58, 74],
 };
 
 function buildOee(machine: Machine, rng: () => number): OeeMetrics {
   const [lo, hi] = OEE_RANGE_BY_STATUS[machine.status];
   const target = randRange(rng, lo, hi);
-  // แตก target เป็น 3 องค์ประกอบที่ "คูณกัน" ได้ใกล้เคียง target จริง
-  // ถ้า availability = performance = quality = x ทุกตัว จะได้ x^3 / 10000 = target ดังนั้น x = cbrt(target * 10000)
-  const cubeRootTarget = Math.cbrt(target * 10000);
-  const availability = round1(Math.min(100, Math.max(40, cubeRootTarget + randRange(rng, -1.5, 1.5))));
-  const performance = round1(Math.min(100, Math.max(40, cubeRootTarget + randRange(rng, -1.5, 1.5))));
-  // แก้สมการย้อนกลับ: quality = target * 10000 / (availability * performance) เพื่อให้ผลคูณกลับมาใกล้ target
-  const rawQuality = (target * 10000) / (availability * performance);
-  const quality = round1(Math.min(100, Math.max(60, rawQuality)));
+
+  let availabilityFinal: number;
+  let performanceFinal: number;
+  let qualityFinal: number;
+
+  if (machine.status === "maintenance") {
+    // เครื่องซ่อมบำรุง: performance/quality ยังใกล้เคียงเครื่องปกติ (เครื่องไม่ได้เสียเพราะทำงานแย่)
+    // ส่วนที่ขาดหายของ oee ต้องถูกดันไปที่ availability ล้วนๆ เพราะเครื่องหยุดทำงานเพื่อซ่อม
+    performanceFinal = round1(randRange(rng, 93, 99));
+    qualityFinal = round1(randRange(rng, 93, 99));
+    const rawAvailability = (target * 10000) / (performanceFinal * qualityFinal);
+    availabilityFinal = round1(Math.min(100, Math.max(40, rawAvailability)));
+  } else {
+    // แตก target เป็น 3 องค์ประกอบที่ "คูณกัน" ได้ใกล้เคียง target จริง
+    // ถ้า availability = performance = quality = x ทุกตัว จะได้ x^3 / 10000 = target ดังนั้น x = cbrt(target * 10000)
+    const cubeRootTarget = Math.cbrt(target * 10000);
+    const availability = round1(Math.min(100, Math.max(40, cubeRootTarget + randRange(rng, -1.5, 1.5))));
+    const performance = round1(Math.min(100, Math.max(40, cubeRootTarget + randRange(rng, -1.5, 1.5))));
+    // แก้สมการย้อนกลับ: quality = target * 10000 / (availability * performance) เพื่อให้ผลคูณกลับมาใกล้ target
+    const rawQuality = (target * 10000) / (availability * performance);
+    const quality = round1(Math.min(100, Math.max(60, rawQuality)));
+
+    availabilityFinal = availability;
+    performanceFinal = performance;
+    qualityFinal = quality;
+  }
 
   // คำนวณ oee จากองค์ประกอบที่ปัดเศษแล้วจริงๆ เพื่อให้ตัวเลขที่แสดงตรงกับ 3 แท่งในหน้าจอเสมอ
-  let availabilityFinal = availability;
-  let performanceFinal = performance;
-  let qualityFinal = quality;
   let oee = round1((availabilityFinal * performanceFinal * qualityFinal) / 10000);
 
-  // การ์ดกันเคส: สถานะที่ไม่ใช่ error ต้องได้ oee เกิน 92 เสมอ ถ้าปัดเศษ/clamp แล้วยังไม่เกิน ให้ค่อยๆ ดันองค์ประกอบขึ้นทีละน้อย
-  if (machine.status !== "error") {
+  // การ์ดกันเคส: เฉพาะ normal/warning ต้องได้ oee เกิน 92 เสมอ ถ้าปัดเศษ/clamp แล้วยังไม่เกิน ให้ค่อยๆ ดันองค์ประกอบขึ้นทีละน้อย
+  // (ไม่รวม error เพราะแย่จริง และไม่รวม maintenance เพราะ oee ต่ำเป็นความตั้งใจ ไม่ใช่บั๊ก)
+  if (machine.status === "normal" || machine.status === "warning") {
     while (oee <= 92 && (availabilityFinal < 100 || performanceFinal < 100 || qualityFinal < 100)) {
       availabilityFinal = round1(Math.min(100, availabilityFinal + 0.5));
       performanceFinal = round1(Math.min(100, performanceFinal + 0.5));

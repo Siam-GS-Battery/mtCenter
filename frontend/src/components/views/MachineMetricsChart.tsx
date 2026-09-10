@@ -80,10 +80,31 @@ export const MachineMetricsChart: React.FC<MachineMetricsChartProps> = ({ machin
 
       <div className="h-56 w-full rounded-[18px] border border-hairline bg-white p-3">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 5, right: 12, left: -12, bottom: 0 }}>
+          <LineChart data={data} margin={{ top: 5, right: 12, left: 4, bottom: 16 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#eef0f2" />
-            <XAxis dataKey="label" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
-            <YAxis tick={{ fontSize: 10 }} width={40} />
+            <XAxis
+              dataKey="label"
+              tick={{ fontSize: 10 }}
+              interval="preserveStartEnd"
+              label={{
+                value: range === "24h" ? "เวลา" : "วันที่",
+                position: "insideBottom",
+                offset: -8,
+                fontSize: 11,
+                fill: "#7a7a7a",
+              }}
+            />
+            <YAxis
+              tick={{ fontSize: 10 }}
+              width={56}
+              label={{
+                value: `${meta.shortLabel} (${meta.unit})`,
+                angle: -90,
+                position: "insideLeft",
+                fontSize: 11,
+                fill: "#7a7a7a",
+              }}
+            />
             <Tooltip
               formatter={(value: number) => [`${value} ${meta.unit}`, meta.label]}
               labelFormatter={(label) => `เวลา: ${label}`}

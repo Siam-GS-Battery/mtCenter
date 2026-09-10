@@ -106,23 +106,43 @@ export interface MachineMetricsMock {
 /* OEE / cycle time / energy — ผูกกับ machine.status                  */
 /* ---------------------------------------------------------------- */
 
-/** ช่วงคะแนน OEE โดยประมาณ ตามสถานะเครื่อง */
+/** ช่วงคะแนน OEE โดยประมาณ ตามสถานะเครื่อง (ค่านี้คือเป้าหมายของ oee ที่แสดงจริง ไม่ใช่ของแต่ละองค์ประกอบ) */
 const OEE_RANGE_BY_STATUS: Record<Machine["status"], [number, number]> = {
-  normal: [78, 88],
-  warning: [62, 75],
+  normal: [94, 98],
+  warning: [92.5, 95],
   error: [35, 55],
-  maintenance: [50, 65],
+  maintenance: [92.5, 94.5],
 };
 
 function buildOee(machine: Machine, rng: () => number): OeeMetrics {
   const [lo, hi] = OEE_RANGE_BY_STATUS[machine.status];
   const target = randRange(rng, lo, hi);
-  // กระจาย target ให้เป็น 3 องค์ประกอบที่คูณกันได้ใกล้เคียงเป้าหมาย
-  const availability = round1(Math.min(99, Math.max(40, target + randRange(rng, -4, 8))));
-  const performance = round1(Math.min(99, Math.max(40, target + randRange(rng, -8, 6))));
-  const quality = round1(Math.min(100, Math.max(60, target + randRange(rng, -2, 10))));
-  const oee = round1((availability * performance * quality) / 10000);
-  return { availability, performance, quality, oee };
+  // แตก target เป็น 3 องค์ประกอบที่ "คูณกัน" ได้ใกล้เคียง target จริง
+  // ถ้า availability = performance = quality = x ทุกตัว จะได้ x^3 / 10000 = target ดังนั้น x = cbrt(target * 10000)
+  const cubeRootTarget = Math.cbrt(target * 10000);
+  const availability = round1(Math.min(100, Math.max(40, cubeRootTarget + randRange(rng, -1.5, 1.5))));
+  const performance = round1(Math.min(100, Math.max(40, cubeRootTarget + randRange(rng, -1.5, 1.5))));
+  // แก้สมการย้อนกลับ: quality = target * 10000 / (availability * performance) เพื่อให้ผลคูณกลับมาใกล้ target
+  const rawQuality = (target * 10000) / (availability * performance);
+  const quality = round1(Math.min(100, Math.max(60, rawQuality)));
+
+  // คำนวณ oee จากองค์ประกอบที่ปัดเศษแล้วจริงๆ เพื่อให้ตัวเลขที่แสดงตรงกับ 3 แท่งในหน้าจอเสมอ
+  let availabilityFinal = availability;
+  let performanceFinal = performance;
+  let qualityFinal = quality;
+  let oee = round1((availabilityFinal * performanceFinal * qualityFinal) / 10000);
+
+  // การ์ดกันเคส: สถานะที่ไม่ใช่ error ต้องได้ oee เกิน 92 เสมอ ถ้าปัดเศษ/clamp แล้วยังไม่เกิน ให้ค่อยๆ ดันองค์ประกอบขึ้นทีละน้อย
+  if (machine.status !== "error") {
+    while (oee <= 92 && (availabilityFinal < 100 || performanceFinal < 100 || qualityFinal < 100)) {
+      availabilityFinal = round1(Math.min(100, availabilityFinal + 0.5));
+      performanceFinal = round1(Math.min(100, performanceFinal + 0.5));
+      qualityFinal = round1(Math.min(100, qualityFinal + 0.5));
+      oee = round1((availabilityFinal * performanceFinal * qualityFinal) / 10000);
+    }
+  }
+
+  return { availability: availabilityFinal, performance: performanceFinal, quality: qualityFinal, oee };
 }
 
 function buildCycleTime(machine: Machine, rng: () => number): CycleTimeMetrics {
@@ -316,7 +336,15 @@ export function getMachineTrendSeries(
       label = `${THAI_DAY_LABELS[t.getDay()]} ${t.getDate()}/${t.getMonth() + 1}`;
     }
     const rawValue = values[i];
-    const value = metric === "vibration" ? round1(Math.max(0, rawValue)) : Math.round(Math.max(0, rawValue) * 10) / 10;
+    let value: number;
+    if (metric === "vibration") {
+      value = round1(Math.max(0, rawValue));
+    } else if (metric === "oee") {
+      // oee เป็นเปอร์เซ็นต์ ห้ามเกิน 100 ไม่งั้นกราฟจะขึ้นเหนือ 100% ได้เมื่อค่าปัจจุบันสูงใกล้เพดาน
+      value = Math.round(Math.min(100, Math.max(0, rawValue)) * 10) / 10;
+    } else {
+      value = Math.round(Math.max(0, rawValue) * 10) / 10;
+    }
     points.push({ t: t.toISOString(), label, value });
   }
 

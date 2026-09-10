@@ -22,6 +22,7 @@ import {
   WALKWAY_CLEARANCE,
   RING_ROAD_GAP,
   RING_ROAD_W,
+  inflateBuildingRects,
   type Buckets,
 } from "./siteShared";
 import { excludeRanges } from "./siteGreenery";
@@ -100,6 +101,12 @@ function tankFarmObstacle(t: PlantTankFarm): RingRoadObstacle {
 /**
  * ระยะเผื่อจริงระหว่างขอบโครงสร้างกับขอบถนนที่ถูกตัด (ม.) — เท่ากับระยะเผื่อ
  * โรงเก็บของ/อาคารอื่นในไฟล์นี้ (`DOCK_SHED_CLEARANCE`/`SUBSTATION_CLEARANCE` = 2)
+ *
+ * `obstacles` (ใน `buildRingRoad` ด้านล่าง) ผ่านกล่องอาคารที่ขยายด้วยชายคาแล้ว
+ * (`inflateBuildingRects`, siteShared.ts) ก่อนเข้าฟังก์ชันนี้ ค่าเผื่อ 2 ม. นี้
+ * จึงยังเป็นระยะเผื่อ "หลังหักชายคา" จริง (2 - 0.4 = 1.6 ม. เทียบกับกล่องสำรวจ
+ * เปลือย ๆ) ไม่ใช่แค่กันชนกับกล่องเปลือยแล้วชายคาไปกินพื้นที่เผื่อจนเหลือ
+ * น้อยกว่าที่ตั้งใจ
  */
 const RING_ROAD_CLEARANCE = 2;
 
@@ -167,7 +174,15 @@ export function buildRingRoad(
   const spanX = hallW + 2 * (RING_ROAD_GAP + roadW);
   const spanZ = hallD + 2 * (RING_ROAD_GAP + roadW);
 
-  const obstacles: RingRoadObstacle[] = [...sheds, ...buildings, ...tankFarms.map(tankFarmObstacle)];
+  // อาคารจริงมีชายคายื่น 0.4 ม./ด้าน (`inflateBuildingRects`, siteShared.ts) —
+  // ขยายกล่องก่อนตัดถนน ไม่งั้นถนนจะตัดตามกล่องสำรวจเปลือย ๆ แล้วเว้นน้อยกว่า
+  // ที่ `RING_ROAD_CLEARANCE` ตั้งใจไว้จริง 0.4 ม. (สเหด `sheds` ไม่มียื่น จึง
+  // ไม่ต้องขยาย)
+  const obstacles: RingRoadObstacle[] = [
+    ...sheds,
+    ...inflateBuildingRects(buildings),
+    ...tankFarms.map(tankFarmObstacle),
+  ];
 
   const runs: Array<{ x: number; z: number; w: number; d: number; alongX: boolean; len: number }> = [
     { x: 0, z: offZ, w: spanX, d: roadW, alongX: true, len: spanX },

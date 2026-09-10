@@ -156,6 +156,18 @@ export const Y_INDOOR_WALK = 0.24;
 export const Y_INDOOR_PAINT = 0.27;
 
 /**
+ * สัดส่วนความสูงเชิงชาย (eave) เทียบกับความสูงโรง — เดิมคำนวณซ้ำกันสองที่แยก
+ * อิสระจากกัน (`siteIndoorInfra.ts` ตอนวาดจันทัน/คานเชิงชายจริง, `siteUtilities.ts`
+ * ตอนหาเพดานท่อลมอัด) ทั้งที่ต้องเป็นค่าเดียวกันเป๊ะเสมอ — ถ้าใครแก้ค่านี้ที่
+ * เดียวแล้วลืมอีกที่ ท่อ (ลมอัดหรือดักฝุ่น) จะเพี้ยนพ้น/ทะลุเชิงชายแบบเงียบ ๆ
+ * ดึงมารวมจุดเดียวตรงนี้ ทั้งสองไฟล์เรียก `eaveYOf(hallHeight)` แทน
+ */
+export const EAVE_Y_FACTOR = 0.78;
+export function eaveYOf(hallHeight: number): number {
+  return hallHeight * EAVE_Y_FACTOR;
+}
+
+/**
  * ความกว้างของแนวทางเดิน/ถนนรอบอาคาร (เมตร)
  *
  * โรงมี "ขอบเขตรอบอาคาร" ว่างอยู่ 15 ม. ทุกด้าน (`HALL_PERIMETER` ใน
@@ -219,6 +231,37 @@ export function insideCorridor(x: number, z: number, corridors: Corridor[]): boo
     if (x >= c.x0 && x <= c.x1 && z >= c.z0 && z <= c.z1) return true;
   }
   return false;
+}
+
+/**
+ * ชายคา (eave) ของอาคารจริง (`RAW_BUILDINGS`) ยื่นเกินกล่องขอบเขตสำรวจ 0.4 ม.
+ * ทุกด้าน — `PlantShell.tsx` วาดคานกันสาด (`b.beam`) กว้าง/ลึกกว่ากล่องจริง
+ * `+0.8` เป๊ะ (`box(building.x, ..., building.w + 0.8, ..., building.d + 0.8)`,
+ * ดู `PlantShell.tsx:235`) เท่ากับยื่น 0.4 ม. ต่อด้าน ต่างจากโรงเก็บของ
+ * (`RAW_SHEDS`) ที่หลังคาเท่าฐานเป๊ะไม่มียื่น (`PlantShell.tsx:247` ใช้
+ * `shed.w`/`shed.d` ตรง ๆ)
+ *
+ * ใครก็ตามที่เช็คระยะเว้น/กันชนกับ `site.buildings` (ไม่ใช่ `site.sheds`) ต้อง
+ * ขยายกล่องอาคารด้วยค่านี้ก่อนเทียบระยะ ไม่งั้นระยะที่เชื่อว่าเว้นไว้จะเผื่อ
+ * น้อยกว่าจริง 0.4 ม. ต่อด้าน (ชนกับชายคาที่มองเห็นจริงบนจอ แม้โค้ดคำนวณว่ายัง
+ * ห่างอยู่) — ดึงมารวมจุดเดียวตรงนี้ (แทนที่จะให้แต่ละไฟล์ hardcode `+ 0.8`
+ * ซ้ำกันเอง) เพื่อไม่ให้ค่านี้กับ `PlantShell.tsx` เพี้ยนตามกันไม่ทันถ้าใครแก้
+ * ที่เดียวแล้วลืมอีกที่
+ */
+export const BUILDING_EAVE_OVERHANG = 0.4;
+
+/** ขยายกล่องขอบเขตอาคาร (`PlantBuilding`/rect เดียวกัน) ด้วยชายคา `BUILDING_EAVE_OVERHANG`
+ *  ต่อด้าน — ใช้ก่อนส่งเข้าเช็คระยะเว้น/กันชนใด ๆ กับ `site.buildings` เสมอ
+ *  (สเหด `site.sheds` ไม่มียื่น จึงไม่ต้องผ่านฟังก์ชันนี้) */
+export function inflateBuildingRects<T extends { x: number; z: number; w: number; d: number }>(
+  buildings: T[]
+): Array<{ x: number; z: number; w: number; d: number }> {
+  return buildings.map((bd) => ({
+    x: bd.x,
+    z: bd.z,
+    w: bd.w + BUILDING_EAVE_OVERHANG * 2,
+    d: bd.d + BUILDING_EAVE_OVERHANG * 2,
+  }));
 }
 
 /**

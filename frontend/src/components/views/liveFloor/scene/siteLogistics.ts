@@ -5,6 +5,7 @@ import {
   pillar,
   pushOutFrom,
   RING_ROAD_GAP,
+  inflateBuildingRects,
   type Corridor,
   type Buckets,
 } from "./siteShared";
@@ -73,7 +74,7 @@ const DOCK_SHED_CLEARANCE = 2;
 /** หนึ่งคันรถบรรทุกกล่องเรียบง่าย (ล้อ + ตัวถัง + ห้องคนขับ) ท้ายรถอยู่ที่ +z
  *  ท้องถิ่น (ชิดแท่น) หัวรถยื่นออกที่ -z ท้องถิ่น (ออกลานจอด) ล้อวางบนพื้นจริง
  *  (`DOCK_GROUND_Y`) ตัวถังวางซ้อนบนล้ออีกที ไม่ใช่แขวนลอย */
-export function pushTruck(cx: number, cz: number, b: Buckets) {
+function pushTruck(cx: number, cz: number, b: Buckets) {
   const bodyBaseY = DOCK_GROUND_Y + DOCK_TRUCK_WHEEL_H;
   const bodyH = DOCK_TRUCK_BODY_H;
   const bodyLen = DOCK_TRUCK_LEN * 0.7;
@@ -118,7 +119,9 @@ export function buildLoadingDock(
   const halfSpan = platformW / 2 + 3;
   let wallFrontZ = wallZ - DOCK_WALL_GAP;
   wallFrontZ = pushOutFrom(sheds, wallFrontZ, dockX, halfSpan, DOCK_SHED_CLEARANCE);
-  wallFrontZ = pushOutFrom(buildings, wallFrontZ, dockX, halfSpan, DOCK_SHED_CLEARANCE);
+  // อาคารจริงมีชายคายื่น 0.4 ม./ด้าน (`inflateBuildingRects`, siteShared.ts) —
+  // ขยายกล่องก่อนเช็คกันชน ไม่งั้นกันสาดท่ารับ-ส่งของจะไปโผล่ทับชายคาจริง
+  wallFrontZ = pushOutFrom(inflateBuildingRects(buildings), wallFrontZ, dockX, halfSpan, DOCK_SHED_CLEARANCE);
 
   const wallBackZ = wallFrontZ - DOCK_WALL_T;
   const platformFrontZ = wallBackZ; // แท่นแนบผนังท่า

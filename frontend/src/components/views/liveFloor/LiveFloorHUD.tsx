@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState, type ReactElement } from "react";
+import { memo, useEffect, useMemo, useState, type CSSProperties, type ReactElement } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   ArrowLeft,
@@ -13,20 +13,34 @@ import {
   Zap,
 } from "lucide-react";
 import type { Machine, MachineStats, MachineStatus, WorkOrder } from "../../../types";
-import type { FloorBuilding } from "../../../lib/floorLayout";
+import type { PlantLayout } from "../../../lib/plantLayout";
 import { machineStatusLabel } from "../../../lib/pillStyles";
 import { formatDecimal, formatWithUnit } from "../../../lib/format";
 import { computeReadyRate, deriveMachineCounts } from "../../../lib/machineAvailability";
-import {
-  ACTIVITY_LABELS,
-  type FloorSimulationSnapshot,
-  type MachineActivity,
-  type MachineRuntime,
-} from "../../../lib/floorSimulation";
 import { LIVE_FLOOR_THEME } from "./liveFloorTheme";
+import Minimap, { type MinimapCameraSample } from "./Minimap";
+import { isWideCameraPreset, type PlantCameraPreset } from "./scene/sceneConfig";
 
-/** Keep in sync with the same union in `LiveFloor4DScene.tsx`. */
-export type FloorCameraPreset = "line" | "plant" | "top" | "eye";
+/**
+ * One production zone (`PlantLayout.site.zones`) that holds at least one
+ * machine, summarised for the building/zone navigator. See `LiveFloorView.tsx`'s
+ * `zoneSummaries` doc comment for why this replaces the pre-swap
+ * `FloorBuilding[]` navigator: the new site model has ONE hall with 8 named
+ * production zones inside it (WH/FRG-A/FRG-B/HT-1..4/LINES), not several
+ * separate multi-hall buildings — the site's OTHER `buildings` (training
+ * centre, offices, guard house, ...) are administrative structures that never
+ * hold machines, so there is nothing meaningful to navigate to on them.
+ */
+export interface PlantZoneSummary {
+  id: string;
+  name: string;
+  x: number;
+  z: number;
+  width: number;
+  depth: number;
+  machineCount: number;
+  worstStatus: MachineStatus;
+}
 
 export interface LiveFloorHUDProps {
   machines: Machine[]; // unfiltered, for counts
@@ -45,22 +59,34 @@ export interface LiveFloorHUDProps {
   selectedMachine: Machine | null;
   onOpenDetail: (machine: Machine) => void; // open the existing detail modal
   onClearSelection: () => void;
-  cameraPreset: FloorCameraPreset;
-  onCameraPresetChange: (next: FloorCameraPreset) => void;
-  highQuality: boolean;
-  onToggleQuality: () => void;
   isFullscreen: boolean;
   onToggleFullscreen: () => void;
   onExit: () => void; // back to the classic dashboard
   onAskAI?: (prompt: string) => void;
-  simSnapshot: FloorSimulationSnapshot;
-  selectedRuntime: MachineRuntime | null;
-  /** every building on the site, for the building navigator */
-  buildings: FloorBuilding[];
-  /** currently focused building; null = whole-site view */
-  focusBuildingId: string | null;
-  /** pick a building to fly to, or null to return to the whole-site view */
-  onFocusBuilding: (buildingId: string | null) => void;
+  cameraPreset: PlantCameraPreset;
+  onCameraPresetChange: (next: PlantCameraPreset) => void;
+  highQuality: boolean;
+  onToggleQuality: () => void;
+  /** every populated production zone on the site, for the building/zone navigator */
+  zones: PlantZoneSummary[];
+  /** currently focused zone; null = whole-site/preset-default view */
+  focusZoneId: string | null;
+  /** pick a zone to fly to, or null to return to the preset's default view */
+  onFocusZone: (zoneId: string | null) => void;
+  /**
+   * ผังโรงงานจริงสำหรับผังย่อ (`Minimap.tsx`, roadmap step 5) — โซน,
+   * เครื่องจักร, ขอบเขตไซต์ ผ่านตรงมาจาก `LiveFloorView.tsx`'s `plantLayout`
+   */
+  minimapLayout: PlantLayout;
+  /** ตำแหน่ง/ทิศ/มุมมอง/ระยะกล้องสด ๆ — mutable ref ที่ `FloorScene.tsx`'s
+   *  `CameraRig` เขียนทับทุกเฟรม (ไม่ผ่าน React state) ให้ `Minimap` อ่านเอง
+   *  ด้วย requestAnimationFrame loop ของมัน */
+  cameraTrackRef: React.RefObject<MinimapCameraSample>;
+  /** false เมื่อ WebGL ใช้ไม่ได้ (ไม่มี `<FloorScene>`/`CameraRig` mount เลย) —
+   *  ผังย่อต้องไม่ mount ตอนนั้น ไม่งั้น requestAnimationFrame loop ของมันจะวน
+   *  เขียนค่ากล้องค้าง (0,0) ไปเรื่อย ๆ อยู่เบื้องหลังแผง WebGLUnavailablePanel
+   *  โดยไม่มีประโยชน์อะไร */
+  minimapEnabled: boolean;
 }
 
 /* ------------------------------------------------------------------ */
@@ -69,7 +95,7 @@ export interface LiveFloorHUDProps {
 
 const STATUS_ORDER: MachineStatus[] = ["normal", "warning", "error", "maintenance"];
 
-/** error > warning > maintenance > normal — the layout's own severity ordering. */
+/** error > warning > maintenance > normal — the zone navigator's triage order. */
 const STATUS_SEVERITY: Record<MachineStatus, number> = {
   error: 3,
   warning: 2,
@@ -77,51 +103,210 @@ const STATUS_SEVERITY: Record<MachineStatus, number> = {
   normal: 0,
 };
 
-const STATUS_META: Record<MachineStatus, { color: string; label: string }> = {
-  normal: { color: LIVE_FLOOR_THEME.status.normal, label: machineStatusLabel("normal") },
-  warning: { color: LIVE_FLOOR_THEME.status.warning, label: machineStatusLabel("warning") },
-  error: { color: LIVE_FLOOR_THEME.status.error, label: machineStatusLabel("error") },
-  maintenance: {
-    color: LIVE_FLOOR_THEME.status.maintenance,
-    label: machineStatusLabel("maintenance"),
-  },
-};
-
-const ACTIVITY_ORDER: MachineActivity[] = ["running", "idle", "setup", "down"];
-
-const ACTIVITY_COLORS: Record<MachineActivity, string> = {
-  running: LIVE_FLOOR_THEME.status.normal,
-  idle: LIVE_FLOOR_THEME.hud.textMuted,
-  setup: LIVE_FLOOR_THEME.status.warning,
-  down: LIVE_FLOOR_THEME.status.error,
-  maintenance: LIVE_FLOOR_THEME.status.maintenance,
-};
-
-/** Clamp a percentage into [0, 100] so a bar/progress fill never overshoots the track. */
-function clampPct(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  return Math.min(100, Math.max(0, value));
-}
-
-const CAMERA_PRESETS: Array<{ id: FloorCameraPreset; label: string; icon: typeof Eye }> = [
+const CAMERA_PRESETS: Array<{ id: PlantCameraPreset; label: string; icon: typeof Eye }> = [
   { id: "line", label: "ซูมเข้าไลน์", icon: Boxes },
   { id: "plant", label: "ดูทั้งโรงงาน", icon: Building2 },
   { id: "top", label: "มุมบนสุด", icon: LayoutGrid },
   { id: "eye", label: "ระดับสายตา", icon: Eye },
 ];
 
-/** Presets that frame the whole building rather than a single hall. */
-function isWideCameraPreset(preset: FloorCameraPreset): boolean {
-  return preset === "plant" || preset === "top";
+/**
+ * `color` = the MUTED tone (`LIVE_FLOOR_THEME.status.*`) — used for all text,
+ * counts, and badge fills/dots, where it must stay legible on the light
+ * frosted panel. `lit` = the SATURATED "lamp lit" tone
+ * (`LIVE_FLOOR_THEME.stackLight.*Lit`) — the same colour the scene actually
+ * paints onto the physical stack-light lamp and the floating status marker
+ * (see `scene/MachineInstances.tsx` / `stackLightColorOf()`). Reading
+ * `LIVE_FLOOR_THEME.stackLight.*` directly here (not `scene/palette.ts`)
+ * follows the existing import pattern of this file — it only ever pulls raw
+ * values from `liveFloorTheme.ts`, never from `scene/`.
+ *
+ * `lit` is used ONLY for the small legend/status-row glyph fill
+ * (`StatusShapeGlyph`), so that glyph's hue matches what the user sees
+ * floating over the machines — that match is the entire point of the legend.
+ * Contrast of each `lit` fill against the panel background (`#ffffffe6`,
+ * effectively white) computed via WCAG relative luminance:
+ *   normal (green #1fbf74):  ~2.40:1
+ *   warning (yellow #ffb020): ~1.83:1
+ *   error (red #e8453c):     ~3.93:1
+ *   maintenance (blue #2f8fe0): ~3.43:1
+ * Green and warning fall short of the 3:1 non-text-contrast guideline on
+ * their own — that is why `StatusShapeGlyph` always rings every shape in the
+ * corresponding MUTED `color` (1px solid): the ring carries the legibility
+ * (edge definition against white), the fill carries the hue-match. None of
+ * the four is so low-contrast that the ring can't rescue it, so no status
+ * falls back to the muted fill.
+ */
+const STATUS_META: Record<MachineStatus, { color: string; lit: string; label: string }> = {
+  normal: {
+    color: LIVE_FLOOR_THEME.status.normal,
+    lit: LIVE_FLOOR_THEME.stackLight.greenLit,
+    label: machineStatusLabel("normal"),
+  },
+  warning: {
+    color: LIVE_FLOOR_THEME.status.warning,
+    lit: LIVE_FLOOR_THEME.stackLight.yellowLit,
+    label: machineStatusLabel("warning"),
+  },
+  error: {
+    color: LIVE_FLOOR_THEME.status.error,
+    lit: LIVE_FLOOR_THEME.stackLight.redLit,
+    label: machineStatusLabel("error"),
+  },
+  maintenance: {
+    color: LIVE_FLOOR_THEME.status.maintenance,
+    lit: LIVE_FLOOR_THEME.stackLight.blueLit,
+    label: machineStatusLabel("maintenance"),
+  },
+};
+
+/**
+ * Shape carried by each status's floating marker above the machine in the 3D
+ * scene — kept in sync with the mapping the scene side (MachineInstances.tsx
+ * / `createMarkerGeometry`) builds its markers from: normal→sphere,
+ * warning→tetrahedron, error→box, maintenance→octahedron. RESOLVED
+ * cross-agent note: this used to say "warning→cone" (stale) and the glyph
+ * fill used to read the MUTED `status` colour while the scene marker used the
+ * new saturated `stackLight.*Lit` colour, so the legend didn't match what it
+ * was explaining — see the `lit` field on `STATUS_META` above and
+ * `StatusShapeGlyph` below for the fix. This file does not touch `scene/`,
+ * so if the marker geometry mapping ever changes again the shape kinds below
+ * need a matching follow-up edit here.
+ */
+type StatusShapeKind = "circle" | "triangle" | "square" | "diamond";
+
+const STATUS_SHAPE: Record<MachineStatus, StatusShapeKind> = {
+  normal: "circle",
+  warning: "triangle",
+  error: "square",
+  maintenance: "diamond",
+};
+
+/** Thai name of each shape, for title/aria-label text — not the glyph itself. */
+const STATUS_SHAPE_NAME_TH: Record<MachineStatus, string> = {
+  normal: "วงกลม",
+  warning: "สามเหลี่ยม",
+  error: "สี่เหลี่ยม",
+  maintenance: "สี่เหลี่ยมข้าวหลามตัด",
+};
+
+/**
+ * Short, code-backed gloss of what each status means for availability — not
+ * invented copy. Sourced from `computeReadyRate` (machineAvailability.ts),
+ * which folds `normal` + `warning` into "พร้อมใช้งาน %" and excludes `error`
+ * and `maintenance`; the "เตือนแต่ยังทำงานได้" phrasing for `warning` mirrors
+ * that function's own doc comment.
+ */
+const STATUS_GLOSS: Record<MachineStatus, string> = {
+  normal: "นับเป็นเครื่องพร้อมใช้งาน",
+  warning: "เตือนแต่ยังทำงานได้ นับเป็นเครื่องพร้อมใช้งาน",
+  error: "ไม่นับเป็นเครื่องพร้อมใช้งาน",
+  maintenance: "ไม่นับเป็นเครื่องพร้อมใช้งาน อยู่ระหว่างซ่อมบำรุง",
+};
+
+/**
+ * Small CSS-drawn glyph matching the floating marker shape AND colour for a
+ * status — deliberately not an emoji/unicode glyph (font coverage on this app
+ * is not guaranteed), so each shape is a styled `<span>`. Fill is the
+ * saturated `lit` tone (matches the scene marker's hue exactly); a thin 1px
+ * ring in the muted `color` tone keeps the shape's edge defined against the
+ * light frosted panel even where the lit fill alone has weak contrast (see
+ * the contrast figures in the `STATUS_META` doc comment above). Colours
+ * always come from `STATUS_META`, never a hardcoded hex. `size` is the box
+ * the shape is drawn inside, in px.
+ */
+function StatusShapeGlyph({
+  status,
+  size = 10,
+  className = "",
+  "aria-label": ariaLabel,
+}: {
+  status: MachineStatus;
+  size?: number;
+  className?: string;
+  "aria-label"?: string;
+}): ReactElement {
+  const { color: ring, lit: fill } = STATUS_META[status];
+  const shape = STATUS_SHAPE[status];
+  const commonStyle: CSSProperties = { width: size, height: size };
+  // hidden from the accessibility tree only when no explicit label is given —
+  // callers that pass aria-label want the shape announced (e.g. the legend).
+  const a11yProps = ariaLabel ? { role: "img" as const, "aria-label": ariaLabel } : { "aria-hidden": true as const };
+
+  if (shape === "circle") {
+    return (
+      <span
+        {...a11yProps}
+        className={`inline-block rounded-full shrink-0 ${className}`}
+        style={{ ...commonStyle, backgroundColor: fill, border: `1px solid ${ring}` }}
+      />
+    );
+  }
+  if (shape === "square") {
+    return (
+      <span
+        {...a11yProps}
+        className={`inline-block rounded-xs shrink-0 ${className}`}
+        style={{ ...commonStyle, backgroundColor: fill, border: `1px solid ${ring}` }}
+      />
+    );
+  }
+  if (shape === "diamond") {
+    return (
+      <span
+        {...a11yProps}
+        className={`inline-block rounded-[1px] shrink-0 ${className}`}
+        style={{
+          ...commonStyle,
+          backgroundColor: fill,
+          border: `1px solid ${ring}`,
+          transform: "rotate(45deg)",
+        }}
+      />
+    );
+  }
+  // triangle — two stacked CSS border-triangles (a slightly larger muted one
+  // behind, a slightly smaller lit one on top) fake the 1px ring, since a
+  // border-trick triangle has no box to put a real CSS `border` on.
+  return (
+    <span
+      {...a11yProps}
+      className={`relative inline-block shrink-0 ${className}`}
+      style={{ width: size, height: size }}
+    >
+      <span
+        className="absolute inset-0"
+        style={{
+          width: 0,
+          height: 0,
+          borderLeft: `${size / 2}px solid transparent`,
+          borderRight: `${size / 2}px solid transparent`,
+          borderBottom: `${size}px solid ${ring}`,
+        }}
+      />
+      <span
+        className="absolute"
+        style={{
+          top: 1,
+          left: 1,
+          width: 0,
+          height: 0,
+          borderLeft: `${size / 2 - 1}px solid transparent`,
+          borderRight: `${size / 2 - 1}px solid transparent`,
+          borderBottom: `${size - 1}px solid ${fill}`,
+        }}
+      />
+    </span>
+  );
 }
 
 const PANEL_CLASS =
   "bg-[var(--lf-panel-bg)] backdrop-blur-md border border-[var(--lf-panel-border)] rounded-[18px] shadow-[0_8px_24px_-12px_var(--lf-panel-glow)] text-[var(--lf-text)]";
 
 /**
- * Scrollbar-hiding pattern shared by the left rail, the building list inside
- * it and the mobile building chip row — the HUD floats over a 3D scene, so a
- * native scrollbar gutter would read as a rendering artefact.
+ * Scrollbar-hiding pattern shared by the left rail and its status list — the
+ * HUD floats over a 3D scene, so a native scrollbar gutter would read as a
+ * rendering artefact.
  */
 const HIDE_SCROLLBAR_CLASS =
   "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden";
@@ -147,8 +332,8 @@ function useFadeAfter(delayMs: number): boolean {
 /**
  * Leaf node that owns the 1Hz clock tick itself, so re-rendering it every
  * second no longer forces a reconciliation of the whole HUD tree (which sits
- * alongside a heavy 3D canvas and a 2Hz simulation snapshot). Markup and Thai
- * formatting are byte-identical to the inline block this replaced.
+ * alongside a heavy 3D canvas). Markup and Thai formatting are byte-identical
+ * to the inline block this replaced.
  */
 const FloorClock = memo(function FloorClock(): ReactElement {
   const now = useNow();
@@ -178,22 +363,42 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
     selectedMachine,
     onOpenDetail,
     onClearSelection,
-    cameraPreset,
-    onCameraPresetChange,
-    highQuality,
-    onToggleQuality,
     isFullscreen,
     onToggleFullscreen,
     onExit,
     onAskAI,
-    simSnapshot,
-    selectedRuntime,
-    buildings,
-    focusBuildingId,
-    onFocusBuilding,
+    cameraPreset,
+    onCameraPresetChange,
+    highQuality,
+    onToggleQuality,
+    zones,
+    focusZoneId,
+    onFocusZone,
+    minimapLayout,
+    cameraTrackRef,
+    minimapEnabled,
   } = props;
 
   const hintVisible = useFadeAfter(8000);
+  /** "สัญลักษณ์สถานะเครื่องจักร" gloss row — collapsed by default so the panel
+      stays a compact stat list; expands into the shape/colour/meaning legend
+      that matches the markers floating over machines in the 3D scene. */
+  const [legendOpen, setLegendOpen] = useState(false);
+
+  /** Worst-status first, then the busiest zone — the supervisor's triage order. */
+  const sortedZones = useMemo(
+    () =>
+      [...zones].sort((a, b) => {
+        const severity = STATUS_SEVERITY[b.worstStatus] - STATUS_SEVERITY[a.worstStatus];
+        if (severity !== 0) return severity;
+        return b.machineCount - a.machineCount;
+      }),
+    [zones]
+  );
+
+  const viewIsWide = isWideCameraPreset(cameraPreset);
+  const scaleTogglePreset: PlantCameraPreset = viewIsWide ? "line" : "plant";
+  const scaleToggleLabel = viewIsWide ? "ซูมเข้าไลน์" : "ดูทั้งโรงงาน";
 
   // "พร้อมใช้งาน %" และยอดนับรายสถานะต้องใช้สูตร/แหล่งข้อมูลเดียวกับ Supervisor
   // Dashboard เสมอ — `machines` ที่หน้านี้ได้รับอาจเป็นแค่ส่วนหนึ่งของ fleet
@@ -238,34 +443,15 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
 
   const selectedMeta = selectedMachine ? STATUS_META[selectedMachine.status] : null;
 
-  const simTotals = simSnapshot.totals;
-  const runningMachineCount = simTotals.running;
-
-  /** Worst-status first, then the busiest building — the supervisor's triage order. */
-  const sortedBuildings = useMemo(
-    () =>
-      [...buildings].sort((a, b) => {
-        const severity = STATUS_SEVERITY[b.worstStatus] - STATUS_SEVERITY[a.worstStatus];
-        if (severity !== 0) return severity;
-        return b.machineCount - a.machineCount;
-      }),
-    [buildings]
-  );
-
-  const viewIsWide = isWideCameraPreset(cameraPreset);
-  const scaleTogglePreset: FloorCameraPreset = viewIsWide ? "line" : "plant";
-  const scaleToggleLabel = viewIsWide ? "ซูมเข้าไลน์" : "ดูทั้งโรงงาน";
-
   return (
     <div className="absolute inset-0 pointer-events-none z-20">
-      {/* LEFT RAIL — ONE vertical column holding every left-hand panel, so the
-          overview, the building navigator and the KPI strip can never overlap
-          each other at any container size. Anchored top-to-bottom and gated on
-          the CONTAINER's inline size (the 4D canvas often sits in a dashboard
-          column far narrower than the viewport, so viewport breakpoints lie).
-          The rail itself scrolls when the content outgrows the height budget;
-          the KPI strip is pushed to the bottom by `mt-auto` whenever there is
-          slack, which reproduces the previous bottom-left placement. */}
+      {/* LEFT RAIL — ONE vertical column holding the overview panel and the KPI
+          strip, so they can never overlap each other at any container size.
+          Anchored top-to-bottom and gated on the CONTAINER's inline size (the
+          4D canvas often sits in a dashboard column far narrower than the
+          viewport, so viewport breakpoints lie). The rail itself scrolls when
+          the content outgrows the height budget; the KPI strip is pushed to
+          the bottom by `mt-auto` whenever there is slack. */}
       <div
         className={`hidden @min-[640px]:flex absolute top-4 left-4 bottom-4 z-10 w-64 max-w-[calc(100%-2rem)] flex-col gap-3 pointer-events-none overflow-y-auto overflow-x-hidden overscroll-contain min-h-0 ${HIDE_SCROLLBAR_CLASS}`}
       >
@@ -302,6 +488,7 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
                   key={status}
                   type="button"
                   aria-pressed={isActive}
+                  title={`${meta.label} · สัญลักษณ์บนเครื่องจักร: ${STATUS_SHAPE_NAME_TH[status]}สี${meta.label}`}
                   onClick={() => onStatusFilterChange(isActive ? "all" : status)}
                   className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-[10px] transition-colors text-left ${
                     isActive
@@ -309,9 +496,9 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
                       : "hover:bg-[var(--lf-accent-14)]"
                   }`}
                 >
-                  <span
-                    className="w-2 h-2 rounded-full shrink-0"
-                    style={{ backgroundColor: meta.color }}
+                  <StatusShapeGlyph
+                    status={status}
+                    aria-label={`สัญลักษณ์สถานะ ${meta.label}`}
                   />
                   <span className="text-xs flex-1 truncate">{meta.label}</span>
                   <span className="text-xs font-semibold" style={{ color: meta.color }}>
@@ -325,39 +512,52 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
             })}
           </div>
 
-          <div className="border-t border-[var(--lf-accent-26)] my-3" />
-
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--lf-text-muted)] mb-2">
-            กำลังทำงานจริง
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {ACTIVITY_ORDER.map((activity) => {
-              const color = ACTIVITY_COLORS[activity];
-              const count = simTotals[activity];
-              return (
-                <span
-                  key={activity}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold"
-                  style={{ backgroundColor: `${color}26`, color }}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
-                  {ACTIVITY_LABELS[activity]} {count.toLocaleString("th-TH")}
-                </span>
-              );
-            })}
-          </div>
+          {/* คำอธิบายสัญลักษณ์ — collapsible so the panel stays a compact stat
+              list by default; expands to spell out shape+colour+meaning for
+              each status, matching the markers floating over machines in the
+              3D scene (see STATUS_SHAPE doc comment above). */}
+          <button
+            type="button"
+            onClick={() => setLegendOpen((v) => !v)}
+            aria-expanded={legendOpen}
+            className="w-full mt-2 pt-2 border-t border-[var(--lf-panel-border)] flex items-center justify-between text-[10px] font-semibold uppercase tracking-wider text-[var(--lf-text-muted)] hover:text-[var(--lf-text)] transition-colors"
+          >
+            <span>คำอธิบายสัญลักษณ์สถานะ</span>
+            <span aria-hidden="true">{legendOpen ? "▴" : "▾"}</span>
+          </button>
+          {legendOpen && (
+            <div className="mt-1.5 space-y-1.5">
+              {STATUS_ORDER.map((status) => {
+                const meta = STATUS_META[status];
+                return (
+                  <div key={status} className="flex items-start gap-2 px-2 py-1">
+                    <span
+                      title={`สัญลักษณ์: ${STATUS_SHAPE_NAME_TH[status]} สี${meta.label}`}
+                      aria-label={`สัญลักษณ์: ${STATUS_SHAPE_NAME_TH[status]} สี${meta.label}`}
+                      className="mt-0.5"
+                    >
+                      <StatusShapeGlyph status={status} size={11} />
+                    </span>
+                    <div className="min-w-0">
+                      <div className="text-xs font-semibold" style={{ color: meta.color }}>
+                        {meta.label}
+                      </div>
+                      <div className="text-[10px] text-[var(--lf-text-muted)] leading-snug">
+                        {STATUS_GLOSS[status]}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* camera / quality controls — moved OUT of the top-right cluster: as
             edge content they competed with the centred title bar for the same
-            pixels, and the rail is a scrolling column with slack to spare.
-            Placed directly under the overview panel rather than lower down,
-            because the building navigator's height changes with the site while
-            these controls are clicked repeatedly — above the navigator they
-            keep one stable position no matter how many buildings there are.
-            A 2x2 grid of labelled buttons: the 16rem rail gives each cell
-            ~7rem, which holds the longest Thai label at 10px without
-            truncating, whereas a 4-across strip would only fit bare icons. */}
+            pixels, and the rail is a scrolling column with slack to spare. A
+            2x2 grid of labelled buttons: the 16rem rail gives each cell ~7rem,
+            which holds the longest Thai label at 10px without truncating. */}
         <div className={`shrink-0 ${PANEL_CLASS} p-3 pointer-events-auto`}>
           <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--lf-text-muted)] mb-2">
             มุมกล้อง
@@ -407,26 +607,22 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
           </button>
         </div>
 
-        {/* building navigator — own panel inside the rail. It is the flexible
-            child: it grows into spare height up to `max-h`, and it is the first
-            thing to shrink when the rail runs short, so the KPI strip below can
-            never be pushed out of the rail or covered. On a short container the
-            cap tightens further via a container HEIGHT query. The cap is 10rem
-            rather than 14rem because the camera panel above now takes ~8.5rem of
-            the rail budget — it keeps the KPI strip on screen without scrolling
-            on a tall container. */}
-        {sortedBuildings.length > 0 && (
+        {/* building/zone navigator — own panel inside the rail. It is the
+            flexible child: grows into spare height up to `max-h`, and is the
+            first thing to shrink when the rail runs short, so the KPI strip
+            below can never be pushed out of the rail or covered. */}
+        {sortedZones.length > 0 && (
           <div
             className={`min-h-24 flex-1 max-h-40 [@container_(max-height:639px)]:max-h-32 flex flex-col overflow-hidden ${PANEL_CLASS} p-3 pointer-events-auto`}
           >
             <div className="flex items-center justify-between mb-2 shrink-0">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--lf-text-muted)]">
-                อาคารในไซต์
+                โซนการผลิตในไซต์
               </span>
-              {focusBuildingId !== null && (
+              {focusZoneId !== null && (
                 <button
                   type="button"
-                  onClick={() => onFocusBuilding(null)}
+                  onClick={() => onFocusZone(null)}
                   className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--lf-accent-26)] text-[var(--lf-accent)] hover:bg-[var(--lf-panel-border)] transition-colors"
                 >
                   ดูทั้งไซต์
@@ -436,16 +632,16 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
             <div
               className={`min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain pr-0.5 ${HIDE_SCROLLBAR_CLASS}`}
             >
-              {sortedBuildings.map((building) => {
-                const meta = STATUS_META[building.worstStatus];
-                const isActive = focusBuildingId === building.id;
+              {sortedZones.map((zone) => {
+                const meta = STATUS_META[zone.worstStatus];
+                const isActive = focusZoneId === zone.id;
                 return (
                   <button
-                    key={building.id}
+                    key={zone.id}
                     type="button"
-                    title={`${building.label} · ${building.machineCount.toLocaleString("th-TH")} เครื่อง · ${meta.label}`}
+                    title={`${zone.name} · ${zone.machineCount.toLocaleString("th-TH")} เครื่อง · ${meta.label}`}
                     aria-pressed={isActive}
-                    onClick={() => onFocusBuilding(isActive ? null : building.id)}
+                    onClick={() => onFocusZone(isActive ? null : zone.id)}
                     className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-[10px] transition-colors text-left ${
                       isActive
                         ? "bg-[var(--lf-accent-26)] ring-2 ring-inset ring-[var(--lf-accent-80)]"
@@ -457,9 +653,9 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
                       style={{ backgroundColor: meta.color }}
                     />
                     <Building2 className="w-3 h-3 shrink-0 text-[var(--lf-text-muted)]" />
-                    <span className="text-xs flex-1 truncate">{building.label}</span>
+                    <span className="text-xs flex-1 truncate">{zone.name}</span>
                     <span className="text-[10px] text-[var(--lf-text-muted)] whitespace-nowrap">
-                      {building.machineCount.toLocaleString("th-TH")} เครื่อง
+                      {zone.machineCount.toLocaleString("th-TH")} เครื่อง
                     </span>
                   </button>
                 );
@@ -469,10 +665,7 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
         )}
 
         {/* KPI strip — last child of the rail, `mt-auto` so it sits flush with
-            the rail's bottom edge exactly where it used to be. On a container
-            shorter than 640px the three secondary tiles (ชิ้นงานสะสม / อัตราผลิต /
-            โหลดเฉลี่ย) drop out rather than letting anything overlap; their data is
-            still summarised by the "กำลังทำงานจริง" chips in the overview panel. */}
+            the rail's bottom edge. Every tile here is real DB data. */}
         <div className="mt-auto shrink-0 grid grid-cols-2 gap-2 pointer-events-auto">
           <div className={`${PANEL_CLASS} p-3`}>
             <div className="text-[10px] text-[var(--lf-text-muted)] mb-1">พร้อมใช้งาน %</div>
@@ -498,73 +691,44 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
               {avgHealth !== null ? formatDecimal(avgHealth, 1) : "—"}
             </div>
           </div>
-          <div className={`${PANEL_CLASS} p-3 min-w-0 [@container_(max-height:639px)]:hidden`}>
-            <div className="text-[10px] text-[var(--lf-text-muted)] mb-1 truncate">ชิ้นงานสะสม</div>
-            <div className="text-lg font-semibold text-[var(--lf-accent-soft)] truncate">
-              {Math.trunc(simTotals.output).toLocaleString("th-TH")}
-            </div>
-          </div>
-          <div className={`${PANEL_CLASS} p-3 min-w-0 [@container_(max-height:639px)]:hidden`}>
-            <div className="text-[10px] text-[var(--lf-text-muted)] mb-1 truncate">อัตราผลิต</div>
-            <div className="text-lg font-semibold text-[var(--lf-accent-soft)] truncate">
-              {simTotals.throughputPerMin.toFixed(1)}
-              <span className="text-[10px] font-normal text-[var(--lf-text-muted)] ml-1">ชิ้น/นาที</span>
-            </div>
-          </div>
-          <div
-            className={`${PANEL_CLASS} p-3 col-span-2 min-w-0 [@container_(max-height:639px)]:hidden`}
-          >
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] text-[var(--lf-text-muted)]">โหลดเฉลี่ย</span>
-              <span className="text-[10px] font-semibold text-[var(--lf-text)]">
-                {clampPct(simTotals.avgLoad * 100).toFixed(0)}%
-              </span>
-            </div>
-            <div className="h-1.5 rounded-full bg-[var(--lf-box-bg)] overflow-hidden">
-              <div
-                className="h-full rounded-full bg-[var(--lf-accent)]"
-                style={{ width: `${clampPct(simTotals.avgLoad * 100)}%` }}
-              />
-            </div>
-          </div>
         </div>
       </div>
       {/* end left rail */}
 
-      {/* COMPACT — building navigator chip row. The rail (with the desktop
-          building list) is hidden while the CONTAINER is narrower than 640px,
-          so below that this row is the only way to switch buildings. Sits just
-          under the title bar and never reaches the bottom-right inspector
-          card or the top-centre title bar. */}
-      {sortedBuildings.length > 0 && (
+      {/* COMPACT — building/zone navigator chip row. The rail (with the
+          desktop zone list) is hidden while the CONTAINER is narrower than
+          640px, so below that this row is the only way to switch zones. Sits
+          just under the title bar and never reaches the bottom-right
+          inspector card or the top-centre title bar. */}
+      {sortedZones.length > 0 && (
         <div className="@min-[640px]:hidden absolute top-[88px] left-2 right-2 z-10 pointer-events-none">
           <div
             className={`flex items-center gap-1.5 overflow-x-auto pointer-events-auto py-0.5 ${HIDE_SCROLLBAR_CLASS}`}
             style={{ WebkitOverflowScrolling: "touch" }}
           >
-            {focusBuildingId !== null && (
+            {focusZoneId !== null && (
               <button
                 type="button"
                 aria-pressed={false}
                 aria-label="ดูทั้งไซต์"
                 title="ดูทั้งไซต์"
-                onClick={() => onFocusBuilding(null)}
+                onClick={() => onFocusZone(null)}
                 className="shrink-0 min-h-9 flex items-center gap-1.5 px-3 py-2 rounded-full border backdrop-blur-md shadow-[0_4px_12px_-6px_var(--lf-panel-glow)] transition-colors bg-[var(--lf-accent-26)] border-[var(--lf-accent-80)] text-[var(--lf-accent)] ring-2 ring-inset ring-[var(--lf-accent-80)]"
               >
                 <span className="text-xs font-semibold whitespace-nowrap">ทั้งไซต์</span>
               </button>
             )}
-            {sortedBuildings.map((building) => {
-              const meta = STATUS_META[building.worstStatus];
-              const isActive = focusBuildingId === building.id;
+            {sortedZones.map((zone) => {
+              const meta = STATUS_META[zone.worstStatus];
+              const isActive = focusZoneId === zone.id;
               return (
                 <button
-                  key={building.id}
+                  key={zone.id}
                   type="button"
                   aria-pressed={isActive}
-                  aria-label={`${building.label} · ${building.machineCount.toLocaleString("th-TH")} เครื่อง · ${meta.label}`}
-                  title={`${building.label} · ${building.machineCount.toLocaleString("th-TH")} เครื่อง · ${meta.label}`}
-                  onClick={() => onFocusBuilding(isActive ? null : building.id)}
+                  aria-label={`${zone.name} · ${zone.machineCount.toLocaleString("th-TH")} เครื่อง · ${meta.label}`}
+                  title={`${zone.name} · ${zone.machineCount.toLocaleString("th-TH")} เครื่อง · ${meta.label}`}
+                  onClick={() => onFocusZone(isActive ? null : zone.id)}
                   className={`shrink-0 min-h-9 flex items-center gap-1.5 px-3 py-2 rounded-full border backdrop-blur-md shadow-[0_4px_12px_-6px_var(--lf-panel-glow)] transition-colors ${
                     isActive
                       ? "bg-[var(--lf-accent-26)] border-[var(--lf-accent-80)] text-[var(--lf-accent)] ring-2 ring-inset ring-[var(--lf-accent-80)]"
@@ -575,11 +739,9 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
                     className="w-2 h-2 rounded-full shrink-0"
                     style={{ backgroundColor: meta.color }}
                   />
-                  <span className="text-xs font-semibold max-w-[88px] truncate">
-                    {building.label}
-                  </span>
+                  <span className="text-xs font-semibold max-w-[88px] truncate">{zone.name}</span>
                   <span className="text-[10px] text-[var(--lf-text-muted)] whitespace-nowrap">
-                    {building.machineCount.toLocaleString("th-TH")}
+                    {zone.machineCount.toLocaleString("th-TH")}
                   </span>
                 </button>
               );
@@ -590,15 +752,12 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
 
       {/* COMPACT — camera presets + quality. Below COMPACT the rail that hosts
           these controls is hidden, so rather than lose two of the four camera
-          angles they get their own horizontally scrollable row, in the same chip
-          idiom as the building row and directly beneath it (offset drops to the
-          building row's own slot when the site has no buildings to list). It is
-          width-bounded by `left-2 right-2` so it cannot bleed, its bottom edge
-          (~172px) stays far above the inspector card, and the action cluster
-          above it ends at ~66px — so it cannot overlap either. */}
+          angles they get their own horizontally scrollable row, in the same
+          chip idiom as the zone row and directly beneath it (offset drops to
+          the zone row's own slot when the site has no populated zones). */}
       <div
         className={`@min-[640px]:hidden absolute left-2 right-2 z-10 pointer-events-none ${
-          sortedBuildings.length > 0 ? "top-[132px]" : "top-[88px]"
+          sortedZones.length > 0 ? "top-[132px]" : "top-[88px]"
         }`}
       >
         <div
@@ -650,19 +809,12 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
       </div>
 
       {/* TOP-CENTER — title bar. It is centred on the CONTAINER, so the only
-          way it can never touch the left rail or the right action cluster is to
-          reserve their lanes in CSS: `max-w-[calc(100%-45rem)]` keeps the bar
-          inside a centred lane with 22.5rem (360px) clear on each side. That is
-          88px more than the rail needs (272px) and 24px more than the cluster's
-          21rem cap needs (336px), so no-overlap is geometric — it does not
-          depend on how wide the Thai/branding text happens to measure, because
-          `min-w-0` + `truncate` inside force the bar to honour the cap. Now
-          that the camera presets have moved to the rail, one reserve covers
-          every container width and the bar can return at 1024px (lane 304px,
-          comfortably more than the branding + subtitle block needs). Below that
-          a centred bar cannot coexist with the rail and the cluster, so it is
-          hidden rather than allowed to collide — it is read-only decoration and
-          no control lives in it. */}
+          way it can never touch the left rail or the right action cluster is
+          to reserve their lanes in CSS: `max-w-[calc(100%-45rem)]` keeps the
+          bar inside a centred lane with 22.5rem (360px) clear on each side.
+          Below 1024px a centred bar cannot coexist with the rail and the
+          cluster, so it is hidden rather than allowed to collide — it is
+          read-only decoration and no control lives in it. */}
       <div className="hidden @min-[1024px]:block absolute top-4 left-1/2 -translate-x-1/2 z-20 max-w-[calc(100%-45rem)] pointer-events-none">
         <div className={`${PANEL_CLASS} px-6 py-2.5 flex items-center gap-3 pointer-events-auto`}>
           <span className="relative flex h-2 w-2 shrink-0">
@@ -676,9 +828,6 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
             <div className="text-[10px] text-[var(--lf-text-muted)] leading-tight truncate">
               ผังโรงงานเสมือน 4 มิติ · อัปเดตสด
             </div>
-            <div className="text-[9px] text-[var(--lf-accent-soft)] leading-tight truncate">
-              กำลังจำลองการเดินเครื่อง · {runningMachineCount.toLocaleString("th-TH")} เครื่องทำงาน
-            </div>
           </div>
           {/* clock — only once the container is wide enough that the bar's own
               lane can hold it without truncating the branding line. Owns its
@@ -688,28 +837,17 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
         </div>
       </div>
 
-      {/* TOP-RIGHT — action cluster. Every control here is visible at every
-          CONTAINER size: the scale toggle, the fullscreen toggle (CSS-based, and
-          it covers the dashboard's own mode toggle, so a touch user must always
-          have a way out without a keyboard) and the exit button. The camera
-          presets and the quality toggle used to live here and had to be hidden
-          on anything but a very wide container, because as EDGE content they
-          collided with the centred title bar; they now live in the left rail
-          instead, which costs nothing and makes all four presets available from
-          640px up. What is left is ~19rem wide, so the cap below is never
-          reached in practice — it exists as the geometric guarantee: capped at
-          21rem, the cluster's left edge is always >= 288px (clear of the rail's
-          272px edge) and always >= 24px clear of the title bar's reserved lane.
-          Labels truncate if the cap ever bites; the fullscreen and exit hit
-          targets are shrink-0 and can never be squeezed. */}
+      {/* TOP-RIGHT — action cluster: the scale toggle, fullscreen toggle
+          (CSS-based, and it covers the dashboard's own mode toggle, so a
+          touch user must always have a way out without a keyboard) and the
+          exit button. */}
       <div
         className={`absolute top-4 right-4 z-30 ${PANEL_CLASS} p-2 flex items-center gap-1.5 max-w-[calc(100%-2rem)] @min-[640px]:max-w-[min(calc(100%-19rem),21rem)] pointer-events-auto`}
       >
         {/* Scale toggle — the rail's preset grid sets an absolute camera
             angle; this pill is the one-tap way to swap between the two very
             different SCALES, and it is the only camera control that survives
-            below COMPACT (where the rail is hidden). Visible at every CONTAINER
-            size; its label collapses to the icon below COMPACT. */}
+            below COMPACT (where the rail is hidden). */}
         <button
           type="button"
           title={scaleToggleLabel}
@@ -768,32 +906,39 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
       >
         <div className="text-[11px] text-[var(--lf-text-muted)] text-center px-3 py-1.5 rounded-full bg-[var(--lf-hint-bg)] backdrop-blur-sm text-balance">
           {/* Below COMPACT there is no left rail, so the full hint's advice to
-              pick a building "ในแผงซ้าย" would point at nothing — the compact
-              hint points at the chip row above instead, and drops the
-              mouse-only gestures that a touch container cannot perform. */}
+              pick a zone "ในแผงซ้าย" would point at nothing — the compact
+              hint points at the chip row above instead. */}
           <span className="@min-[640px]:hidden">
             ลากเพื่อหมุน · สกอร์ลเพื่อซูม · แตะเครื่องจักรเพื่อดูข้อมูล ·
-            เลือกชื่ออาคารด้านบนเพื่อบินไปที่อาคารนั้น
+            เลือกชื่อโซนด้านบนเพื่อบินไปที่โซนนั้น
           </span>
           <span className="hidden @min-[640px]:inline">
             ลากเพื่อหมุน · สกอร์ลเพื่อซูม · คลิกขวาลากเพื่อเลื่อน · คลิกเครื่องจักรเพื่อดูข้อมูล ·
-            ดับเบิลคลิกเพื่อเปิดรายละเอียด · เลือกชื่ออาคารในแผงซ้ายเพื่อบินไปที่อาคารนั้น ·
-            กด “ดูทั้งโรงงาน” เพื่อถอยออกดูผังรวมทั้งไซต์
+            ดับเบิลคลิกเพื่อเปิดรายละเอียด · เลือกชื่อโซนในแผงซ้ายเพื่อบินไปที่โซนนั้น
           </span>
         </div>
       </div>
 
-      {/* BOTTOM-RIGHT — selected machine inspector */}
-      <AnimatePresence>
-        {selectedMachine && selectedMeta && (
-          <motion.div
-            key={selectedMachine.id}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 16 }}
-            transition={{ duration: 0.2 }}
-            className={`absolute bottom-4 right-4 z-30 w-72 ${PANEL_CLASS} p-4 pointer-events-auto`}
-          >
+      {/* BOTTOM-RIGHT — selected machine inspector + ผังย่อ (roadmap step 5)
+          รวมกันเป็น flex stack เดียว (แทนที่จะ absolute-position ผังย่อแยก
+          แล้วเดาความสูงการ์ดผู้ตรวจสอบด้วยเลขพิกเซลตายตัว — การ์ดนี้สูงไม่คงที่
+          จริง เนื้อหา activeErrorCode/activeErrorDesc ยาวได้ ตัวเลขตายตัวจะ
+          ผิดพลาดได้ในบางกรณี) `flex-col-reverse` + DOM order [การ์ด, ผังย่อ]
+          ทำให้การ์ดชิดขอบล่างเสมอ (bottom-4 ของ container) และผังย่อวางซ้อน
+          ขึ้นไปด้านบนโดยอัตโนมัติไม่ว่าการ์ดจะสูงแค่ไหน — ไม่มีการ์ด (ไม่ได้
+          เลือกเครื่อง) ผังย่อก็เลื่อนลงมาชิดขอบล่างเองเพราะเป็น flex child
+          เดียวที่เหลือ ไม่ต้องมีตัวแปร/พร็อพ "มีการ์ดอยู่ไหม" คอยติดตามเลย */}
+      <div className="absolute bottom-4 right-4 z-30 flex flex-col-reverse items-end gap-3 max-w-[calc(100%-2rem)] pointer-events-none">
+        <AnimatePresence>
+          {selectedMachine && selectedMeta && (
+            <motion.div
+              key={selectedMachine.id}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              transition={{ duration: 0.2 }}
+              className={`w-72 ${PANEL_CLASS} p-4 pointer-events-auto`}
+            >
             <div className="flex items-start justify-between mb-2">
               <div>
                 <div className="text-sm font-semibold">
@@ -864,67 +1009,6 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
               </div>
             </div>
 
-            {selectedRuntime && (
-              <div className="bg-[var(--lf-box-bg)] rounded-[10px] p-2.5 mb-3">
-                <div className="flex items-center justify-between mb-2">
-                  <span
-                    className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold"
-                    style={{
-                      backgroundColor: `${ACTIVITY_COLORS[selectedRuntime.activity]}26`,
-                      color: ACTIVITY_COLORS[selectedRuntime.activity],
-                    }}
-                  >
-                    <span
-                      className="w-1.5 h-1.5 rounded-full"
-                      style={{ backgroundColor: ACTIVITY_COLORS[selectedRuntime.activity] }}
-                    />
-                    {ACTIVITY_LABELS[selectedRuntime.activity]}
-                  </span>
-                  <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-[var(--lf-accent-soft)]">
-                    <span className="relative flex h-1.5 w-1.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--lf-accent-soft)] opacity-75" />
-                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[var(--lf-accent-soft)]" />
-                    </span>
-                    สด
-                  </span>
-                </div>
-
-                <div className="mb-2">
-                  <div className="flex items-center justify-between text-[9px] text-[var(--lf-text-muted)] mb-1">
-                    <span>รอบการผลิต</span>
-                    <span>รอบละ {formatDecimal(selectedRuntime.cycleSeconds, 1)} วิ</span>
-                  </div>
-                  <div className="h-1.5 rounded-full bg-[var(--lf-bg)] overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-[var(--lf-accent-soft)]"
-                      style={{ width: `${clampPct(selectedRuntime.cycleProgress * 100)}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-1.5">
-                  <div>
-                    <div className="text-[9px] text-[var(--lf-text-muted)]">รอบ/นาที</div>
-                    <div className="text-xs font-semibold text-[var(--lf-text)]">
-                      {formatDecimal(selectedRuntime.spindleRpm, 0)}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-[9px] text-[var(--lf-text-muted)]">°C (สด)</div>
-                    <div className="text-xs font-semibold text-[var(--lf-text)]">
-                      {formatDecimal(selectedRuntime.tempC, 1)}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-[9px] text-[var(--lf-text-muted)]">มม./วินาที (สด)</div>
-                    <div className="text-xs font-semibold text-[var(--lf-text)]">
-                      {formatDecimal(selectedRuntime.vibration, 2)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -948,9 +1032,20 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
                 </button>
               )}
             </div>
-          </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        {minimapEnabled && (
+          <Minimap
+            layout={minimapLayout}
+            statusFilter={statusFilter}
+            zones={zones}
+            focusZoneId={focusZoneId}
+            onFocusZone={onFocusZone}
+            cameraTrackRef={cameraTrackRef}
+          />
         )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 }
@@ -958,10 +1053,9 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
 /**
  * Memoized so a parent re-render that leaves every prop reference unchanged
  * (e.g. an unrelated sibling state update) skips reconciling this whole
- * heavy tree. Most props are event-handler callbacks and arrays that the
- * caller only recreates when their underlying data actually changes, so the
- * default shallow-prop comparator is safe here; `simSnapshot` legitimately
- * changes every simulation tick and will still trigger a re-render then, as
- * intended.
+ * heavy tree. Every prop is now either an event-handler callback or data that
+ * only changes when the underlying DB data actually changes (no simulation
+ * snapshot ticking every frame any more), so the default shallow-prop
+ * comparator is a good fit here.
  */
 export default memo(LiveFloorHUD);

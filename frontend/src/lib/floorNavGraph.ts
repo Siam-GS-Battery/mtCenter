@@ -1,19 +1,16 @@
-import type { FloorAisle, FloorLayout, FloorRoad } from "./floorLayout";
-
 /**
  * ===========================================================================
  * FLOOR NAV GRAPH — โครงข่ายทางเดินของโรงงาน (สำหรับเดินตามถนน ไม่ตัดตรง)
  * ===========================================================================
  *
- * ผัง (`FloorLayout`) บอกไว้แล้วว่าที่ไหนเป็น "ที่ว่างที่เดินได้จริง":
- *   • `layout.aisles` — ทางเดินภายในโรง (แถบระหว่างไลน์ผลิต + ช่องว่าง
- *     ระหว่างคอลัมน์ที่ใช้เป็นทางหลักของ AGV)
- *   • `layout.roads`  — ถนนภายในไซต์ระหว่างอาคาร
- * ทั้งสองอย่างถูกวางไว้ให้ไม่ทับเครื่องจักรหรือ prop อยู่แล้ว (ดูคอมเมนต์ใน
- * floorLayout.ts) โมดูลนี้จึงแปลง "แถบ" เหล่านั้นเป็น "เส้นกลางทาง" แล้ว
- * ประกอบเป็นกราฟที่หาเส้นทางสั้นสุดได้ ผลลัพธ์คือหุ่นยนต์ตรวจเดินเลี้ยว
- * เป็นมุมฉากไปตามทางเดิน เหมือนคนเดินในโรงงานจริง ไม่ใช่ลากเส้นตรงทะลุ
- * แท่นเครื่องไปหาเป้าหมาย
+ * รับ "แถบที่เดินได้จริง" เข้ามาเป็น `NavStrip[]` ล้วนๆ (ไม่ผูกกับผังชนิดใด
+ * ชนิดหนึ่งโดยเฉพาะ) — เดิมโมดูลนี้อ่านจาก `FloorLayout.aisles`/`.roads`
+ * โดยตรง แต่ตอนนี้ผู้เรียก (lib/inspectionAgent.ts) แปลง `PlantLayout`'s
+ * `site.roads`/`site.walkways` (+ ทางเดินกลางโรงที่สังเคราะห์ขึ้น) เป็น
+ * `NavStrip[]` เองก่อนส่งเข้ามา โมดูลนี้จึงแปลง "แถบ" เหล่านั้นเป็น
+ * "เส้นกลางทาง" แล้วประกอบเป็นกราฟที่หาเส้นทางสั้นสุดได้ ผลลัพธ์คือหุ่นยนต์
+ * ตรวจเดินเลี้ยวเป็นมุมฉากไปตามทางเดิน เหมือนคนเดินในโรงงานจริง ไม่ใช่ลาก
+ * เส้นตรงทะลุแท่นเครื่องไปหาเป้าหมาย
  *
  * ข้อจำกัดที่ยอมรับไว้อย่างตั้งใจ (POC):
  *   • กราฟนี้ไม่รู้จักตัวเครื่องจักรเป็นสิ่งกีดขวาง — ความปลอดภัยมาจากการที่
@@ -21,6 +18,16 @@ import type { FloorAisle, FloorLayout, FloorRoad } from "./floorLayout";
  *   • ช่วงต่อสุดท้ายจากทางเดินเข้าไปยืนหน้าเครื่อง (ประมาณ 1–3 เมตร) ยังเป็น
  *     เส้นตรง ซึ่งตรงกับความจริงว่าคนต้องก้าวออกจากทางเดินเข้าไปหาเครื่อง
  */
+
+/** แถบที่เดินได้จริงหนึ่งแถบ (ทางเดินในโรง/ถนนในไซต์/ฯลฯ) — ไม่ผูกกับผังใดผังหนึ่ง */
+export interface NavStrip {
+  x: number;
+  z: number;
+  width: number;
+  depth: number;
+  /** true = แถบทอดตามแกน X (แนวนอน), false = ทอดตามแกน Z (แนวตั้ง) */
+  horizontal: boolean;
+}
 
 // ---------------------------------------------------------------------------
 // ชนิดข้อมูล
@@ -77,7 +84,7 @@ function nodeKey(x: number, z: number): string {
 }
 
 /** แปลงแถบทางเดิน/ถนนหนึ่งแถบเป็นเส้นกลางทาง */
-function toCentreline(strip: FloorAisle | FloorRoad): Centreline | null {
+function toCentreline(strip: NavStrip): Centreline | null {
   const length = strip.horizontal ? strip.width : strip.depth;
   if (length < MIN_LENGTH) return null;
   const half = length / 2;
@@ -110,14 +117,10 @@ function crossing(h: Centreline, v: Centreline): NavPoint | null {
  *      ผังไม่ได้ให้ประตูไว้เป็นเรขาคณิต) ด้วยสะพานสั้นสุดระหว่างสองส่วน —
  *      ถ้าไม่ทำ การเดินข้ามโรงจะหาเส้นทางไม่ได้เลยและต้องถอยไปตัดตรง
  */
-export function buildNavGraph(layout: FloorLayout): NavGraph {
+export function buildNavGraph(strips: readonly NavStrip[]): NavGraph {
   const lines: Centreline[] = [];
-  for (const aisle of layout.aisles) {
-    const line = toCentreline(aisle);
-    if (line) lines.push(line);
-  }
-  for (const road of layout.roads) {
-    const line = toCentreline(road);
+  for (const strip of strips) {
+    const line = toCentreline(strip);
     if (line) lines.push(line);
   }
 

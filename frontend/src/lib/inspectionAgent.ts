@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { FloorLayout, FloorSlot } from "./floorLayout";
-import { buildNavGraph, routeBetween, type NavGraph, type NavPoint } from "./floorNavGraph";
-import type { FloorSimulation, MachineActivity } from "./floorSimulation";
-import { ACTIVITY_LABELS } from "./floorSimulation";
+import type { PlacedMachine, PlantLayout } from "./plantLayout";
+import { buildNavGraph, routeBetween, type NavGraph, type NavPoint, type NavStrip } from "./floorNavGraph";
 import {
   SPINDLE_TEMP_ERROR,
   SPINDLE_TEMP_WARNING,
@@ -82,7 +80,8 @@ export interface InspectionStop {
   facing: number;
 }
 
-/** ผลตรวจของเครื่องหนึ่งตัว */
+/** ผลตรวจของเครื่องหนึ่งตัว — ทุกค่ามาจากฟิลด์จริงของเครื่องในฐานข้อมูล
+ *  (ไม่มี "activity"/"load" จำลองอีกต่อไป — ผังใหม่ไม่มีการจำลองการเดินเครื่อง) */
 export interface InspectionFinding {
   machineId: string;
   machineCode: string;
@@ -90,13 +89,10 @@ export interface InspectionFinding {
   zoneLabel: string;
   severity: FindingSeverity;
   status: MachineStatus;
-  activity: MachineActivity;
-  /** ค่าที่อ่านได้ขณะตรวจ (องศาเซลเซียส) */
+  /** ค่าที่บันทึกไว้ล่าสุดในฐานข้อมูล (องศาเซลเซียส) */
   tempC: number;
-  /** mm/s RMS */
+  /** mm/s RMS ที่บันทึกไว้ล่าสุดในฐานข้อมูล */
   vibration: number;
-  /** 0..1 */
-  load: number;
   healthScore: number | null;
   /** เหตุผลประกอบ (ภาษาไทย) — ว่างเมื่อทุกอย่างปกติ */
   notes: string[];
@@ -198,16 +194,7 @@ export interface InspectionAgent {
   /** true = จบรอบแล้วเริ่มรอบใหม่เองอัตโนมัติ */
   setAutoLoop(auto: boolean): void;
   /** ผังเปลี่ยน (ข้อมูลเครื่องจักรรีเฟรช) — วางแผนเส้นทางใหม่ */
-  setLayout(layout: FloorLayout): void;
-  /**
-   * เปลี่ยนตัว simulation ที่ใช้อ่านค่าเซนเซอร์
-   *
-   * `useFloorSimulation` สร้าง instance ใหม่ทุกครั้งที่ `machines` เปลี่ยน
-   * (ข้อมูลรีเฟรช) ถ้าหุ่นยนต์ผูกอายุตัวเองไว้กับ instance นั้น รายงานที่
-   * เดินสะสมมาทั้งวันจะหายไปพร้อมกับการรีเฟรชเบื้องหลังหนึ่งครั้ง — จึงรับ
-   * ตัวใหม่เข้ามาแทนที่แบบไม่รีเซ็ตสถานะตัวเอง
-   */
-  setSimulation(sim: FloorSimulation | null): void;
+  setLayout(layout: PlantLayout): void;
   /** เส้นทางที่วางไว้ (อ่านเท่านั้น) */
   route(): readonly InspectionStop[];
 }
@@ -246,6 +233,10 @@ const MAX_DT = 0.25;
 const LOG_LIMIT = 120;
 /** จำนวนรายงานที่เก็บไว้ */
 const REPORT_LIMIT = 12;
+/** ความหนาของ "กากบาททางเดินกลางโรง" ที่ใช้ประมาณทางเดินในโรง (ดู `navStripsFor`) */
+const HALL_CROSS_THICKNESS = 4;
+/** ความหนาของทางเดินนอกอาคาร (`site.walkways`) — คงที่ตามที่ `PlantEnvironment.tsx` ใช้วาด (`kit.walkway(len, 2.8)`) */
+const WALKWAY_THICKNESS = 2.8;
 
 const STATUS_LABELS: Record<MachineStatus, string> = {
   normal: "ปกติ",
@@ -337,26 +328,26 @@ function periodLabelFor(scope: InspectionScope, now: Date): string {
 /**
  * จุดยืนตรวจของเครื่องหนึ่งตัว
  *
- * `slot.rotationY` ทำให้เครื่องหันหน้าเข้าหาสายพานกลางไลน์เสมอ ดังนั้นทิศ
- * "ด้านหน้าเครื่อง" คือ (sin, cos) ของมุมนั้น และด้านที่เป็นทางเดิน (aisle)
- * คือทิศตรงข้าม — หุ่นยนต์จึงยืนด้านทางเดินแล้วหันหน้ากลับเข้าหาเครื่อง
- * เพื่อไม่ไปยืนทับสายพานหรือแทรกกลางไลน์
+ * `machine.rotationY` ทำให้เครื่องหันหน้าไปทางหนึ่งเสมอ (ตาม `buildPlantLayout`)
+ * ดังนั้นทิศ "ด้านหน้าเครื่อง" คือ (sin, cos) ของมุมนั้น และด้านตรงข้ามคือด้าน
+ * ที่หุ่นยนต์ควรยืน — หุ่นยนต์จึงยืนด้านหลังแล้วหันหน้ากลับเข้าหาเครื่อง
+ * เพื่อไม่ไปยืนทับตัวเครื่อง
  */
-function standPointFor(slot: FloorSlot): {
+function standPointFor(machine: PlacedMachine): {
   standX: number;
   standZ: number;
   laneX: number;
   laneZ: number;
   facing: number;
 } {
-  const nx = -Math.sin(slot.rotationY);
-  const nz = -Math.cos(slot.rotationY);
-  const half = Math.max(slot.depth, slot.width) / 2;
+  const nx = -Math.sin(machine.rotationY);
+  const nz = -Math.cos(machine.rotationY);
+  const half = Math.max(machine.depth, machine.width) / 2;
   return {
-    standX: slot.x + nx * (half + STAND_CLEARANCE),
-    standZ: slot.z + nz * (half + STAND_CLEARANCE),
-    laneX: slot.x + nx * (half + LANE_CLEARANCE),
-    laneZ: slot.z + nz * (half + LANE_CLEARANCE),
+    standX: machine.x + nx * (half + STAND_CLEARANCE),
+    standZ: machine.z + nz * (half + STAND_CLEARANCE),
+    laneX: machine.x + nx * (half + LANE_CLEARANCE),
+    laneZ: machine.z + nz * (half + LANE_CLEARANCE),
     // หันกลับเข้าหาเครื่อง = ทิศตรงข้ามกับ normal ที่ใช้ถอยออกมา
     facing: Math.atan2(-nx, -nz),
   };
@@ -368,24 +359,25 @@ function standPointFor(slot: FloorSlot): {
  * ผังจริงมีเครื่องหลายร้อยตัว ถ้าเดินทุกตัวรอบหนึ่งจะยาวเกินกว่าจะดูรู้เรื่อง
  * ในการนำเสนอ จึงเลือกแบบ "ของสำคัญต้องครบ": ทุกเครื่องที่สถานะไม่ปกติเข้า
  * เส้นทางก่อนทั้งหมด แล้วเติมเครื่องปกติแบบกระจายทุกโซนจนครบโควตา จากนั้น
- * จัดลำดับเดินตามโซน -> ไลน์ -> ลำดับในไลน์ เพื่อให้เส้นทางดูเป็นระบบ
- * ไม่ใช่วิ่งข้ามโรงไปกลับ
+ * จัดลำดับเดินตามโซน -> ไลน์ -> รหัสเครื่อง เพื่อให้เส้นทางดูเป็นระบบ
+ * ไม่ใช่วิ่งข้ามโรงไปกลับ (ผังใหม่ไม่มี `indexInLine` — ใช้รหัสเครื่อง/ชื่อ
+ * แทนเป็นตัวจัดลำดับรอง)
  */
-function planRoute(layout: FloorLayout, maxStops: number): InspectionStop[] {
-  const slots = layout.slots;
-  if (slots.length === 0) return [];
+function planRoute(layout: PlantLayout, maxStops: number): InspectionStop[] {
+  const machines = layout.machines;
+  if (machines.length === 0) return [];
 
-  const zoneLabel = new Map(layout.zones.map((z) => [z.id, z.label]));
+  const zoneLabel = new Map(layout.site.zones.map((z) => [z.id, z.name]));
 
-  const abnormal: FloorSlot[] = [];
-  const normalByZone = new Map<string, FloorSlot[]>();
-  for (const slot of slots) {
-    if (slot.machine.status === "normal") {
-      const list = normalByZone.get(slot.zoneId);
-      if (list) list.push(slot);
-      else normalByZone.set(slot.zoneId, [slot]);
+  const abnormal: PlacedMachine[] = [];
+  const normalByZone = new Map<string, PlacedMachine[]>();
+  for (const pm of machines) {
+    if (pm.machine.status === "normal") {
+      const list = normalByZone.get(pm.zoneId);
+      if (list) list.push(pm);
+      else normalByZone.set(pm.zoneId, [pm]);
     } else {
-      abnormal.push(slot);
+      abnormal.push(pm);
     }
   }
 
@@ -395,7 +387,7 @@ function planRoute(layout: FloorLayout, maxStops: number): InspectionStop[] {
     return machineLabel(a.machine).localeCompare(machineLabel(b.machine), "th");
   });
 
-  const picked: FloorSlot[] = abnormal.slice(0, maxStops);
+  const picked: PlacedMachine[] = abnormal.slice(0, maxStops);
 
   // เติมเครื่องปกติแบบวนรอบทุกโซน (round-robin) ให้รายงานครอบคลุมทุกโรง
   // ไม่ใช่กระจุกอยู่โซนแรก
@@ -407,7 +399,7 @@ function planRoute(layout: FloorLayout, maxStops: number): InspectionStop[] {
       const zoneId = zoneIds[cursor % zoneIds.length];
       const list = normalByZone.get(zoneId);
       if (list && list.length > 0) {
-        picked.push(list.shift() as FloorSlot);
+        picked.push(list.shift() as PlacedMachine);
         exhausted = 0;
       } else {
         exhausted += 1;
@@ -416,19 +408,55 @@ function planRoute(layout: FloorLayout, maxStops: number): InspectionStop[] {
     }
   }
 
-  // จัดลำดับการเดินให้เป็นระบบ: โซน -> ไลน์ -> ลำดับในไลน์
+  // จัดลำดับการเดินให้เป็นระบบ: โซน -> ไลน์ -> รหัส/ชื่อเครื่อง
   picked.sort((a, b) => {
     if (a.zoneId !== b.zoneId) return a.zoneId.localeCompare(b.zoneId);
     if (a.lineId !== b.lineId) return a.lineId.localeCompare(b.lineId);
-    return a.indexInLine - b.indexInLine;
+    return machineLabel(a.machine).localeCompare(machineLabel(b.machine), "th");
   });
 
-  return picked.map((slot) => ({
-    machine: slot.machine,
-    zoneId: slot.zoneId,
-    zoneLabel: zoneLabel.get(slot.zoneId) ?? slot.zoneId,
-    ...standPointFor(slot),
+  return picked.map((pm) => ({
+    machine: pm.machine,
+    zoneId: pm.zoneId,
+    zoneLabel: zoneLabel.get(pm.zoneId) ?? pm.zoneId,
+    ...standPointFor(pm),
   }));
+}
+
+/**
+ * แปลง `PlantLayout` ให้เป็นแถบที่เดินได้จริง (`NavStrip[]`) สำหรับ
+ * `buildNavGraph` — ผังใหม่ (`buildPlantLayout`) ไม่มี aisle/road ที่เป็น
+ * "แถบพื้นที่เดินได้" ล้วนๆ เหมือน `FloorLayout` เดิม (ทางเดินในโรงจริงตาม
+ * แนวไลน์ผลิตถูกวาดตรงใน `PlantEnvironment.tsx` เท่านั้น ไม่ได้ส่งออกมาเป็น
+ * ข้อมูล) จึงประมาณทางเดินภายในโรงด้วย "กากบาททางเดินกลางโรง" หนึ่งคู่
+ * (แนวนอน+แนวตั้งผ่านกึ่งกลางโรงพอดี) แล้วต่อกับถนน/ทางเดินจริงของไซต์
+ * (`site.roads`, `site.walkways`) ด้วยสะพานอัตโนมัติของ `buildNavGraph`
+ *
+ * ข้อจำกัดที่ยอมรับไว้ (เทียบกับผังเดิม): หุ่นยนต์อาจเดินตัดพื้นที่โล่งระหว่าง
+ * กากบาทกลางโรงกับจุดยืนตรวจเครื่อง แทนที่จะเดินตามทางเดินจริงข้างไลน์ผลิต
+ * ทุกช่วง — ยังคงเลี้ยวเป็นมุมฉากและไม่ทะลุกำแพง/ถนนนอกไซต์ แต่ความสมจริง
+ * ของเส้นทางในโรงต่ำกว่าผังเดิมเล็กน้อย
+ */
+function navStripsFor(layout: PlantLayout): NavStrip[] {
+  const strips: NavStrip[] = [];
+  const { w, d } = layout.hall;
+  strips.push({ x: 0, z: 0, width: w, depth: HALL_CROSS_THICKNESS, horizontal: true });
+  strips.push({ x: 0, z: 0, width: HALL_CROSS_THICKNESS, depth: d, horizontal: false });
+  for (const road of layout.site.roads) {
+    strips.push(
+      road.dir === "x"
+        ? { x: road.x, z: road.z, width: road.len, depth: road.w, horizontal: true }
+        : { x: road.x, z: road.z, width: road.w, depth: road.len, horizontal: false }
+    );
+  }
+  for (const wk of layout.site.walkways) {
+    strips.push(
+      wk.dir === "x"
+        ? { x: wk.x, z: wk.z, width: wk.len, depth: WALKWAY_THICKNESS, horizontal: true }
+        : { x: wk.x, z: wk.z, width: WALKWAY_THICKNESS, depth: wk.len, horizontal: false }
+    );
+  }
+  return strips;
 }
 
 // ---------------------------------------------------------------------------
@@ -436,26 +464,18 @@ function planRoute(layout: FloorLayout, maxStops: number): InspectionStop[] {
 // ---------------------------------------------------------------------------
 
 /**
- * ประเมินเครื่องหนึ่งตัวจากค่าที่ "อ่านได้" ตอนไปยืนหน้าเครื่อง
+ * ประเมินเครื่องหนึ่งตัวจากค่าที่บันทึกไว้ล่าสุดในฐานข้อมูล
  *
- * ใช้ค่าจาก simulation (อุณหภูมิ/ความสั่น/โหลดที่วิ่งอยู่จริงในฉาก) เป็นหลัก
- * และถอยไปใช้ค่าที่บันทึกไว้ในฐานข้อมูลเมื่อเครื่องนั้นไม่มี runtime — เกณฑ์
- * ตัดสินทุกตัวมาจาก `lib/thresholds` ตัวเดียวกับที่หน้าอื่นใช้ จะได้ไม่เกิด
- * กรณี "หน้านี้ว่าเฝ้าระวัง หน้านั้นว่าปกติ"
+ * ผังใหม่ไม่มีการจำลองการเดินเครื่อง (`floorSimulation.ts` ถูกลบทิ้งไปพร้อม
+ * ผังเก่า) จึงอ่านค่าอุณหภูมิ/ความสั่นจากฟิลด์จริงของเครื่องโดยตรง แทนที่จะ
+ * มีค่า "สด" ที่วิ่งอยู่ในฉากให้ถอยกลับไปใช้ — เกณฑ์ตัดสินทุกตัวยังคงมาจาก
+ * `lib/thresholds` ตัวเดียวกับที่หน้าอื่นใช้ จะได้ไม่เกิดกรณี
+ * "หน้านี้ว่าเฝ้าระวัง หน้านั้นว่าปกติ"
  */
-function evaluate(stop: InspectionStop, sim: FloorSimulation | null): InspectionFinding {
+function evaluate(stop: InspectionStop): InspectionFinding {
   const machine = stop.machine;
-  const runtime = sim?.getRuntime(machine.id);
-  const tempC = runtime?.tempC ?? machine.spindleTemp ?? 0;
-  const vibration = runtime?.vibration ?? machine.vibrationMms ?? 0;
-  const load = runtime?.load ?? 0;
-  const activity: MachineActivity =
-    runtime?.activity ??
-    (machine.status === "error"
-      ? "down"
-      : machine.status === "maintenance"
-      ? "maintenance"
-      : "idle");
+  const tempC = machine.spindleTemp ?? 0;
+  const vibration = machine.vibrationMms ?? 0;
 
   const notes: string[] = [];
   let severity: FindingSeverity = "ok";
@@ -499,13 +519,6 @@ function evaluate(stop: InspectionStop, sim: FloorSimulation | null): Inspection
     notes.push(`ความสั่น ${fmt(vibration, 2)} mm/s หลุดโซน A/B ตาม ISO 10816-3`);
   }
 
-  if (activity === "down") {
-    raise("alert");
-    notes.push("ขณะตรวจเครื่องหยุดเดิน");
-  } else if (activity === "idle" && machine.status === "normal") {
-    notes.push("เครื่องรอคอยงาน ไม่พบความผิดปกติ");
-  }
-
   return {
     machineId: machine.id,
     machineCode: machineLabel(machine),
@@ -513,10 +526,8 @@ function evaluate(stop: InspectionStop, sim: FloorSimulation | null): Inspection
     zoneLabel: stop.zoneLabel,
     severity,
     status: machine.status,
-    activity,
     tempC,
     vibration,
-    load,
     healthScore: machine.healthScore,
     notes,
   };
@@ -682,8 +693,7 @@ export function reportToText(report: InspectionReport): string {
  * ของ field ไว้ใช้ข้ามเฟรม
  */
 export function createInspectionAgent(
-  layout: FloorLayout,
-  sim: FloorSimulation | null,
+  layout: PlantLayout,
   options?: InspectionAgentOptions
 ): InspectionAgent {
   const maxStops = Math.max(1, options?.maxStops ?? DEFAULT_MAX_STOPS);
@@ -692,48 +702,52 @@ export function createInspectionAgent(
   const loopPause = options?.loopPauseSeconds ?? DEFAULT_LOOP_PAUSE;
 
   let currentLayout = layout;
-  let currentSim = sim;
   /**
    * โครงข่ายทางเดินของผังปัจจุบัน — สร้างครั้งเดียวต่อผัง (ไม่ใช่ต่อรอบตรวจ
    * และไม่ใช่ต่อเฟรม) หุ่นยนต์เดินตามกราฟนี้เท่านั้น จึงเลี้ยวเป็นมุมฉากไป
-   * ตามทางเดิน/ถนน ไม่ตัดตรงทะลุแท่นเครื่อง
+   * ตามทางเดิน/ถนน ไม่ตัดตรงทะลุแท่นเครื่อง (ดู `navStripsFor` — ผังใหม่
+   * ประมาณทางเดินในโรงด้วยกากบาทกลางโรง แทนแถบทางเดินจริงตามแนวไลน์)
    */
-  let navGraph: NavGraph | null = buildNavGraph(currentLayout);
+  let navGraph: NavGraph | null = buildNavGraph(navStripsFor(currentLayout));
   let route: InspectionStop[] = planRoute(currentLayout, maxStops);
-  let totalMachines = currentLayout.slots.length;
+  let totalMachines = currentLayout.machines.length;
 
   /**
-   * จุดตั้งต้น/จุดกลับมาสรุปรายงาน — ป้ายชื่อโรง (sign) หน้าอาคารผลิตหลัก
-   * (อาคารที่มีจำนวนเครื่องจักรมากที่สุด) แทนที่จะเป็นขอบไซต์หน้าประตูโรงงาน
-   * เดิม เพื่อให้หุ่นเริ่ม/จบรอบตรงหน้าตึกที่มันจะเดินเข้าไปตรวจจริง ๆ
+   * จุดตั้งต้น/จุดกลับมาสรุปรายงาน — ผังใหม่ไม่มีอาคาร/ป้ายชื่อโรงเป็นข้อมูล
+   * แยกต่างหาก (ไม่มี `FloorBuilding`/prop "sign" อีกต่อไป) จึงใช้ขอบของโซน
+   * ที่มีเครื่องจักรมากที่สุด (`site.zones`) แทน — ยืนอยู่ริมโซนนั้น หันเข้า
+   * หาตัวโซน
    */
   let homeX = 0;
   let homeZ = 0;
-  /** ทิศที่หุ่นหันตอนอยู่บ้าน — หันเข้าหาตัวอาคาร (ทิศ +Z จากป้ายหน้าโรง) */
+  /** ทิศที่หุ่นหันตอนอยู่บ้าน */
   let homeYaw = 0;
   function recomputeHome() {
-    // อาคารผลิตหลัก = อาคารที่มีเครื่องจักรเยอะที่สุดในผังปัจจุบัน
-    const productionBuilding = currentLayout.buildings.reduce<
-      (typeof currentLayout.buildings)[number] | null
-    >((best, b) => (best === null || b.machineCount > best.machineCount ? b : best), null);
-
-    if (productionBuilding) {
-      // ป้ายชื่อโรง (kind: "sign") ถูกวางไว้ที่ขอบด้าน -Z ของอาคารนั้นพอดี
-      // (ดู floorLayout.ts: `SIGN_${hall.id}`) — ถ้ามีป้ายจริงให้ยืนหน้าป้าย
-      const sign = currentLayout.props.find((p) => p.id === `SIGN_${productionBuilding.id}`);
-      if (sign) {
-        homeX = sign.x;
-        homeZ = sign.z + 1; // ยืนถัดจากป้ายเล็กน้อย ไม่ทับป้าย
-      } else {
-        // ไม่มีป้ายชัดเจน → ใช้ขอบด้านหน้า/ทางเข้าของอาคารผลิตแทน
-        homeX = productionBuilding.x;
-        homeZ = productionBuilding.z - productionBuilding.depth / 2;
+    // โซนที่มีเครื่องจักรเยอะที่สุดในผังปัจจุบัน
+    const counts = new Map<string, number>();
+    for (const m of currentLayout.machines) {
+      counts.set(m.zoneId, (counts.get(m.zoneId) ?? 0) + 1);
+    }
+    let bestZoneId: string | null = null;
+    let bestCount = 0;
+    for (const [id, count] of counts) {
+      if (count > bestCount) {
+        bestCount = count;
+        bestZoneId = id;
       }
-      homeYaw = 0; // หันเข้าหาตัวอาคาร (ทิศ +Z)
+    }
+    const zone = bestZoneId
+      ? currentLayout.site.zones.find((z) => z.id === bestZoneId) ?? null
+      : null;
+
+    if (zone) {
+      homeX = zone.x;
+      homeZ = zone.z + zone.d / 2 + 3; // ยืนถัดจากขอบโซนเล็กน้อย
+      homeYaw = Math.PI; // หันกลับเข้าหาโซน
     } else {
-      // ไม่มีอาคารเลย (ผังว่าง) — สำรองกลับไปที่ขอบไซต์ด้านหน้าเหมือนเดิม
+      // ไม่มีเครื่องจักรเลย (ผังว่าง) — สำรองกลับไปที่ขอบโรงหน้าประตูเหมือนเดิม
       homeX = 0;
-      homeZ = Math.max(6, currentLayout.site.depth / 2 - 4);
+      homeZ = currentLayout.hall.d / 2 + 6;
       homeYaw = Math.PI;
     }
     // ดึงจุดตั้งต้นเข้ามาอยู่บนโครงข่ายทางเดิน (ถนน/ทางเดินหน้าโรง) — ถ้าปล่อยให้
@@ -857,7 +871,7 @@ export function createInspectionAgent(
     dwellLeft = 0;
     pauseLeft = 0;
     route = planRoute(currentLayout, maxStops);
-    totalMachines = currentLayout.slots.length;
+    totalMachines = currentLayout.machines.length;
 
     if (route.length === 0) {
       phase = "done";
@@ -880,7 +894,7 @@ export function createInspectionAgent(
   /** ตรวจเครื่องที่จุดปัจจุบันแล้วบันทึกผล */
   function inspectCurrent() {
     const stop = route[stopIndex];
-    const finding = evaluate(stop, currentSim);
+    const finding = evaluate(stop);
     findings.push(finding);
 
     const head = `${finding.machineCode} · ${stop.zoneLabel}`;
@@ -893,10 +907,7 @@ export function createInspectionAgent(
     } else {
       pushLog(
         "check",
-        `${head} — ปกติ (${ACTIVITY_LABELS[finding.activity]}, ${fmt(finding.tempC)}°C, ${fmt(
-          finding.vibration,
-          2
-        )} mm/s)`
+        `${head} — ปกติ (${fmt(finding.tempC)}°C, ${fmt(finding.vibration, 2)} mm/s)`
       );
       bubble = `${finding.machineCode} ปกติ`;
     }
@@ -1045,14 +1056,11 @@ export function createInspectionAgent(
     setAutoLoop(auto) {
       autoLoop = auto;
     },
-    setSimulation(nextSim) {
-      currentSim = nextSim;
-    },
     setLayout(nextLayout) {
       currentLayout = nextLayout;
-      navGraph = buildNavGraph(currentLayout);
+      navGraph = buildNavGraph(navStripsFor(currentLayout));
       recomputeHome();
-      totalMachines = nextLayout.slots.length;
+      totalMachines = nextLayout.machines.length;
       // รอบที่เดินอยู่ยังใช้เส้นทางเดิม (ไม่ยกหุ่นไปวางที่ใหม่กลางรอบ);
       // รอบถัดไปจึงจะวางแผนใหม่จากผังใหม่
       if (phase === "idle") {
@@ -1080,18 +1088,17 @@ export function createInspectionAgent(
  * ปลุก React ให้ re-render พาเนลรายงานเป็นจังหวะที่อ่านได้สบายตา
  */
 export function useInspectionAgent(
-  layout: FloorLayout,
-  sim: FloorSimulation | null,
+  layout: PlantLayout,
   options?: InspectionAgentOptions & { hz?: number }
 ): { agent: InspectionAgent; snapshot: InspectorSnapshot; tick: number } {
   const hz = clamp(options?.hz ?? 4, 1, 15);
 
-  // หุ่นยนต์ตัวเดียวตลอดอายุของหน้านี้ — ทั้ง `layout` และ `sim` ถูกสร้างใหม่
-  // ทุกครั้งที่ข้อมูลเครื่องจักรรีเฟรช ถ้าผูกอายุหุ่นไว้กับตัวใดตัวหนึ่ง
-  // รายงานที่เดินสะสมมาจะหายไปพร้อมการรีเฟรชเบื้องหลังหนึ่งครั้ง จึงส่งของ
-  // ใหม่เข้าไปแทนที่ผ่าน setLayout/setSimulation ด้านล่างแทน
+  // หุ่นยนต์ตัวเดียวตลอดอายุของหน้านี้ — `layout` ถูกสร้างใหม่ทุกครั้งที่
+  // ข้อมูลเครื่องจักรรีเฟรช ถ้าผูกอายุหุ่นไว้กับมัน รายงานที่เดินสะสมมาจะ
+  // หายไปพร้อมการรีเฟรชเบื้องหลังหนึ่งครั้ง จึงส่งของใหม่เข้าไปแทนที่ผ่าน
+  // setLayout ด้านล่างแทน
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const agent = useMemo(() => createInspectionAgent(layout, sim, options), []);
+  const agent = useMemo(() => createInspectionAgent(layout, options), []);
 
   const layoutRef = useRef(layout);
   useEffect(() => {
@@ -1099,13 +1106,6 @@ export function useInspectionAgent(
     layoutRef.current = layout;
     agent.setLayout(layout);
   }, [agent, layout]);
-
-  const simRef = useRef(sim);
-  useEffect(() => {
-    if (simRef.current === sim) return;
-    simRef.current = sim;
-    agent.setSimulation(sim);
-  }, [agent, sim]);
 
   const [tick, setTick] = useState(0);
   useEffect(() => {

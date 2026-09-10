@@ -17,6 +17,7 @@
     "mock:history": "tsx scripts/mock-repair-history.ts",
     "mock:maintenance-fleet": "tsx scripts/mock-maintenance-fleet.ts",
     "mock:demo-telemetry": "tsx scripts/mock-demo-telemetry.ts",
+    "mock:machine-metrics": "tsx scripts/mock-machine-metrics.ts",
     "index:manuals": "tsx scripts/index-manuals.ts",
     "check:intents": "tsx scripts/check-intents.ts",
     "seed:review-queue": "tsx scripts/seed-review-queue.ts",

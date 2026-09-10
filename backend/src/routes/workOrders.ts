@@ -346,6 +346,107 @@ async function fetchAllWorkOrderStatRows(filters: {
   return rows;
 }
 
+type WorkOrderStatByMachineRow = {
+  machine_code: string | null;
+  status: string | null;
+  mtloss_min: number | string | null;
+  repair_duration_min: number | string | null;
+};
+
+// Same paging shape as fetchAllWorkOrderStatRows above, but grouped by a fixed set of
+// machine codes via a single `.in("machine_code", codes)` call (paged, since
+// PostgREST caps unpaginated selects at ~1000 rows) instead of one query per code —
+// GET /stats/by-machine below needs stats for up to 100 machines in one request.
+async function fetchWorkOrderStatRowsByMachines(codes: string[]): Promise<WorkOrderStatByMachineRow[]> {
+  const PAGE_SIZE = 1000;
+  const rows: WorkOrderStatByMachineRow[] = [];
+  let from = 0;
+  for (;;) {
+    const { data, error } = await supabase
+      .from("work_orders")
+      .select("machine_code, status, mtloss_min, repair_duration_min")
+      .in("machine_code", codes)
+      .order("id", { ascending: true })
+      .range(from, from + PAGE_SIZE - 1);
+    if (error) throw new ApiError(500, error.message);
+
+    const batch = (data ?? []) as unknown as WorkOrderStatByMachineRow[];
+    rows.push(...batch);
+    if (batch.length < PAGE_SIZE) break;
+    from += PAGE_SIZE;
+  }
+  return rows;
+}
+
+interface MachineWorkOrderStats {
+  total: number;
+  open: number;
+  totalMtlossMin: number;
+  avgRepairDurationMin: number | null;
+}
+
+type MachineWorkOrderStatsMap = Record<string, MachineWorkOrderStats>;
+
+// รวมสถิติใบงานของหลายเครื่องจักรในคำขอเดียว (สำหรับหน้า dashboard หัวหน้างานที่ต้อง
+// แสดง 24 เครื่อง) แทนที่จะยิง GET /stats ทีละเครื่อง (N+1) — ต้อง register ก่อน
+// GET "/:id" เช่นเดียวกับ /stats ด้านล่าง เพราะ "stats" เป็น literal segment แรก
+// ของทั้งสอง route
+router.get(
+  "/stats/by-machine",
+  asyncHandler(async (req, res) => {
+    const codesParam = typeof req.query.codes === "string" ? req.query.codes : "";
+    const codes = codesParam
+      .split(",")
+      .map((code) => code.trim())
+      .filter((code) => code.length > 0);
+
+    if (codes.length === 0) {
+      throw new ApiError(400, "codes is required (comma-separated machine codes)");
+    }
+    if (codes.length > 100) {
+      throw new ApiError(400, "codes must not exceed 100 machine codes per request");
+    }
+
+    const result: MachineWorkOrderStatsMap = {};
+    for (const code of codes) {
+      // ทุก code ที่ขอมาต้องมี key ในผลลัพธ์เสมอ แม้ไม่มีใบงานเลย
+      result[code] = { total: 0, open: 0, totalMtlossMin: 0, avgRepairDurationMin: null };
+    }
+
+    const rows = await fetchWorkOrderStatRowsByMachines(codes);
+
+    // เก็บ sum/count แยกจาก result เพื่อไม่ให้ avgRepairDurationMin ถูกเขียนทับด้วย 0
+    // ระหว่างวนลูป (ต้องเป็น null จนกว่าจะรู้ว่ามีข้อมูลจริง)
+    const durationAcc = new Map<string, { sum: number; count: number }>();
+
+    for (const row of rows) {
+      const code = row.machine_code;
+      if (!code || !(code in result)) continue;
+      const stat = result[code];
+
+      stat.total += 1;
+      // ใช้ predicate เดียวกับ isOverdueRow/GET /stats ด้านบน: ไม่ completed = open
+      if (row.status !== "completed") stat.open += 1;
+      stat.totalMtlossMin += toNumberOrZero(row.mtloss_min);
+
+      if (row.repair_duration_min !== null && row.repair_duration_min !== undefined) {
+        const acc = durationAcc.get(code) ?? { sum: 0, count: 0 };
+        acc.sum += toNumberOrZero(row.repair_duration_min);
+        acc.count += 1;
+        durationAcc.set(code, acc);
+      }
+    }
+
+    for (const code of codes) {
+      result[code].totalMtlossMin = round2(result[code].totalMtlossMin);
+      const acc = durationAcc.get(code);
+      result[code].avgRepairDurationMin = acc ? Math.round(acc.sum / acc.count) : null;
+    }
+
+    sendSuccess(res, result);
+  })
+);
+
 // IMPORTANT: /stats must be registered before any GET "/:id" is ever added to this
 // router, otherwise Express would match "stats" as an :id param.
 router.get(

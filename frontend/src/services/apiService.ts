@@ -332,6 +332,26 @@ export function getWorkOrderStats(params: WorkOrderStatsParams = {}): Promise<Wo
   return request<WorkOrderStats>(`/api/work-orders/stats${buildQuery(params)}`);
 }
 
+/** Per-machine work-order stats — one entry of the map GET /stats/by-machine returns. */
+export interface MachineWorkOrderStats {
+  total: number;
+  open: number;
+  totalMtlossMin: number;
+  /** `null` when the machine has no work order with a recorded repair duration. */
+  avgRepairDurationMin: number | null;
+}
+
+/** Keyed by machine code — every requested code is always present as a key. */
+export type MachineWorkOrderStatsMap = Record<string, MachineWorkOrderStats>;
+
+/** Aggregate work-order stats for up to 100 machines in a single request — used
+ * by the supervisor registry so each page of cards doesn't fire N+1 requests. */
+export function getWorkOrderStatsByMachine(codes: string[]): Promise<MachineWorkOrderStatsMap> {
+  return request<MachineWorkOrderStatsMap>(
+    `/api/work-orders/stats/by-machine${buildQuery({ codes: codes.join(",") })}`
+  );
+}
+
 // ต้อง login แล้ว (ตรวจสอบผ่านเฮดเดอร์ x-user-id ฝั่ง backend) — actorId เป็น optional
 // เพื่อไม่ต้องแก้ signature ของ call site เดิมทุกที่ ถ้าไม่ส่งมาจะใช้ id ที่ set ไว้ล่าสุด
 // ผ่าน setCurrentUserId() แทน

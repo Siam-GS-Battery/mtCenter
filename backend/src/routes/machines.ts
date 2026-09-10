@@ -341,7 +341,23 @@ router.get(
       hours = Math.min(parsedHours, MAX_READINGS_HOURS);
     }
 
-    const sinceIso = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+    // ข้อมูล telemetry ถูก seed ไว้ล่วงหน้า ไม่ได้เขียนต่อเนื่องแบบ real-time
+    // ดังนั้นแถวล่าสุดอาจเก่ากว่าปัจจุบันหลายชั่วโมง หากใช้ Date.now() เป็นจุดอ้างอิง
+    // ช่วงเวลาที่คำนวณได้อาจไม่ครอบคลุมข้อมูลใด ๆ เลย จึงต้องยึดจุดอ้างอิง (anchor)
+    // จากเวลาของแถวล่าสุดที่มีอยู่จริงแทน
+    const { data: latestReadingRow, error: latestReadingError } = await supabase
+      .from("telemetry_readings")
+      .select("recorded_at")
+      .eq("machine_id", req.params.id)
+      .eq("metric", dbMetric)
+      .order("recorded_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (latestReadingError) throw new ApiError(500, latestReadingError.message);
+
+    const latestRecordedAt = latestReadingRow?.recorded_at;
+    const anchorMs = latestRecordedAt ? new Date(latestRecordedAt).getTime() : Date.now();
+    const sinceIso = new Date(anchorMs - hours * 60 * 60 * 1000).toISOString();
 
     const { data, error } = await supabase
       .from("telemetry_readings")

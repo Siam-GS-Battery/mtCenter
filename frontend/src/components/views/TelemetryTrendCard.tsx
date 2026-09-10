@@ -51,11 +51,16 @@ const RANGE_OPTIONS: { hours: RangeHours; label: string }[] = [
 
 /**
  * The seeded telemetry history ends at migration time and nothing writes readings
- * continuously yet, so a 24-hour default would render an empty chart for every
- * machine a couple of days after deploy. 7 days is the shortest window that still
- * contains data in practice; 24 ชม. stays selectable.
+ * continuously yet. The backend now anchors the `hours` window to the newest
+ * available reading rather than wall-clock now, so every range (24 ชม. included)
+ * returns data — it just may not be recent. 7 days stays the default for a wider
+ * first view; see formatDataFreshness below for surfacing how stale it is.
  */
 const DEFAULT_RANGE_HOURS: RangeHours = 168;
+
+/** Beyond this age, the newest reading is stale enough that the chart could look
+ *  "live" while actually anchored in the past — worth a note near the controls. */
+const STALE_DATA_THRESHOLD_MS = 2 * 60 * 60 * 1000;
 
 const METRIC_META: Record<
   TelemetryMetric,
@@ -143,6 +148,29 @@ function formatTimestamp(iso: string, hours: RangeHours): string {
     return date.toLocaleString("th-TH", { hour: "2-digit", minute: "2-digit", hour12: false });
   }
   return date.toLocaleString("th-TH", { day: "numeric", month: "short" });
+}
+
+/**
+ * Tells the user how current the chart is. The range window is now anchored to
+ * the newest reading, not to wall-clock now, so "24 ชม." can silently return a
+ * window that ended days ago — returns null when the data is fresh (or there is
+ * none) so the card stays quiet in the common case.
+ */
+function formatDataFreshness(newestRecordedAt: string | undefined): string | null {
+  if (!newestRecordedAt) return null;
+  const newest = new Date(newestRecordedAt);
+  const ageMs = Date.now() - newest.getTime();
+  if (ageMs <= STALE_DATA_THRESHOLD_MS) return null;
+  const ageHours = ageMs / (60 * 60 * 1000);
+  const ageLabel = ageHours >= 24 ? `เก่า ${Math.floor(ageHours / 24)} วัน` : `เก่า ${Math.floor(ageHours)} ชม.`;
+  const timestamp = newest.toLocaleString("th-TH", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  return `ข้อมูลล่าสุด ${timestamp} (${ageLabel})`;
 }
 
 /**
@@ -239,6 +267,11 @@ export const TelemetryTrendCard: React.FC<TelemetryTrendCardProps> = ({ machines
     [readings, hours]
   );
 
+  const dataFreshness = useMemo(
+    () => formatDataFreshness(chartData[chartData.length - 1]?.recordedAt),
+    [chartData]
+  );
+
   const yDomain = useMemo((): [number, number] => {
     const values = chartData.map((d) => d.value);
     const dataMin = values.length > 0 ? Math.min(...values) : meta.warning;
@@ -289,6 +322,7 @@ export const TelemetryTrendCard: React.FC<TelemetryTrendCardProps> = ({ machines
           <p className="text-xs text-ink-faint">
             เลือกเครื่องจักรเพื่อดูแนวโน้มย้อนหลังเทียบกับเกณฑ์เฝ้าระวัง
           </p>
+          {dataFreshness && <p className="text-xs text-ink-faint">{dataFreshness}</p>}
         </div>
 
         <div className="flex flex-col md:flex-row md:items-center gap-3">

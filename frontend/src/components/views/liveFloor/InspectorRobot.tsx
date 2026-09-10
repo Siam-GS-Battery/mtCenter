@@ -69,12 +69,17 @@ const BOB = 0.045;
 // พื้น ไม่พึ่ง emissive จ้า (ดูหัวไฟล์ liveFloorTheme.ts)
 // ---------------------------------------------------------------------------
 
-const SHELL_COLOR = "#f7f9fc";
+// เดิม "#f7f9fc" เกือบขาวสนิท คอนทราสต์กับพื้น #f4f5f7 อยู่แค่ ~1.03:1
+// (มองไม่เห็นตัวหุ่นบนพื้น) — เปลี่ยนมาใช้ machineSteel ของธีม (เข้มกว่าพื้น
+// ชัดเจน ~1.5:1 และยังคงเป็นเปลือกสีอ่อนสไตล์โลโก้ ไม่ใช่โทนเข้มจัด)
+const SHELL_COLOR = LIVE_FLOOR_THEME.machineSteel;
 const SHELL_TRIM = LIVE_FLOOR_THEME.machineSteelDark;
 const BODY_COLOR = LIVE_FLOOR_THEME.accent;
 const EYE_COLOR = "#1a4b8c";
 const EYE_GLASS = "#2997ff";
-const ANTENNA_BULB = "#0066cc";
+// เดิม hardcode "#0066cc" ซึ่งตรงกับสี accent ของธีมเก่า (dark blue) เป๊ะ —
+// เปลี่ยนมา derive จาก LIVE_FLOOR_THEME.accent ให้เป็น single source of truth
+const ANTENNA_BULB = LIVE_FLOOR_THEME.accent;
 const VEST_COLOR = LIVE_FLOOR_THEME.hazard;
 
 /** สีวงแหวนใต้เท้าตามสิ่งที่หุ่นกำลังทำ */

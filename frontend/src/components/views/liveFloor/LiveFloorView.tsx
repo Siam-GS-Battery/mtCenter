@@ -3,17 +3,33 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
-import { Loader2, MonitorX, RotateCcw } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Info,
+  Loader2,
+  MonitorX,
+  RotateCcw,
+  Warehouse,
+} from "lucide-react";
 import { Machine, MachineStats, MachineStatus, WorkOrder } from "../../../types";
-import { buildFloorLayout } from "../../../lib/floorLayout";
-import { useFloorSimulation } from "../../../lib/floorSimulation";
+import { buildPlantLayout } from "../../../lib/plantLayout";
 import { useInspectionAgent } from "../../../lib/inspectionAgent";
 import PixelAILogo from "../../PixelAILogo";
-import LiveFloorHUD, { FloorCameraPreset } from "./LiveFloorHUD";
+import LiveFloorHUD, { type PlantZoneSummary } from "./LiveFloorHUD";
+import { type MinimapCameraSample } from "./Minimap";
 import InspectorPanel from "./InspectorPanel";
+import InspectorRobot from "./InspectorRobot";
 import { LIVE_FLOOR_THEME } from "./liveFloorTheme";
+import FloorScene from "./scene/FloorScene";
+import {
+  REFERENCE_SITE_SIZE,
+  type CameraFocusBox,
+  type PlantCameraPreset,
+} from "./scene/sceneConfig";
 
 /**
  * CSS custom properties for the Live Floor dark palette, applied once on the
@@ -58,7 +74,19 @@ const LIVE_FLOOR_THEME_VARS = {
   "--lf-danger-40": `${LIVE_FLOOR_THEME.hud.danger}61`,
 } as React.CSSProperties;
 
-const LiveFloor4DScene = React.lazy(() => import("./LiveFloor4DScene"));
+/**
+ * error > warning > maintenance > normal — the zone navigator's "worst
+ * status wins" triage order. Kept in sync with the identical map in
+ * `LiveFloorHUD.tsx`; duplicated (not imported) because it is a two-line
+ * constant and importing it would couple this file's zone-summarising logic
+ * to the HUD's internal module layout for no real benefit.
+ */
+const STATUS_SEVERITY: Record<MachineStatus, number> = {
+  error: 3,
+  warning: 2,
+  maintenance: 1,
+  normal: 0,
+};
 
 export interface LiveFloorViewProps {
   machines: Machine[];
@@ -74,10 +102,14 @@ export interface LiveFloorViewProps {
   onOpenMachineDetail: (machine: Machine) => void;
   onExit: () => void;
   onAskAI?: (prompt: string) => void;
-  /** true while the machine-detail modal (owned by the parent dashboard) is open.
-   * Passed down to the 3D scene so its floating `<Html>` name labels hide instead
-   * of painting on top of the modal (drei's Html escapes the app's stacking
-   * context and would otherwise always sit above it). */
+  /**
+   * true while the machine-detail modal (owned by the parent dashboard) is
+   * open. The old scene used this to hide floating `<Html>` name labels so
+   * they wouldn't paint on top of the modal — the new reference-look kit
+   * (`plantMachinesKit.js`) bakes machine names into plaque meshes instead of
+   * DOM `<Html>` overlays, so there is nothing left in the scene that needs
+   * hiding. Kept in the prop type only so the call site doesn't need editing.
+   */
   detailOpen?: boolean;
 }
 
@@ -92,8 +124,7 @@ export interface LiveFloorViewProps {
  * creating WebGL context.") therefore surfaces as an unhandled promise
  * rejection, NOT as a React render error the boundary can catch. So the probe
  * stays as the gate for "this browser genuinely cannot do WebGL", while
- * `SceneErrorBoundary` covers render-time three.js crashes and the canvas'
- * own `webglcontextlost` covers a context dying mid-session.
+ * `SceneErrorBoundary` covers render-time three.js crashes.
  *
  * CRITICAL: the probe context MUST be handed back. Browsers cap the number of
  * LIVE WebGL contexts per page (Chrome ~16) and only reclaim an abandoned one
@@ -153,7 +184,7 @@ class SceneErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: unknown, info: unknown) {
-    console.error("[LiveFloor4DScene] render error", error, info);
+    console.error("[LiveFloorView] plant scene render error", error, info);
   }
 
   render() {
@@ -259,7 +290,8 @@ function WebGLUnavailablePanel({
 
 /**
  * Shown while the canvas' context is lost. The scene stays MOUNTED underneath
- * so the browser can still fire `webglcontextrestored` and we can resume
+ * (see `PlantSceneShell`'s `onContextLost`/`onContextRestored`) so the
+ * browser can still fire `webglcontextrestored` and rendering can resume
  * without rebuilding anything; retry is the manual escape hatch.
  */
 function ContextLostPanel({
@@ -273,7 +305,7 @@ function ContextLostPanel({
     <FallbackCard>
       <MonitorX className="w-10 h-10 text-[var(--lf-warning)] mx-auto" />
       <p className="text-sm text-[var(--lf-warning)] font-semibold">
-        การแสดงผล 3 มิติหยุดทำงานชั่วคราว
+        การแสดงผลหยุดชั่วคราว
       </p>
       <p className="text-xs text-[var(--lf-text-muted)]">
         เบราว์เซอร์คืนหน่วยความจำกราฟิกไป มักเกิดเมื่อเปิดงาน 3 มิติพร้อมกันหลายหน้าต่าง ระบบจะกู้คืนให้เองเมื่อพร้อม
@@ -304,18 +336,13 @@ export default function LiveFloorView({
   onOpenMachineDetail,
   onExit,
   onAskAI,
-  detailOpen = false,
+  // Unused — see the prop's own doc comment. Kept so the call site (which
+  // passes it based on the parent's own modal state) doesn't need editing.
+  detailOpen: _detailOpen = false,
 }: LiveFloorViewProps) {
   const [statusFilter, setStatusFilter] = useState<MachineStatus | "all">("all");
-  const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
-  // Default to the close production-line view: at the whole-plant fit distance
-  // the machines are a few pixels tall and none of the archetype detail or
-  // animation reads. "ดูทั้งโรงงาน" in the HUD switches to the plant overview.
-  const [cameraPreset, setCameraPreset] = useState<FloorCameraPreset>("line");
-  const [highQuality, setHighQuality] = useState(true);
+  const [selectedMachineId, setSelectedMachineId] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  // null = no explicit pick; the scene falls back to `layout.focusBuildingId`.
-  const [focusBuildingId, setFocusBuildingId] = useState<string | null>(null);
   /**
    * โหมด Agent (POC): เปิดแล้วจะมีหุ่นยนต์เดินไล่ตรวจเครื่องจักรในผัง และมี
    * พาเนลแชตรายงานด้านขวา ปิดไว้เป็นค่าเริ่มต้นเพราะโหมดปกติของหน้านี้คือ
@@ -329,12 +356,35 @@ export default function LiveFloorView({
    * ปิดหุ่นจริงต้องกดปุ่ม "ปิดหุ่นยนต์" ในพาเนล ซึ่งเรียก handleStopInspector
    */
   const [inspectorPanelOpen, setInspectorPanelOpen] = useState(false);
+
+  /**
+   * "เปิดหลังคา" — ซ่อนแผ่นหลังคาอาคารไลน์ผลิต เหลือแต่โครงถัก
+   *
+   * เริ่มต้นเป็น true (เปิดอยู่) โดยเจตนา: หน้านี้มีไว้ดูสถานะเครื่องจักร ถ้า
+   * เปิดเข้ามาแล้วเห็นแต่หลังคาปิดทึบก็ไม่ได้ประโยชน์อะไร — ปิดหลังคาลงเป็น
+   * มุมมองเสริมสำหรับดูตัวอาคารทั้งหลัง ไม่ใช่ค่าเริ่มต้น
+   */
+  const [roofOpen, setRoofOpen] = useState(true);
   /**
    * true = กล้องเกาะติดตัวหุ่นไปตลอด (เปิดอัตโนมัติเมื่อคลิกที่ตัวหุ่นในฉาก)
-   * โหมดนี้ขยับเฉพาะ "จุดที่กล้องเล็ง" ไปพร้อมหุ่น ไม่ยึดมุม/ระยะซูมที่ผู้ใช้
-   * ตั้งไว้ — จะหมุนดูรอบตัวหุ่นระหว่างที่มันเดินอยู่ก็ยังได้
+   *
+   * `PlantSceneShell` now exposes a `followPoint` callback the CameraRig reads
+   * every frame (see that file) -- the callback below reads the inspector
+   * agent's own live (mutable, never-reallocated) `snapshot()` object rather
+   * than the React `inspectorSnapshot` state, so the camera tracks the robot
+   * smoothly every frame instead of only re-centring on the ~250ms cadence
+   * the HUD's own re-render happens at.
    */
   const [inspectorFollow, setInspectorFollow] = useState(false);
+
+  /** ค่าเริ่มต้น "line" (ซูมเข้าไลน์) — เหมือนพฤติกรรมเดิมก่อนถูกรื้อออก */
+  const [cameraPreset, setCameraPreset] = useState<PlantCameraPreset>("line");
+  /** false = "ประหยัด" (ปิดเงา + ลด dpr ceiling) */
+  const [highQuality, setHighQuality] = useState(true);
+  /** โซนที่ผู้ใช้เลือกจากตัวนำทางอาคาร/โซน — null = มุมมองเริ่มต้นของพรีเซ็ต */
+  const [focusZoneId, setFocusZoneId] = useState<string | null>(null);
+  /** true = canvas เพิ่งแจ้ง `webglcontextlost` และยังไม่ได้ `webglcontextrestored` */
+  const [contextLost, setContextLost] = useState(false);
 
   // Bumped by "ลองอีกครั้ง" to bust the memoised probe result: a context limit
   // that was temporarily full, or a GPU process that has since restarted, must
@@ -343,27 +393,135 @@ export default function LiveFloorView({
   // Bumped by the same button to force a FRESH scene mount (and to reset
   // `SceneErrorBoundary`, which is keyed on it).
   const [sceneNonce, setSceneNonce] = useState(0);
-  const [contextLost, setContextLost] = useState(false);
+  // "รายการเครื่องจักรที่ไม่แสดงในผัง" — collapsed by default so the note
+  // stays a small pill; expanding it lists every skipped DB row by code/ชื่อ.
+  const [skippedExpanded, setSkippedExpanded] = useState(false);
 
   const webglSupported = useMemo(() => {
     void probeNonce;
     return detectWebGLSupport();
   }, [probeNonce]);
 
-  // Built HERE, not inside the Canvas, so the scene and the HUD's building
-  // navigator share ONE instance — `buildFloorLayout` runs exactly once per
-  // `machines` change and the scene's internal fallback stays unused.
-  const layout = useMemo(() => buildFloorLayout(machines), [machines]);
+  // Built HERE, not inside the Canvas, so the scene, the HUD and the
+  // inspector agent all share ONE instance — this build runs exactly once per
+  // `machines` change.
+  const plantLayout = useMemo(() => buildPlantLayout(machines), [machines]);
+  const skippedMachines = plantLayout.skipped;
 
-  // The 3D scene steps the simulation itself (once mounted) from its own
-  // render loop; this hook only re-renders HUD consumers at `hz` — it never
-  // steps on its own.
-  const { sim, snapshot } = useFloorSimulation(machines, { hz: 2, autoStep: false });
+  // O(1) id -> Machine lookup for PlantMachines' pick callbacks, which report
+  // a bare machine id (see PlantMachines.tsx's picking scheme for both the
+  // detailed and far-tier draw paths) rather than a whole Machine object.
+  const machineById = useMemo(() => {
+    const map = new Map<string, Machine>();
+    for (const m of machines) map.set(m.id, m);
+    return map;
+  }, [machines]);
 
-  // หุ่นยนต์ตรวจสายการผลิต: ฉากเป็นผู้ก้าวเวลาให้ (เหมือน `sim`) hook นี้แค่
-  // รีเฟรช snapshot ให้พาเนลแชตที่ 4Hz — อ่านค่าเซนเซอร์จาก `sim` ตัวเดียวกับ
-  // ที่ฉากใช้ ผลตรวจจึงตรงกับสิ่งที่ผู้ชมเห็นวิ่งอยู่บนจอ
-  const { agent: inspector, snapshot: inspectorSnapshot } = useInspectionAgent(layout, sim, {
+  /**
+   * ตัวนำทางอาคาร/โซน — ข้อจำกัดของผังใหม่: ก่อนหน้านี้ `FloorLayout.buildings`
+   * เป็นอาคาร/โรงหลายหลังแยกกัน แต่ละหลังมีเครื่องจักรของตัวเอง ผังใหม่
+   * (`PlantLayout.site`, จาก `plantSite.ts`) มีเครื่องจักรอยู่ใน "โซนการผลิต"
+   * เดียว 8 โซน (WH/FRG-A/FRG-B/HT-1..4/LINES) ภายในโรงหลังเดียว ส่วน
+   * `site.buildings` (TRAINING CENTER, OFFICE/STORE, GUARD HOUSE, ...) เป็น
+   * อาคารบริหาร/สนับสนุนรอบไซต์ที่ไม่เคยมีเครื่องจักรอยู่เลย — จึงไม่มีอะไร
+   * ให้นำทางไปหา (นับเครื่อง/สถานะ) อย่างมีความหมาย
+   *
+   * ตัวนำทางนี้จึงผูกกับ 8 โซนการผลิตแทน (เฉพาะโซนที่มีเครื่องจักรอยู่จริง —
+   * โซนว่างถูกข้ามเพราะไม่มีอะไรให้บินไปดู) ให้ผลลัพธ์เทียบเท่าของเดิม: รายชื่อ
+   * พื้นที่ + จำนวนเครื่อง + สถานะแย่สุด + บินกล้องไปยังพื้นที่นั้น
+   */
+  const zoneSummaries = useMemo<PlantZoneSummary[]>(() => {
+    const machinesByZone = new Map<string, Machine[]>();
+    for (const pm of plantLayout.machines) {
+      const list = machinesByZone.get(pm.zoneId);
+      if (list) list.push(pm.machine);
+      else machinesByZone.set(pm.zoneId, [pm.machine]);
+    }
+    const summaries: PlantZoneSummary[] = [];
+    for (const zone of plantLayout.site.zones) {
+      const zoneMachines = machinesByZone.get(zone.id);
+      if (!zoneMachines || zoneMachines.length === 0) continue;
+      let worstStatus: MachineStatus = "normal";
+      for (const m of zoneMachines) {
+        if (STATUS_SEVERITY[m.status] > STATUS_SEVERITY[worstStatus]) worstStatus = m.status;
+      }
+      summaries.push({
+        id: zone.id,
+        name: zone.name,
+        x: zone.x,
+        z: zone.z,
+        width: zone.w,
+        depth: zone.d,
+        machineCount: zoneMachines.length,
+        worstStatus,
+      });
+    }
+    return summaries;
+  }, [plantLayout]);
+
+  const focusZone = useMemo(
+    () => (focusZoneId ? zoneSummaries.find((z) => z.id === focusZoneId) ?? null : null),
+    [focusZoneId, zoneSummaries]
+  );
+
+  const focusBox = useMemo<CameraFocusBox | null>(
+    () =>
+      focusZone
+        ? { x: focusZone.x, z: focusZone.z, width: focusZone.width, depth: focusZone.depth }
+        : null,
+    [focusZone]
+  );
+
+  // ตัวกรองสถานะใน HUD ซ่อน/แสดงเฉพาะ "เครื่องจักร" — เปลือกอาคาร โซน และ
+  // ไซต์ภายนอกที่ `PlantShell` วาดไม่ขึ้นกับสถานะของเครื่องตัวใดตัวหนึ่ง จึง
+  // narrow แค่รายการเครื่อง ส่วนที่เหลือของผังส่งไปเต็ม
+  const layoutForScene = useMemo(() => {
+    if (statusFilter === "all") return plantLayout;
+    return {
+      ...plantLayout,
+      machines: plantLayout.machines.filter((m) => m.machine.status === statusFilter),
+    };
+  }, [plantLayout, statusFilter]);
+
+  // Post-scaling site footprint for PlantSceneShell (fog density, camera
+  // placement, ground/apron sizing, shadow-camera box): the reference site is
+  // 190x170 m at the reference hall's 94.3x74.3 m.
+  //
+  // IMPORTANT: `plantLayout.ts#buildPlantLayout` (and `plantSite.ts#scaleSiteTo`,
+  // which it calls) grow the hall/site with INDEPENDENT per-axis factors —
+  // `sx` (width) and `sz` (depth) — not a single uniform scalar, precisely
+  // because a real DB-driven floor plan is rarely square (see
+  // `plantLayout.ts`'s "A single uniform scalar ... forces the SHORT axis to
+  // balloon" comment on `sx`/`sz`). `scale.factor` is only the LARGER of the
+  // two, kept around as an informational summary (and for the couple of
+  // legacy call sites that still position things against one scalar) — using
+  // it here for BOTH axes reintroduces the exact bug that comment warns
+  // about, one level up: it stretches whichever axis is smaller far beyond
+  // what `PlantEnvironment`'s actual (per-axis-scaled) geometry occupies.
+  //
+  // For the real ~973-machine dataset this is not a cosmetic mismatch: sx
+  // ≈ 3.75, sz ≈ 11.81 (hall grows to 353x878 m), so the old uniform
+  // `scale.factor` (11.81) applied to BOTH axes produced a fictitious
+  // 2244x2008 m "site" — 3.2x the real site's diagonal. Every proportional
+  // quantity `PlantSceneShell`/`plantSceneConfig.ts` derives from
+  // siteWidth/siteDepth (fog density, camera position/target, zoom limits,
+  // ground/apron size, shadow frustum) was computed for that phantom site
+  // instead of the real one, which put the initial camera literally beyond
+  // its own look-at target by nearly 2x `CAMERA_FAR` — see
+  // `plantSceneConfig.ts`'s `computeCameraFar` doc comment for the rest of
+  // that story. Re-deriving `sx`/`sz` here (same formula `scaleSiteTo` used)
+  // keeps this in lock-step with whatever `PlantEnvironment` actually drew.
+  const siteWidthScaleX = plantLayout.scale.hall.w / plantLayout.scale.referenceHall.w;
+  const siteDepthScaleZ = plantLayout.scale.hall.d / plantLayout.scale.referenceHall.d;
+  const siteWidth = REFERENCE_SITE_SIZE[0] * siteWidthScaleX;
+  const siteDepth = REFERENCE_SITE_SIZE[1] * siteDepthScaleZ;
+
+  // หุ่นยนต์ตรวจสายการผลิต: วางแผนเส้นทางจากผังจริง (DB) ล้วนๆ ไม่ผูกกับ
+  // สถานะ filter ของ HUD — ผังเก่ามีการจำลองการเดินเครื่อง (`floorSimulation.ts`)
+  // ที่หุ่นเคยอ่านค่า "สด" จากมัน ผังใหม่ไม่มีการจำลองนั้นแล้ว หุ่นจึงอ่าน
+  // อุณหภูมิ/ความสั่นจากฟิลด์จริงของเครื่องในฐานข้อมูลโดยตรง (ดู
+  // lib/inspectionAgent.ts's evaluate())
+  const { agent: inspector, snapshot: inspectorSnapshot } = useInspectionAgent(plantLayout, {
     hz: 4,
   });
 
@@ -391,22 +549,31 @@ export default function LiveFloorView({
         setIsFullscreen(false);
         return;
       }
-      setSelectedMachine(null);
+      setSelectedMachineId(null);
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isFullscreen]);
 
-  const handleSelectMachine = useCallback((machine: Machine) => {
-    setSelectedMachine(machine);
+  /**
+   * เลือก/เปิดเครื่องจักรจากการคลิกในฉาก
+   *
+   * `MachineInstances` raycast โดน instance ไหนก็ส่ง machine id ดิบตัวนั้น
+   * กลับมา แล้วที่นี่แปลงเป็น Machine ผ่าน `machineById`
+   *   • คลิกหนึ่งครั้ง = ไฮไลต์ในฉาก + ขึ้นการ์ดรายละเอียดใน HUD
+   *   • ดับเบิลคลิก = เด้ง modal รายละเอียด/ประวัติของ dashboard
+   */
+  const handleSelectMachine = useCallback((machineId: string) => {
+    setSelectedMachineId(machineId);
   }, []);
 
   const handleOpenMachine = useCallback(
-    (machine: Machine) => {
-      setSelectedMachine(machine);
-      onOpenMachineDetail(machine);
+    (machineId: string) => {
+      setSelectedMachineId(machineId);
+      const machine = machineById.get(machineId);
+      if (machine) onOpenMachineDetail(machine);
     },
-    [onOpenMachineDetail]
+    [machineById, onOpenMachineDetail]
   );
 
   const handleOpenDetail = useCallback(
@@ -417,20 +584,26 @@ export default function LiveFloorView({
   );
 
   const handleClearSelection = useCallback(() => {
-    setSelectedMachine(null);
-  }, []);
-
-  const handleToggleQuality = useCallback(() => {
-    setHighQuality((q) => !q);
+    setSelectedMachineId(null);
   }, []);
 
   const handleToggleFullscreen = useCallback(() => {
     setIsFullscreen((f) => !f);
   }, []);
 
+  const handleToggleQuality = useCallback(() => {
+    setHighQuality((q) => !q);
+  }, []);
+
+  /** เลือกโซนจากตัวนำทาง (หรือ null = "ดูทั้งไซต์"/กลับพรีเซ็ตปกติ). */
+  const handleFocusZone = useCallback((zoneId: string | null) => {
+    setFocusZoneId(zoneId);
+  }, []);
+
   /**
-   * The canvas lost its context. The scene stays mounted (so the browser's own
-   * restore can still land), we just cover it with a Thai notice + retry.
+   * The canvas lost its context (`PlantSceneShell`'s `onContextLost`). The
+   * scene stays mounted (so the browser's own restore can still land), we
+   * just cover it with the Thai notice + retry.
    */
   const handleContextLost = useCallback(() => {
     setContextLost(true);
@@ -452,11 +625,6 @@ export default function LiveFloorView({
     setSceneNonce((n) => n + 1);
   }, []);
 
-  /**
-   * Building navigator: picking a building flies the near view into it, and
-   * clearing the pick ("ดูทั้งไซต์" / clicking the active row) pulls back out to
-   * the whole-site overview.
-   */
   /**
    * เปิดโหมด Agent (mount หุ่น + เปิดพาเนล) หรือ "ซ่อน" พาเนลเฉยๆ — การซ่อนไม่
    * หยุดรอบตรวจ หุ่นยังเดินต่อเบื้องหลัง ผู้ใช้กดปุ่มลอยเพื่อเรียกพาเนลกลับมา
@@ -515,14 +683,52 @@ export default function LiveFloorView({
     setInspectorFollow((following) => !following);
   }, []);
 
-  const handleFocusBuilding = useCallback((buildingId: string | null) => {
-    setFocusBuildingId(buildingId);
-    setCameraPreset(buildingId === null ? "plant" : "line");
-  }, []);
+  const selectedMachine = selectedMachineId ? machineById.get(selectedMachineId) ?? null : null;
 
-  const selectedRuntime = selectedMachine
-    ? snapshot.runtimes.get(selectedMachine.id) ?? null
-    : null;
+  /**
+   * Passed to `PlantSceneShell`'s `followPoint` prop, which its internal
+   * CameraRig calls every animation frame (see that component's own doc
+   * comment). Reads `inspector.snapshot()` -- the agent's own mutable,
+   * never-reallocated snapshot object -- directly, NOT the `inspectorSnapshot`
+   * React state above (which only updates at the hook's 4 Hz React-render
+   * cadence): a per-frame follow has to see the robot's position at 60 Hz,
+   * same as `InspectorRobot.tsx` reads it for the mesh transform itself.
+   */
+  const inspectorFollowPoint = useCallback(() => {
+    if (!inspectorFollow) return null;
+    const snap = inspector.snapshot();
+    return { x: snap.x, z: snap.z };
+  }, [inspectorFollow, inspector]);
+
+  /**
+   * ผังย่อ (`Minimap.tsx`, roadmap step 5) — ตำแหน่ง/ทิศ/มุมมอง/ระยะกล้องสด ๆ
+   *
+   * เก็บเป็น mutable ref เดียวกันตลอดอายุ component (ไม่ใช่ React state):
+   * `FloorScene`'s `CameraRig` เขียนทับ 6 ตัวเลขนี้ทุกเฟรมผ่าน
+   * `handleCameraFrame` ด้านล่าง แล้ว `Minimap` เองอ่านมันด้วย
+   * requestAnimationFrame loop ของตัวเอง (ดูคอมเมนต์ที่ไฟล์นั้น) — ทั้งคู่ไม่
+   * เคยเรียก setState เลย จึงไม่มีการ re-render ของ HUD/ผังย่อ 60 ครั้งต่อวินาที
+   */
+  const cameraTrackRef = useRef<MinimapCameraSample>({
+    x: 0,
+    z: 0,
+    dirX: 0,
+    dirZ: 1,
+    halfFovDeg: 0,
+    distance: 0,
+  });
+  const handleCameraFrame = useCallback(
+    (x: number, z: number, dirX: number, dirZ: number, halfFovDeg: number, distance: number) => {
+      const sample = cameraTrackRef.current;
+      sample.x = x;
+      sample.z = z;
+      sample.dirX = dirX;
+      sample.dirZ = dirZ;
+      sample.halfFovDeg = halfFovDeg;
+      sample.distance = distance;
+    },
+    []
+  );
 
   /**
    * `container-type: size` makes THIS box the query container for the HUD.
@@ -566,30 +772,34 @@ export default function LiveFloorView({
                 error-boundary state before the fresh mount. */}
             <SceneErrorBoundary key={sceneNonce} onExit={onExit}>
               <Suspense fallback={<SceneLoadingFallback />}>
-                <LiveFloor4DScene
-                  machines={machines}
-                  statusFilter={statusFilter}
-                  selectedMachineId={selectedMachine?.id ?? null}
+                <FloorScene
+                  layout={layoutForScene}
+                  selectedMachineId={selectedMachineId}
                   onSelectMachine={handleSelectMachine}
                   onOpenMachine={handleOpenMachine}
+                  siteWidth={siteWidth}
+                  siteDepth={siteDepth}
                   cameraPreset={cameraPreset}
+                  focusBox={focusBox}
+                  followPoint={inspectorFollowPoint}
+                  onCameraFrame={handleCameraFrame}
                   highQuality={highQuality}
-                  simulation={sim}
-                  focusBuildingId={focusBuildingId}
-                  layout={layout}
-                  inspector={inspector}
-                  inspectorActive={inspectorMode}
-                  inspectorFollow={inspectorFollow}
-                  onSelectInspector={handleSelectInspector}
+                  roofOpen={roofOpen}
                   onContextLost={handleContextLost}
                   onContextRestored={handleContextRestored}
-                  hideLabels={detailOpen}
-                />
+                >
+                  {inspectorMode ? (
+                    <InspectorRobot
+                      agent={inspector}
+                      active={inspectorMode}
+                      selected={inspectorFollow}
+                      onSelect={handleSelectInspector}
+                    />
+                  ) : null}
+                </FloorScene>
               </Suspense>
             </SceneErrorBoundary>
-            {contextLost ? (
-              <ContextLostPanel onRetry={handleRetry} onExit={onExit} />
-            ) : null}
+            {contextLost ? <ContextLostPanel onRetry={handleRetry} onExit={onExit} /> : null}
           </>
         ) : (
           <WebGLUnavailablePanel onRetry={handleRetry} onExit={onExit} />
@@ -601,22 +811,23 @@ export default function LiveFloorView({
           workOrders={workOrders}
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
-          selectedMachine={selectedMachine}
-          onOpenDetail={handleOpenDetail}
-          onClearSelection={handleClearSelection}
           cameraPreset={cameraPreset}
           onCameraPresetChange={setCameraPreset}
           highQuality={highQuality}
           onToggleQuality={handleToggleQuality}
+          zones={zoneSummaries}
+          focusZoneId={focusZoneId}
+          onFocusZone={handleFocusZone}
+          selectedMachine={selectedMachine}
+          onOpenDetail={handleOpenDetail}
+          onClearSelection={handleClearSelection}
           isFullscreen={isFullscreen}
           onToggleFullscreen={handleToggleFullscreen}
           onExit={onExit}
           onAskAI={onAskAI}
-          simSnapshot={snapshot}
-          selectedRuntime={selectedRuntime}
-          buildings={layout.buildings}
-          focusBuildingId={focusBuildingId}
-          onFocusBuilding={handleFocusBuilding}
+          minimapLayout={plantLayout}
+          cameraTrackRef={cameraTrackRef}
+          minimapEnabled={webglSupported}
         />
 
         {/* โหมด Agent — ปุ่มเปิด และพาเนลแชตรายงาน ใช้จุดยึดเดียวกัน
@@ -648,6 +859,53 @@ export default function LiveFloorView({
             )}
           </button>
         )}
+
+        {/* เปิด/ปิดหลังคาอาคารไลน์ผลิต — มุมมองแบบเกม The Sims
+            อยู่ในชุดปุ่มลอยมุมขวาบนเดียวกับปุ่มหุ่นยนต์ */}
+        <button
+          type="button"
+          onClick={() => setRoofOpen((v) => !v)}
+          aria-pressed={!roofOpen}
+          className="absolute right-4 top-[128px] z-40 flex items-center gap-2 rounded-[14px] border border-[var(--lf-panel-border)] bg-[var(--lf-panel-bg)] px-3 py-2 text-[11.5px] font-bold text-[var(--lf-text)] shadow-[0_8px_24px_-12px_var(--lf-panel-glow)] backdrop-blur-md hover:bg-[var(--lf-accent-14)] transition-colors pointer-events-auto cursor-pointer"
+        >
+          <Warehouse className="w-4 h-4 text-[var(--lf-accent)]" />
+          {roofOpen ? "ปิดหลังคาโรง" : "เปิดหลังคาโรง"}
+        </button>
+
+        {/* เครื่องจักรที่ผังใหม่ (ตาม section/department ในฐานข้อมูล) ตั้งใจไม่
+            แสดง — แถวธุรการ/ไม่ใช่เครื่องจักรจริง ปุ่มเล็กใต้ปุ่มหุ่นยนต์
+            เพื่อให้ยังเห็นว่าครบทุกแถวจากฐานข้อมูล แค่บางส่วนไม่ได้วาง
+            บนพื้นผัง 3 มิติ */}
+        {skippedMachines.length > 0 ? (
+          <div className="absolute right-4 top-[180px] z-40 max-w-[260px] pointer-events-auto">
+            <button
+              type="button"
+              onClick={() => setSkippedExpanded((v) => !v)}
+              className="flex w-full items-center gap-1.5 rounded-[14px] border border-[var(--lf-panel-border)] bg-[var(--lf-panel-bg)] px-3 py-2 text-[11px] font-semibold text-[var(--lf-text-muted)] shadow-[0_8px_24px_-12px_var(--lf-panel-glow)] backdrop-blur-md hover:bg-[var(--lf-accent-14)] transition-colors cursor-pointer"
+            >
+              <Info className="w-3.5 h-3.5 shrink-0 text-[var(--lf-accent)]" />
+              <span className="text-left">
+                {skippedMachines.length} เครื่องไม่แสดงในผัง (ไม่ใช่เครื่องจักรจริง)
+              </span>
+              {skippedExpanded ? (
+                <ChevronUp className="w-3.5 h-3.5 shrink-0" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5 shrink-0" />
+              )}
+            </button>
+            {skippedExpanded ? (
+              <div className="mt-1.5 max-h-52 overflow-y-auto rounded-[14px] border border-[var(--lf-panel-border)] bg-[var(--lf-panel-bg)] p-2.5 text-[10.5px] leading-relaxed text-[var(--lf-text-muted)] shadow-[0_8px_24px_-12px_var(--lf-panel-glow)] backdrop-blur-md space-y-1">
+                {skippedMachines.map((s) => (
+                  <div key={s.machineId} className="truncate" title={s.reason}>
+                    <span className="font-semibold text-[var(--lf-text)]">{s.code ?? s.machineId}</span>
+                    {" — "}
+                    {s.name}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </div>
   );

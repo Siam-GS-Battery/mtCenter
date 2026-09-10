@@ -49,10 +49,13 @@ import LiveFloorView from "./liveFloor/LiveFloorView";
 import {
   getMachines,
   getWorkOrders,
+  getWorkOrderStatsByMachine,
   getManuals,
   getManualFileUrl,
   getManualContent,
   toUserMessage,
+  type MachineWorkOrderStats,
+  type MachineWorkOrderStatsMap,
 } from "../../services/apiService";
 import { getMachineMetricsMock } from "../../lib/machineMetricsMock";
 import {
@@ -79,6 +82,8 @@ import {
   isMissing,
   orDash,
   formatDate,
+  formatNumber,
+  formatWithUnit,
   isOverdueDate,
   overdueLabel,
 } from "../../lib/format";
@@ -86,11 +91,29 @@ import {
 // จำนวนรายการประวัติซ่อมต่อหน้า (ต่อเครื่อง)
 const MACHINE_HISTORY_PAGE_SIZE = 50;
 
-/** Tailwind needs whole class names — no template literals for column counts. */
+/**
+ * Tailwind needs whole class names — no template literals for column counts.
+ * The grid now holds 3 always-on cells (กลุ่มโรงงาน/แผนก-หน่วยงาน/สุขภาพเครื่อง)
+ * plus up to 3 sensor cells (spindleTemp/vibrationMms/operatingHours, gated on
+ * `fleetReadings`) plus up to 3 work-order stat cells (ใบซ่อมค้าง/เวลาสูญเสีย
+ * รวม/เวลาซ่อมเฉลี่ย, always on once the per-machine fetch resolves) — so every
+ * count from 1 to 9 is reachable and needs a real class. The outer card grid
+ * (see `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2` below) never exceeds
+ * 2 columns, so each card stays roughly half the viewport width no matter how
+ * wide the screen gets. Widening the metric grid past 3 columns on a fixed
+ * ~half-viewport card only shrinks the cells further, so we cap at 3 columns
+ * and let extra cells wrap into more rows instead.
+ */
 const METRIC_GRID_COLS: Record<number, string> = {
   1: "grid-cols-1",
   2: "grid-cols-2",
-  3: "grid-cols-3",
+  3: "grid-cols-2 sm:grid-cols-3",
+  4: "grid-cols-2 sm:grid-cols-3",
+  5: "grid-cols-2 sm:grid-cols-3",
+  6: "grid-cols-2 sm:grid-cols-3",
+  7: "grid-cols-2 sm:grid-cols-3",
+  8: "grid-cols-2 sm:grid-cols-3",
+  9: "grid-cols-2 sm:grid-cols-3",
 };
 
 /** Same idea for the machine-detail modal, whose card count is 2–5. */
@@ -176,6 +199,11 @@ interface MachineCardProps {
   machine: Machine;
   fleetReadings: ReadingAvailability;
   metricCellCount: number;
+  /** This machine's work-order stats, keyed by `machine.code` — `undefined`
+   * while the follow-up fetch is still in flight (or the machine has no
+   * code), in which case the three work-order cells fall back to `NO_DATA`
+   * rather than blocking the rest of the card. */
+  workOrderStats: MachineWorkOrderStats | undefined;
   onSelect: (machine: Machine) => void;
 }
 
@@ -190,6 +218,7 @@ const MachineCard = React.memo(function MachineCard({
   machine: m,
   fleetReadings,
   metricCellCount,
+  workOrderStats,
   onSelect,
 }: MachineCardProps) {
   return (
@@ -245,10 +274,23 @@ const MachineCard = React.memo(function MachineCard({
         </div>
       )}
 
-      {/* Metrics Grid — sensor cells appear only when real readings exist */}
+      {/* Metrics Grid — the plant has no spindle/vibration sensors installed
+          (spindleTemp/vibrationMms are null for essentially every machine),
+          so the first two cells use registry fields the Excel import
+          actually populates for ~99% of rows (factoryGroup/departmentCode)
+          instead of showing a permanent "—". Sensor cells still appear
+          automatically once real readings exist. */}
       <div
         className={`grid ${METRIC_GRID_COLS[metricCellCount]} gap-2 bg-divider p-3 rounded-[11px] border border-divider text-xs mb-3`}
       >
+        <div>
+          <span className="text-xs text-ink-faint font-normal block">กลุ่มโรงงาน</span>
+          <span className="font-semibold text-ink">{orDash(m.factoryGroup)}</span>
+        </div>
+        <div>
+          <span className="text-xs text-ink-faint font-normal block">แผนก/หน่วยงาน</span>
+          <span className="font-semibold text-ink">{orDash(m.departmentCode)}</span>
+        </div>
         {fleetReadings.spindleTemp && (
           <div>
             <span className="text-xs text-ink-faint font-normal block">อุณหภูมิ Spindle</span>
@@ -273,12 +315,44 @@ const MachineCard = React.memo(function MachineCard({
             </span>
           </div>
         )}
+        {fleetReadings.operatingHours && (
+          <div>
+            <span className="text-xs text-ink-faint font-normal block">ชั่วโมงทำงาน</span>
+            <span className="font-semibold text-ink">
+              {formatWithUnit(m.operatingHours, "ชม.")}
+            </span>
+          </div>
+        )}
         <div>
           <span className="text-xs text-ink-faint font-normal block">คะแนนสุขภาพเครื่อง</span>
           {/* Never blue-on-null: a machine with no repair history has no
               score to show, and that is not a low score. */}
           <span className={`font-semibold ${healthScoreTextClass(m.healthScore)}`}>
             {m.healthScore == null ? NO_REPAIR_HISTORY_TH : `${m.healthScore}%`}
+          </span>
+        </div>
+        {/* Per-machine work-order stats — fetched separately for the current
+            registry page (see the follow-up effect below). `workOrderStats`
+            is `undefined` on fetch failure or while still loading, and every
+            field renders NO_DATA/"—" rather than 0/null in that case, so the
+            card never implies "zero repairs" for a machine that simply has
+            no data back yet. */}
+        <div>
+          <span className="text-xs text-ink-faint font-normal block">ใบซ่อมค้าง</span>
+          <span className="font-semibold text-ink">
+            {formatNumber(workOrderStats?.open)}
+          </span>
+        </div>
+        <div>
+          <span className="text-xs text-ink-faint font-normal block">เวลาสูญเสียรวม</span>
+          <span className="font-semibold text-ink">
+            {formatWithUnit(workOrderStats?.totalMtlossMin, "นาที")}
+          </span>
+        </div>
+        <div>
+          <span className="text-xs text-ink-faint font-normal block">เวลาซ่อมเฉลี่ย</span>
+          <span className="font-semibold text-ink">
+            {formatWithUnit(workOrderStats?.avgRepairDurationMin, "นาที")}
           </span>
         </div>
       </div>
@@ -448,6 +522,36 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, registryOffset, warningMachines, errorMachines]);
 
+  // สถิติใบงานรายเครื่อง (ใบซ่อมค้าง/เวลาสูญเสียรวม/เวลาซ่อมเฉลี่ย) สำหรับการ์ด
+  // ในหน้านี้ — ดึงแยกต่อจาก registryMachines ด้านบนเพราะ endpoint เป็นคนละตัว
+  // (GET /api/work-orders/stats/by-machine) คีย์ด้วย code เดิม ทำครั้งเดียวต่อ
+  // การเปลี่ยนหน้า/ตัวกรอง ไม่ยิงทีละเครื่อง (N+1) เก็บผลไว้แบบสะสม (merge) เพื่อ
+  // ให้การ์ดหน้าที่เคยโหลดแล้วไม่กลับไปว่างเปล่าเมื่อสลับกลับมา
+  const [machineWorkOrderStats, setMachineWorkOrderStats] = useState<MachineWorkOrderStatsMap>({});
+
+  useEffect(() => {
+    const codes = registryMachines
+      .map((m) => m.code)
+      .filter((code): code is string => !!code);
+    if (codes.length === 0) return;
+
+    let cancelled = false;
+    getWorkOrderStatsByMachine(codes)
+      .then((stats) => {
+        if (cancelled) return;
+        setMachineWorkOrderStats((prev) => ({ ...prev, ...stats }));
+      })
+      .catch(() => {
+        // การ์ดยัง render ได้ตามปกติโดยแสดง "—" ที่ช่องสถิติใบงาน (ดู formatNumber/
+        // formatWithUnit กับ workOrderStats undefined ใน MachineCard) — ไม่ต้อง
+        // ตั้ง error state แยกเพราะไม่ใช่ข้อมูลหลักของหน้านี้ ไม่ควรบล็อกทั้งหน้า
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [registryMachines]);
+
   const handleAskDailySummary = () => {
     const errorList = machines.filter((m) => m.status === "error");
     const warningList = machines.filter((m) => m.status === "warning");
@@ -504,11 +608,21 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
   // metric tab to draw and never renders itself away inside a live grid slot.
   const showTelemetryTrend = fleetReadings.spindleTemp || fleetReadings.vibrationMms;
 
-  // Cells inside the registry / detail metric grids, gated on real data. Health
-  // score stays permanently: it is derived from repair history, not measured, and
-  // its absence is itself information a supervisor needs ("never repaired").
+  // Cells inside the registry metric grid. กลุ่มโรงงาน/แผนก-หน่วยงาน and
+  // คะแนนสุขภาพเครื่อง are always shown (3 base cells) — the first two come
+  // from the Excel import and are populated for ~99% of machines, the third
+  // is derived from repair history and its absence ("never repaired") is
+  // itself information. Sensor cells (spindleTemp/vibrationMms/operatingHours)
+  // are added on top only once a real reading exists somewhere in the fleet.
+  // The 3 work-order stat cells (ใบซ่อมค้าง/เวลาสูญเสียรวม/เวลาซ่อมเฉลี่ย) are
+  // always shown too — a missing per-machine fetch renders "—" per cell
+  // (see MachineCard), it never removes the cell itself.
   const metricCellCount =
-    1 + (fleetReadings.spindleTemp ? 1 : 0) + (fleetReadings.vibrationMms ? 1 : 0);
+    3 +
+    3 +
+    (fleetReadings.spindleTemp ? 1 : 0) +
+    (fleetReadings.vibrationMms ? 1 : 0) +
+    (fleetReadings.operatingHours ? 1 : 0);
 
   // เดิม machineHistory กรอง `wo.machineId === selectedMachine.id` จาก
   // workOrders ที่โหลดมาแล้ว — ใช้ไม่ได้กับข้อมูลจริงเลย เพราะใบงานที่นำเข้าจาก
@@ -1042,6 +1156,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
                   machine={m}
                   fleetReadings={fleetReadings}
                   metricCellCount={metricCellCount}
+                  workOrderStats={m.code ? machineWorkOrderStats[m.code] : undefined}
                   onSelect={handleCardSelect}
                 />
               ))}

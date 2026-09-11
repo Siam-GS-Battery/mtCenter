@@ -234,8 +234,12 @@ const ArchetypeInstances = memo(function ArchetypeInstances({
       {MATERIAL_KEYS.map((key) => {
         const geometry = buckets[key];
         if (!geometry) return null;
-        // `body` เท่านั้นที่รับ event — ดูเหตุผลหัวไฟล์
-        const pickable = key === "body";
+        // ไม่มีก้อนใดใน `ArchetypeInstances` รับ event อีกต่อไป — ตัวรับคลิก
+        // จริงย้ายไปเป็นก้อนแยกต่างหาก `PickProxyInstances` (กล่องโปร่งใสที่
+        // ขยายคลุมทั้งฐาน+ความสูงเครื่องเสมอ ไม่ขึ้นกับรูปทรง `body` จริงซึ่ง
+        // บางแบบ archetype อาจไม่ครอบเต็มฐาน/เต็มความสูง) ดูคอมเมนต์ที่
+        // `PickProxyInstances` ด้านล่าง
+        const pickable = false;
         return (
           <instancedMesh
             key={key}
@@ -333,6 +337,124 @@ const ContactShadowInstances = memo(function ContactShadowInstances({
       args={[geometry, material, placed.length]}
       castShadow={false}
       receiveShadow={false}
+    />
+  );
+});
+
+/** สัดส่วนขยายพื้นที่รับคลิกในแนวราบ (X/Z) เทียบกับฐานเครื่องจริง — เผื่อ
+ *  คลิก/ชี้เฉียดขอบเครื่องเล็กน้อยโดยไม่ทำให้เครื่องข้างเคียงชนกัน ระยะห่าง
+ *  จริงที่แคบที่สุดระหว่างแนวเครื่องคือ 1.75 ม. (`plantLayout.ts`'s
+ *  `MACHINE_PITCH_GAP`) — ต่อให้เครื่องกว้างสุดในผัง (archetype ใหญ่สุด ~5-6 ม.)
+ *  ขยาย 10% ต่อด้าน (5% ต่อฝั่ง) ก็ยังเหลือช่องว่างมากกว่าครึ่งของช่องว่างจริง
+ *  เสมอ เครื่องสองตัวจึงไม่มีทางที่กล่องรับคลิกทับกันเอง */
+const PICK_MARGIN_XZ = 1.1;
+/** แนวตั้งเผื่อมากกว่าแนวราบได้ (1.2 = ขยาย 20%) เพราะไม่มีเครื่องเรียงซ้อน
+ *  กันในแนว Y — ไม่กระทบเพื่อนบ้านเลย แค่กันคลิกใกล้ยอด/ฐานเครื่องพลาดจาก
+ *  ขอบกล่องจริง */
+const PICK_MARGIN_Y = 1.2;
+
+/**
+ * กล่องรับคลิกโปร่งใส (invisible pick proxy) ต่อ archetype — คลุมฐาน
+ * (width x depth) และความสูงเต็มของเครื่องเสมอ ไม่ขึ้นกับรูปทรงจริงของก้อน
+ * `body` ใน `ArchetypeInstances` (บาง archetype ตัวถังจริงแคบกว่ากรอบเครื่อง
+ * ทั้งหมด เช่น ขาตั้ง/แขนยื่น ทำให้คลิกพลาดบ่อย) นี่คือตัวรับ
+ * onClick/onDoubleClick/onPointerMove/Out จริงตอนนี้ — ดูคอมเมนต์ที่ตั้งค่า
+ * `pickable` ใน `ArchetypeInstances` ด้านบน
+ *
+ * วัสดุ: `transparent, opacity: 0, depthWrite: false` (ไม่ใช้ `visible={false}`
+ * ซึ่งจะปิด raycast ไปด้วย) จึงมองไม่เห็นและไม่ยุ่งกับ depth buffer แต่ยังรับ
+ * ray ได้ตามปกติ — เพิ่ม draw call คงที่ 1 ก้อนต่อ archetype (สเกลแบบเดียวกับ
+ * `ContactShadowInstances` ไม่ใช่ต่อเครื่อง)
+ */
+const PickProxyInstances = memo(function PickProxyInstances({
+  group,
+  geometry,
+  material,
+  onSelectMachine,
+  onOpenMachine,
+  onHoverMachine,
+}: {
+  group: ArchetypeGroup;
+  geometry: THREE.BufferGeometry;
+  material: THREE.Material;
+  onSelectMachine?: (machineId: string) => void;
+  onOpenMachine?: (machineId: string) => void;
+  onHoverMachine?: (machineId: string | null) => void;
+}) {
+  const meshRef = useRef<THREE.InstancedMesh | null>(null);
+  const { placed, ids } = group;
+
+  useEffect(() => {
+    const mesh = meshRef.current;
+    if (!mesh) return;
+
+    const matrix = new THREE.Matrix4();
+    const quaternion = new THREE.Quaternion();
+    const position = new THREE.Vector3();
+    const scale = new THREE.Vector3();
+
+    for (let i = 0; i < placed.length; i += 1) {
+      const m = placed[i];
+      position.set(m.x, 0, m.z);
+      quaternion.setFromAxisAngle(UP, m.rotationY);
+      scale.set(m.width * PICK_MARGIN_XZ, m.height * PICK_MARGIN_Y, m.depth * PICK_MARGIN_XZ);
+      matrix.compose(position, quaternion, scale);
+      mesh.setMatrixAt(i, matrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    // ดูคอมเมนต์เดียวกันที่ `ArchetypeInstances`/`ContactShadowInstances` —
+    // ต้องคำนวณ bounding sphere ใหม่จาก instance จริง ไม่งั้น frustum culling
+    // ใช้ทรงของ geometry ต้นแบบ (กว้าง 1x1x1 ที่จุดกำเนิด) แล้วตัดทั้งก้อนทิ้ง
+    mesh.computeBoundingSphere();
+  }, [placed]);
+
+  // ดูคอมเมนต์ที่ `handlePointerMove` ของ `ArchetypeInstances` — throttle
+  // เดียวกัน เหตุผลเดียวกัน (ก้อนนี้แทนที่ก้อนนั้นเป็นตัวรับ pointer event)
+  const lastHoverAtRef = useRef(0);
+
+  const handleClick = (event: ThreeEvent<MouseEvent>) => {
+    const index = event.instanceId;
+    if (index === undefined) return;
+    const id = ids[index];
+    if (!id) return;
+    event.stopPropagation();
+    onSelectMachine?.(id);
+  };
+
+  const handleDoubleClick = (event: ThreeEvent<MouseEvent>) => {
+    const index = event.instanceId;
+    if (index === undefined) return;
+    const id = ids[index];
+    if (!id) return;
+    event.stopPropagation();
+    onOpenMachine?.(id);
+  };
+
+  const handlePointerMove = (event: ThreeEvent<PointerEvent>) => {
+    const now = performance.now();
+    if (now - lastHoverAtRef.current < HOVER_THROTTLE_MS) return;
+    lastHoverAtRef.current = now;
+    const index = event.instanceId;
+    if (index === undefined) return;
+    const id = ids[index];
+    if (!id) return;
+    onHoverMachine?.(id);
+  };
+
+  const handlePointerOut = () => {
+    onHoverMachine?.(null);
+  };
+
+  return (
+    <instancedMesh
+      ref={meshRef}
+      args={[geometry, material, placed.length]}
+      castShadow={false}
+      receiveShadow={false}
+      onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
+      onPointerMove={handlePointerMove}
+      onPointerOut={handlePointerOut}
     />
   );
 });
@@ -804,6 +926,24 @@ export function MachineInstances({
   }, []);
   useEffect(() => () => shadowGeometry.dispose(), [shadowGeometry]);
 
+  // กล่อง 1x1x1 ยกฐานให้อยู่ที่ y=0 (แทนกึ่งกลางที่จุดกำเนิดแบบ default) —
+  // ให้ตรงกับ position.set(m.x, 0, m.z) ที่เครื่องจริงใช้ ก่อนสเกลด้วย
+  // width/height/depth x margin ต่อ instance ใน `PickProxyInstances`
+  const pickGeometry = useMemo(() => {
+    const g = new THREE.BoxGeometry(1, 1, 1);
+    g.translate(0, 0.5, 0);
+    return g;
+  }, []);
+  useEffect(() => () => pickGeometry.dispose(), [pickGeometry]);
+
+  // โปร่งใสสนิท (opacity 0) แต่ยัง raycast ได้ปกติ — `depthWrite: false` กัน
+  // ไม่ให้กล่องที่มองไม่เห็นนี้ไปตัดเครื่อง/พื้นหลังมันใน depth buffer
+  const pickMaterial = useMemo(
+    () => new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),
+    []
+  );
+  useEffect(() => () => pickMaterial.dispose(), [pickMaterial]);
+
   /**
    * เท็กซ์เจอร์ไล่จางสร้างจาก canvas ครั้งเดียว — เฉพาะโหมด high quality
    * โหมดประหยัด (`highQuality=false`) ตัด texture sampling ทิ้ง เหลือ quad
@@ -864,6 +1004,17 @@ export function MachineInstances({
           key={group.archetype}
           group={group}
           materials={materials}
+          onSelectMachine={onSelectMachine}
+          onOpenMachine={onOpenMachine}
+          onHoverMachine={handleHoverMachine}
+        />
+      ))}
+      {groups.map((group) => (
+        <PickProxyInstances
+          key={`pick-${group.archetype}`}
+          group={group}
+          geometry={pickGeometry}
+          material={pickMaterial}
           onSelectMachine={onSelectMachine}
           onOpenMachine={onOpenMachine}
           onHoverMachine={handleHoverMachine}

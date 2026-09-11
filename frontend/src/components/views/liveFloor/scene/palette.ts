@@ -187,6 +187,20 @@ export const RACKING = {
   pallet: "#b08968",
 };
 
+/** รถยกที่วิ่งอยู่ในฉาก (`Forklifts.tsx`, roadmap step 13) — โทนนิรภัย
+ *  อุตสาหกรรมมาตรฐาน derive จาก `MACHINE`/`RACKING` ที่มีอยู่แล้ว ไม่ประกาศ
+ *  ฮาร์ดโค้ดสีใหม่ซ้ำซ้อน */
+export const FORKLIFT = {
+  /** ตัวถัง/ถ่วงน้ำหนักท้าย — เหลืองนิรภัยเดียวกับแถบเตือนคาดตัวเครื่องจักร */
+  body: MACHINE.hazard,
+  /** มาสต์/ส้อม/เสากันสาด — เทาเข้มเดียวกับโครงเหล็กเครื่องจักร */
+  steel: MACHINE.frame,
+  /** ยาง — เข้มสุดในกลุ่มเดียวกับยาง/สายพานเครื่องจักร */
+  tire: MACHINE.rubber,
+  /** พาเลทที่บรรทุก — สีเดียวกับพาเลทในชั้นวาง `WarehouseRacking.tsx` */
+  cargo: RACKING.pallet,
+};
+
 /** สีไฮไลต์ตอน hover / เลือกเครื่อง — derive จาก liveFloorTheme.ts จุดเดียว
  *  (ไม่ hardcode ที่นี่) selected ใช้ accent (น้ำเงินวิศวกรรม เข้มกว่า) และ
  *  hover ใช้ accentAlt (ฟ้าอมเขียว/cyan สว่างกว่า) ทั้งสองค่าต่างเฉด+ความสว่าง
@@ -245,3 +259,54 @@ export const LABEL = {
 export function statusColorOf(status: KitStatus): string {
   return STATUS[status] ?? STATUS_FALLBACK;
 }
+
+/** คนงานประจำสถานี (`FloorActivity.tsx`, roadmap step 14) — เสื้อกั๊กใช้โทน
+ *  hazard เดียวกับที่ `InspectorRobot.tsx` ใช้เป็นเสื้อกั๊กอยู่แล้ว (สไตล์
+ *  เดียวกัน ไม่ประกาศสีเสื้อกั๊กใหม่ซ้ำซ้อน) หมวกนิรภัยใช้ขาวเดียวกับเส้น
+ *  แบ่งเลนถนน (ต่างเฉด/ความสว่างจากเสื้อกั๊กชัดเจน อ่านได้จากระยะไกล) */
+export const WORKER = {
+  vest: MACHINE.hazard,
+  hat: WALKWAY.laneWhite,
+};
+
+/** พาเลท/กองของ WIP + ถังเหล็ก (`FloorActivity.tsx`, roadmap step 14) — พาเลท
+ *  ใช้สีเดียวกับพาเลทในชั้นวาง/บนรถยก (`RACKING.pallet`) ไม่ประกาศไม้พาเลทสี
+ *  ใหม่ซ้ำซ้อน กองของบนพาเลทใช้โทนกระดาษลูกฟูกอุ่นกว่าไม้พาเลทเล็กน้อยให้แยก
+ *  ชั้นได้ ถังเหล็ก/stillage ใช้โทนเหล็กเดียวกับโครงเครื่องจักร */
+export const STOCK = {
+  pallet: RACKING.pallet,
+  crate: "#c9a06a",
+  bin: MACHINE.frame,
+};
+
+/** กระบวนการ/บรรยากาศเคลื่อนไหว (`ProcessEffects.tsx`, roadmap step 15) —
+ *  กล่องบนสายพาน derive จาก STOCK.crate เดียวกับกล่อง WIP อื่นในฉาก (ไม่คิด
+ *  สีใหม่ซ้ำซ้อน) ไอร้อน/ควันจากปล่องอบชุบใช้เทาอมฟ้าอ่อนโปร่งแสงที่ยังไม่มี
+ *  ใครใช้ ส่วนประกายที่โซนตีขึ้นรูปใช้โทน hazard เดียวกับไฟเตือน/เสื้อกั๊ก
+ *  แต่ทำให้อิ่มตัว/สว่างขึ้นเป็น emissive ember แยกออกมาต่างหาก */
+export const PROCESS = {
+  beltCargo: STOCK.crate,
+  plume: "#c9d2da",
+  ember: "#ff8a3d",
+};
+
+/** Roadmap step 16 — real-time day/night cycle (`scene/TimeOfDaySky.tsx`).
+ *  Additive re-export of `LIVE_FLOOR_THEME.night`, same pattern as every
+ *  other block in this file: colours live in `liveFloorTheme.ts`, this file
+ *  just groups them for the scene code that consumes them. */
+export const NIGHT = {
+  skyNight: LIVE_FLOOR_THEME.night.skyNight,
+  skyDawn: LIVE_FLOOR_THEME.night.skyDawn,
+  skyDusk: LIVE_FLOOR_THEME.night.skyDusk,
+  skyDay: LIVE_FLOOR_THEME.night.skyDay,
+  fogNight: LIVE_FLOOR_THEME.night.fogNight,
+  fogDay: FOG,
+  sunDawn: LIVE_FLOOR_THEME.night.sunDawn,
+  sunDay: LIVE_FLOOR_THEME.night.sunDay,
+  sunDusk: LIVE_FLOOR_THEME.night.sunDusk,
+  poleLampLit: LIVE_FLOOR_THEME.night.poleLampLit,
+  windowLit: LIVE_FLOOR_THEME.night.windowLit,
+  gateLit: LIVE_FLOOR_THEME.night.gateLit,
+  /** pole shaft colour — reuses the existing site pole/fence steel tone, no new hex */
+  poleShaft: SHELL.pole,
+};

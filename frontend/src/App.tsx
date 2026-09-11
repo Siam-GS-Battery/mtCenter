@@ -54,6 +54,9 @@ import MachineAdminView from "./components/views/MachineAdminView";
 import { SettingsModal } from "./components/SettingsModal";
 import { HelpModal } from "./components/HelpModal";
 import { AIAssistantDrawer } from "./components/AIAssistantDrawer";
+import type { ChatMessageWithFallback } from "./components/ai/AssistantConversation";
+import type { InspectionReport } from "./lib/inspectionAgent";
+import { buildRoundAiSummaryMock, roundAiSummaryToMarkdown } from "./lib/roundAiSummaryMock";
 import AIAssistantToggleButton from "./components/AIAssistantToggleButton";
 import { CreateWorkOrderModal, PrefilledWorkOrderData } from "./components/CreateWorkOrderModal";
 import type { NotificationTarget } from "./components/TopBar";
@@ -117,6 +120,10 @@ export default function App() {
   const [chatInitialPrompt, setChatInitialPrompt] = useState<string>("");
   const [isAiDrawerOpen, setIsAiDrawerOpen] = useState<boolean>(false);
   const [aiDrawerPrompt, setAiDrawerPrompt] = useState<string>("");
+  // seed ข้อความสำเร็จรูปลงแชต AI ด้านข้างตรงๆ (ไม่ผ่าน backend) — ใช้เฉพาะ
+  // ปุ่ม "ให้ AI สรุป" บนการ์ดรายงานรอบตรวจของหุ่นยนต์ (ดู handleAskAIRoundSummary)
+  const [aiDrawerSeedMessages, setAiDrawerSeedMessages] =
+    useState<ChatMessageWithFallback[] | null>(null);
 
   // 6. Modals State
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -315,6 +322,35 @@ export default function App() {
       setAiDrawerPrompt(prompt);
       setChatInitialPrompt(prompt);
     }
+    // เคลียร์ seed ที่อาจค้างจากรอบตรวจก่อนหน้า ไม่งั้นเปิดแชตครั้งถัดไปแบบ
+    // ปกติ (initialPrompt) จะยังโดน effect ของ AIAssistantDrawer เลือก seed เดิมไปแสดงซ้ำ
+    setAiDrawerSeedMessages(null);
+    setIsAiDrawerOpen(true);
+  };
+
+  // ปุ่ม "ให้ AI สรุป" บนการ์ดรายงานรอบตรวจของหุ่นยนต์ (Live Floor 4D) — เปิด
+  // แชต AI ด้านข้างทันทีพร้อม "คำตอบ" ที่เป็นสรุปผลรอบนั้น (ข้อมูลจำลอง,
+  // deterministic ตาม report.id) โดย seed ตรงเข้าไปในบทสนทนา ไม่ผ่าน
+  // POST /api/ai/chat เลย — ต่างจาก handleAskAIWithPrompt ซึ่งใช้เมื่อยังไม่มี
+  // "คำตอบ" สำเร็จรูปและต้องให้แชตไปถามโมเดลจริง (หรือ mock ฝั่ง backend) เอง
+  const handleAskAIRoundSummary = (report: InspectionReport) => {
+    const summary = buildRoundAiSummaryMock(report);
+    const nowLabel = new Date().toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" });
+    setAiDrawerSeedMessages([
+      {
+        id: `usr-round-${report.id}`,
+        sender: "user",
+        text: "สรุปผลรอบตรวจของหุ่นยนต์ให้หน่อย",
+        timestamp: nowLabel,
+      },
+      {
+        id: `ai-round-${report.id}`,
+        sender: "assistant",
+        text: roundAiSummaryToMarkdown(summary),
+        timestamp: nowLabel,
+        mode: "mock",
+      },
+    ]);
     setIsAiDrawerOpen(true);
   };
 
@@ -901,6 +937,7 @@ export default function App() {
               machineStats={machineStats}
               workOrderStats={workOrderStats}
               onAskAI={handleAskAIWithPrompt}
+              onAskAIRoundSummary={handleAskAIRoundSummary}
               onDeleteWorkOrder={handleDeleteWorkOrder}
               currentUser={currentUser}
             />
@@ -962,11 +999,18 @@ export default function App() {
       {/* Slide-Over AI Assistant Drawer */}
       <AIAssistantDrawer
         isOpen={isAiDrawerOpen}
-        onClose={() => setIsAiDrawerOpen(false)}
+        onClose={() => {
+          setIsAiDrawerOpen(false);
+          // เคลียร์ seed ตอนปิดด้วย ไม่งั้นเปิดแชตครั้งถัดไปผ่านปุ่ม toggle ที่
+          // sidebar (ซึ่งไม่ผ่าน handleAskAIWithPrompt) จะยังโดน effect ของ
+          // AIAssistantDrawer หยิบสรุปรอบตรวจเดิมมาแสดงซ้ำ
+          setAiDrawerSeedMessages(null);
+        }}
         activeMachine={activeMachine}
         currentUserRole={currentUser.role}
         currentUserName={currentUser.name}
         initialPrompt={aiDrawerPrompt}
+        seedMessages={aiDrawerSeedMessages}
         onOpenFullChatPage={() => {
           setIsAiDrawerOpen(false);
           setActiveTab("chat");
@@ -978,7 +1022,13 @@ export default function App() {
       {activeTab !== "chat" && (
         <AIAssistantToggleButton
           isOpen={isAiDrawerOpen}
-          onToggle={() => setIsAiDrawerOpen((prev) => !prev)}
+          onToggle={() => {
+            // เหมือนกับ onClose ด้านบน — ปุ่ม toggle นี้ปิด/เปิดแชตตรงๆ โดยไม่ผ่าน
+            // handleAskAIWithPrompt เลย จึงต้องเคลียร์ seed ที่นี่ด้วย ไม่งั้นเปิด
+            // แชตซ้ำผ่านปุ่มนี้หลังเคยกด "ให้ AI สรุป" จะยังเห็นสรุปรอบตรวจเดิม
+            setIsAiDrawerOpen((prev) => !prev);
+            setAiDrawerSeedMessages(null);
+          }}
         />
       )}
     </div>

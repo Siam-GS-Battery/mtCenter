@@ -77,6 +77,10 @@ const SHELL_TRIM = LIVE_FLOOR_THEME.machineSteelDark;
 const BODY_COLOR = LIVE_FLOOR_THEME.accent;
 const EYE_COLOR = "#1a4b8c";
 const EYE_GLASS = "#2997ff";
+// สีแก้มชมพูอ่อน — เพิ่มความน่ารัก ใช้สีทึบด้าน ไม่มี emissive ตามกฎธีมสว่าง
+const CHEEK_COLOR = "#ff8fa8";
+// สีไฟสถานะเล็กบนอก — เขียวนวลบอกว่าระบบพร้อมทำงาน (ไม่ใช้ emissive จ้า)
+const STATUS_LIGHT_COLOR = "#57c78a";
 // เดิม hardcode "#0066cc" ซึ่งตรงกับสี accent ของธีมเก่า (dark blue) เป๊ะ —
 // เปลี่ยนมา derive จาก LIVE_FLOOR_THEME.accent ให้เป็น single source of truth
 const ANTENNA_BULB = LIVE_FLOOR_THEME.accent;
@@ -220,6 +224,13 @@ function InspectorRobotImpl({
    * แคปซูลใสก้อนเดียวครอบทั้งตัว ไม่ใช่ผูก event ไว้กับ mesh ทุกชิ้น (หัว/
    * แขน/ขา) — จำนวนวัตถุที่ raycaster ต้องไล่ต่อการขยับเมาส์หนึ่งครั้งต่างกัน
    * สิบเท่า และผู้ใช้ก็คลิกโดนง่ายกว่าเพราะไม่มีช่องว่างระหว่างชิ้นส่วน
+   *
+   * ก้อนตกแต่งทุกชิ้น (วงแหวน/ขา/ลำตัว/แขน/หัว/ตา/เสาอากาศ ฯลฯ) จึงต้องปิด
+   * `raycast={() => null}` ไปด้วย — ไม่ใช่แค่ไม่ผูก event เฉย ๆ หุ่นตัวนี้เดิน
+   * ปะปนอยู่กับเครื่องจักรตลอดเวลา ถ้าปล่อยให้ชิ้นส่วนพวกนี้ยังรับ ray โดยไม่
+   * ตั้งใจ ต่อให้ไม่มี handler ก็ยังเพิ่มภาระ raycaster ทุก pointermove/click
+   * โดยไม่จำเป็นและเสี่ยงพฤติกรรมไม่คงเส้นคงวาเมื่อโค้ดรอบข้างเปลี่ยน — คงเหลือ
+   * ก้อนเดียวที่รับ ray จริงคือแคปซูล `geometry.hit` ด้านล่างเท่านั้น
    */
   const handleOver = useCallback(
     (event: ThreeEvent<PointerEvent>) => {
@@ -361,7 +372,7 @@ function InspectorRobotImpl({
 
       {/* วงแหวนแสดงว่าถูกเลือกอยู่ */}
       {selected && (
-        <mesh geometry={geometry.select} rotation={RING_ROTATION} position={[0, 0.085, 0]} castShadow={false}>
+        <mesh geometry={geometry.select} rotation={RING_ROTATION} position={[0, 0.085, 0]} castShadow={false} raycast={() => null}>
           <meshBasicMaterial
             color={LIVE_FLOOR_THEME.accent}
             transparent
@@ -372,7 +383,7 @@ function InspectorRobotImpl({
       )}
 
       {/* วงแหวนบอกตำแหน่ง + วงสแกน อยู่นอกกลุ่มที่ยกตัวขึ้นลง จะได้ติดพื้นนิ่ง */}
-      <mesh ref={ring} geometry={geometry.ring} rotation={RING_ROTATION} position={[0, 0.09, 0]} castShadow={false}>
+      <mesh ref={ring} geometry={geometry.ring} rotation={RING_ROTATION} position={[0, 0.09, 0]} castShadow={false} raycast={() => null}>
         <meshBasicMaterial ref={ringMat} color={RING_WALK} transparent opacity={0.5} depthWrite={false} />
       </mesh>
       <mesh
@@ -381,7 +392,7 @@ function InspectorRobotImpl({
         rotation={RING_ROTATION}
         position={[0, 0.1, 0]}
         visible={false}
-        castShadow={false}
+        castShadow={false} raycast={() => null}
       >
         <meshBasicMaterial color={RING_INSPECT} transparent opacity={0.4} depthWrite={false} />
       </mesh>
@@ -389,12 +400,12 @@ function InspectorRobotImpl({
       <group ref={bob}>
         {/* ---- ขาสองข้าง (หมุนที่สะโพก) ---- */}
         <group ref={legL} position={[-0.14, HIP_Y, 0]}>
-          <mesh geometry={geometry.leg} position={[0, -LEG_HEIGHT / 2, 0]} castShadow={false}>
+          <mesh geometry={geometry.leg} position={[0, -LEG_HEIGHT / 2, 0]} castShadow={false} raycast={() => null}>
             <meshStandardMaterial color={SHELL_TRIM} roughness={0.55} metalness={0.25} />
           </mesh>
         </group>
         <group ref={legR} position={[0.14, HIP_Y, 0]}>
-          <mesh geometry={geometry.leg} position={[0, -LEG_HEIGHT / 2, 0]} castShadow={false}>
+          <mesh geometry={geometry.leg} position={[0, -LEG_HEIGHT / 2, 0]} castShadow={false} raycast={() => null}>
             <meshStandardMaterial color={SHELL_TRIM} roughness={0.55} metalness={0.25} />
           </mesh>
         </group>
@@ -405,35 +416,64 @@ function InspectorRobotImpl({
           radius={0.09}
           smoothness={highQuality ? 3 : 2}
           position={[0, TORSO_Y, 0]}
-          castShadow={false}
+          castShadow={false} raycast={() => null}
         >
           <meshStandardMaterial color={BODY_COLOR} roughness={0.42} metalness={0.15} />
         </RoundedBox>
 
+        {/* แบตเตอรี/แบ็คแพ็คเล็กด้านหลังลำตัว — เติมมิติให้ตัวหุ่นดูสมบูรณ์
+            ขึ้นเวลามองจากด้านข้าง/ด้านหลัง */}
+        <RoundedBox
+          args={[0.3, TORSO_HEIGHT * 0.62, 0.09]}
+          radius={0.03}
+          smoothness={highQuality ? 3 : 2}
+          position={[0, TORSO_Y + 0.02, -0.195]}
+          castShadow={false} raycast={() => null}
+        >
+          <meshStandardMaterial color={SHELL_TRIM} roughness={0.45} metalness={0.3} />
+        </RoundedBox>
+
         {/* เสื้อกั๊กสะท้อนแสงสีส้ม — สัญลักษณ์ "ผู้เดินตรวจ" ที่คนหน้างานอ่านออกทันที */}
-        <mesh position={[0, TORSO_Y + 0.06, 0.16]} castShadow={false}>
+        <mesh position={[0, TORSO_Y + 0.06, 0.16]} castShadow={false} raycast={() => null}>
           <boxGeometry args={[0.48, 0.1, 0.02]} />
           <meshStandardMaterial color={VEST_COLOR} roughness={0.35} />
         </mesh>
 
         {/* แผงป้ายชื่อบนอก */}
-        <mesh position={[0, TORSO_Y - 0.14, 0.155]} castShadow={false}>
+        <mesh position={[0, TORSO_Y - 0.14, 0.155]} castShadow={false} raycast={() => null}>
           <boxGeometry args={[0.18, 0.12, 0.02]} />
           <meshStandardMaterial color={SHELL_COLOR} roughness={0.5} />
         </mesh>
 
+        {/* ไฟสถานะเล็กบนอก (ข้างป้ายชื่อ) — เขียวนวลด้าน ไม่ใช้ emissive
+            เป็นรายละเอียดเสริมให้ตัวหุ่นดูมีระบบทำงานอยู่ */}
+        <mesh position={[0.13, TORSO_Y - 0.14, 0.163]} castShadow={false} raycast={() => null}>
+          <sphereGeometry args={[0.022, highQuality ? 10 : 6, highQuality ? 8 : 5]} />
+          <meshStandardMaterial color={STATUS_LIGHT_COLOR} roughness={0.3} metalness={0.1} />
+        </mesh>
+
         {/* ---- แขนสองข้าง (หมุนที่ไหล่) ---- */}
         <group ref={armL} position={[-0.28, TORSO_Y + 0.2, 0]}>
-          <mesh geometry={geometry.arm} position={[0, -0.22, 0]} castShadow={false}>
+          {/* วงแหวนข้อไหล่ — บดบังรอยต่อระหว่างลำตัวกับแขนให้ดูเป็นข้อต่อจริง */}
+          <mesh rotation={[0, 0, Math.PI / 2]} castShadow={false} raycast={() => null}>
+            <cylinderGeometry args={[0.07, 0.07, 0.03, highQuality ? 12 : 8]} />
+            <meshStandardMaterial color={SHELL_TRIM} roughness={0.4} metalness={0.35} />
+          </mesh>
+          <mesh geometry={geometry.arm} position={[0, -0.22, 0]} castShadow={false} raycast={() => null}>
             <meshStandardMaterial color={SHELL_COLOR} roughness={0.5} metalness={0.1} />
           </mesh>
         </group>
         <group ref={armR} position={[0.28, TORSO_Y + 0.2, 0]}>
-          <mesh geometry={geometry.arm} position={[0, -0.22, 0]} castShadow={false}>
+          {/* วงแหวนข้อไหล่ */}
+          <mesh rotation={[0, 0, Math.PI / 2]} castShadow={false} raycast={() => null}>
+            <cylinderGeometry args={[0.07, 0.07, 0.03, highQuality ? 12 : 8]} />
+            <meshStandardMaterial color={SHELL_TRIM} roughness={0.4} metalness={0.35} />
+          </mesh>
+          <mesh geometry={geometry.arm} position={[0, -0.22, 0]} castShadow={false} raycast={() => null}>
             <meshStandardMaterial color={SHELL_COLOR} roughness={0.5} metalness={0.1} />
           </mesh>
           {/* แท็บเล็ตในมือขวา — ที่ที่หุ่นจดผลตรวจ */}
-          <mesh position={[0.02, -0.44, 0.1]} rotation={[-0.9, 0, 0]} castShadow={false}>
+          <mesh position={[0.02, -0.44, 0.1]} rotation={[-0.9, 0, 0]} castShadow={false} raycast={() => null}>
             <boxGeometry args={[0.2, 0.26, 0.02]} />
             <meshStandardMaterial color={SHELL_TRIM} roughness={0.4} metalness={0.3} />
           </mesh>
@@ -445,41 +485,65 @@ function InspectorRobotImpl({
             args={[HEAD_SIZE, HEAD_SIZE, HEAD_SIZE * 0.78]}
             radius={0.12}
             smoothness={highQuality ? 4 : 2}
-            castShadow={false}
+            castShadow={false} raycast={() => null}
           >
             <meshStandardMaterial color={SHELL_COLOR} roughness={0.38} metalness={0.12} />
           </RoundedBox>
 
           {/* แผงข้างหูสองข้าง */}
-          <mesh position={[-HEAD_SIZE / 2 - 0.03, 0, 0]} castShadow={false}>
+          <mesh position={[-HEAD_SIZE / 2 - 0.03, 0, 0]} castShadow={false} raycast={() => null}>
             <boxGeometry args={[0.07, 0.2, 0.16]} />
             <meshStandardMaterial color={SHELL_TRIM} roughness={0.45} metalness={0.3} />
           </mesh>
-          <mesh position={[HEAD_SIZE / 2 + 0.03, 0, 0]} castShadow={false}>
+          <mesh position={[HEAD_SIZE / 2 + 0.03, 0, 0]} castShadow={false} raycast={() => null}>
             <boxGeometry args={[0.07, 0.2, 0.16]} />
             <meshStandardMaterial color={SHELL_TRIM} roughness={0.45} metalness={0.3} />
           </mesh>
 
           {/* หน้าจอใบหน้า + ตาสี่เหลี่ยมโตสองดวง */}
-          <mesh position={[0, 0.02, HEAD_SIZE * 0.39 + 0.005]} castShadow={false}>
+          <mesh position={[0, 0.02, HEAD_SIZE * 0.39 + 0.005]} castShadow={false} raycast={() => null}>
             <boxGeometry args={[0.42, 0.26, 0.015]} />
             <meshStandardMaterial color={EYE_COLOR} roughness={0.25} metalness={0.05} />
           </mesh>
-          <mesh position={[-0.1, 0.03, HEAD_SIZE * 0.39 + 0.016]} castShadow={false}>
+          <mesh position={[-0.1, 0.03, HEAD_SIZE * 0.39 + 0.016]} castShadow={false} raycast={() => null}>
             <boxGeometry args={[0.1, 0.1, 0.012]} />
             <meshStandardMaterial color={EYE_GLASS} roughness={0.2} />
           </mesh>
-          <mesh position={[0.1, 0.03, HEAD_SIZE * 0.39 + 0.016]} castShadow={false}>
+          <mesh position={[0.1, 0.03, HEAD_SIZE * 0.39 + 0.016]} castShadow={false} raycast={() => null}>
             <boxGeometry args={[0.1, 0.1, 0.012]} />
             <meshStandardMaterial color={EYE_GLASS} roughness={0.2} />
           </mesh>
 
+          {/* รอยยิ้มบางๆ ใต้ตา — เส้นโค้งง่ายๆ จากแคปซูลแบนบิดองศาเล็กน้อย
+              ให้หน้าจอดูมีอารมณ์ ไม่ใช่แค่ตาสี่เหลี่ยมนิ่งๆ */}
+          <mesh
+            position={[0, -0.05, HEAD_SIZE * 0.39 + 0.016]}
+            rotation={[0, 0, Math.PI / 2]}
+            castShadow={false}
+            raycast={() => null}
+          >
+            <capsuleGeometry args={[0.006, 0.1, 2, highQuality ? 8 : 4]} />
+            <meshStandardMaterial color={EYE_GLASS} roughness={0.2} />
+          </mesh>
+
+          {/* แก้มชมพูน่ารักสองข้าง — วางใต้และนอกดวงตา แบนลงทาง Z เล็กน้อย
+              เพื่อให้แนบผิวหน้าจอโดยไม่ทะลุเปลือกหัว สีทึบด้าน ไม่มี emissive
+              ตามกฎธีมสว่างของไฟล์นี้ */}
+          <mesh position={[-0.17, -0.04, HEAD_SIZE * 0.39 + 0.01]} scale={[1, 1, 0.4]} castShadow={false} raycast={() => null}>
+            <sphereGeometry args={[0.045, highQuality ? 12 : 6, highQuality ? 10 : 5]} />
+            <meshStandardMaterial color={CHEEK_COLOR} roughness={0.55} metalness={0} />
+          </mesh>
+          <mesh position={[0.17, -0.04, HEAD_SIZE * 0.39 + 0.01]} scale={[1, 1, 0.4]} castShadow={false} raycast={() => null}>
+            <sphereGeometry args={[0.045, highQuality ? 12 : 6, highQuality ? 10 : 5]} />
+            <meshStandardMaterial color={CHEEK_COLOR} roughness={0.55} metalness={0} />
+          </mesh>
+
           {/* เสาอากาศ + หลอดไฟบนยอด */}
-          <mesh position={[0, HEAD_SIZE / 2 + 0.1, 0]} castShadow={false}>
+          <mesh position={[0, HEAD_SIZE / 2 + 0.1, 0]} castShadow={false} raycast={() => null}>
             <cylinderGeometry args={[0.018, 0.018, 0.2, 6]} />
             <meshStandardMaterial color={SHELL_TRIM} roughness={0.4} metalness={0.4} />
           </mesh>
-          <mesh ref={bulb} position={[0, HEAD_SIZE / 2 + 0.23, 0]} castShadow={false}>
+          <mesh ref={bulb} position={[0, HEAD_SIZE / 2 + 0.23, 0]} castShadow={false} raycast={() => null}>
             <sphereGeometry args={[0.062, highQuality ? 12 : 6, highQuality ? 10 : 5]} />
             <meshStandardMaterial
               color={ANTENNA_BULB}

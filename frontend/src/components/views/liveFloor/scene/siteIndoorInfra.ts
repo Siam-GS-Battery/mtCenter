@@ -16,6 +16,7 @@ import {
   INDOOR_WALK_OFFSET,
   WALKWAY_WIDTH,
   WALKWAY_CLEARANCE,
+  eaveYOf,
   type Buckets,
 } from "./siteShared";
 
@@ -195,7 +196,7 @@ export function buildIndoorRoads(hallW: number, hallD: number, b: Buckets) {
  * ไว้ที่ระดับ `hall.h` พอดี จึงอ่านเป็นอาคารย่อยอยู่ *ใน* โรง ไม่ใช่ชนกัน
  */
 export function buildLineHalls(zones: PlantZone[], hallHeight: number, bay: number, b: Buckets) {
-  const eaveY = hallHeight * 0.78;
+  const eaveY = eaveYOf(hallHeight);
   const ridgeRise = hallHeight * 0.12;
 
   for (const zone of zones) {

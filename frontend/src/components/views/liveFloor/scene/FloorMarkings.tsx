@@ -4,6 +4,7 @@ import type { PlacedMachine, PlantLayout } from "../../../../lib/plantLayout";
 import { mergeAll, slabGeometry } from "./geometryKit";
 import { INDOOR_ROAD_OFFSET, INDOOR_ROAD_W, ringStrip } from "./indoorLanes";
 import { MARKINGS } from "./palette";
+import { RACKED_ZONE_IDS } from "./WarehouseRacking";
 
 /**
  * ===========================================================================
@@ -321,13 +322,16 @@ function buildMarkings(layout: PlantLayout): Partial<Record<MarkKey, THREE.Buffe
 
   // --- 3. ลานพาเลท — หยิบโซนแรกตามลำดับที่ประกาศไว้ (deterministic), ต้อง
   //        ไม่ทับเครื่องจักรตัวใดในโซนนั้นเลย (ข้ามช่องนั้นถ้าไม่มีที่ว่าง) --
-  // ยกเว้นโซน `WH` เสมอ — "ลานพาเลทว่างที่ทาสีไว้" มีความหมายเฉพาะในโซนการ
-  // ผลิตที่ยังไม่มีที่เก็บของจริง (จุดพักงานระหว่างทำ) แต่ `WH` มีชั้นวางพาเลท
-  // จริง 3 มิติแล้ว (`WarehouseRacking.tsx`, roadmap step 8) — ทาสีลานว่างทับ
-  // ชั้นวางจริงจะขัดกันเอง (ป้ายบอก "ที่ว่างเปล่า" ซ้อนอยู่ใต้ชั้นวางที่เต็มไป
-  // ด้วยพาเลท) จึงกรอง `WH` ออกก่อนหยิบ `PALLET_ZONE_COUNT` โซนแรก แทนที่จะ
-  // slice ดิบ ๆ ตามลำดับประกาศ
-  const baySeedZones = site.zones.filter((z) => z.id !== "WH").slice(0, PALLET_ZONE_COUNT);
+  // ยกเว้นทุกโซนที่มีชั้นวางพาเลทจริงอยู่แล้ว (`RACKED_ZONE_IDS`, มาจาก
+  // `WarehouseRacking.tsx`'s `RACK_ZONE_CONFIGS` โดยตรง ไม่ hardcode id ซ้ำ
+  // ไว้ที่นี่ กันสองรายการนี้ไหลตามกันไม่ทันในอนาคต) — "ลานพาเลทว่างที่ทาสี
+  // ไว้" มีความหมายเฉพาะในโซนการผลิตที่ยังไม่มีที่เก็บของจริง (จุดพักงาน
+  // ระหว่างทำ) แต่โซนที่อยู่ใน `RACKED_ZONE_IDS` มีชั้นวางพาเลทจริง 3 มิติแล้ว
+  // (`WarehouseRacking.tsx`, roadmap step 8) — ทาสีลานว่างทับชั้นวางจริงจะขัด
+  // กันเอง (ป้ายบอก "ที่ว่างเปล่า" ซ้อนอยู่ใต้ชั้นวางที่เต็มไปด้วยพาเลท) จึง
+  // กรองออกก่อนหยิบ `PALLET_ZONE_COUNT` โซนแรก แทนที่จะ slice ดิบ ๆ ตามลำดับ
+  // ประกาศ
+  const baySeedZones = site.zones.filter((z) => !RACKED_ZONE_IDS.has(z.id)).slice(0, PALLET_ZONE_COUNT);
   baySeedZones.forEach((zone, i) => {
     // Spatial overlap, not `m.zoneId === zone.id` — a rotated machine
     // assigned to the neighbouring zone can still overhang this zone's own

@@ -230,6 +230,37 @@ export const LIVE_FLOOR_THEME = {
     boxBg: "#f4f5f7",
     accentHover: "#0a6cb5",
   },
+  /**
+   * NIGHT MODE (roadmap step 16) — additive block, does not touch any
+   * existing key above. Sky/fog/sun/ambient tokens for the real-time day/night
+   * cycle in `scene/TimeOfDaySky.tsx`, plus emissive tokens for the plant's own
+   * night lighting (pole lights, office windows, gate/guard house).
+   *
+   * Deliberately NOT touching `status`/`stackLight` above: those are emissive
+   * materials that render independent of scene light intensity (see note 1 at
+   * the top of this file) and the night sky is DARKER than the day background,
+   * so status legibility only improves after dark — it never needs a separate
+   * night variant.
+   */
+  night: {
+    /** deep-night sky/background */
+    skyNight: "#0b1220",
+    /** dawn/dusk horizon band — warm, low-saturation so it doesn't compete with status colours */
+    skyDawn: "#6b7f9e",
+    skyDusk: "#7a6a5a",
+    /** midday sky — brighter, cooler than the daytime background/fog above (those stay a neutral studio grey) */
+    skyDay: "#bcd2e8",
+    /** fog tint at night — cool dark grey, never pure black so distant shapes still separate from it */
+    fogNight: "#1a2333",
+    /** sun disc colour through the day arc */
+    sunDawn: "#ffb37a",
+    sunDay: "#ffffff",
+    sunDusk: "#ff9a5c",
+    /** plant's own night lighting — pole lamp + office window + gate glow (all emissive, unlit materials) */
+    poleLampLit: "#ffdca0",
+    windowLit: "#ffd9a0",
+    gateLit: "#ffe2ad",
+  },
 } as const;
 
 export type LiveFloorTheme = typeof LIVE_FLOOR_THEME;

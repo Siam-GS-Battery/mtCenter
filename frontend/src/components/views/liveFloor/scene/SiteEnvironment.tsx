@@ -12,8 +12,14 @@ import {
   buildCompressorRoom,
   buildFireHydrants,
   buildFireCabinets,
+  coolingExtractionAnchor,
+  buildCoolingExtractionPlant,
+  buildExtractionDucting,
+  buildExhaustStacks,
+  fireWaterAnchor,
+  buildFireWaterPlant,
 } from "./siteUtilities";
-import { buildGreenery } from "./siteGreenery";
+import { buildGreenery, buildRoadsideHedges, buildOfficeFrontageHedges } from "./siteGreenery";
 import { buildOfficeBuildings, buildOfficeLinks, officeSites, officeEntryCorridors } from "./siteOffice";
 import { buildSiteBuildings } from "./siteEntrance";
 
@@ -104,7 +110,6 @@ export function SiteEnvironment({ layout, roofOpen = false }: SiteEnvironmentPro
     const whZone = layout.site.zones.find((z) => z.id === "WH");
     const dockCorridor = buildLoadingDock(hall.d, whZone, layout.site.sheds, layout.site.buildings, b);
     const substationCorridor = buildSubstation(hall.d, layout.site.sheds, layout.site.buildings, b);
-    const extraCorridors = [dockCorridor, substationCorridor].filter((c): c is Corridor => c !== null);
 
     // --- ห้องปั๊มลม: ยึดโรงเก็บของจริงชื่อ "AIR COMP" ทั้งสองหลัง (มีกี่หลังก็
     // ทำเท่านั้น — ไม่มีเลยก็ข้ามเงียบ ๆ เหมือน `buildSubstation`/`buildLoadingDock`) --
@@ -116,9 +121,42 @@ export function SiteEnvironment({ layout, roofOpen = false }: SiteEnvironmentPro
     const heatZones = layout.site.zones.filter((z) => z.id.startsWith("HT-"));
     buildAirHeaderRun(forgingZones, hall.h, bay, layout.machines, b);
     buildAirHeaderRun(heatZones, hall.h, bay, layout.machines, b);
+
+    // --- ระบบทำความเย็นและดักฝุ่น/ไอควัน: ยึดโรงเก็บของจริงชื่อ "WATER PUMP"
+    // (แถวเดียวกับ TR/AIR COMP — ไม่มีก็ข้ามเงียบ ๆ เหมือนกลุ่มอื่น) — ส่ง
+    // `substationCorridor` เข้าไปด้วยให้ `coolingExtractionAnchor` บังคับระยะ
+    // เผื่อจากกลุ่มสถานีไฟฟ้าจริง (ไม่ใช่แค่เช็ค sheds/buildings เหมือนเดิม) —
+    // ท่อดักฝุ่นยึดเฉพาะแถวตีขึ้นรูปที่ต่อออกไปได้จริง (ดู comment ที่
+    // `buildExtractionDucting`) ปล่องระบายไอความร้อนยึดกล่องขอบเขตโซนอบชุบ
+    // ตรง ๆ ไม่ต้องมี anchor ---------------------------------------------------
+    const coolingAnchor = coolingExtractionAnchor(
+      hall.d,
+      layout.site.sheds,
+      layout.site.buildings,
+      substationCorridor ? [substationCorridor] : []
+    );
+    const coolingCorridor = coolingAnchor ? buildCoolingExtractionPlant(coolingAnchor, b) : null;
+    if (coolingAnchor) buildExtractionDucting(forgingZones, hall.h, hall.d, bay, layout.machines, coolingAnchor, b);
+    buildExhaustStacks(heatZones, hall.h, b);
+
+    // --- ระบบเก็บสำรองน้ำ/น้ำดับเพลิง: ยึดอาคารจริงชื่อ "WATER PUMP" ใน
+    // `layout.site.buildings` (คนละหลังกับโรงเก็บของ "WATER PUMP" ที่กลุ่ม
+    // ทำความเย็นยึดไปแล้ว — ดู comment ที่ `fireWaterAnchor`) — ส่ง corridor
+    // ของกลุ่มท่ารับ-ส่งของ/สถานีไฟฟ้า/ทำความเย็นเข้าไปด้วยให้บังคับระยะเผื่อ
+    // จริงเหมือนที่ `coolingExtractionAnchor` ทำกับ `substationCorridor` -----
+    const preFireWaterCorridors = [dockCorridor, substationCorridor, coolingCorridor].filter(
+      (c): c is Corridor => c !== null
+    );
+    const fwAnchor = fireWaterAnchor(hall.d, layout.site.sheds, layout.site.buildings, preFireWaterCorridors);
+    const fireWaterCorridor = fwAnchor ? buildFireWaterPlant(fwAnchor, b) : null;
+
+    const extraCorridors = [dockCorridor, substationCorridor, coolingCorridor, fireWaterCorridor].filter(
+      (c): c is Corridor => c !== null
+    );
     buildGreenery(hall.w, hall.d, b, extraCorridors);
     buildOfficeBuildings(hall.w, hall.d, b);
     buildOfficeLinks(hall.w, hall.d, b);
+    buildOfficeFrontageHedges(hall.w, hall.d, b);
     buildLineToPerimeterLinks(layout.lines, hall.w, hall.d, b);
     const gateRoad = layout.site.roads.find((r) => r.name === "MAIN GATE road");
     const gateCorridors = buildSiteBuildings(hall.w, hall.d, b, gateRoad);
@@ -140,8 +178,14 @@ export function SiteEnvironment({ layout, roofOpen = false }: SiteEnvironmentPro
       ...officeFootprints,
       ...officeEntryCorridors(hall.w, hall.d),
     ];
+    // `extraCorridors` above already carries `fireWaterCorridor` (see the
+    // fire-water block) — no need to add it again here separately.
     buildFireHydrants(hall.w, hall.d, b, fireExclusions);
     buildFireCabinets(hall.w, hall.d, b, fireExclusions);
+    // พุ่มเตี้ยเลียบถนนบริการวงรอบ — ใช้ชุดกันชนเดียวกับหัวจ่ายน้ำ/ตู้ดับเพลิง
+    // ข้างบน (ท่ารับ-ส่งของ/สถานีไฟฟ้า/ประตู/ทางเข้าอาคารสำนักงานครบ) ไม่ได้คิด
+    // กลไกกันชนใหม่
+    buildRoadsideHedges(hall.w, hall.d, b, fireExclusions);
 
     const out: Partial<Record<EnvKey, THREE.BufferGeometry>> = {};
     for (const key of ENV_KEYS) {

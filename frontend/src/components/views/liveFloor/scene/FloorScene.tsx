@@ -7,12 +7,16 @@ import type { PlantLayout } from "../../../../lib/plantLayout";
 import { isWideCameraPreset, type CameraFocusBox, type PlantCameraPreset } from "./sceneConfig";
 import { BACKGROUND, FOG, LIGHT } from "./palette";
 import FloorGrid from "./FloorGrid";
+import FloorActivity from "./FloorActivity";
 import FloorMarkings from "./FloorMarkings";
+import Forklifts from "./Forklifts";
 import MachineInstances from "./MachineInstances";
 import PlantShell from "./PlantShell";
+import ProcessEffects from "./ProcessEffects";
 import ProductionLines from "./ProductionLines";
 import SceneAnnotations from "./SceneAnnotations";
 import SiteEnvironment from "./SiteEnvironment";
+import TimeOfDaySky from "./TimeOfDaySky";
 import WarehouseRacking from "./WarehouseRacking";
 
 /**
@@ -69,6 +73,18 @@ const EYE_HEIGHT = 1.7;
 
 /** สัดส่วนที่กล้อง/เป้าเลื่อนเข้าหาค่าเป้าหมายต่อเฟรม (ยิ่งน้อยยิ่งนวล) */
 const CAMERA_EASE = 0.08;
+
+/**
+ * ระยะ/ความสูงกล้องตอน "ตามหุ่น" (เมตร) — มุมเฉียงหลังไหล่ (over-the-shoulder)
+ *
+ * ค่าคงที่ตายตัว "ไม่" สเกลตาม `scale.factor` ของ `buildPlantLayout` โดยตั้งใจ
+ * — factor นั้นแค่ขยาย "ระยะห่างระหว่างเครื่อง" ในผังให้พอดีจำนวนเครื่องจริง
+ * (ดูคอมเมนต์ sx/sz ใน LiveFloorView.tsx) ไม่มี <group scale> ห่อฉากทั้งก้อน
+ * เมช/หุ่นยนต์ยังเรนเดอร์ 1:1 เมตรเสมอ หุ่นสูงจริงราว 1.8 ม. จึงใช้ระยะคงที่
+ * ที่เฟรมพอดีกับ fov 45 ได้ทุกไซต์ ไม่ว่าโรงงานจะใหญ่แค่ไหน
+ */
+const FOLLOW_DISTANCE = 14;
+const FOLLOW_HEIGHT = 7.5;
 
 interface CameraPlacement {
   position: [number, number, number];
@@ -227,6 +243,16 @@ function CameraRig({
     flyingRef.current = true;
   }, [placement]);
 
+  // จำไว้ว่าเฟรมก่อนหน้า "ตามหุ่น" อยู่หรือไม่ — ใช้จับจังหวะเปลี่ยนจาก
+  // ปิด→เปิด follow (transition) เพื่อบังคับระยะซูมใกล้แค่ครั้งเดียวตอนเข้าโหมด
+  // ไม่ใช่ทุกเฟรม ไม่งั้นจะไปแย่งกล้องจากมือผู้ใช้ที่ซูม/หมุนเองอยู่ระหว่างตามหุ่น
+  const followEngagedRef = useRef(false);
+
+  // ตำแหน่งหุ่นยนต์ (target) เมื่อเฟรมก่อนหน้า — ใช้คำนวณ "delta" ที่หุ่น
+  // ขยับไปในเฟรมนี้ เพื่อแปลกล้อง+เป้าด้วยระยะเท่ากันเป๊ะ (ดูคอมเมนต์ที่จุดใช้
+  // งานด้านล่าง เรื่อง chase camera)
+  const followTargetPrev = useRef(new THREE.Vector3());
+
   useFrame(() => {
     const controls = controlsRef.current;
 
@@ -262,17 +288,83 @@ function CameraRig({
     // (หุ่นยนต์เดินตรวจ) ขยับทุกเฟรม ถ้าเป็น prop ที่เป็นค่าจะ re-render
     // subtree ทั้งก้อนทุกเฟรม
     const follow = followPoint?.() ?? null;
+    // follow ปิดแล้ว (ไม่ว่ากำลังบินกลับ preset หรือผู้ใช้ถือกล้องอยู่เฉย ๆ)
+    // — เคลียร์ธงไว้ เพื่อให้ครั้งหน้าที่กดตามหุ่นใหม่ถือเป็น transition
+    //
+    // บั๊กที่แก้: ถ้าผู้ใช้คว้ากล้องเอง (ลาก/ซูม) ระหว่างตามหุ่นอยู่ —
+    // onStart จะเซ็ต flyingRef เป็น false ไปแล้วตอนนั้น — แล้วค่อยกดปิด
+    // ตามหุ่นทีหลัง จะเข้า branch `else { return; }` ด้านล่างทันที (ข้าม
+    // `else if (flyingRef.current)` ที่บินกลับ preset ไปเฉย ๆ) ผลคือกล้อง
+    // ค้างอยู่ที่เดิม และ `controls.target` ค้างอยู่ที่ตำแหน่งสุดท้ายของ
+    // หุ่นยนต์ตลอดไป ไม่มีอะไรมาบังคับให้บินกลับ preset อีกเลย จึงต้อง
+    // บังคับ flyingRef กลับเป็น true ตรงจังหวะปิด follow เสมอ (เฉพาะตอนที่
+    // เพิ่ง engaged จริง ไม่ใช่ทุกเฟรมที่ follow ปิดอยู่แล้ว)
+    if (!follow) {
+      if (followEngagedRef.current) flyingRef.current = true;
+      followEngagedRef.current = false;
+    }
 
     if (follow) {
-      // ตามจุดที่กำลังเคลื่อน: คงระยะ/ทิศของมุมที่เลือกอยู่ แค่ย้ายเป้า
-      // โหมดนี้ถือกล้องต่อเนื่องโดยเจตนา — ผู้ใช้เป็นคนสั่งให้ตามหุ่นเอง และ
-      // ปิดได้จากปุ่ม "ตามหุ่น" ใน InspectorPanel
+      // ตามจุดที่กำลังเคลื่อน: เป้าเลื่อนตามหุ่นทุกเฟรมเสมอ (แม้ผู้ใช้กำลังลาก
+      // หมุนกล้องเองอยู่) เพื่อให้การหมุนด้วยเมาส์วนรอบตัวหุ่น ไม่ใช่วนรอบจุด
+      // เก่าที่หุ่นเดินจากไปแล้ว — ปิดโหมดนี้ได้จากปุ่ม "ตามหุ่น" ใน
+      // InspectorPanel
       desiredTarget.current.set(follow.x, 0, follow.z);
-      desiredPos.current.set(
-        follow.x + (placement.position[0] - placement.target[0]),
-        placement.position[1],
-        follow.z + (placement.position[2] - placement.target[2])
-      );
+
+      // ทิศ (azimuth) เอามาจาก offset ของมุมกล้อง preset ที่เลือกอยู่ (เหมือน
+      // เดิม) กดตามหุ่นแล้วมุมมองจึงไม่สะบัดไปทิศอื่น แค่ดึงระยะเข้าใกล้แบบ
+      // over-the-shoulder ด้วย FOLLOW_DISTANCE/FOLLOW_HEIGHT แทนระยะไกลของ
+      // preset เดิม
+      const offX = placement.position[0] - placement.target[0];
+      const offZ = placement.position[2] - placement.target[2];
+      const offLen = Math.hypot(offX, offZ) || 1;
+
+      // บังคับระยะใกล้เฉพาะ "ตอนเพิ่งเปิด follow" หรือระหว่างที่ rig ยังถือ
+      // กล้องบินเข้าหาอยู่ (flyingRef true) — ถ้าผู้ใช้คว้ากล้องเอง onStart
+      // จะเซ็ต flyingRef เป็น false ทันที เฟรมถัดไปเราก็จะเลิกบังคับระยะ ปล่อย
+      // ให้ผู้ใช้ซูม/หมุนรอบหุ่นได้อิสระ โดยเป้ายังคงเลื่อนตามหุ่นต่อไปด้านบน
+      if (flyingRef.current || !followEngagedRef.current) {
+        desiredPos.current.set(
+          follow.x + (offX / offLen) * FOLLOW_DISTANCE,
+          FOLLOW_HEIGHT,
+          follow.z + (offZ / offLen) * FOLLOW_DISTANCE
+        );
+        flyingRef.current = true;
+        // เพิ่งเข้าโหมด (หรือยังบินเข้าเฟรมอยู่) — รีเซ็ตตำแหน่งหุ่นเฟรมก่อนหน้า
+        // ไว้ที่ตำแหน่งปัจจุบัน กัน chase branch ด้านล่างคำนวณ delta เพี้ยนจาก
+        // ตำแหน่งหุ่นก่อนเข้าโหมด/ก่อนบินถึง ในเฟรมแรกที่ผู้ใช้คว้ากล้อง
+        followTargetPrev.current.copy(desiredTarget.current);
+      } else {
+        // CHASE CAMERA แท้ ๆ — ผู้ใช้คว้ากล้องเอง (หมุน/ซูม/แพน) อยู่ระหว่าง
+        // ตามหุ่น: แปล "ทั้งกล้องและเป้า" ด้วย delta ที่หุ่นขยับในเฟรมนี้
+        // ตรง ๆ (ไม่ lerp) เพื่อรักษา offset (ระยะ/มุม/ซูมที่ผู้ใช้ปรับเอง)
+        // ให้คงที่เป๊ะทุกเฟรม — เท่ากับลาก "กรอบ" ทั้งกรอบตามหุ่นไปเรื่อย ๆ
+        //
+        // บั๊กที่แก้: เดิม branch นี้ขยับแค่ controls.target (lerp เข้าหาหุ่น
+        // 8%/เฟรม ที่ท้ายฟังก์ชัน) แต่ปล่อย camera.position นิ่งอยู่กับที่
+        // (โค้ดเดิม copy ตัวเอง = no-op) OrbitControls.update() คำนวณ
+        // spherical (ระยะ/มุม) ใหม่จาก position-target ทุกเฟรมอยู่แล้ว พอเป้า
+        // คืบออกจากกล้องไปเรื่อย ๆ (หุ่นเดินต่อเนื่อง) ระยะ/มุมที่เห็นจึงเพี้ยน
+        // สะสมไม่มีที่สิ้นสุด สุดท้ายหุ่นหลุดเฟรมไปเลย — แก้โดยย้ายกล้องตาม
+        // เป้าด้วย delta เดียวกันเป๊ะทุกเฟรมแทน
+        //
+        // ผลคือ: หมุน (orbit) และซูมยังทำได้อิสระ เพราะ OrbitControls แก้ไข
+        // camera.position ของมันเองระหว่างลาก ส่วนที่นี่แค่ "เลื่อน" กรอบที่
+        // ผู้ใช้ปรับไว้ตามหุ่นทุกเฟรม ไม่ไปยุ่งกับระยะ/มุมที่ผู้ใช้ตั้ง —
+        // ส่วนการแพน (pan) จะถูกโหมดตามหุ่นดึงเป้ากลับไปที่ตัวหุ่นทุกเฟรม
+        // เสมอ (ตั้งใจ: การแพนขณะตามหุ่นไม่ทำให้หลุดจากหุ่น ถือเป็นพฤติกรรม
+        // ที่คาดเดาง่ายที่สุด)
+        const dx = follow.x - followTargetPrev.current.x;
+        const dz = follow.z - followTargetPrev.current.z;
+        camera.position.x += dx;
+        camera.position.z += dz;
+        controls.target.copy(desiredTarget.current);
+        followTargetPrev.current.copy(desiredTarget.current);
+        // ให้บรรทัด lerp ท้ายฟังก์ชันเป็น no-op (ค่าตรงกันอยู่แล้ว จากที่ตั้ง
+        // ตรง ๆ ไปข้างบน) — การแปลของ chase camera ต้องเป๊ะ ไม่ผ่าน ease อีกชั้น
+        desiredPos.current.copy(camera.position);
+      }
+      followEngagedRef.current = true;
     } else if (flyingRef.current) {
       desiredPos.current.set(...placement.position);
       desiredTarget.current.set(...placement.target);
@@ -402,10 +494,22 @@ function Lights({
   siteWidth,
   siteDepth,
   highQuality,
+  sunRef,
+  ambientRef,
+  hemiRef,
 }: {
   siteWidth: number;
   siteDepth: number;
   highQuality: boolean;
+  /**
+   * ref สามตัวนี้ให้ `TimeOfDaySky` (roadmap step 16) เขียนสี/ความเข้ม/ทิศทาง
+   * ทับทุก ~30 วิ ตามเวลานาฬิกาจริง — ตัว JSX ด้านล่างยังกำหนดค่าเริ่มต้น
+   * (ตำแหน่ง/ความเข้ม) ไว้เหมือนเดิมทุกอย่าง `TimeOfDaySky` แค่ mutate ทับหลัง
+   * mount เท่านั้น ไม่มีอะไรเปลี่ยนถ้าไม่ mount มัน (เช่นตอนที่ยังไม่พร้อม)
+   */
+  sunRef?: React.RefObject<THREE.DirectionalLight | null>;
+  ambientRef?: React.RefObject<THREE.AmbientLight | null>;
+  hemiRef?: React.RefObject<THREE.HemisphereLight | null>;
 }) {
   // ดวงอาทิตย์ต้องถอยตามขนาดไซต์ ไม่ใช่ตำแหน่งตายตัว ไม่งั้นไซต์ใหญ่จะมีแสง
   // ส่องถึงแค่มุมเดียว
@@ -446,12 +550,14 @@ function Lights({
           away from the key light room to actually go darker, which is what
           "shape" looks like. The floor is being deepened in parallel
           (#f4f5f7→#e2e6ea), so this isn't fighting for contrast alone. */}
-      <hemisphereLight args={[LIGHT.ambient, LIGHT.hemisphereGround, 0.7]} />
-      <ambientLight intensity={0.48} />
+      <hemisphereLight ref={hemiRef} args={[LIGHT.ambient, LIGHT.hemisphereGround, 0.7]} />
+      <ambientLight ref={ambientRef} intensity={0.48} />
       <directionalLight
+        ref={sunRef}
         // มุมบนซ้ายด้านหน้า สูง ให้เป็นแหล่งแสงหลักเดียวที่ทอดเงา ความเข้ม
         // สูงพอให้รูปทรงเครื่องจักรอ่านออกชัดเจน (แยกด้านสว่าง/มืด) แทนการ
-        // ล้างแบนแบบ diorama เดิม
+        // ล้างแบนแบบ diorama เดิม — ค่าเริ่มต้นนี้คือกลางวัน `TimeOfDaySky`
+        // จะ mutate ตำแหน่ง/สี/ความเข้มทับตามเวลาจริงหลัง mount
         position={[-reach * 0.45, reach * 0.75, reach * 0.35]}
         intensity={1.6}
         color={LIGHT.key}
@@ -540,6 +646,12 @@ export function FloorScene({
   onContextRestored,
   children,
 }: FloorSceneProps) {
+  // ให้ `TimeOfDaySky` (roadmap step 16) เขียนทับแสงคีย์/ไฟเติมตามเวลานาฬิกา
+  // จริง — สร้าง ref ที่นี่แทนใน `Lights` เพราะทั้งสองคอมโพเนนต์ต้องแชร์กัน
+  const sunRef = useRef<THREE.DirectionalLight>(null);
+  const ambientRef = useRef<THREE.AmbientLight>(null);
+  const hemiRef = useRef<THREE.HemisphereLight>(null);
+
   return (
     <Canvas
       dpr={[1, highQuality ? DPR_CAP_HIGH : DPR_CAP_LOW]}
@@ -585,7 +697,15 @@ export function FloorScene({
         followPoint={followPoint}
         onCameraFrame={onCameraFrame}
       />
-      <Lights siteWidth={siteWidth} siteDepth={siteDepth} highQuality={highQuality} />
+      <Lights
+        siteWidth={siteWidth}
+        siteDepth={siteDepth}
+        highQuality={highQuality}
+        sunRef={sunRef}
+        ambientRef={ambientRef}
+        hemiRef={hemiRef}
+      />
+      <TimeOfDaySky layout={layout} siteWidth={siteWidth} siteDepth={siteDepth} sunRef={sunRef} ambientRef={ambientRef} hemiRef={hemiRef} />
       <PlantShell layout={layout} />
       <FloorGrid layout={layout} highQuality={highQuality} />
       <FloorMarkings layout={layout} />
@@ -599,6 +719,9 @@ export function FloorScene({
         highQuality={highQuality}
       />
       <WarehouseRacking layout={layout} />
+      <Forklifts layout={layout} />
+      <FloorActivity layout={layout} />
+      <ProcessEffects layout={layout} />
       <SceneAnnotations layout={layout} />
       {children}
     </Canvas>

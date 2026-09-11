@@ -215,7 +215,16 @@ export interface InspectionAgentOptions {
 // ---------------------------------------------------------------------------
 
 const DEFAULT_MAX_STOPS = 24;
-const DEFAULT_WALK_SPEED = 7;
+/**
+ * เดิมตั้งไว้ 7 ม./วินาที (ดูคอมเมนต์ `layoutSpeedScale` ใน
+ * `createInspectionAgent` — ค่านี้คือ "ความเร็วอ้างอิง" ก่อนคูณด้วย
+ * `layoutSpeedScale` ตามขนาดผังจริง) ผู้ใช้แจ้งว่าหลังแก้บั๊กแล้วเดินเร็วไป
+ * นิดหน่อย จึงลดลงเหลือ 5.5 (~21%) เป็นการลดทอนคงที่ ไม่ผูกกับขนาดผัง — คูณ
+ * กับ `layoutSpeedScale` เหมือนเดิม จึงยังคงสัดส่วนความเร็วระหว่างปุ่ม x1/x2/x4
+ * (`speedScale`) และระหว่างผังเล็ก/ใหญ่ไว้เท่าเดิม เปลี่ยนแค่ "ฐาน" ที่ทุกอย่าง
+ * คูณทับ
+ */
+const DEFAULT_WALK_SPEED = 5.5;
 const DEFAULT_DWELL = 1.7;
 const DEFAULT_LOOP_PAUSE = 6;
 
@@ -711,6 +720,23 @@ export function createInspectionAgent(
   let navGraph: NavGraph | null = buildNavGraph(navStripsFor(currentLayout));
   let route: InspectionStop[] = planRoute(currentLayout, maxStops);
   let totalMachines = currentLayout.machines.length;
+  /**
+   * ตัวคูณความเร็วเดินตามขนาดผังจริง — เหตุผลที่หุ่นยนต์ "ดูเหมือนไม่ขยับเลย"
+   * บนฐานข้อมูลจริง (973 เครื่องจักร) ทั้งที่ `phase === "walking"` และพิกัด
+   * เปลี่ยนทุกเฟรมจริง (ยืนยันด้วยการจำลอง step() ตรงๆ): `DEFAULT_WALK_SPEED`
+   * (7 ม./วินาที) ถูกตั้งไว้สำหรับผังอ้างอิง (94.3x74.3 ม.) แต่
+   * `buildPlantLayout` ขยายห้องโถงตามจำนวน/ความหนาแน่นเครื่องจักรจริงแบบไม่
+   * เท่ากันทั้งสองแกน (ดูคอมเมนต์ที่ `LiveFloorView.tsx` เรียก `plantLayout.ts`
+   * — ผัง 973 เครื่องจริงขยายเป็นหลักร้อยถึงเกือบพันเมตรต่อแกน) เดินด้วย
+   * ความเร็วอ้างอิงเฉยๆ แปลว่าไปจุดตรวจแรกจุดเดียวอาจกินเวลาเป็นนาที —
+   * ระยะที่ขยับต่อเฟรมเล็กจนมองไม่ออกเทียบกับพื้นที่ทั้งไซต์ที่กล้องเห็น จึง
+   * คูณความเร็วเดินตามอัตราขยายจริงของผัง (`scale.factor`) ให้รอบตรวจยังคง
+   * ใช้เวลาใกล้เคียงกับผังอ้างอิงไม่ว่าฐานข้อมูลจะมีเครื่องจักรกี่ตัว —
+   * สอดคล้องกับที่ความเร็วอ้างอิงเองก็ไม่ใช่ความเร็วเดินจริงของคนอยู่แล้ว
+   * (คนเดินจริง ~1.4 ม./วินาที) นี่คือแอนิเมชันของ digital twin ไม่ใช่การ
+   * จำลองฟิสิกส์ตรงตัว
+   */
+  let layoutSpeedScale = currentLayout.scale.factor;
 
   /**
    * จุดตั้งต้น/จุดกลับมาสรุปรายงาน — ผังใหม่ไม่มีอาคาร/ป้ายชื่อโรงเป็นข้อมูล
@@ -874,10 +900,15 @@ export function createInspectionAgent(
     totalMachines = currentLayout.machines.length;
 
     if (route.length === 0) {
-      phase = "done";
-      running = false;
-      bubble = null;
-      pushLog("route", "ยังไม่มีข้อมูลเครื่องจักรในผัง — ไม่มีจุดตรวจให้เดิน");
+      // ผังยังไม่มีเครื่องจักร (เช่น ข้อมูลจาก DB ยังโหลดไม่เสร็จตอนกดเริ่ม) —
+      // ค้างไว้ที่ "idle" แทน "done" โดยตั้งใจไม่แตะ `running`: setLayout()
+      // ด้านล่างจะเห็น phase "idle" + running ค้างจริง แล้วเรียก beginRound()
+      // ซ้ำเองทันทีที่ผังจริงมาถึง ไม่ต้องให้ผู้ใช้กดเริ่มซ้ำ — ถ้าเซ็ต "done"
+      // เหมือนเดิม รอบจะค้างตายถาวรเพราะ setLayout() วางแผนใหม่ให้เฉพาะตอน
+      // phase เป็น "idle" เท่านั้น
+      phase = "idle";
+      bubble = "รอข้อมูลเครื่องจักร…";
+      pushLog("route", "ยังไม่มีข้อมูลเครื่องจักรในผัง — รอข้อมูลก่อนเริ่มตรวจ");
       return;
     }
 
@@ -930,7 +961,7 @@ export function createInspectionAgent(
 
   /** เดินเข้าหาเป้าหมายปัจจุบัน คืน true เมื่อถึงจุดสุดท้ายของ legs แล้ว */
   function advanceAlongLegs(dt: number): boolean {
-    const speed = baseWalk * speedScale;
+    const speed = baseWalk * speedScale * layoutSpeedScale;
     let budget = speed * dt;
 
     while (budget > 0 && legIndex < legs.length) {
@@ -939,7 +970,9 @@ export function createInspectionAgent(
       const dz = target.z - z;
       const dist = Math.hypot(dx, dz);
 
-      if (dist <= ARRIVE_EPS) {
+      // เป้าหมายพัง (NaN/Infinity จากผังเสื่อมสภาพ) หรือถึงจุดหมายแล้ว —
+      // ข้ามไปเลยแทนที่จะปล่อยให้เดินค้าง เดินตรวจต้องไม่มีวันหยุดกลางทาง
+      if (!Number.isFinite(dist) || dist <= ARRIVE_EPS) {
         legIndex += 1;
         continue;
       }
@@ -1061,13 +1094,20 @@ export function createInspectionAgent(
       navGraph = buildNavGraph(navStripsFor(currentLayout));
       recomputeHome();
       totalMachines = nextLayout.machines.length;
+      layoutSpeedScale = currentLayout.scale.factor;
       // รอบที่เดินอยู่ยังใช้เส้นทางเดิม (ไม่ยกหุ่นไปวางที่ใหม่กลางรอบ);
       // รอบถัดไปจึงจะวางแผนใหม่จากผังใหม่
       if (phase === "idle") {
-        route = planRoute(currentLayout, maxStops);
-        x = homeX;
-        z = homeZ;
-        yaw = homeYaw;
+        if (running) {
+          // ผู้ใช้กดเริ่มไว้ตอนผังยังไม่มีเครื่องจักร (ดู beginRound) —
+          // ผังจริงมาถึงแล้ว เริ่มรอบทันทีโดยไม่ต้องให้กดเริ่มซ้ำ
+          beginRound();
+        } else {
+          route = planRoute(currentLayout, maxStops);
+          x = homeX;
+          z = homeZ;
+          yaw = homeYaw;
+        }
       }
       writeSnapshot();
     },

@@ -591,9 +591,13 @@ export const PLANT_SITE: PlantSite = buildPlantSite(REF_HALL);
  *
  * Positions (`x`/`z` on every feature) and the genuinely-envelope spans
  * (`zones[].w/d`, `lineBand`, `walkways[].len`, `fences[].len`,
- * `roads[].len`, `grass[].w/d`) still scale proportionally. `grass` is
- * deliberately left fully proportional: a bigger plant plausibly has more
- * open ground, and there's no single fixed-size "lawn".
+ * `roads[].len`) still scale proportionally — but `walkways[].len`,
+ * `roads[].len` and `fences[].len` are then clamped (`clampSpanToGround`) so
+ * a scaled span can never run past the ground slab `PlantShell.tsx` actually
+ * draws (`SITE_GROUND_MARGIN`); only the overshooting end is trimmed; the
+ * feature's anchored centre only shifts if trimming requires it.
+ * `grass[].w/d` is NOT proportional (see `grass:` below) — like `parking`,
+ * it is anchored position + real fixed size.
  *
  * `parking[].w/d` are BOTH kept at their real, fixed traced size (position
  * wall-anchored, same as `rooms`/`buildings`/`sheds`/`tankFarms`) — this used
@@ -674,10 +678,40 @@ function anchorPoint<T extends PlantPoint>(p: T, target: { w: number; d: number 
   return { ...p, x: anchorAxis(p.x, ref.w / 2, target.w / 2), z: anchorAxis(p.z, ref.d / 2, target.d / 2) };
 }
 
+/**
+ * Multiplier `PlantShell.tsx` uses for the base grass ground slab
+ * (`siteW = hall.w * SITE_GROUND_MARGIN`, likewise for `d`) — the single
+ * source of truth for "how far past the hall the ground actually extends",
+ * shared here so `scaleSiteTo` can clamp any line feature (`roads`,
+ * `walkways`, `fences`) whose scaled length would otherwise run past the
+ * edge of that slab and hang in empty space. Keep this in sync with
+ * `PlantShell.tsx`'s `siteW`/`siteD` — it imports this constant rather than
+ * repeating the `1.9` literal.
+ */
+export const SITE_GROUND_MARGIN = 1.9;
+
+/**
+ * Shrinks a centred line span (`center` ± `len/2` along one scene axis) so
+ * both ends stay within `[-groundHalf, groundHalf]`, trimming only the
+ * end(s) that actually overshoot — the in-bounds end (if any) keeps its
+ * exact original position, so a road that only oversteps on one side (the
+ * common case here: the anchored centre sits well inside the ground, only
+ * the far end runs off) loses just the floating tail instead of being
+ * symmetrically shortened from both ends around its centre.
+ */
+function clampSpanToGround(center: number, len: number, groundHalf: number): { center: number; len: number } {
+  const end1 = Math.min(center + len / 2, groundHalf);
+  const end2 = Math.max(center - len / 2, -groundHalf);
+  if (end2 >= end1) return { center, len: 0 };
+  return { center: (end1 + end2) / 2, len: end1 - end2 };
+}
+
 export function scaleSiteTo(target: { w: number; d: number; h?: number }): PlantSite {
   const ref = REF_HALL;
   const sx = target.w / ref.w;
   const sz = target.d / ref.d;
+  const groundHalfX = (target.w * SITE_GROUND_MARGIN) / 2;
+  const groundHalfZ = (target.d * SITE_GROUND_MARGIN) / 2;
 
   /** Position AND size scale — the only genuinely-proportional envelope
    *  rectangle left: `grass` (deliberately proportional, see below; zones
@@ -732,15 +766,44 @@ export function scaleSiteTo(target: { w: number; d: number; h?: number }): Plant
     },
     rooms: PLANT_SITE.rooms.map(anchorRectPositionOnly),
     buildings: PLANT_SITE.buildings.map(anchorBuildingPosition),
-    walkways: PLANT_SITE.walkways.map((w) => ({ ...anchorPointPosition(w), len: w.len * (w.dir === "x" ? sx : sz) })),
+    walkways: PLANT_SITE.walkways.map((w) => {
+      const anchored = anchorPointPosition(w);
+      const isX = w.dir === "x";
+      const scaledLen = w.len * (isX ? sx : sz);
+      const span = clampSpanToGround(isX ? anchored.x : anchored.z, scaledLen, isX ? groundHalfX : groundHalfZ);
+      return { ...anchored, [isX ? "x" : "z"]: span.center, len: span.len } as PlantWalkway;
+    }),
     flowerBeds: PLANT_SITE.flowerBeds.map(anchorRectPositionOnly),
     sheds: PLANT_SITE.sheds.map(anchorRectPositionOnly),
     tankFarms: PLANT_SITE.tankFarms.map(anchorPointPosition),
     parking: PLANT_SITE.parking.map(scaleParkingRect),
-    roads: PLANT_SITE.roads.map((r) => ({ ...anchorPointPosition(r), len: r.len * (r.dir === "x" ? sx : sz) })),
-    grass: PLANT_SITE.grass.map(scaleRect),
+    roads: PLANT_SITE.roads.map((r) => {
+      const anchored = anchorPointPosition(r);
+      const isX = r.dir === "x";
+      const scaledLen = r.len * (isX ? sx : sz);
+      const span = clampSpanToGround(isX ? anchored.x : anchored.z, scaledLen, isX ? groundHalfX : groundHalfZ);
+      return { ...anchored, [isX ? "x" : "z"]: span.center, len: span.len } as PlantRoad;
+    }),
+    // Real, fixed-size ground cover (a lawn/garden patch), same treatment as
+    // `rooms`/`buildings`/`sheds`/`parking`: position wall-anchored, size left
+    // exactly as traced. Used to be fully proportional (`scaleRect`) on the
+    // theory that a bigger plant plausibly has more open lawn — but that
+    // stretches BOTH axes independently (X by `sx`, Z by `sz`), and at a hall
+    // this anisotropic (`sx` ~3.45, `sz` ~7.2 for the real ~325x535 m hall)
+    // that turns a 10x10 m / 20x10 m / 12x40 m patch into wildly distorted
+    // rectangles whose anchored-adjacent corner can end up far outside the
+    // ground slab (`PlantShell.tsx`'s `siteW`/`siteD`) — reading on screen as
+    // a green rectangle floating off the plot. A patch of grass doesn't grow
+    // with the plant any more than a parking lot does.
+    grass: PLANT_SITE.grass.map(anchorRectPositionOnly),
     trees: PLANT_SITE.trees.map(anchorPointPosition),
     poles: PLANT_SITE.poles.map(anchorPointPosition),
-    fences: PLANT_SITE.fences.map((f) => ({ ...anchorPointPosition(f), len: f.len * (f.dir === "x" ? sx : sz) })),
+    fences: PLANT_SITE.fences.map((f) => {
+      const anchored = anchorPointPosition(f);
+      const isX = f.dir === "x";
+      const scaledLen = f.len * (isX ? sx : sz);
+      const span = clampSpanToGround(isX ? anchored.x : anchored.z, scaledLen, isX ? groundHalfX : groundHalfZ);
+      return { ...anchored, [isX ? "x" : "z"]: span.center, len: span.len } as PlantFence;
+    }),
   };
 }

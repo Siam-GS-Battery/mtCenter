@@ -6,6 +6,7 @@ import {
   AssistantConversation,
   useAssistantChat,
   userRoleLabel,
+  type ChatMessageWithFallback,
 } from "./ai/AssistantConversation";
 import type { WorkOrderPrefill } from "../lib/aiActions";
 import { formatWithUnit, orDash } from "../lib/format";
@@ -19,6 +20,13 @@ interface AIAssistantDrawerProps {
   /** ชื่อผู้ใช้ปัจจุบัน — แสดงในแผงยืนยันก่อนสร้างใบงาน */
   currentUserName?: string;
   initialPrompt?: string;
+  /**
+   * ข้อความที่พร้อมใช้อยู่แล้ว (ไม่ต้องเรียก backend) — ใช้ seed บทสนทนาตรงๆ
+   * ผ่าน `chat.hydrate` แทนการส่ง `initialPrompt` ไปถาม AI จริง เมื่อมีค่านี้
+   * จะมีความสำคัญกว่า `initialPrompt` (ดูตัวอย่างที่ App.tsx:
+   * handleAskAIRoundSummary — สรุปผลรอบตรวจของหุ่นยนต์แบบจำลอง)
+   */
+  seedMessages?: ChatMessageWithFallback[] | null;
   onOpenFullChatPage?: () => void;
   onAutoCreateWorkOrder?: (prefilled: WorkOrderPrefill) => void;
   onOpenCreateWorkOrderModal?: (prefilled: WorkOrderPrefill) => void;
@@ -36,6 +44,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
   currentUserRole,
   currentUserName,
   initialPrompt = "",
+  seedMessages = null,
   onOpenFullChatPage,
   onAutoCreateWorkOrder,
   onOpenCreateWorkOrderModal,
@@ -43,11 +52,18 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
   const chat = useAssistantChat(activeMachine, currentUserRole);
 
   useEffect(() => {
-    if (isOpen && initialPrompt && initialPrompt.trim() !== "") {
+    if (!isOpen) return;
+    if (seedMessages && seedMessages.length > 0) {
+      // มีข้อความสำเร็จรูปอยู่แล้ว (เช่นสรุปผลรอบตรวจแบบจำลอง) — seed ตรงเข้า
+      // บทสนทนาโดยไม่ยิง backend เลย ไม่ใช้ initialPrompt กรณีนี้
+      chat.hydrate(seedMessages);
+      return;
+    }
+    if (initialPrompt && initialPrompt.trim() !== "") {
       chat.send(initialPrompt);
     }
     // ส่งคำถามตั้งต้นเมื่อเปิดผู้ช่วยพร้อมคำถามจากหน้าจออื่น
-  }, [isOpen, initialPrompt]);
+  }, [isOpen, initialPrompt, seedMessages]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -78,13 +94,13 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
         className="relative w-full max-w-full sm:w-[480px] lg:w-[520px] xl:w-[600px] bg-white h-dvh shadow-2xl border-l border-hairline flex flex-col z-10 animate-in slide-in-from-right duration-300"
       >
         {/* Drawer Header */}
-        <div className="px-4 py-3 bg-white border-b border-hairline flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white shrink-0">
-              <PixelAILogo className="w-5 h-5" />
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-hairline shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center shrink-0">
+              <PixelAILogo className="w-4 h-4" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-sm font-semibold text-ink truncate">MT Center AI</h3>
+              <h3 className="font-semibold text-ink text-sm truncate">MT Center AI</h3>
               <div className="flex items-center gap-1.5 text-xs text-ink-muted">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                 <span>พร้อมใช้งาน</span>
@@ -101,7 +117,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
                 }}
                 title="ขยายเต็มหน้าจอ"
                 aria-label="เปิดผู้ช่วย AI แบบเต็มหน้าจอ"
-                className="h-11 w-11 rounded-full hover:bg-primary/5 text-ink-muted flex items-center justify-center transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                className="w-9 h-9 rounded-full text-ink-muted hover:text-ink hover:bg-ink/5 transition-colors cursor-pointer flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
               >
                 <Maximize2 className="w-4 h-4" />
               </button>
@@ -111,7 +127,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
               onClick={chat.reset}
               title="เริ่มการสนทนาใหม่"
               aria-label="เริ่มการสนทนาใหม่"
-              className="h-11 w-11 rounded-full hover:bg-primary/5 text-ink-muted flex items-center justify-center transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+              className="w-9 h-9 rounded-full text-ink-muted hover:text-ink hover:bg-ink/5 transition-colors cursor-pointer flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
@@ -120,9 +136,9 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
               onClick={onClose}
               title="ปิดผู้ช่วยด้านข้าง"
               aria-label="ปิดผู้ช่วยด้านข้าง"
-              className="h-11 w-11 rounded-full hover:bg-primary/5 text-ink-muted flex items-center justify-center transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+              className="w-9 h-9 rounded-full text-ink-muted hover:text-ink hover:bg-ink/5 transition-colors cursor-pointer flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>

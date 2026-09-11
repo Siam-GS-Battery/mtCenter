@@ -1,8 +1,9 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import type { ConveyorSegment, PlantLayout } from "../../../../lib/plantLayout";
 import { mergeAll } from "./geometryKit";
-import { CONVEYOR, FLOOR } from "./palette";
+import { CONVEYOR, FLOOR, PROCESS } from "./palette";
 
 /**
  * ===========================================================================
@@ -107,6 +108,156 @@ function buildSegment(
   }
 }
 
+// ---------------------------------------------------------------------------
+// กล่อง/ชิ้นงานเคลื่อนที่บนสายพาน — roadmap step 15 ("process motion")
+// ---------------------------------------------------------------------------
+//
+// สายพานเป็น merged geometry ก้อนเดียว (ดูคอมเมนต์บนสุดของไฟล์) จึงเปลี่ยน
+// สีรายท่อนไม่ได้ — ให้ "อ่านว่ากำลังวิ่ง" ด้วยกล่องเล็ก ๆ ไถลไปตามหน้าสายพาน
+// แทน (ทางเลือกที่โจทย์อนุญาตไว้แทนการ scroll UV เพราะห้ามใช้ texture ไฟล์
+// และ CanvasTexture ยังต้องผูกกับ merged mesh เดียวกันทั้งผังอยู่ดี)
+//
+// สถานะ "ไลน์นี้วิ่งจริงไหม" มาจาก `layout.machines[].status` (ที่เดียวกับที่
+// HUD/minimap ใช้) ไม่ได้คิดสถานะใหม่: ไลน์หนึ่งวิ่งก็ต่อเมื่อทุกเครื่องใน
+// ไลน์นั้น status === "run" — มีเครื่องเดียวหยุด/เตือน/idle ก็ถือว่าทั้งไลน์นิ่ง
+// (ตรงตามโจทย์ "a line with a stopped machine should be still")
+//
+// `ConveyorSegment` ไม่ได้เก็บ `lineId` ไว้ (ดู `plantLayout.ts`) จึงจับคู่ท่อน
+// สายพานเข้ากับไลน์ด้วยตำแหน่ง: ท่อนอยู่ในกล่องขอบเขตของไลน์ไหน (ขยายขอบ
+// เผื่อระยะเล็กน้อย) ก็ถือว่าเป็นของไลน์นั้น — ยังคงเป็น "อ่านจากสถานะเดิม"
+// ไม่ใช่แหล่งสถานะที่สอง เพียงแค่แม็ปตำแหน่งเข้ากับสถานะที่มีอยู่แล้ว
+//
+// งบชิ้นงาน: สูงสุด `MAX_MOVING_PARTS` ชิ้นทั้งผัง คงที่เสมอ ไม่ผูกกับจำนวน
+// เครื่องจักร/ท่อนสายพาน — ถ้าท่อนที่ "วิ่ง" มีมากกว่างบ ก็หยุดรับเพิ่มที่
+// `MAX_MOVING_PARTS` ท่อนแรกตามลำดับ `layout.conveyors` (deterministic เสมอ
+// ไม่ใช่การสุ่ม)
+const MAX_MOVING_PARTS = 48;
+/** ความเร็วไถลของกล่องบนสายพาน (ม./วินาที) — ช้าและนุ่ม ไม่ใช่แถบวิ่งเร็วจี๋ */
+const PART_SPEED = 0.45;
+const PART_LEN = 0.34;
+const PART_HEIGHT = 0.16;
+/** ระยะขอบขยายกล่องขอบเขตไลน์ตอนจับคู่ท่อนสายพาน — เผื่อท่อนที่โผล่พ้น
+ *  bounding box ของตัวเครื่องเล็กน้อย (ความกว้างสายพาน + ช่องว่างเผื่อ) */
+const LINE_MATCH_MARGIN = 2.2;
+
+/** seed -> [0,1) แบบ deterministic (sine hash เดียวกับ `FloorActivity.tsx`) */
+function hash01(seed: number): number {
+  const s = Math.sin(seed * 12.9898) * 43758.5453;
+  return s - Math.floor(s);
+}
+
+interface MovingPart {
+  /** ตำแหน่งกึ่งกลางท่อนสายพาน (world) */
+  x: number;
+  z: number;
+  /** cos/sin ของมุมหมุนท่อน — ทิศ "หน้าสายพาน" ในพิกัดโลก ตามท่อนจริง ไม่ใช่แกนตายตัว */
+  cos: number;
+  sin: number;
+  len: number;
+  width: number;
+  phase: number;
+}
+
+function buildMovingParts(layout: PlantLayout): MovingPart[] {
+  const statusById = new Map<string, string>();
+  for (const m of layout.machines) statusById.set(m.id, m.status);
+
+  const lineRunning = new Map<string, boolean>();
+  for (const line of layout.lines) {
+    const running =
+      line.machineIds.length > 0 && line.machineIds.every((id) => statusById.get(id) === "run");
+    lineRunning.set(line.id, running);
+  }
+  if (layout.lines.length === 0 || layout.conveyors.length === 0) return [];
+
+  const parts: MovingPart[] = [];
+  for (const segment of layout.conveyors) {
+    if (parts.length >= MAX_MOVING_PARTS) break;
+    if (segment.len <= PART_LEN || segment.width <= 0) continue;
+
+    // หาไลน์ที่ท่อนนี้ตกอยู่ในขอบเขต (ขยายเผื่อ) — ท่อนแรกที่ตรงเงื่อนไขพอ
+    const line = layout.lines.find(
+      (l) =>
+        segment.x >= l.x0 - LINE_MATCH_MARGIN &&
+        segment.x <= l.x1 + LINE_MATCH_MARGIN &&
+        segment.z >= l.z0 - LINE_MATCH_MARGIN &&
+        segment.z <= l.z1 + LINE_MATCH_MARGIN
+    );
+    if (!line || !lineRunning.get(line.id)) continue;
+
+    const rad = THREE.MathUtils.degToRad(segment.rot);
+    parts.push({
+      x: segment.x,
+      z: segment.z,
+      cos: Math.cos(rad),
+      sin: Math.sin(rad),
+      len: segment.len,
+      width: segment.width,
+      phase: hash01(parts.length * 7.13 + 1) * segment.len,
+    });
+  }
+  return parts;
+}
+
+const SCRATCH_POS = new THREE.Vector3();
+const SCRATCH_QUAT = new THREE.Quaternion();
+const SCRATCH_SCALE = new THREE.Vector3();
+const SCRATCH_MATRIX = new THREE.Matrix4();
+const Y_AXIS = new THREE.Vector3(0, 1, 0);
+
+/** กล่อง/ชิ้นงานเล็ก ๆ ไถลไปตามท่อนสายพานของไลน์ที่ "วิ่ง" จริง */
+function MovingBeltParts({ layout }: { layout: PlantLayout }) {
+  const parts = useMemo(() => buildMovingParts(layout), [layout]);
+  const count = parts.length;
+
+  const geometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  const material = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: PROCESS.beltCargo, roughness: 0.8, metalness: 0.02 }),
+    []
+  );
+  useEffect(() => () => material.dispose(), [material]);
+
+  const meshRef = useRef<THREE.InstancedMesh | null>(null);
+
+  useFrame(({ clock }) => {
+    const mesh = meshRef.current;
+    if (!mesh || count === 0) return;
+    const t = clock.elapsedTime;
+    for (let i = 0; i < count; i += 1) {
+      const p = parts[i]!;
+      // ตำแหน่งไถล วนรอบท่อนระหว่าง -len/2..+len/2 ตามแกน x ท้องถิ่นของท่อน
+      const span = p.len - PART_LEN;
+      const raw = (t * PART_SPEED + p.phase) % p.len;
+      const local = (raw < 0 ? raw + p.len : raw) - p.len / 2;
+      const clamped = Math.max(-span / 2, Math.min(span / 2, local));
+      // แปลงกลับเป็นพิกัดโลกด้วย cos/sin ของท่อนนั้น (ทิศจริงของท่อน ไม่ใช่แกนตายตัว)
+      const worldX = p.x + clamped * p.cos;
+      const worldZ = p.z - clamped * p.sin;
+      SCRATCH_POS.set(worldX, BELT_HEIGHT + 0.07 + 0.015 + PART_HEIGHT / 2, worldZ);
+      SCRATCH_QUAT.setFromAxisAngle(Y_AXIS, Math.atan2(-p.sin, p.cos));
+      SCRATCH_SCALE.set(PART_LEN, PART_HEIGHT, Math.max(0.2, p.width * 0.55));
+      SCRATCH_MATRIX.compose(SCRATCH_POS, SCRATCH_QUAT, SCRATCH_SCALE);
+      mesh.setMatrixAt(i, SCRATCH_MATRIX);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+  });
+
+  // ผังไม่มีไลน์ที่วิ่ง/ไม่มีสายพานเลย -> ไม่มีชิ้นงานให้ไถล ปล่อยว่างแทนการ crash
+  if (count === 0) return null;
+
+  return (
+    <instancedMesh
+      ref={(node: THREE.InstancedMesh | null) => {
+        meshRef.current = node;
+        if (node) node.raycast = () => null;
+      }}
+      args={[geometry, material, count]}
+      castShadow
+    />
+  );
+}
+
 export interface ProductionLinesProps {
   layout: PlantLayout;
 }
@@ -175,6 +326,7 @@ export function ProductionLines({ layout }: ProductionLinesProps) {
           </mesh>
         );
       })}
+      <MovingBeltParts layout={layout} />
     </group>
   );
 }

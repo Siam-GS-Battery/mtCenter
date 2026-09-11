@@ -7,9 +7,12 @@ import type { PlantLayout } from "../../../../lib/plantLayout";
 import { isWideCameraPreset, type CameraFocusBox, type PlantCameraPreset } from "./sceneConfig";
 import { BACKGROUND, FOG, LIGHT } from "./palette";
 import FloorGrid from "./FloorGrid";
+import FloorActivity from "./FloorActivity";
 import FloorMarkings from "./FloorMarkings";
+import Forklifts from "./Forklifts";
 import MachineInstances from "./MachineInstances";
 import PlantShell from "./PlantShell";
+import ProcessEffects from "./ProcessEffects";
 import ProductionLines from "./ProductionLines";
 import SceneAnnotations from "./SceneAnnotations";
 import SiteEnvironment from "./SiteEnvironment";
@@ -599,6 +602,9 @@ export function FloorScene({
         highQuality={highQuality}
       />
       <WarehouseRacking layout={layout} />
+      <Forklifts layout={layout} />
+      <FloorActivity layout={layout} />
+      <ProcessEffects layout={layout} />
       <SceneAnnotations layout={layout} />
       {children}
     </Canvas>

@@ -2,6 +2,14 @@ import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { PlacedMachine, PlantLayout } from "../../../../lib/plantLayout";
 import { RACKING } from "./palette";
+import {
+  WH_EDGE_MARGIN as EDGE_MARGIN,
+  WH_BAY_WIDTH as BAY_WIDTH,
+  WH_CROSS_AISLE_WIDTH as CROSS_AISLE_WIDTH,
+  WH_MACHINE_CLEARANCE as MACHINE_CLEARANCE,
+  computeWhZoneAxes,
+  computeWhTwoBlockSplit,
+} from "./warehouseRackingLayout";
 
 /**
  * ===========================================================================
@@ -67,18 +75,14 @@ import { RACKING } from "./palette";
  * `MachineInstances.tsx`)
  */
 
-/** ระยะเผื่อขอบโซนก่อนเริ่มวางชั้นวางแถวแรก (เมตร) */
-const EDGE_MARGIN = 2;
 /** ความลึกของเสาโครงหนึ่งต้น/ชั้นวางหนึ่งแถว (เมตร) */
 const RACK_DEPTH = 1.1;
-/** ความกว้างช่วงชั้นหนึ่งช่วง (เมตร) */
-const BAY_WIDTH = 2.7;
 /** ช่องว่างเล็กน้อยระหว่างหลังชั้นวางคู่ back-to-back (เมตร) */
 const BACK_TO_BACK_GAP = 0.2;
-/** ทางเดินฟอร์คลิฟท์ระหว่างคู่แถว back-to-back (เมตร) */
+/** ทางเดินฟอร์คลิฟท์ระหว่างคู่แถว back-to-back (เมตร) — `EDGE_MARGIN`/
+ *  `BAY_WIDTH`/`CROSS_AISLE_WIDTH`/`MACHINE_CLEARANCE` ย้ายไป
+ *  `./warehouseRackingLayout.ts` แล้ว (ใช้ร่วมกับ `Forklifts.tsx`) */
 const AISLE_WIDTH = 3.5;
-/** ทางเดินขวางที่ตัดกลางแนวช่วงชั้น กันไม่ให้เป็นบล็อกทึบตันข้ามไม่ได้ (เมตร) */
-const CROSS_AISLE_WIDTH = 3.5;
 /** ความสูงรวมของชั้นวาง (เมตร) */
 const RACK_HEIGHT = 6;
 /** ระดับคานราง 4 ชั้น ห่างกันชั้นละ 1.5 ม. (เมตร, จากฐาน) */
@@ -96,8 +100,6 @@ const PALLET_W_FRAC = 0.72;
 const PALLET_D_FRAC = 0.78;
 /** ความสูงพาเลท+สินค้ากอง (เมตร) */
 const PALLET_H = 1.05;
-/** ระยะเผื่อรอบเครื่องจักรที่ชั้นวางต้องไม่ล้ำเข้าไป (เมตร) */
-const MACHINE_CLEARANCE = 0.6;
 
 /** ฐานชั้นวาง — ดูคอมเมนต์หัวไฟล์ "ระดับความสูง (y)" */
 const BASE_Y = 0.4;
@@ -189,14 +191,10 @@ function buildRackingPlan(layout: PlantLayout): RackingPlan | null {
 
   // แกนที่ยาวกว่าเป็นแกน "ช่วงชั้น" (bay axis) แกนสั้นกว่าเป็นแกน "แถว" (row
   // axis) — บรรจุแถวได้มากที่สุดเท่าที่ zone จริงจะรับได้ ไม่ว่า zone จะกว้าง
-  // หรือลึกกว่า
-  const alongX = zone.w >= zone.d;
-  const bayAxisLen = alongX ? zone.w : zone.d;
-  const rowAxisLen = alongX ? zone.d : zone.w;
-
-  const usableBay = bayAxisLen - 2 * EDGE_MARGIN;
-  const usableRow = rowAxisLen - 2 * EDGE_MARGIN;
-  if (usableBay <= 0 || usableRow <= 0) return null;
+  // หรือลึกกว่า (สูตรใน `./warehouseRackingLayout.ts` ใช้ร่วมกับ `Forklifts.tsx`)
+  const axes = computeWhZoneAxes(zone);
+  if (!axes) return null;
+  const { alongX, usableBay, usableRow } = axes;
 
   const pairDepth = RACK_DEPTH * 2 + BACK_TO_BACK_GAP;
   const rowPitch = pairDepth + AISLE_WIDTH;
@@ -205,11 +203,13 @@ function buildRackingPlan(layout: PlantLayout): RackingPlan | null {
   if (rowPairCount < 1) return null;
 
   // ลองแบ่งเป็น 2 บล็อกคั่นด้วยทางเดินขวางก่อน (กันบล็อกทึบตัน) — ถ้าโซนแคบ
-  // เกินไปสำหรับ 2 บล็อก ถอยไปเป็นบล็อกเดียว
-  const twoBlockWidth = (usableBay - CROSS_AISLE_WIDTH) / 2;
+  // เกินไปสำหรับ 2 บล็อก ถอยไปเป็นบล็อกเดียว (fallback บล็อกเดียวนี้ใช้เฉพาะ
+  // ไฟล์นี้ — `Forklifts.tsx`'s `computeWhCrossAisle` ต้องมีทางเดินขวางเสมอ
+  // จึงหยุดที่ `null` ของ `computeWhTwoBlockSplit` ไปเลยแทน)
+  const twoBlockSplit = computeWhTwoBlockSplit(usableBay);
   let blocks = 2;
-  let baysPerBlock = Math.floor(twoBlockWidth / BAY_WIDTH);
-  if (baysPerBlock < 1) {
+  let baysPerBlock = twoBlockSplit?.baysPerBlock ?? 0;
+  if (!twoBlockSplit) {
     blocks = 1;
     baysPerBlock = Math.floor(usableBay / BAY_WIDTH);
   }

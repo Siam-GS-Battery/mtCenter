@@ -3,6 +3,13 @@ import * as THREE from "three";
 import type { PlantLayout } from "../../../../lib/plantLayout";
 import { mergeAll, slabGeometry } from "./geometryKit";
 import { FLOOR, SHELL } from "./palette";
+// อ่าน (ไม่แก้) `excludeRanges` ตัวเดียวกับที่ `buildGreenery`/`buildRingRoad`
+// ใช้เจาะช่องให้ท่ารับ-ส่งของ/ถนนวงรอบอยู่แล้ว — ดูคอมเมนต์ที่จุดเจาะผนังด้านล่าง
+import { excludeRanges } from "./siteGreenery";
+// อ่าน (ไม่แก้ นอกจาก export ค่านี้) `DOCK_DOOR_W` ตัวเดียวกับที่ `siteLogistics.ts`'s
+// `buildLoadingDock` วาดประตูม้วนท่ารับ-ส่งของจริง — ใช้ตัดสินความกว้างช่องผนัง
+// ตรงหน้าท่า แทนที่จะคัดลอกค่าคงที่แยกไว้อีกชุด (เดิมชื่อ `DOOR_W_REF`)
+import { DOCK_DOOR_W } from "./siteLogistics";
 
 /**
  * ===========================================================================
@@ -181,8 +188,51 @@ function buildShell(layout: PlantLayout): Partial<Record<ShellKey, THREE.BufferG
   // ผนังสูงแค่ 1/4 ของอาคารจริง เพื่อให้เห็นขอบเขตโรงงานแต่ไม่บังของข้างใน
   const wallH = hall.h * 0.26;
   const wallT = 0.5;
+
+  // ผนังฝั่งใต้ (-Z) เป็นฝั่งเดียวกับท่ารับ-ส่งของเสมอ — `siteLogistics.ts`'s
+  // `buildLoadingDock` ปักผนังท่าไว้ที่ `wallZ = -hallD / 2` ตรงๆ ไม่ขึ้นกับ
+  // ตำแหน่งจริงของโซน WH บนแกน Z เลย (ไฟล์นั้นห้ามแก้จึงอ้างอิงจากพฤติกรรม
+  // ของมัน ไม่ใช่เดา) เดิมผนังฝั่งนี้เป็นกล่องทึบตันยาวเต็มผนัง ทำให้ประตูม้วน
+  // ของท่า (ภาพวาดทับผนังอีกชั้นใน `siteLogistics.ts`) เป็นแค่ลวดลาย — รถยก
+  // (roadmap step 13, `Forklifts.tsx`) ที่วิ่งออกไปท่ารับ-ส่งของจึงต้องมุดทะลุ
+  // กล่องทึบนี้ทุกรอบ เจาะช่องกว้างเท่าประตูท่าจริงตรงตำแหน่ง X ของโซน WH จริง
+  // ด้วย `excludeRanges` (เทคนิคเดียวกับที่ `buildGreenery` เจาะแนวพุ่มไม้ และ
+  // `buildRingRoad` เจาะถนนวงรอบให้สิ่งปลูกสร้างจริง) แทนที่จะวาดกล่องทึบเดียว
+  //
+  // `DOCK_DOOR_W` import ตรงจาก `siteLogistics.ts` (export ไว้ให้ไฟล์นี้โดยเฉพาะ
+  // — เดิมคัดลอกค่าเป็น `DOOR_W_REF` แยกไว้ต่างหากเพราะไฟล์นั้นไม่ export ค่านี้
+  // มาก่อน ถ้าใครขยับ `DOCK_DOOR_W` แล้วลืมขยับค่าที่คัดลอกไว้ ผนังกับประตูจะไม่
+  // ตรงกันเงียบๆ จึง import ตัวเดียวกันแทน)
+  //
+  // เผื่อระยะขับผ่านจริงอีก 0.4 ม. ต่อข้าง (รถยก 1.3 ม. + กระจกมองข้าง/ระยะ
+  // เลี้ยว) ไม่ใช่ตัดแค่พอดีความกว้างประตู — ไม่มีเสาโครงสร้างใดในอาคารเลย
+  // ("ไม่มีเสาในอาคาร โดยเจตนา" ด้านล่าง) และคานขอบหลังคา/คานพาดของไฟล์นี้
+  // อยู่ที่ y = hall.h เท่านั้น (10.5 ม. — สูงกว่าผนังเตี้ยนี้เกือบ 4 เท่า)
+  // ช่องที่เจาะจึงไม่มีทางไปชนคาน/เสาใด ๆ เลยไม่ว่าจะกว้างแค่ไหน
+  //
+  // ผนังนี้เป็นกล่องทึบเต็มความสูง `wallH` (ไม่ใช่แค่ครึ่งล่าง) ช่องที่เจาะจึง
+  // เปิดโล่งทั้งความสูง — ไม่ต้องเทียบกับความสูงมาสต์รถยกเลยเพราะไม่มีวัสดุ
+  // เหลืออยู่ในช่องนั้นให้ชน (ต่างจาก `DOCK_DOOR_H` = 3.4 ม. ของประตูม้วนจริง
+  // ที่ `siteLogistics.ts` วาดไว้ ซึ่งเผื่อไว้มากกว่ามาสต์รถยก `FORKLIFT_MAST_TOP_Y`
+  // ≈ 2.79 ม. อยู่แล้ว 0.61 ม. — สอดคล้องกัน ไม่ใช่ผนังนี้แคบกว่า)
+  const whZone = site.zones.find((z) => z.id === "WH");
+  const southWallZ = -hall.d / 2;
+  if (whZone) {
+    const doorHalf = DOCK_DOOR_W / 2 + 0.4;
+    const segments = excludeRanges(-hall.w / 2, hall.w / 2, [
+      { x0: whZone.x - doorHalf, x1: whZone.x + doorHalf },
+    ]);
+    for (const seg of segments) {
+      const segLen = seg.x1 - seg.x0;
+      if (segLen <= 0.05) continue;
+      b.wall.push(box((seg.x0 + seg.x1) / 2, 0.2, southWallZ, segLen, wallH, wallT));
+    }
+  } else {
+    // ไม่มีโซน WH ในผัง (ไม่ควรเกิดขึ้นจริง) — คงผนังทึบเดิมไว้ ไม่เดาตำแหน่งช่อง
+    b.wall.push(box(0, 0.2, southWallZ, hall.w, wallH, wallT));
+  }
+
   b.wall.push(box(0, 0.2, hall.d / 2, hall.w, wallH, wallT));
-  b.wall.push(box(0, 0.2, -hall.d / 2, hall.w, wallH, wallT));
   b.wall.push(box(hall.w / 2, 0.2, 0, wallT, wallH, hall.d));
   b.wall.push(box(-hall.w / 2, 0.2, 0, wallT, wallH, hall.d));
 

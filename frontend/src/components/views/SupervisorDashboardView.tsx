@@ -46,6 +46,7 @@ import { MachineSelect } from "../MachineSelect";
 import { TelemetryTrendCard } from "./TelemetryTrendCard";
 import { MachineMetricsChart } from "./MachineMetricsChart";
 import LiveFloorView from "./liveFloor/LiveFloorView";
+import type { InspectionReport } from "../../lib/inspectionAgent";
 import {
   getMachines,
   getWorkOrders,
@@ -169,6 +170,12 @@ interface SupervisorDashboardViewProps {
   /** Same idea as `machineStats`, for GET /api/work-orders/stats. */
   workOrderStats: WorkOrderStats | null;
   onAskAI: (prompt: string) => void;
+  /**
+   * ปุ่ม "ให้ AI สรุป" บนการ์ดรายงานรอบตรวจของหุ่นยนต์ใน Live Floor 4D — เปิด
+   * แชต AI ด้านข้างพร้อมสรุปผล (จำลอง) ของรอบนั้นทันที ส่งต่อให้ LiveFloorView
+   * เท่านั้น ไม่ได้ใช้ในหน้านี้เอง
+   */
+  onAskAIRoundSummary?: (report: InspectionReport) => void;
   /**
    * Optional — this view has no work-order detail modal of its own today
    * (the machine-detail modal above only lists repair history rows), so
@@ -377,6 +384,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
   machineStats,
   workOrderStats,
   onAskAI,
+  onAskAIRoundSummary,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onDeleteWorkOrder,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -897,6 +905,7 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
           onOpenMachineDetail={handleCardSelect}
           onExit={() => setViewMode("classic")}
           onAskAI={onAskAI}
+          onAskAIRoundSummary={onAskAIRoundSummary}
           detailOpen={selectedMachine !== null}
         />
       )}

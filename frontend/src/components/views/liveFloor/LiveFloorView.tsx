@@ -6,18 +6,10 @@ import React, {
   useRef,
   useState,
 } from "react";
-import {
-  ChevronDown,
-  ChevronUp,
-  Info,
-  Loader2,
-  MonitorX,
-  RotateCcw,
-  Warehouse,
-} from "lucide-react";
+import { Loader2, MonitorX, RotateCcw } from "lucide-react";
 import { Machine, MachineStats, MachineStatus, WorkOrder } from "../../../types";
 import { buildPlantLayout } from "../../../lib/plantLayout";
-import { useInspectionAgent } from "../../../lib/inspectionAgent";
+import { useInspectionAgent, type InspectionReport } from "../../../lib/inspectionAgent";
 import PixelAILogo from "../../PixelAILogo";
 import LiveFloorHUD, { type PlantZoneSummary } from "./LiveFloorHUD";
 import { type MinimapCameraSample } from "./Minimap";
@@ -102,6 +94,11 @@ export interface LiveFloorViewProps {
   onOpenMachineDetail: (machine: Machine) => void;
   onExit: () => void;
   onAskAI?: (prompt: string) => void;
+  /**
+   * ปุ่ม "ให้ AI สรุป" บนการ์ดรายงานรอบตรวจของหุ่นยนต์ — เปิดแชต AI ด้านข้าง
+   * ทันทีพร้อมสรุปผล (จำลอง) ของรอบนั้น ส่งต่อเข้า InspectorPanel เท่านั้น
+   */
+  onAskAIRoundSummary?: (report: InspectionReport) => void;
   /**
    * true while the machine-detail modal (owned by the parent dashboard) is
    * open. The old scene used this to hide floating `<Html>` name labels so
@@ -336,6 +333,7 @@ export default function LiveFloorView({
   onOpenMachineDetail,
   onExit,
   onAskAI,
+  onAskAIRoundSummary,
   // Unused — see the prop's own doc comment. Kept so the call site (which
   // passes it based on the parent's own modal state) doesn't need editing.
   detailOpen: _detailOpen = false,
@@ -360,11 +358,10 @@ export default function LiveFloorView({
   /**
    * "เปิดหลังคา" — ซ่อนแผ่นหลังคาอาคารไลน์ผลิต เหลือแต่โครงถัก
    *
-   * เริ่มต้นเป็น true (เปิดอยู่) โดยเจตนา: หน้านี้มีไว้ดูสถานะเครื่องจักร ถ้า
-   * เปิดเข้ามาแล้วเห็นแต่หลังคาปิดทึบก็ไม่ได้ประโยชน์อะไร — ปิดหลังคาลงเป็น
-   * มุมมองเสริมสำหรับดูตัวอาคารทั้งหลัง ไม่ใช่ค่าเริ่มต้น
+   * คงที่เป็น true เสมอ (ไม่มีปุ่มสลับแล้ว): หน้านี้มีไว้ดูสถานะเครื่องจักร
+   * ถ้าเปิดเข้ามาแล้วเห็นแต่หลังคาปิดทึบก็ไม่ได้ประโยชน์อะไร
    */
-  const [roofOpen, setRoofOpen] = useState(true);
+  const roofOpen = true;
   /**
    * true = กล้องเกาะติดตัวหุ่นไปตลอด (เปิดอัตโนมัติเมื่อคลิกที่ตัวหุ่นในฉาก)
    *
@@ -393,9 +390,6 @@ export default function LiveFloorView({
   // Bumped by the same button to force a FRESH scene mount (and to reset
   // `SceneErrorBoundary`, which is keyed on it).
   const [sceneNonce, setSceneNonce] = useState(0);
-  // "รายการเครื่องจักรที่ไม่แสดงในผัง" — collapsed by default so the note
-  // stays a small pill; expanding it lists every skipped DB row by code/ชื่อ.
-  const [skippedExpanded, setSkippedExpanded] = useState(false);
 
   const webglSupported = useMemo(() => {
     void probeNonce;
@@ -406,7 +400,6 @@ export default function LiveFloorView({
   // inspector agent all share ONE instance — this build runs exactly once per
   // `machines` change.
   const plantLayout = useMemo(() => buildPlantLayout(machines), [machines]);
-  const skippedMachines = plantLayout.skipped;
 
   // O(1) id -> Machine lookup for PlantMachines' pick callbacks, which report
   // a bare machine id (see PlantMachines.tsx's picking scheme for both the
@@ -837,6 +830,7 @@ export default function LiveFloorView({
             agent={inspector}
             snapshot={inspectorSnapshot}
             onAskAI={onAskAI}
+            onAskAIRoundSummary={onAskAIRoundSummary}
             follow={inspectorFollow}
             onToggleFollow={handleToggleFollow}
             onClose={handleHideInspectorPanel}
@@ -860,52 +854,6 @@ export default function LiveFloorView({
           </button>
         )}
 
-        {/* เปิด/ปิดหลังคาอาคารไลน์ผลิต — มุมมองแบบเกม The Sims
-            อยู่ในชุดปุ่มลอยมุมขวาบนเดียวกับปุ่มหุ่นยนต์ */}
-        <button
-          type="button"
-          onClick={() => setRoofOpen((v) => !v)}
-          aria-pressed={!roofOpen}
-          className="absolute right-4 top-[128px] z-40 flex items-center gap-2 rounded-[14px] border border-[var(--lf-panel-border)] bg-[var(--lf-panel-bg)] px-3 py-2 text-[11.5px] font-bold text-[var(--lf-text)] shadow-[0_8px_24px_-12px_var(--lf-panel-glow)] backdrop-blur-md hover:bg-[var(--lf-accent-14)] transition-colors pointer-events-auto cursor-pointer"
-        >
-          <Warehouse className="w-4 h-4 text-[var(--lf-accent)]" />
-          {roofOpen ? "ปิดหลังคาโรง" : "เปิดหลังคาโรง"}
-        </button>
-
-        {/* เครื่องจักรที่ผังใหม่ (ตาม section/department ในฐานข้อมูล) ตั้งใจไม่
-            แสดง — แถวธุรการ/ไม่ใช่เครื่องจักรจริง ปุ่มเล็กใต้ปุ่มหุ่นยนต์
-            เพื่อให้ยังเห็นว่าครบทุกแถวจากฐานข้อมูล แค่บางส่วนไม่ได้วาง
-            บนพื้นผัง 3 มิติ */}
-        {skippedMachines.length > 0 ? (
-          <div className="absolute right-4 top-[180px] z-40 max-w-[260px] pointer-events-auto">
-            <button
-              type="button"
-              onClick={() => setSkippedExpanded((v) => !v)}
-              className="flex w-full items-center gap-1.5 rounded-[14px] border border-[var(--lf-panel-border)] bg-[var(--lf-panel-bg)] px-3 py-2 text-[11px] font-semibold text-[var(--lf-text-muted)] shadow-[0_8px_24px_-12px_var(--lf-panel-glow)] backdrop-blur-md hover:bg-[var(--lf-accent-14)] transition-colors cursor-pointer"
-            >
-              <Info className="w-3.5 h-3.5 shrink-0 text-[var(--lf-accent)]" />
-              <span className="text-left">
-                {skippedMachines.length} เครื่องไม่แสดงในผัง (ไม่ใช่เครื่องจักรจริง)
-              </span>
-              {skippedExpanded ? (
-                <ChevronUp className="w-3.5 h-3.5 shrink-0" />
-              ) : (
-                <ChevronDown className="w-3.5 h-3.5 shrink-0" />
-              )}
-            </button>
-            {skippedExpanded ? (
-              <div className="mt-1.5 max-h-52 overflow-y-auto rounded-[14px] border border-[var(--lf-panel-border)] bg-[var(--lf-panel-bg)] p-2.5 text-[10.5px] leading-relaxed text-[var(--lf-text-muted)] shadow-[0_8px_24px_-12px_var(--lf-panel-glow)] backdrop-blur-md space-y-1">
-                {skippedMachines.map((s) => (
-                  <div key={s.machineId} className="truncate" title={s.reason}>
-                    <span className="font-semibold text-[var(--lf-text)]">{s.code ?? s.machineId}</span>
-                    {" — "}
-                    {s.name}
-                  </div>
-                ))}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
       </div>
     </div>
   );

@@ -63,7 +63,7 @@ const AI_FALLBACK_NOTICE =
 // mode/logId เก็บต่อข้อความเช่นเดียวกับ fallback: logId ใช้ผูกปุ่มให้ผลตอบรับกับคำตอบ
 // ข้อนั้น ๆ (Frame 4 ของ UX Storyboard) และ mode ใช้บอกผู้ใช้ว่าคำตอบนี้มาจากกฎ
 // (โหมดสาธิต) หรือจากโมเดลภาษาจริง
-type ChatMessageWithFallback = ChatMessage & {
+export type ChatMessageWithFallback = ChatMessage & {
   fallback?: boolean;
   mode?: AiMode;
   logId?: number | null;
@@ -741,21 +741,6 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
         className={`shrink-0 ${isPage ? "pb-4 pt-2 bg-parchment" : "bg-white border-t border-hairline p-3"}`}
       >
         <div className={isPage ? "mx-auto w-full max-w-3xl" : ""}>
-          {hasUserMessage && !isPage && (
-            <div className="flex flex-nowrap items-center gap-2 overflow-x-auto overflow-y-hidden -mx-4 px-4 pb-2 scrollbar-none">
-              {presetQuestions.map((q, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => send(q)}
-                  disabled={isLoading}
-                  className="min-h-11 px-4 py-2 rounded-full border border-hairline bg-white hover:border-primary/40 hover:text-primary text-[13px] text-ink-muted transition-colors cursor-pointer active:scale-95 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60 whitespace-nowrap shrink-0"
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
-          )}
-
           <form
             onSubmit={(e) => {
               e.preventDefault();

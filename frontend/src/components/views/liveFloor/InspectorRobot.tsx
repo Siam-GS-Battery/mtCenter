@@ -77,6 +77,10 @@ const SHELL_TRIM = LIVE_FLOOR_THEME.machineSteelDark;
 const BODY_COLOR = LIVE_FLOOR_THEME.accent;
 const EYE_COLOR = "#1a4b8c";
 const EYE_GLASS = "#2997ff";
+// สีแก้มชมพูอ่อน — เพิ่มความน่ารัก ใช้สีทึบด้าน ไม่มี emissive ตามกฎธีมสว่าง
+const CHEEK_COLOR = "#ff8fa8";
+// สีไฟสถานะเล็กบนอก — เขียวนวลบอกว่าระบบพร้อมทำงาน (ไม่ใช้ emissive จ้า)
+const STATUS_LIGHT_COLOR = "#57c78a";
 // เดิม hardcode "#0066cc" ซึ่งตรงกับสี accent ของธีมเก่า (dark blue) เป๊ะ —
 // เปลี่ยนมา derive จาก LIVE_FLOOR_THEME.accent ให้เป็น single source of truth
 const ANTENNA_BULB = LIVE_FLOOR_THEME.accent;
@@ -417,6 +421,18 @@ function InspectorRobotImpl({
           <meshStandardMaterial color={BODY_COLOR} roughness={0.42} metalness={0.15} />
         </RoundedBox>
 
+        {/* แบตเตอรี/แบ็คแพ็คเล็กด้านหลังลำตัว — เติมมิติให้ตัวหุ่นดูสมบูรณ์
+            ขึ้นเวลามองจากด้านข้าง/ด้านหลัง */}
+        <RoundedBox
+          args={[0.3, TORSO_HEIGHT * 0.62, 0.09]}
+          radius={0.03}
+          smoothness={highQuality ? 3 : 2}
+          position={[0, TORSO_Y + 0.02, -0.195]}
+          castShadow={false} raycast={() => null}
+        >
+          <meshStandardMaterial color={SHELL_TRIM} roughness={0.45} metalness={0.3} />
+        </RoundedBox>
+
         {/* เสื้อกั๊กสะท้อนแสงสีส้ม — สัญลักษณ์ "ผู้เดินตรวจ" ที่คนหน้างานอ่านออกทันที */}
         <mesh position={[0, TORSO_Y + 0.06, 0.16]} castShadow={false} raycast={() => null}>
           <boxGeometry args={[0.48, 0.1, 0.02]} />
@@ -429,13 +445,30 @@ function InspectorRobotImpl({
           <meshStandardMaterial color={SHELL_COLOR} roughness={0.5} />
         </mesh>
 
+        {/* ไฟสถานะเล็กบนอก (ข้างป้ายชื่อ) — เขียวนวลด้าน ไม่ใช้ emissive
+            เป็นรายละเอียดเสริมให้ตัวหุ่นดูมีระบบทำงานอยู่ */}
+        <mesh position={[0.13, TORSO_Y - 0.14, 0.163]} castShadow={false} raycast={() => null}>
+          <sphereGeometry args={[0.022, highQuality ? 10 : 6, highQuality ? 8 : 5]} />
+          <meshStandardMaterial color={STATUS_LIGHT_COLOR} roughness={0.3} metalness={0.1} />
+        </mesh>
+
         {/* ---- แขนสองข้าง (หมุนที่ไหล่) ---- */}
         <group ref={armL} position={[-0.28, TORSO_Y + 0.2, 0]}>
+          {/* วงแหวนข้อไหล่ — บดบังรอยต่อระหว่างลำตัวกับแขนให้ดูเป็นข้อต่อจริง */}
+          <mesh rotation={[0, 0, Math.PI / 2]} castShadow={false} raycast={() => null}>
+            <cylinderGeometry args={[0.07, 0.07, 0.03, highQuality ? 12 : 8]} />
+            <meshStandardMaterial color={SHELL_TRIM} roughness={0.4} metalness={0.35} />
+          </mesh>
           <mesh geometry={geometry.arm} position={[0, -0.22, 0]} castShadow={false} raycast={() => null}>
             <meshStandardMaterial color={SHELL_COLOR} roughness={0.5} metalness={0.1} />
           </mesh>
         </group>
         <group ref={armR} position={[0.28, TORSO_Y + 0.2, 0]}>
+          {/* วงแหวนข้อไหล่ */}
+          <mesh rotation={[0, 0, Math.PI / 2]} castShadow={false} raycast={() => null}>
+            <cylinderGeometry args={[0.07, 0.07, 0.03, highQuality ? 12 : 8]} />
+            <meshStandardMaterial color={SHELL_TRIM} roughness={0.4} metalness={0.35} />
+          </mesh>
           <mesh geometry={geometry.arm} position={[0, -0.22, 0]} castShadow={false} raycast={() => null}>
             <meshStandardMaterial color={SHELL_COLOR} roughness={0.5} metalness={0.1} />
           </mesh>
@@ -479,6 +512,30 @@ function InspectorRobotImpl({
           <mesh position={[0.1, 0.03, HEAD_SIZE * 0.39 + 0.016]} castShadow={false} raycast={() => null}>
             <boxGeometry args={[0.1, 0.1, 0.012]} />
             <meshStandardMaterial color={EYE_GLASS} roughness={0.2} />
+          </mesh>
+
+          {/* รอยยิ้มบางๆ ใต้ตา — เส้นโค้งง่ายๆ จากแคปซูลแบนบิดองศาเล็กน้อย
+              ให้หน้าจอดูมีอารมณ์ ไม่ใช่แค่ตาสี่เหลี่ยมนิ่งๆ */}
+          <mesh
+            position={[0, -0.05, HEAD_SIZE * 0.39 + 0.016]}
+            rotation={[0, 0, Math.PI / 2]}
+            castShadow={false}
+            raycast={() => null}
+          >
+            <capsuleGeometry args={[0.006, 0.1, 2, highQuality ? 8 : 4]} />
+            <meshStandardMaterial color={EYE_GLASS} roughness={0.2} />
+          </mesh>
+
+          {/* แก้มชมพูน่ารักสองข้าง — วางใต้และนอกดวงตา แบนลงทาง Z เล็กน้อย
+              เพื่อให้แนบผิวหน้าจอโดยไม่ทะลุเปลือกหัว สีทึบด้าน ไม่มี emissive
+              ตามกฎธีมสว่างของไฟล์นี้ */}
+          <mesh position={[-0.17, -0.04, HEAD_SIZE * 0.39 + 0.01]} scale={[1, 1, 0.4]} castShadow={false} raycast={() => null}>
+            <sphereGeometry args={[0.045, highQuality ? 12 : 6, highQuality ? 10 : 5]} />
+            <meshStandardMaterial color={CHEEK_COLOR} roughness={0.55} metalness={0} />
+          </mesh>
+          <mesh position={[0.17, -0.04, HEAD_SIZE * 0.39 + 0.01]} scale={[1, 1, 0.4]} castShadow={false} raycast={() => null}>
+            <sphereGeometry args={[0.045, highQuality ? 12 : 6, highQuality ? 10 : 5]} />
+            <meshStandardMaterial color={CHEEK_COLOR} roughness={0.55} metalness={0} />
           </mesh>
 
           {/* เสาอากาศ + หลอดไฟบนยอด */}

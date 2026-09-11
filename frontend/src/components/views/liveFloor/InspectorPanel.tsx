@@ -15,7 +15,6 @@ import PixelAILogo from "../../PixelAILogo";
 import {
   SCOPE_LABELS,
   SEVERITY_LABELS,
-  reportToPrompt,
   reportToText,
   type InspectionAgent,
   type InspectionReport,
@@ -23,6 +22,7 @@ import {
   type InspectorLogEntry,
   type InspectorSnapshot,
 } from "../../../lib/inspectionAgent";
+import { buildRoundAiSummaryMock, roundAiSummaryToText } from "../../../lib/roundAiSummaryMock";
 
 /**
  * ===========================================================================
@@ -68,8 +68,14 @@ const PHASE_LABELS: Record<InspectorSnapshot["phase"], string> = {
 export interface InspectorPanelProps {
   agent: InspectionAgent;
   snapshot: InspectorSnapshot;
-  /** ส่งข้อความไปถาม AI Assistant (ปุ่ม "ให้ AI สรุป") */
+  /** ส่งข้อความไปถาม AI Assistant แบบข้อความล้วน (ผู้เรียกอื่นๆ ที่ไม่ใช่การ์ดรายงานรอบตรวจ) */
   onAskAI?: (prompt: string) => void;
+  /**
+   * ปุ่ม "ให้ AI สรุป" บนการ์ดรายงานรอบตรวจ — เปิดแชต AI ด้านข้างทันที พร้อม
+   * สรุปผล (จำลอง) ของรอบนั้นเป็นคำตอบแรก แทนที่จะเปิดการ์ดสรุปในพาเนลนี้เอง
+   * (ดู App.tsx: handleAskAIRoundSummary ที่ seed ข้อความลงแชตโดยตรง)
+   */
+  onAskAIRoundSummary?: (report: InspectionReport) => void;
   /** true = กล้องกำลังเกาะติดตัวหุ่นอยู่ */
   follow: boolean;
   onToggleFollow: () => void;
@@ -93,16 +99,23 @@ function fmtClock(seconds: number): string {
 function ReportCard({
   report,
   onAskAI,
+  onAskAIRoundSummary,
 }: {
   report: InspectionReport;
   onAskAI?: (prompt: string) => void;
+  onAskAIRoundSummary?: (report: InspectionReport) => void;
 }) {
   const [expanded, setExpanded] = useState(report.alertCount > 0);
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(reportToText(report));
+      // สรุป AI (จำลอง) เป็น deterministic ตาม report.id เสมอ (ดู
+      // buildRoundAiSummaryMock) จึงคำนวณตรงนี้ได้เลยโดยไม่ต้องเก็บ state —
+      // ไม่มีการ์ดสรุปแบบ inline ให้ผูก state ไว้อีกต่อไป (ย้ายไปแสดงในแชตแทน)
+      const text =
+        reportToText(report) + "\n" + roundAiSummaryToText(buildRoundAiSummaryMock(report));
+      await navigator.clipboard.writeText(text);
       setCopied(true);
     } catch {
       // คลิปบอร์ดถูกปิดกั้น (บริบทไม่ปลอดภัย/ไม่ได้รับอนุญาต) — ไม่ต้องแจ้ง
@@ -110,6 +123,14 @@ function ReportCard({
       setCopied(false);
     }
   }, [report]);
+
+  // ปุ่ม "ให้ AI สรุป" — เปิดแชต AI ด้านข้างทันทีพร้อมสรุปผลรอบนี้ (preferred:
+  // onAskAIRoundSummary ที่ seed ข้อความสรุปลงแชตโดยตรงแบบไม่ผ่าน backend)
+  // fallback เป็น onAskAI ทั่วไปถ้าผู้เรียกยังไม่ได้ส่ง callback เฉพาะทางมาให้
+  const handleAskAI = useCallback(() => {
+    if (onAskAIRoundSummary) onAskAIRoundSummary(report);
+    else onAskAI?.(`ช่วยสรุปผล${report.title} ช่วง ${report.periodLabel}ให้หน่อย`);
+  }, [report, onAskAI, onAskAIRoundSummary]);
 
   // คืนป้าย "คัดลอกแล้ว" กลับเป็นปุ่มเดิมหลังผ่านไปสองวินาที
   useEffect(() => {
@@ -236,7 +257,7 @@ function ReportCard({
         </div>
       )}
 
-      <div className="flex items-center gap-1.5 pt-0.5">
+      <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
         <button
           type="button"
           onClick={handleCopy}
@@ -245,16 +266,14 @@ function ReportCard({
           <ClipboardCopy className="w-3 h-3" />
           {copied ? "คัดลอกแล้ว" : "คัดลอกรายงาน"}
         </button>
-        {onAskAI && (
-          <button
-            type="button"
-            onClick={() => onAskAI(reportToPrompt(report))}
-            className="flex-1 flex items-center justify-center gap-1 rounded-[10px] bg-[var(--lf-accent)] px-2 py-1.5 text-[10.5px] font-semibold text-white hover:bg-[var(--lf-accent-hover)] transition-colors"
-          >
-            <Send className="w-3 h-3" />
-            ให้ AI สรุป
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={handleAskAI}
+          className="flex-1 flex items-center justify-center gap-1 rounded-[10px] bg-[var(--lf-accent)] px-2 py-1.5 text-[10.5px] font-semibold text-white hover:bg-[var(--lf-accent-hover)] transition-colors"
+        >
+          <Send className="w-3 h-3" />
+          ให้ AI สรุป
+        </button>
       </div>
     </div>
   );
@@ -268,6 +287,7 @@ export default function InspectorPanel({
   agent,
   snapshot,
   onAskAI,
+  onAskAIRoundSummary,
   follow,
   onToggleFollow,
   onClose,
@@ -505,7 +525,12 @@ export default function InspectorPanel({
 
         {/* การ์ดรายงาน: ใหม่สุดอยู่ล่างสุดเหมือนแชต */}
         {snapshot.reports.map((report) => (
-          <ReportCard key={report.id} report={report} onAskAI={onAskAI} />
+          <ReportCard
+            key={report.id}
+            report={report}
+            onAskAI={onAskAI}
+            onAskAIRoundSummary={onAskAIRoundSummary}
+          />
         ))}
       </div>
 

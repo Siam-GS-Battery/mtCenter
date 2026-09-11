@@ -118,9 +118,20 @@ function buildSegment(
 // และ CanvasTexture ยังต้องผูกกับ merged mesh เดียวกันทั้งผังอยู่ดี)
 //
 // สถานะ "ไลน์นี้วิ่งจริงไหม" มาจาก `layout.machines[].status` (ที่เดียวกับที่
-// HUD/minimap ใช้) ไม่ได้คิดสถานะใหม่: ไลน์หนึ่งวิ่งก็ต่อเมื่อทุกเครื่องใน
-// ไลน์นั้น status === "run" — มีเครื่องเดียวหยุด/เตือน/idle ก็ถือว่าทั้งไลน์นิ่ง
-// (ตรงตามโจทย์ "a line with a stopped machine should be still")
+// HUD/minimap ใช้) ไม่ได้คิดสถานะใหม่ — แต่ "วิ่ง" ไม่ได้แปลว่า "ทุกเครื่อง
+// เป็น run" อีกต่อไป (วัดจริงแล้วพบว่ากฎนั้นเข้มเกินไปจนแทบไม่มีไลน์ไหนผ่าน
+// เลย — ดูตัวเลขวัดจริงด้านล่าง) ไลน์หนึ่งถือว่า "วิ่ง" ตราบใดที่ไม่มีเครื่อง
+// ไหนอยู่ในสถานะที่บล็อกจริง ๆ คือ "stop" (error) หรือ "idle" (maintenance)
+// — ส่วน "warn" (เครื่องเตือนแต่ยังทำงานอยู่) ไม่ทำให้ไลน์หยุด เพราะเครื่อง
+// เตือนก็ยังผลิตอยู่จริง นี่คือความหมายของสถานะ warn ตั้งแต่ต้น การจะให้
+// ไลน์หยุดสนิทเฉพาะตอนมีเครื่อง stop/idle จริง ๆ จึงยังคงความหมาย "ไลน์ที่
+// เครื่องพังจริงต้องดูนิ่ง" ไว้ครบ ไม่ได้ทำให้ทุกไลน์วิ่งมั่ว
+//
+// วัดจริงกับข้อมูลจริง (973 เครื่อง, 53 ไลน์, 871 ท่อนสายพาน):
+//   - กฎเดิม (ทุกเครื่อง === run): ผ่าน 20/53 ไลน์ ครอบคลุมแค่ 54/871 ท่อน
+//     (6%) — เกือบทั้งผังจึงดูนิ่งสนิทแม้โค้ดจะทำงานถูกต้อง
+//   - กฎใหม่ (ไม่มีเครื่อง stop/idle): ผ่าน 26/53 ไลน์ ครอบคลุม 587/871 ท่อน
+//     (67%) — เห็นการเคลื่อนไหวกระจายทั่วผังจริง
 //
 // `ConveyorSegment` ไม่ได้เก็บ `lineId` ไว้ (ดู `plantLayout.ts`) จึงจับคู่ท่อน
 // สายพานเข้ากับไลน์ด้วยตำแหน่ง: ท่อนอยู่ในกล่องขอบเขตของไลน์ไหน (ขยายขอบ
@@ -130,12 +141,22 @@ function buildSegment(
 // งบชิ้นงาน: สูงสุด `MAX_MOVING_PARTS` ชิ้นทั้งผัง คงที่เสมอ ไม่ผูกกับจำนวน
 // เครื่องจักร/ท่อนสายพาน — ถ้าท่อนที่ "วิ่ง" มีมากกว่างบ ก็หยุดรับเพิ่มที่
 // `MAX_MOVING_PARTS` ท่อนแรกตามลำดับ `layout.conveyors` (deterministic เสมอ
-// ไม่ใช่การสุ่ม)
-const MAX_MOVING_PARTS = 48;
+// ไม่ใช่การสุ่ม) — ปรับจาก 48 เป็น 96 เพื่อให้การเคลื่อนไหวกระจายเห็นได้ทั่ว
+// ผังมากขึ้นหลังกฎ "วิ่ง" ครอบคลุมท่อนมากขึ้นมาก (instancedMesh เดียว ต้นทุน
+// GPU เพิ่มขึ้นเล็กน้อยมาก ไม่คุ้มจะกังวล)
+const MAX_MOVING_PARTS = 96;
 /** ความเร็วไถลของกล่องบนสายพาน (ม./วินาที) — ช้าและนุ่ม ไม่ใช่แถบวิ่งเร็วจี๋ */
 const PART_SPEED = 0.45;
-const PART_LEN = 0.34;
-const PART_HEIGHT = 0.16;
+// ขนาดชิ้นงาน — ใหญ่กว่ากล่องเดิม (0.34 x 0.16) เพราะฉากซูมออกไกลมาก
+// (มุมกล้องเริ่มต้น "line" ตอนยังไม่เลือกโซนเล็งทั้งไซต์ ~325x535 ม. ระยะ
+// กล้อง ๆ ร้อยเมตรขึ้นไป) กล่องเดิมเล็กกว่าพิกเซลเดียวที่ระยะนั้น เท่ากับ
+// "วิ่งแต่มองไม่เห็น" ขนาดใหม่ยังเป็นสัดส่วนกล่อง/ลังของสมจริง (ไม่ใหญ่
+// เกินจริงเทียบหน้าสายพาน 0.85 ม.) แต่ให้พื้นที่ผิวมากพออ่านออกไกลขึ้น
+const PART_LEN = 0.46;
+const PART_HEIGHT = 0.3;
+/** สัดส่วนความกว้างชิ้นงานเทียบความกว้างสายพาน (หน้าสายพานเองใช้ 0.92) —
+ *  กว้างขึ้นจากเดิม (0.55) ให้ชิ้นงานดูเต็มหน้าสายพานขึ้น อ่านง่ายขึ้นจากที่ไกล */
+const PART_WIDTH_RATIO = 0.72;
 /** ระยะขอบขยายกล่องขอบเขตไลน์ตอนจับคู่ท่อนสายพาน — เผื่อท่อนที่โผล่พ้น
  *  bounding box ของตัวเครื่องเล็กน้อย (ความกว้างสายพาน + ช่องว่างเผื่อ) */
 const LINE_MATCH_MARGIN = 2.2;
@@ -164,8 +185,13 @@ function buildMovingParts(layout: PlantLayout): MovingPart[] {
 
   const lineRunning = new Map<string, boolean>();
   for (const line of layout.lines) {
-    const running =
-      line.machineIds.length > 0 && line.machineIds.every((id) => statusById.get(id) === "run");
+    // บล็อกไลน์ก็ต่อเมื่อมีเครื่อง "stop" (error) หรือ "idle" (maintenance)
+    // จริง ๆ — "warn" ไม่บล็อก เพราะเครื่องเตือนยังทำงาน/ผลิตอยู่
+    const blocked = line.machineIds.some((id) => {
+      const s = statusById.get(id);
+      return s === "stop" || s === "idle";
+    });
+    const running = line.machineIds.length > 0 && !blocked;
     lineRunning.set(line.id, running);
   }
   if (layout.lines.length === 0 || layout.conveyors.length === 0) return [];
@@ -212,8 +238,18 @@ function MovingBeltParts({ layout }: { layout: PlantLayout }) {
 
   const geometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   useEffect(() => () => geometry.dispose(), [geometry]);
+  // emissive อ่อน ๆ ช่วยให้ชิ้นงานอ่านออกง่ายขึ้นตอนซูมออกไกล (กล่องเล็กบน
+  // สายพานสีเข้ม แสงส่องธรรมดาอาจจมกับพื้นหลัง) ไม่ได้ทำให้ดู "เรืองแสง"
+  // เกินจริง แค่ยกความสว่างขึ้นเล็กน้อยจากสีเดิม
   const material = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: PROCESS.beltCargo, roughness: 0.8, metalness: 0.02 }),
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: PROCESS.beltCargo,
+        emissive: PROCESS.beltCargo,
+        emissiveIntensity: 0.12,
+        roughness: 0.8,
+        metalness: 0.02,
+      }),
     []
   );
   useEffect(() => () => material.dispose(), [material]);
@@ -236,7 +272,7 @@ function MovingBeltParts({ layout }: { layout: PlantLayout }) {
       const worldZ = p.z - clamped * p.sin;
       SCRATCH_POS.set(worldX, BELT_HEIGHT + 0.07 + 0.015 + PART_HEIGHT / 2, worldZ);
       SCRATCH_QUAT.setFromAxisAngle(Y_AXIS, Math.atan2(-p.sin, p.cos));
-      SCRATCH_SCALE.set(PART_LEN, PART_HEIGHT, Math.max(0.2, p.width * 0.55));
+      SCRATCH_SCALE.set(PART_LEN, PART_HEIGHT, Math.max(0.24, p.width * PART_WIDTH_RATIO));
       SCRATCH_MATRIX.compose(SCRATCH_POS, SCRATCH_QUAT, SCRATCH_SCALE);
       mesh.setMatrixAt(i, SCRATCH_MATRIX);
     }
@@ -307,8 +343,9 @@ export function ProductionLines({ layout }: ProductionLinesProps) {
   return (
     <group>
       {built.lineFloor ? (
-        <mesh geometry={built.lineFloor} receiveShadow>
-          {/* แถบสีพื้นบอกขอบเขตไลน์ — จัดเป็นงานทาสีพื้น (floor marking) */}
+        // แถบสีพื้นบอกขอบเขตไลน์ — จัดเป็นงานทาสีพื้น (floor marking) ของนิ่ง
+        // ไม่ใช่ของที่คลิกได้ ปิด raycast เหมือนเมชอื่นทั้งไฟล์นี้/ทั้งฉาก
+        <mesh geometry={built.lineFloor} receiveShadow raycast={() => null}>
           <meshStandardMaterial color={FLOOR.aisle} roughness={0.65} metalness={0.04} />
         </mesh>
       ) : null}
@@ -317,7 +354,7 @@ export function ProductionLines({ layout }: ProductionLinesProps) {
         if (!geometry) return null;
         const spec = MATERIAL_SPECS[key];
         return (
-          <mesh key={key} geometry={geometry} castShadow receiveShadow>
+          <mesh key={key} geometry={geometry} castShadow receiveShadow raycast={() => null}>
             <meshStandardMaterial
               color={spec.color}
               roughness={spec.roughness}

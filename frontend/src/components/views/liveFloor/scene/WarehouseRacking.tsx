@@ -13,18 +13,30 @@ import {
 
 /**
  * ===========================================================================
- * WAREHOUSE RACKING — ชั้นวางพาเลทในโซน WH (roadmap step 8)
+ * WAREHOUSE RACKING — ชั้นวางพาเลทในโซน WH / FRG-B / HT-4 (roadmap step 8)
  * ===========================================================================
  *
- * โซน `WH` ("Warehouse / Racking") เดิมเป็นแค่แผ่นพื้นเปล่า
- * (`PlantShell.tsx`'s `zone` slab) — ไฟล์นี้เพิ่ม "ชั้นวางพาเลท" 3 มิติทับ
- * ลงไปเพื่อให้อ่านเป็นคลังสินค้าจริง: เสาโครง (upright) + คานราง (beam) หลาย
- * ระดับ + พาเลท/สินค้าบางช่อง (ไม่ใช่ทุกช่อง — คลังเต็มทุกช่องดูปลอม)
+ * โซนเหล่านี้เดิมเป็นแค่แผ่นพื้นเปล่า (`PlantShell.tsx`'s `zone` slab) — ไฟล์
+ * นี้เพิ่ม "ชั้นวางพาเลท" 3 มิติทับลงไปเพื่อให้อ่านเป็นคลังสินค้าจริง: เสาโครง
+ * (upright) + คานราง (beam) หลายระดับ + พาเลท/สินค้าบางช่อง (ไม่ใช่ทุกช่อง —
+ * คลังเต็มทุกช่องดูปลอม)
  *
- * ที่มาของตำแหน่ง — ทุกอย่างอ่านจาก `layout.site.zones` ("WH") จริง ไม่มี
- * พิกัดสัมบูรณ์คงที่ในไฟล์นี้เลย (`plantLayout.ts`'s `WH.x` เป็นค่าคงที่โดย
- * บังเอิญในผังปัจจุบันเพราะ `FRG-A`/`FRG-B` ยังว่างเสมอ — ไฟล์นี้ไม่พึ่งพา
- * ข้อเท็จจริงนั้นเลย อ่านแค่ zone rect ที่ได้จริง ณ ตอนนั้น)
+ * โซนที่เติม (`RACK_ZONE_CONFIGS` ด้านล่าง) — `WH` มีเครื่องจักรจริงอยู่แล้ว
+ * (section TOOLING/PACKING) ส่วน `FRG-B`/`HT-4` เป็น 2 โซนที่ผู้ใช้ชี้ในภาพว่า
+ * เป็น "ช่องว่างเปล่า" ทางฝั่งขวาของผังเครื่องจักร (วัดจริงแล้ว: ไม่มี DB
+ * section ใดแม็ปมาลง `FRG-A`/`FRG-B` เลย และมีแค่ `HT-1` ในกลุ่ม `HT-1..4` ที่
+ * ได้เครื่องจักรจาก DB จริง — `FRG-B` และ `HT-4` จึงว่างสนิททั้งคู่เสมอในผัง
+ * ปัจจุบัน แต่ยังคงต้องเช็คชนเครื่องจักรเผื่อ DB เปลี่ยนในอนาคต) ทั้งสองโซนนี้
+ * ยังมี "ท่อลมอัด" (air header, ดู `siteUtilities.ts`'s `buildAirHeaderRun`)
+ * วิ่งผ่านกึ่งกลางแนวแถวของตัวเองที่ Y=7.2 ม. พร้อม drop-leg หย่อนลงมา — ผัง
+ * ชั้นวางของทั้งสองโซนนี้จึงบังคับให้มีช่องทางเดินว่าง (aisle) พาดผ่านจุดกึ่ง
+ * กลางโซนพอดี (ดูคอมเมนต์ `hasOverheadHeader` ด้านล่าง) กันไม่ให้ท่อ/ขาท่อ
+ * ทะลุชั้นวาง
+ *
+ * ที่มาของตำแหน่ง — ทุกอย่างอ่านจาก `layout.site.zones` จริง ไม่มีพิกัด
+ * สัมบูรณ์คงที่ในไฟล์นี้เลย (`plantLayout.ts`'s zone rect เป็นค่าคงที่โดย
+ * บังเอิญในผังปัจจุบันเพราะ `FRG-A`/`FRG-B`/`HT-2..4` ยังว่างเสมอ — ไฟล์นี้ไม่
+ * พึ่งพาข้อเท็จจริงนั้นเลย อ่านแค่ zone rect ที่ได้จริง ณ ตอนนั้น)
  *
  * ทิศทางแถว — เลือกแกนที่ยาวกว่าของ zone (`w` หรือ `d`) เป็นแกน "ช่อง" (bay
  * axis, แถวชั้นวางยาวไปตามแกนนี้) แกนที่สั้นกว่าเป็นแกน "แถว" (row axis, ระยะ
@@ -55,20 +67,33 @@ import {
  *
  * ระดับความสูง (y) — อ่านจาก y-stack เดิมก่อนเลือกค่า
  * ---------------------------------------------------------------------
- * ชั้นบนสุดที่มีอยู่เดิมคือ `FloorMarkings.tsx`'s `Y_ZONE_MARK = 0.37` (เส้นตี
- * ขอบโซน/ลานพาเลท 2D) ซึ่งเองก็อยู่เหนือ `PlantShell.tsx`'s zone platform top
- * (0.29) และ zone-edge stripe top (0.35) แล้ว ฐานของชั้นวางในไฟล์นี้
- * (`BASE_Y = 0.40`) จึงเผื่อระยะจริง 0.03 ม. เหนือ 0.37 — ไม่ชนกับพื้นทาสีใด ๆ
- * ในสแตกเดิมเลย
+ * พื้นผิวที่มีอยู่เดิมเรียงจากต่ำไปสูง: `PlantShell.tsx`'s zone platform top
+ * (0.29) → zone-edge stripe top (0.35) → พื้นทาสี (ลานพาเลท/`Y_ZONE_MARK`)
+ * ที่ยอดสูงสุด ≈0.39 (`FloorMarkings.tsx`'s `Y_ZONE_MARK = 0.37` บวกความหนา
+ * ลานพาเลท ~0.02) `FloorActivity.tsx` เองก็ใช้ 0.45 ด้วยเหตุผลเดียวกัน — โค้ด
+ * เบสนี้เคยโดนวางที่ 0.40 (เผื่อแค่ 0.01 ม. เหนือ 0.39) ซึ่งบางเกินไปตาม
+ * มาตรฐานของโปรเจกต์ที่กำหนดไว้หลังเจอบั๊ก "วางชิดพื้นผิวอื่นพอดี/แทบพอดี"
+ * มาแล้ว 4 ครั้ง (ต้องเผื่อ ≥0.05 ม. เสมอ) จึงยกฐานชั้นวางในไฟล์นี้ขึ้นเป็น
+ * `BASE_Y = 0.45` — เผื่อระยะจริง 0.06 ม. เหนือพื้นทาสีที่สูงสุด (0.39), 0.10
+ * ม. เหนือ zone-edge stripe (0.35), และ 0.16 ม. เหนือ zone platform top (0.29)
+ * ไม่ชนกับพื้นผิวใดในสแตกเดิมเลย — ยอดชั้นวาง (`BASE_Y + RACK_HEIGHT` =
+ * 0.45+6 = 6.45 ม.) ยังเหลือระยะห่างจากท่อลมอัด (header centerline 7.2 ม. ลบ
+ * รัศมีท่อ 0.14 ม. = ท้องท่อ ≈7.06 ม.) อยู่ 0.61 ม. — แคบลงจาก 0.66 ม. เดิม
+ * ตามที่ BASE_Y สูงขึ้น 0.05 ม. แต่ยังห่างเหลือเฟือ ไม่ชนแน่นอน (ดูโซนที่มี
+ * `hasOverheadHeader` — ชั้นวางไม่ได้อยู่ตรงกึ่งกลางที่ท่อวิ่งผ่านอยู่แล้วตาม
+ * การ์ดในส่วนถัดไป จุดนี้เป็นแค่การเผื่อ worst-case เชิงตัวเลขเท่านั้น)
  *
  * การเรนเดอร์ — ต้อง instance เท่านั้น
  * -------------------------------------
- * ชั้นวางเป็นของซ้ำมหาศาล (เสา/คาน/พาเลทนับพันชิ้นได้ง่าย ๆ) จึงทำ 3
- * `InstancedMesh` (เสา/คาน/พาเลท) ก้อนเดียวต่อชนิด แชร์ geometry/material กัน
- * ทุก instance เหมือนแพทเทิร์นของ `MachineInstances.tsx` — ได้ **สูงสุด 3 draw
- * call** (1-3 จริง ๆ: `RackInstances` คืน `null` ทิ้งก้อนที่ไม่มี instance เลย
- * เช่นถ้าทุกช่วงชั้นชนเครื่องจักรจนไม่มีคาน/พาเลทเหลือ) ไม่ว่าจะมีชั้นวางกี่
- * ร้อยช่วงชั้นก็ตาม ไม่ใช่ mesh ต่อกล่อง
+ * ชั้นวางเป็นของซ้ำมหาศาล (เสา/คาน/พาเลทนับพันชิ้นได้ง่าย ๆ) จึงทำ `InstancedMesh`
+ * ก้อนเดียวต่อ "ชนิด+ขนาดกล่อง" แชร์ geometry/material กันทุก instance เหมือน
+ * แพทเทิร์นของ `MachineInstances.tsx` — เสาโครงทุกโซนขนาดเดียวกันเสมอ (1 ก้อน)
+ * ส่วนคาน/พาเลทมีแค่ 2 ขนาดที่เป็นไปได้ทั้งไฟล์ (ขึ้นกับ `alongX` ของโซนนั้น
+ * เท่านั้น ไม่ขึ้นกับขนาดโซน — ดู `buildAllRackingPlans`) จึงรวมโซนที่ `alongX`
+ * เดียวกันเข้าก้อนเดียวกันได้ — **สูงสุด 5 draw call** (1 เสา + ≤2 คาน + ≤2
+ * พาเลท ขึ้นกับว่ามีกี่กลุ่ม `alongX` ที่ไม่ว่างจริง; `RackInstances` คืน `null`
+ * ทิ้งก้อนที่ไม่มี instance เลย เช่นถ้าทุกช่วงชั้นชนเครื่องจักรจนไม่มีคาน/พาเลท
+ * เหลือ) ไม่ว่าจะมีชั้นวางกี่ร้อยช่วงชั้นในกี่โซนก็ตาม ไม่ใช่ mesh ต่อกล่อง
  *
  * เป็นฉากประกอบ ไม่ใช่ของที่คลิกได้ — ปิด `raycast` ทั้งสามก้อนเหมือนของ
  * ตกแต่งอื่นในฉากนี้ (`FloorMarkings.tsx`, contact shadow ใน
@@ -101,12 +126,51 @@ const PALLET_D_FRAC = 0.78;
 /** ความสูงพาเลท+สินค้ากอง (เมตร) */
 const PALLET_H = 1.05;
 
-/** ฐานชั้นวาง — ดูคอมเมนต์หัวไฟล์ "ระดับความสูง (y)" */
-const BASE_Y = 0.4;
+/** ฐานชั้นวาง — ดูคอมเมนต์หัวไฟล์ "ระดับความสูง (y)" (เผื่อ ≥0.05 ม. เหนือทุก
+ *  พื้นผิวเดิม ตามมาตรฐานของโปรเจกต์หลังบั๊ก "วางชิดพอดี" 4 ครั้ง) */
+const BASE_Y = 0.45;
 
-/** สัดส่วนช่วงชั้น+ระดับที่ "มีพาเลทวางอยู่" — ไม่ใช่ทุกช่องเพื่อให้ดูสมจริง */
+/** สัดส่วนช่วงชั้น+ระดับที่ "มีพาเลทวางอยู่" (ค่าเริ่มต้น/ของ `WH`) — ไม่ใช่ทุก
+ *  ช่องเพื่อให้ดูสมจริง แต่ละโซนใน `RACK_ZONE_CONFIGS` แปรค่านี้ต่างกันแบบ
+ *  deterministic (ไม่ใช่ `Math.random()`) กันไม่ให้ทุกโซนดูเหมือนก็อปวางซ้ำ */
 const PALLET_OCCUPANCY = 0.45;
 const PALLET_HASH_SEED = 4231;
+
+/** ค่าคงที่ต่อโซนที่เติมชั้นวาง — เพิ่มโซนใหม่ในนี้แทนการเขียนฟังก์ชันซ้ำ */
+interface RackZoneConfig {
+  /** id ของ `layout.site.zones` ที่จะเติมชั้นวาง */
+  id: string;
+  /** true = มีท่อลมอัด (air header) พาดผ่านกึ่งกลางแนวแถวของโซนนี้จริง
+   *  (`FRG-A`/`FRG-B`/`HT-1..4` ทุกตัว — ดู `siteUtilities.ts`'s
+   *  `buildAirHeaderRun`, เรียกครั้งเดียวต่อแถวคลุมทั้งแถว) — เมื่อ true จะ
+   *  บังคับให้สูตรแบ่งบล็อก/แถวของโซนนั้น "ต้องมี" ทางเดินว่างพาดผ่านจุด
+   *  กึ่งกลางโซนพอดี (คืน `null` แทนถ้าใส่ไม่ได้จริง ไม่ใช่ปล่อยให้ชั้นวางทึบ
+   *  ตันชนท่อ) — ดูคอมเมนต์ `buildZoneRackingPlan` ส่วนแบ่งบล็อก/แถว */
+  hasOverheadHeader: boolean;
+  /** สัดส่วนช่องที่มีพาเลท (`PALLET_OCCUPANCY` ของโซนนี้) */
+  occupancy: number;
+  /** เกลือของ hash พาเลท กันไม่ให้ผังพาเลทของแต่ละโซนซ้ำแพทเทิร์นเดียวกัน */
+  seedSalt: number;
+}
+
+/**
+ * `WH` มีเครื่องจักรจริงอยู่แล้วและไม่มีท่อลมอัดพาดผ่าน — พฤติกรรมเดิมไม่
+ * เปลี่ยน `FRG-B`/`HT-4` คือ 2 โซนว่างฝั่งขวาที่ผู้ใช้ชี้ในภาพ (ดูคอมเมนต์หัว
+ * ไฟล์) — สัดส่วนพาเลทต่างกันโดยตั้งใจ (โกดังของแยกที่มักไม่เต็มเท่ากัน ไม่ใช่
+ * บังเอิญเท่ากับ WH) เพื่อไม่ให้ทั้ง 3 โซนดูก็อปวางซ้ำกันเป๊ะ
+ */
+export const RACK_ZONE_CONFIGS: RackZoneConfig[] = [
+  { id: "WH", hasOverheadHeader: false, occupancy: PALLET_OCCUPANCY, seedSalt: 0 },
+  { id: "FRG-B", hasOverheadHeader: true, occupancy: 0.3, seedSalt: 5171 },
+  { id: "HT-4", hasOverheadHeader: true, occupancy: 0.62, seedSalt: 8317 },
+];
+
+/** ชุด id ของทุกโซนที่มีชั้นวางพาเลทจริง (จาก `RACK_ZONE_CONFIGS`) — ให้ไฟล์
+ *  อื่น (เช่น `FloorMarkings.tsx`'s painted pallet-staging bays) เช็คแล้ว
+ *  "ยกเว้น" โซนกลุ่มนี้ได้จากแหล่งความจริงเดียวกัน แทนที่จะ hardcode id ซ้ำ
+ *  ไว้อีกที่ — กันไม่ให้สองรายการนี้ไหลตามกันไม่ทัน (drift) เมื่อมีการเพิ่ม/
+ *  ลดโซนที่เติมชั้นวางในอนาคต */
+export const RACKED_ZONE_IDS: ReadonlySet<string> = new Set(RACK_ZONE_CONFIGS.map((c) => c.id));
 
 /** seed -> [0,1) แบบ deterministic (shader-style sine hash) — เหมือน
  *  `FloorMarkings.tsx`'s `hash01`, ไม่ใช้ `Math.random()` เพื่อให้ตำแหน่ง
@@ -180,12 +244,14 @@ interface RackingPlan {
 }
 
 /**
- * ประกอบแผนตำแหน่งชั้นวางทั้งหมดในโซน `WH` — ฟังก์ชันบริสุทธิ์ (ไม่ใช่ hook)
- * เหมือนแพทเทิร์น `buildShell`/`buildMarkings` ของไฟล์พี่น้อง คืน `null` เมื่อ
- * ไม่มีโซน `WH` หรือโซนเล็กเกินกว่าจะใส่ชั้นวางได้แม้แถวเดียว
+ * ประกอบแผนตำแหน่งชั้นวางทั้งหมดในโซนหนึ่งโซน (`config.id`, ดู
+ * `RACK_ZONE_CONFIGS`) — ฟังก์ชันบริสุทธิ์ (ไม่ใช่ hook) เหมือนแพทเทิร์น
+ * `buildShell`/`buildMarkings` ของไฟล์พี่น้อง คืน `null` เมื่อไม่มีโซนนี้ หรือ
+ * โซนเล็กเกินกว่าจะใส่ชั้นวางได้แม้แถวเดียว หรือ (เมื่อ `hasOverheadHeader`)
+ * เล็กเกินกว่าจะเว้นทางเดินตรงกึ่งกลางให้ท่อลมอัดได้จริง
  */
-function buildRackingPlan(layout: PlantLayout): RackingPlan | null {
-  const zone = layout.site.zones.find((z) => z.id === "WH");
+function buildZoneRackingPlan(layout: PlantLayout, config: RackZoneConfig): RackingPlan | null {
+  const zone = layout.site.zones.find((z) => z.id === config.id);
   if (!zone) return null;
   if (zone.w <= 0 || zone.d <= 0) return null;
 
@@ -199,7 +265,7 @@ function buildRackingPlan(layout: PlantLayout): RackingPlan | null {
   const pairDepth = RACK_DEPTH * 2 + BACK_TO_BACK_GAP;
   const rowPitch = pairDepth + AISLE_WIDTH;
   if (usableRow < pairDepth) return null;
-  const rowPairCount = 1 + Math.floor((usableRow - pairDepth) / rowPitch);
+  let rowPairCount = 1 + Math.floor((usableRow - pairDepth) / rowPitch);
   if (rowPairCount < 1) return null;
 
   // ลองแบ่งเป็น 2 บล็อกคั่นด้วยทางเดินขวางก่อน (กันบล็อกทึบตัน) — ถ้าโซนแคบ
@@ -214,6 +280,31 @@ function buildRackingPlan(layout: PlantLayout): RackingPlan | null {
     baysPerBlock = Math.floor(usableBay / BAY_WIDTH);
   }
   if (baysPerBlock < 1) return null;
+
+  // --- กันท่อลมอัดพาดชนชั้นวาง (เฉพาะโซนที่ `hasOverheadHeader`) ---
+  // `buildAirHeaderRun` (siteUtilities.ts) วางท่อคุมทั้งแถวที่ world Z คงที่ =
+  // จุดกึ่งกลาง Z ของแถวโซนนั้น (`rowZCenter`, เท่ากับ `zone.z` เพราะทุกโซนใน
+  // แถวเดียวกันมี z เท่ากันในผังปัจจุบัน) เมื่อไม่มีเครื่องจักรใกล้ๆให้เลือก
+  // aisle จริง (กรณี FRG-B/HT-4 ที่ยังว่างสนิทเสมอ) — จุดกึ่งกลางโซน (bayLocal
+  // = 0, rowLocal = 0) จึงตรงกับตำแหน่งท่อพอดีไม่ว่า zone จะวางแนวไหน:
+  //   - `alongX` (row axis อยู่บนแกน Z): ท่อสมมูลกับ rowLocal = 0 — ต้องมี
+  //     ทางเดินคู่แถว (`AISLE_WIDTH`) พาดผ่านจุดนั้น ⇒ ต้องมี `rowPairCount`
+  //     เป็นเลขคู่ (คู่แถวเรียงสมมาตรรอบ 0 มีช่องว่างตรงกลางพอดีเมื่อคู่เท่านั้น)
+  //   - ไม่ `alongX` (bay axis อยู่บนแกน Z): ท่อสมมูลกับ bayLocal = 0 — ต้องมี
+  //     ทางเดินขวาง 2 บล็อก (`CROSS_AISLE_WIDTH`) พาดผ่านจุดนั้น ⇒ ต้องแบ่ง
+  //     ได้ 2 บล็อกจริง (`blocks === 2`) เท่านั้น ห้าม fallback เป็นบล็อกเดียว
+  // ทั้งสองเงื่อนไขนี้บังเอิญเป็นจริงอยู่แล้วกับขนาดจริงของ FRG-B/HT-4 วันนี้
+  // (`FRG-B`: rowPairCount=2; `HT-4`: blocks=2) แต่ต้อง "บังคับ" ไว้เป็นโค้ด
+  // ไม่ใช่ปล่อยผ่านเพราะบังเอิญพอดี — ถ้าขนาดโซนเปลี่ยนในอนาคตจนเงื่อนไขไม่
+  // เป็นจริง ต้องคืน `null` ทิ้งชั้นวางทั้งโซนไปเลย ดีกว่าปล่อยให้ท่อทะลุชั้นวาง
+  if (config.hasOverheadHeader) {
+    if (alongX) {
+      if (rowPairCount % 2 !== 0) rowPairCount -= 1;
+      if (rowPairCount < 2) return null;
+    } else {
+      if (blocks !== 2) return null;
+    }
+  }
 
   // --- ตำแหน่งตามแกนแถว (คู่แถว back-to-back, กึ่งกลาง) ---
   const totalRowsSpan = rowPairCount * pairDepth + (rowPairCount - 1) * AISLE_WIDTH;
@@ -281,8 +372,8 @@ function buildRackingPlan(layout: PlantLayout): RackingPlan | null {
         }
 
         PALLET_TIER_Y.forEach((tierY, tierIdx) => {
-          const seed = PALLET_HASH_SEED + bayGlobalIndex * 97 + rowIdx * 13 + tierIdx * 7 + b * 31;
-          if (hash01(seed) < PALLET_OCCUPANCY) {
+          const seed = PALLET_HASH_SEED + config.seedSalt + bayGlobalIndex * 97 + rowIdx * 13 + tierIdx * 7 + b * 31;
+          if (hash01(seed) < config.occupancy) {
             const restY = tierIdx === 0 ? BASE_Y : BASE_Y + tierY + BEAM_THICKNESS / 2;
             pallets.push({ x: bx, y: restY, z: bz });
           }
@@ -301,6 +392,48 @@ function buildRackingPlan(layout: PlantLayout): RackingPlan | null {
   const palletD = (alongX ? RACK_DEPTH : BAY_WIDTH) * PALLET_D_FRAC;
 
   return { uprights, beams, pallets, beamW, beamD, palletW, palletD };
+}
+
+/** ผลรวมของทุกโซนที่เติมชั้นวาง — เสาโครงทุกโซนขนาดเดียวกันเสมอ
+ *  (`UPRIGHT_SIZE`) เลยรวมเป็นก้อนเดียวได้โดยตรง ส่วนคาน/พาเลทมีแค่ 2 ขนาดที่
+ *  เป็นไปได้ (ขึ้นกับ `alongX` ของโซนนั้นเท่านั้น ไม่ขึ้นกับขนาดโซน) จึงจัดกลุ่ม
+ *  ตาม `alongX` แล้วรวม placements ของโซนที่ `alongX` เดียวกันเข้า `InstancedMesh`
+ *  ก้อนเดียวกันได้ — ยังคง "instance เดียวต่อชนิด/ทิศทาง" ไม่ใช่ mesh ต่อโซน */
+interface RackingGroup {
+  beamW: number;
+  beamD: number;
+  palletW: number;
+  palletD: number;
+  beams: Placement[];
+  pallets: Placement[];
+}
+
+interface AllRackingPlans {
+  uprights: Placement[];
+  /** สูงสุด 2 กลุ่ม (alongX=true / alongX=false) — ดูคอมเมนต์ข้างบน */
+  groups: RackingGroup[];
+}
+
+function buildAllRackingPlans(layout: PlantLayout): AllRackingPlans | null {
+  const uprights: Placement[] = [];
+  const groupByDims = new Map<string, RackingGroup>();
+
+  for (const config of RACK_ZONE_CONFIGS) {
+    const plan = buildZoneRackingPlan(layout, config);
+    if (!plan) continue;
+    uprights.push(...plan.uprights);
+    const key = `${plan.beamW}|${plan.beamD}|${plan.palletW}|${plan.palletD}`;
+    let group = groupByDims.get(key);
+    if (!group) {
+      group = { beamW: plan.beamW, beamD: plan.beamD, palletW: plan.palletW, palletD: plan.palletD, beams: [], pallets: [] };
+      groupByDims.set(key, group);
+    }
+    group.beams.push(...plan.beams);
+    group.pallets.push(...plan.pallets);
+  }
+
+  if (uprights.length === 0) return null;
+  return { uprights, groups: Array.from(groupByDims.values()) };
 }
 
 const IDENTITY_QUATERNION = new THREE.Quaternion();
@@ -356,35 +489,60 @@ function RackInstances({
   );
 }
 
+/**
+ * คาน+พาเลทของกลุ่มเดียว (โซนที่ `alongX` เดียวกัน แชร์ขนาดกล่องเดียวกัน) —
+ * แยก geometry ตามกลุ่มเพราะขนาดกล่อง (`beamW`/`beamD`/`palletW`/`palletD`)
+ * ขึ้นกับ `alongX` เท่านั้น (สูงสุด 2 ค่าที่เป็นไปได้ทั้งไฟล์) วัสดุ (material)
+ * ใช้ร่วมกันทุกกลุ่มอยู่แล้วจากพารามิเตอร์ ไม่สร้างซ้ำ
+ */
+function RackGroupInstances({
+  group,
+  beamMaterial,
+  palletMaterial,
+}: {
+  group: RackingGroup;
+  beamMaterial: THREE.Material;
+  palletMaterial: THREE.Material;
+}) {
+  const beamGeometry = useMemo(() => {
+    const g = new THREE.BoxGeometry(group.beamW, BEAM_THICKNESS, group.beamD);
+    g.translate(0, BEAM_THICKNESS / 2, 0);
+    return g;
+  }, [group.beamW, group.beamD]);
+
+  const palletGeometry = useMemo(() => {
+    const g = new THREE.BoxGeometry(group.palletW, PALLET_H, group.palletD);
+    g.translate(0, PALLET_H / 2, 0);
+    return g;
+  }, [group.palletW, group.palletD]);
+
+  useEffect(() => () => beamGeometry.dispose(), [beamGeometry]);
+  useEffect(() => () => palletGeometry.dispose(), [palletGeometry]);
+
+  return (
+    <group>
+      <RackInstances placements={group.beams} geometry={beamGeometry} material={beamMaterial} castShadow />
+      <RackInstances placements={group.pallets} geometry={palletGeometry} material={palletMaterial} castShadow />
+    </group>
+  );
+}
+
 export interface WarehouseRackingProps {
   layout: PlantLayout;
 }
 
 /**
- * ชั้นวางพาเลทในโซน `WH` — ดูคอมเมนต์หัวไฟล์
+ * ชั้นวางพาเลทในโซน `WH`/`FRG-B`/`HT-4` — ดูคอมเมนต์หัวไฟล์ และ
+ * `RACK_ZONE_CONFIGS` สำหรับรายการโซนที่เติม
  */
 export function WarehouseRacking({ layout }: WarehouseRackingProps) {
-  const plan = useMemo(() => buildRackingPlan(layout), [layout]);
+  const plans = useMemo(() => buildAllRackingPlans(layout), [layout]);
 
   const uprightGeometry = useMemo(() => {
     const g = new THREE.BoxGeometry(UPRIGHT_SIZE, RACK_HEIGHT, UPRIGHT_SIZE);
     g.translate(0, RACK_HEIGHT / 2, 0);
     return g;
   }, []);
-
-  const beamGeometry = useMemo(() => {
-    if (!plan) return null;
-    const g = new THREE.BoxGeometry(plan.beamW, BEAM_THICKNESS, plan.beamD);
-    g.translate(0, BEAM_THICKNESS / 2, 0);
-    return g;
-  }, [plan]);
-
-  const palletGeometry = useMemo(() => {
-    if (!plan) return null;
-    const g = new THREE.BoxGeometry(plan.palletW, PALLET_H, plan.palletD);
-    g.translate(0, PALLET_H / 2, 0);
-    return g;
-  }, [plan]);
 
   const uprightMaterial = useMemo(
     () => new THREE.MeshStandardMaterial({ color: RACKING.upright, roughness: 0.55, metalness: 0.2 }),
@@ -400,8 +558,6 @@ export function WarehouseRacking({ layout }: WarehouseRackingProps) {
   );
 
   useEffect(() => () => uprightGeometry.dispose(), [uprightGeometry]);
-  useEffect(() => () => beamGeometry?.dispose(), [beamGeometry]);
-  useEffect(() => () => palletGeometry?.dispose(), [palletGeometry]);
   useEffect(
     () => () => {
       uprightMaterial.dispose();
@@ -411,13 +567,16 @@ export function WarehouseRacking({ layout }: WarehouseRackingProps) {
     [uprightMaterial, beamMaterial, palletMaterial]
   );
 
-  if (!plan || !beamGeometry || !palletGeometry) return null;
+  if (!plans) return null;
 
   return (
     <group>
-      <RackInstances placements={plan.uprights} geometry={uprightGeometry} material={uprightMaterial} castShadow />
-      <RackInstances placements={plan.beams} geometry={beamGeometry} material={beamMaterial} castShadow />
-      <RackInstances placements={plan.pallets} geometry={palletGeometry} material={palletMaterial} castShadow />
+      <RackInstances placements={plans.uprights} geometry={uprightGeometry} material={uprightMaterial} castShadow />
+      {plans.groups.map((group, i) => (
+        // key = ดัชนีกลุ่ม (สูงสุด 2 กลุ่ม, ลำดับคงที่ตาม insertion order ของ
+        // `buildAllRackingPlans` ในแต่ละ render ของ `layout` เดียวกัน)
+        <RackGroupInstances key={i} group={group} beamMaterial={beamMaterial} palletMaterial={palletMaterial} />
+      ))}
     </group>
   );
 }

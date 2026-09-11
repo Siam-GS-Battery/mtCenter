@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import * as THREE from "three";
 import type { PlantLayout } from "../../../../lib/plantLayout";
+import { SITE_GROUND_MARGIN } from "../../../../lib/plantSite";
 import { mergeAll, slabGeometry } from "./geometryKit";
 import { FLOOR, SHELL } from "./palette";
 // อ่าน (ไม่แก้) `excludeRanges` ตัวเดียวกับที่ `buildGreenery`/`buildRingRoad`
@@ -26,9 +27,16 @@ import { DOCK_DOOR_W } from "./siteLogistics";
  * ไม่มีหลังคาปิดทับโดยเจตนา
  * ------------------------
  * ผังนี้ถูกดูจากมุมสูงเป็นหลัก (มุม "plant"/"top" ใน HUD) หลังคาทึบจะบัง
- * เครื่องจักรทั้งโรงจนมองไม่เห็นอะไรเลย ที่วาดแทนคือ "ขอบหลังคา" (คานขอบ
- * รอบอาคาร) กับเสาโครงสร้างตามระยะ bay จริง ซึ่งให้ความรู้สึกว่าอยู่ในอาคาร
- * และให้ความลึกจากเงาเสา โดยยังเห็นไลน์การผลิตข้างใน
+ * เครื่องจักรทั้งโรงจนมองไม่เห็นอะไรเลย — เดิมเคยมีทั้งคานขอบหลังคารอบอาคาร
+ * และคานพาดกลางโรงตามแนว bay แต่เอาออกทั้งคู่แล้ว (ดูคอมเมนต์ที่จุดสร้างผนัง/
+ * คานด้านล่าง) เพราะคานพาดกลางโรงยาวข้ามพื้นที่เครื่องจักรทั้งผืนและไปบังการ
+ * คลิกเลือกเครื่องจักร ไม่ใช่แค่บังสายตา ส่วนคานขอบหลังคาก็เป็นโครงลอยเหนือหัว
+ * ที่ผู้ใช้ขอให้ไม่เหลือไว้ — ตอนนี้จึงไม่มีสิ่งใดพาดผ่านเหนือพื้นที่เครื่องจักร
+ * หรือลอยอยู่เหนืออาคารเลย เหลือแค่ผนังเตี้ยรอบอาคาร (`wallH`) บอกขอบเขต
+ *
+ * ทุกเมชในไฟล์นี้ปิด raycast (`raycast={() => null}`) — ก้อนพวกนี้เป็นฉาก
+ * นิ่งอย่างเดียว ไม่ใช่ของที่คลิกได้ ตัวรับคลิกเครื่องจักรจริงอยู่ที่
+ * `MachineInstances.tsx` (`PickProxyInstances`) เท่านั้น
  */
 
 /** คีย์วัสดุของเปลือกอาคาร/ไซต์ */
@@ -121,8 +129,8 @@ function buildShell(layout: PlantLayout): Partial<Record<ShellKey, THREE.BufferG
   const hall = layout.hall;
 
   // --- พื้นไซต์: หญ้าคลุมทั้งผืน แล้วปูลานคอนกรีตทับ ------------------------
-  const siteW = hall.w * 1.9;
-  const siteD = hall.d * 1.9;
+  const siteW = hall.w * SITE_GROUND_MARGIN;
+  const siteD = hall.d * SITE_GROUND_MARGIN;
   b.grass.push(slabGeometry(0, 0, siteW, siteD, 0, 0.06));
   for (const g of site.grass) b.grass.push(slabGeometry(g.x, g.z, g.w, g.d, 0.06, 0.03));
   b.apron.push(slabGeometry(0, 0, hall.w * 1.35, hall.d * 1.3, 0.09, 0.05));
@@ -236,16 +244,15 @@ function buildShell(layout: PlantLayout): Partial<Record<ShellKey, THREE.BufferG
   b.wall.push(box(hall.w / 2, 0.2, 0, wallT, wallH, hall.d));
   b.wall.push(box(-hall.w / 2, 0.2, 0, wallT, wallH, hall.d));
 
-  // คานขอบหลังคาที่ความสูงจริงของอาคาร — บอกความสูงโรงโดยไม่ปิดทับ
-  const beamT = 0.7;
-  b.beam.push(box(0, hall.h, hall.d / 2, hall.w + beamT, beamT, beamT));
-  b.beam.push(box(0, hall.h, -hall.d / 2, hall.w + beamT, beamT, beamT));
-  b.beam.push(box(hall.w / 2, hall.h, 0, beamT, beamT, hall.d + beamT));
-  b.beam.push(box(-hall.w / 2, hall.h, 0, beamT, beamT, hall.d + beamT));
+  // ไม่มีคานขอบหลังคารอบอาคาร (perimeter roof-edge beam) อีกต่อไป
+  // -------------------------------------------------------------
+  // เดิมมีคานกรอบสี่ด้านที่ y = hall.h (ความสูงจริงของอาคาร) ไว้บอกขนาด/ความสูง
+  // โรงแบบคร่าว ๆ — เอาออกตามที่ผู้ใช้ขอให้ไม่เหลือโครงหลังคาเลย ผนังเตี้ยรอบ
+  // อาคาร (`wallH = hall.h * 0.26` ด้านบน) เดิมก็จบที่ราว 1 ใน 4 ของความสูงจริง
+  // อยู่แล้ว เหนือผนังขึ้นไปเป็นที่โล่งเสมอ (ไม่เคยมีอะไรเติมเต็มถึง hall.h)
+  // การเอาคานกรอบนี้ออกจึงไม่ทำให้ผนังดูขาดตอนเพิ่มขึ้นจากเดิม — แค่เอากรอบ
+  // เส้นลอยเหนือหัวออกไปเท่านั้น
 
-  // คานพาดตามแนว z ทุกระยะ bay จริง (`site.hall.bay`, 8.5 ม. — ค่าคงที่
-  // โครงสร้างที่ plantSite.ts ยืนยันว่าไม่เคยถูกสเกล)
-  //
   // ไม่มีเสาในอาคาร โดยเจตนา
   // ---------------------------
   // เดิมปลูกเสาตามตาราง bay ทั่วพื้นโรง ซึ่งถูกตามหลักโครงสร้าง แต่ในการใช้งาน
@@ -253,15 +260,18 @@ function buildShell(layout: PlantLayout): Partial<Record<ShellKey, THREE.BufferG
   // ระดับสายตา/ระดับไลน์แล้วเห็นแต่เสา ไม่เห็นเครื่อง — ซึ่งเป็นสิ่งเดียวที่
   // หน้านี้มีไว้ให้ดู
   //
-  // เหลือไว้แค่คานพาดด้านบนกับคานขอบหลังคา: ยังบอกความสูงและระยะ bay ของโรง
-  // ได้ และยังทอดเงาเป็นแถบซ้ำ ๆ ลงบนพื้นซึ่งช่วยให้อ่านสเกลออก แต่ไม่มี
-  // อะไรมาขวางสายตาที่ระดับเครื่องจักรเลย
-  const bay = site.hall.bay > 0 ? site.hall.bay : 8.5;
-  const colsX = Math.max(2, Math.floor(hall.w / bay));
-  for (let i = 0; i <= colsX; i += 1) {
-    const x = -hall.w / 2 + (hall.w * i) / colsX;
-    b.beam.push(box(x, hall.h, 0, beamT * 0.7, beamT * 0.7, hall.d));
-  }
+  // ไม่มีคานพาดกลางโรงตามแนว bay อีกต่อไป (ลบออกทั้งหมด)
+  // ------------------------------------------------------
+  // เดิมมีคานพาดตามแนว z ทุกระยะ bay จริง (`site.hall.bay`) พาดยาวเต็มความลึก
+  // อาคาร (`hall.d`) ที่ y = hall.h ข้ามพื้นที่เครื่องจักรทั้งผืน — ผู้ใช้แจ้งว่า
+  // คลิกเลือกเครื่องจักรติด ๆ ดับ ๆ ("ทำงานบ้างไม่ทำงานบ้าง") และสงสัยว่าโครง
+  // หลังคาบัง ตรวจสอบแล้วพบว่าเมชทุกก้อนในไฟล์นี้ (รวมคานชุดนี้) ไม่เคยปิด
+  // `raycast` เลย — คานพาดยาวเหล่านี้ซึ่งวางตัดผ่านเหนือเครื่องจักรแทบทุกแถว
+  // คือตัวรับ ray ปลอมที่สุ่มบังทางคลิกไปยังเครื่องจักรจริงเบื้องล่าง (ตรงกับ
+  // อาการ "บางทีติด บางทีไม่ติด" ขึ้นกับมุมยิง ray พอดีหรือไม่) แก้สองชั้น:
+  // (1) ปิด raycast ทุกเมชในไฟล์นี้ด้านล่าง (2) เอาคานชุดนี้ออกทั้งหมดตามที่
+  // ผู้ใช้ขอให้ลดโครงสร้างหลังคาลง — เหลือไว้แค่คานขอบหลังคารอบอาคาร (ด้านบน)
+  // ซึ่งอยู่ที่ขอบเขตอาคารเท่านั้น ไม่พาดผ่านพื้นที่เครื่องจักรตรงกลางเลย
 
   // --- ห้องบริการในอาคาร --------------------------------------------------
   for (const room of site.rooms) {
@@ -391,7 +401,13 @@ export function PlantShell({ layout }: PlantShellProps) {
         const isFloor =
           key === "apron" || key === "slab" || key === "zone" || key === "grass" || key === "road" || key === "roadLine";
         return (
-          <mesh key={key} geometry={geometry} castShadow={!isFloor} receiveShadow>
+          <mesh
+            key={key}
+            geometry={geometry}
+            castShadow={!isFloor}
+            receiveShadow
+            raycast={() => null}
+          >
             <meshStandardMaterial
               color={spec.color}
               roughness={spec.roughness}

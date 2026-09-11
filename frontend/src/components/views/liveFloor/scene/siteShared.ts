@@ -412,3 +412,16 @@ export function officeFloors(index: number): number {
   const h = Math.sin(index * 12.9898) * 43758.5453;
   return 3 + Math.floor(Math.abs(h - Math.floor(h)) * 4);
 }
+
+/**
+ * แฮชคงที่ (deterministic) จาก seed ตัวเลขใด ๆ → เศษส่วน [0, 1)
+ *
+ * สูตรเดียวกับ `officeFloors` ข้างบน (sine-hash มาตรฐาน) แต่ดึงออกมาเป็น
+ * ฟังก์ชันกลางเพื่อใช้ซ้ำกับความหลากหลายของต้นไม้ (ทรง/ขนาด/ระยะปลูก จิตเตอร์
+ * เล็กน้อย) ใน `siteGreenery.ts` — ไม่ใช้ `Math.random()` เพื่อให้ฉากเหมือนเดิม
+ * ทุกครั้งที่เปิด (กฎเดียวกับที่ `plantLayout.ts` ยืนยันว่า pure/deterministic)
+ */
+export function hash01(seed: number): number {
+  const h = Math.sin(seed * 12.9898) * 43758.5453;
+  return Math.abs(h - Math.floor(h));
+}

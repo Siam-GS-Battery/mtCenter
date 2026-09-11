@@ -19,7 +19,7 @@ import {
   fireWaterAnchor,
   buildFireWaterPlant,
 } from "./siteUtilities";
-import { buildGreenery } from "./siteGreenery";
+import { buildGreenery, buildRoadsideHedges, buildOfficeFrontageHedges } from "./siteGreenery";
 import { buildOfficeBuildings, buildOfficeLinks, officeSites, officeEntryCorridors } from "./siteOffice";
 import { buildSiteBuildings } from "./siteEntrance";
 
@@ -156,6 +156,7 @@ export function SiteEnvironment({ layout, roofOpen = false }: SiteEnvironmentPro
     buildGreenery(hall.w, hall.d, b, extraCorridors);
     buildOfficeBuildings(hall.w, hall.d, b);
     buildOfficeLinks(hall.w, hall.d, b);
+    buildOfficeFrontageHedges(hall.w, hall.d, b);
     buildLineToPerimeterLinks(layout.lines, hall.w, hall.d, b);
     const gateRoad = layout.site.roads.find((r) => r.name === "MAIN GATE road");
     const gateCorridors = buildSiteBuildings(hall.w, hall.d, b, gateRoad);
@@ -181,6 +182,10 @@ export function SiteEnvironment({ layout, roofOpen = false }: SiteEnvironmentPro
     // fire-water block) — no need to add it again here separately.
     buildFireHydrants(hall.w, hall.d, b, fireExclusions);
     buildFireCabinets(hall.w, hall.d, b, fireExclusions);
+    // พุ่มเตี้ยเลียบถนนบริการวงรอบ — ใช้ชุดกันชนเดียวกับหัวจ่ายน้ำ/ตู้ดับเพลิง
+    // ข้างบน (ท่ารับ-ส่งของ/สถานีไฟฟ้า/ประตู/ทางเข้าอาคารสำนักงานครบ) ไม่ได้คิด
+    // กลไกกันชนใหม่
+    buildRoadsideHedges(hall.w, hall.d, b, fireExclusions);
 
     const out: Partial<Record<EnvKey, THREE.BufferGeometry>> = {};
     for (const key of ENV_KEYS) {

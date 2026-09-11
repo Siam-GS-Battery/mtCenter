@@ -16,6 +16,7 @@ import ProcessEffects from "./ProcessEffects";
 import ProductionLines from "./ProductionLines";
 import SceneAnnotations from "./SceneAnnotations";
 import SiteEnvironment from "./SiteEnvironment";
+import TimeOfDaySky from "./TimeOfDaySky";
 import WarehouseRacking from "./WarehouseRacking";
 
 /**
@@ -405,10 +406,22 @@ function Lights({
   siteWidth,
   siteDepth,
   highQuality,
+  sunRef,
+  ambientRef,
+  hemiRef,
 }: {
   siteWidth: number;
   siteDepth: number;
   highQuality: boolean;
+  /**
+   * ref สามตัวนี้ให้ `TimeOfDaySky` (roadmap step 16) เขียนสี/ความเข้ม/ทิศทาง
+   * ทับทุก ~30 วิ ตามเวลานาฬิกาจริง — ตัว JSX ด้านล่างยังกำหนดค่าเริ่มต้น
+   * (ตำแหน่ง/ความเข้ม) ไว้เหมือนเดิมทุกอย่าง `TimeOfDaySky` แค่ mutate ทับหลัง
+   * mount เท่านั้น ไม่มีอะไรเปลี่ยนถ้าไม่ mount มัน (เช่นตอนที่ยังไม่พร้อม)
+   */
+  sunRef?: React.RefObject<THREE.DirectionalLight | null>;
+  ambientRef?: React.RefObject<THREE.AmbientLight | null>;
+  hemiRef?: React.RefObject<THREE.HemisphereLight | null>;
 }) {
   // ดวงอาทิตย์ต้องถอยตามขนาดไซต์ ไม่ใช่ตำแหน่งตายตัว ไม่งั้นไซต์ใหญ่จะมีแสง
   // ส่องถึงแค่มุมเดียว
@@ -449,12 +462,14 @@ function Lights({
           away from the key light room to actually go darker, which is what
           "shape" looks like. The floor is being deepened in parallel
           (#f4f5f7→#e2e6ea), so this isn't fighting for contrast alone. */}
-      <hemisphereLight args={[LIGHT.ambient, LIGHT.hemisphereGround, 0.7]} />
-      <ambientLight intensity={0.48} />
+      <hemisphereLight ref={hemiRef} args={[LIGHT.ambient, LIGHT.hemisphereGround, 0.7]} />
+      <ambientLight ref={ambientRef} intensity={0.48} />
       <directionalLight
+        ref={sunRef}
         // มุมบนซ้ายด้านหน้า สูง ให้เป็นแหล่งแสงหลักเดียวที่ทอดเงา ความเข้ม
         // สูงพอให้รูปทรงเครื่องจักรอ่านออกชัดเจน (แยกด้านสว่าง/มืด) แทนการ
-        // ล้างแบนแบบ diorama เดิม
+        // ล้างแบนแบบ diorama เดิม — ค่าเริ่มต้นนี้คือกลางวัน `TimeOfDaySky`
+        // จะ mutate ตำแหน่ง/สี/ความเข้มทับตามเวลาจริงหลัง mount
         position={[-reach * 0.45, reach * 0.75, reach * 0.35]}
         intensity={1.6}
         color={LIGHT.key}
@@ -543,6 +558,12 @@ export function FloorScene({
   onContextRestored,
   children,
 }: FloorSceneProps) {
+  // ให้ `TimeOfDaySky` (roadmap step 16) เขียนทับแสงคีย์/ไฟเติมตามเวลานาฬิกา
+  // จริง — สร้าง ref ที่นี่แทนใน `Lights` เพราะทั้งสองคอมโพเนนต์ต้องแชร์กัน
+  const sunRef = useRef<THREE.DirectionalLight>(null);
+  const ambientRef = useRef<THREE.AmbientLight>(null);
+  const hemiRef = useRef<THREE.HemisphereLight>(null);
+
   return (
     <Canvas
       dpr={[1, highQuality ? DPR_CAP_HIGH : DPR_CAP_LOW]}
@@ -588,7 +609,15 @@ export function FloorScene({
         followPoint={followPoint}
         onCameraFrame={onCameraFrame}
       />
-      <Lights siteWidth={siteWidth} siteDepth={siteDepth} highQuality={highQuality} />
+      <Lights
+        siteWidth={siteWidth}
+        siteDepth={siteDepth}
+        highQuality={highQuality}
+        sunRef={sunRef}
+        ambientRef={ambientRef}
+        hemiRef={hemiRef}
+      />
+      <TimeOfDaySky layout={layout} siteWidth={siteWidth} siteDepth={siteDepth} sunRef={sunRef} ambientRef={ambientRef} hemiRef={hemiRef} />
       <PlantShell layout={layout} />
       <FloorGrid layout={layout} highQuality={highQuality} />
       <FloorMarkings layout={layout} />

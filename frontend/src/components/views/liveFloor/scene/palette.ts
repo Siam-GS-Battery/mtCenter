@@ -289,3 +289,24 @@ export const PROCESS = {
   plume: "#c9d2da",
   ember: "#ff8a3d",
 };
+
+/** Roadmap step 16 — real-time day/night cycle (`scene/TimeOfDaySky.tsx`).
+ *  Additive re-export of `LIVE_FLOOR_THEME.night`, same pattern as every
+ *  other block in this file: colours live in `liveFloorTheme.ts`, this file
+ *  just groups them for the scene code that consumes them. */
+export const NIGHT = {
+  skyNight: LIVE_FLOOR_THEME.night.skyNight,
+  skyDawn: LIVE_FLOOR_THEME.night.skyDawn,
+  skyDusk: LIVE_FLOOR_THEME.night.skyDusk,
+  skyDay: LIVE_FLOOR_THEME.night.skyDay,
+  fogNight: LIVE_FLOOR_THEME.night.fogNight,
+  fogDay: FOG,
+  sunDawn: LIVE_FLOOR_THEME.night.sunDawn,
+  sunDay: LIVE_FLOOR_THEME.night.sunDay,
+  sunDusk: LIVE_FLOOR_THEME.night.sunDusk,
+  poleLampLit: LIVE_FLOOR_THEME.night.poleLampLit,
+  windowLit: LIVE_FLOOR_THEME.night.windowLit,
+  gateLit: LIVE_FLOOR_THEME.night.gateLit,
+  /** pole shaft colour — reuses the existing site pole/fence steel tone, no new hex */
+  poleShaft: SHELL.pole,
+};

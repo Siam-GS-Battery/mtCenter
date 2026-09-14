@@ -45,6 +45,7 @@ import { SkeletonCardGrid, SkeletonList } from "../ui/Skeleton";
 import { MachineSelect } from "../MachineSelect";
 import { TelemetryTrendCard } from "./TelemetryTrendCard";
 import { MachineMetricsChart } from "./MachineMetricsChart";
+import { MachineProductionCycleCard } from "./MachineProductionCycleCard";
 import LiveFloorView from "./liveFloor/LiveFloorView";
 import type { InspectionReport } from "../../lib/inspectionAgent";
 import {
@@ -1411,6 +1412,11 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* รอบการผลิต (mock/demo) */}
+            {selectedMetrics && (
+              <MachineProductionCycleCard machine={selectedMachine} metrics={selectedMetrics.productionCycle} />
             )}
 
             {/* การใช้พลังงาน (mock/demo) */}

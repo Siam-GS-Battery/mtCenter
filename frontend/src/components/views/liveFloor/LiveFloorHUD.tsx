@@ -5,6 +5,7 @@ import {
   Boxes,
   Building2,
   Eye,
+  EyeOff,
   LayoutGrid,
   Maximize2,
   Minimize2,
@@ -67,6 +68,9 @@ export interface LiveFloorHUDProps {
   onCameraPresetChange: (next: PlantCameraPreset) => void;
   highQuality: boolean;
   onToggleQuality: () => void;
+  /** true = หลังคาอาคารไลน์ผลิตเปิดอยู่ (มองเห็นเครื่องจักรด้านใน) */
+  roofOpen: boolean;
+  onToggleRoof: () => void;
   /** every populated production zone on the site, for the building/zone navigator */
   zones: PlantZoneSummary[];
   /** currently focused zone; null = whole-site/preset-default view */
@@ -371,6 +375,8 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
     onCameraPresetChange,
     highQuality,
     onToggleQuality,
+    roofOpen,
+    onToggleRoof,
     zones,
     focusZoneId,
     onFocusZone,
@@ -605,6 +611,27 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
               {highQuality ? "กราฟิกสูง" : "ประหยัด"}
             </span>
           </button>
+          <button
+            type="button"
+            title={roofOpen ? "เปิดหลังคา (กดเพื่อปิดหลังคา ซ่อนภายในอาคาร)" : "ปิดหลังคา (กดเพื่อเปิดหลังคา มองเห็นเครื่องจักรภายใน)"}
+            aria-label={roofOpen ? "เปิดหลังคา" : "ปิดหลังคา"}
+            aria-pressed={roofOpen}
+            onClick={onToggleRoof}
+            className={`mt-1.5 w-full min-w-0 flex items-center gap-1.5 px-2 py-1.5 rounded-[10px] transition-colors text-left ${
+              roofOpen
+                ? "bg-[var(--lf-accent-26)] text-[var(--lf-accent)] hover:bg-[var(--lf-panel-border)]"
+                : "bg-[var(--lf-box-bg)] text-[var(--lf-text-muted)] hover:bg-[var(--lf-accent-14)] hover:text-[var(--lf-text)]"
+            }`}
+          >
+            {roofOpen ? (
+              <Eye className="w-3.5 h-3.5 shrink-0" />
+            ) : (
+              <EyeOff className="w-3.5 h-3.5 shrink-0" />
+            )}
+            <span className="text-[10px] font-semibold truncate">
+              {roofOpen ? "เปิดหลังคา" : "ปิดหลังคา"}
+            </span>
+          </button>
         </div>
 
         {/* building/zone navigator — own panel inside the rail. It is the
@@ -803,6 +830,27 @@ function LiveFloorHUD(props: LiveFloorHUDProps): ReactElement {
             )}
             <span className="text-xs font-semibold whitespace-nowrap">
               {highQuality ? "กราฟิกสูง" : "ประหยัด"}
+            </span>
+          </button>
+          <button
+            type="button"
+            title={roofOpen ? "เปิดหลังคา (กดเพื่อปิดหลังคา ซ่อนภายในอาคาร)" : "ปิดหลังคา (กดเพื่อเปิดหลังคา มองเห็นเครื่องจักรภายใน)"}
+            aria-label={roofOpen ? "เปิดหลังคา" : "ปิดหลังคา"}
+            aria-pressed={roofOpen}
+            onClick={onToggleRoof}
+            className={`shrink-0 min-h-9 flex items-center gap-1.5 px-3 py-2 rounded-full border backdrop-blur-md shadow-[0_4px_12px_-6px_var(--lf-panel-glow)] transition-colors ${
+              roofOpen
+                ? "bg-[var(--lf-accent-26)] border-[var(--lf-accent-80)] text-[var(--lf-accent)]"
+                : "bg-[var(--lf-panel-bg)] border-[var(--lf-panel-border)] text-[var(--lf-text)]"
+            }`}
+          >
+            {roofOpen ? (
+              <Eye className="w-3.5 h-3.5 shrink-0" />
+            ) : (
+              <EyeOff className="w-3.5 h-3.5 shrink-0" />
+            )}
+            <span className="text-xs font-semibold whitespace-nowrap">
+              {roofOpen ? "เปิดหลังคา" : "ปิดหลังคา"}
             </span>
           </button>
         </div>

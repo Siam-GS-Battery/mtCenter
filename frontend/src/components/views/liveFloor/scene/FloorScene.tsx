@@ -10,6 +10,7 @@ import FloorGrid from "./FloorGrid";
 import FloorActivity from "./FloorActivity";
 import FloorMarkings from "./FloorMarkings";
 import Forklifts from "./Forklifts";
+import { HallRoof } from "./HallRoof";
 import MachineInstances from "./MachineInstances";
 import PlantShell from "./PlantShell";
 import ProcessEffects from "./ProcessEffects";
@@ -710,6 +711,7 @@ export function FloorScene({
       <FloorGrid layout={layout} highQuality={highQuality} />
       <FloorMarkings layout={layout} />
       <SiteEnvironment layout={layout} roofOpen={roofOpen} />
+      <HallRoof layout={layout} roofOpen={roofOpen} highQuality={highQuality} />
       <ProductionLines layout={layout} />
       <MachineInstances
         layout={layout}

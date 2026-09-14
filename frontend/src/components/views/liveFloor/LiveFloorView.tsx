@@ -358,10 +358,10 @@ export default function LiveFloorView({
   /**
    * "เปิดหลังคา" — ซ่อนแผ่นหลังคาอาคารไลน์ผลิต เหลือแต่โครงถัก
    *
-   * คงที่เป็น true เสมอ (ไม่มีปุ่มสลับแล้ว): หน้านี้มีไว้ดูสถานะเครื่องจักร
-   * ถ้าเปิดเข้ามาแล้วเห็นแต่หลังคาปิดทึบก็ไม่ได้ประโยชน์อะไร
+   * ค่าเริ่มต้นเป็น true (เปิด) เหมือนพฤติกรรมเดิม แต่ตอนนี้ผู้ใช้สลับเองได้
+   * ผ่านปุ่มไอคอนตาใน HUD (ดู handleToggleRoof)
    */
-  const roofOpen = true;
+  const [roofOpen, setRoofOpen] = useState(true);
   /**
    * true = กล้องเกาะติดตัวหุ่นไปตลอด (เปิดอัตโนมัติเมื่อคลิกที่ตัวหุ่นในฉาก)
    *
@@ -588,6 +588,10 @@ export default function LiveFloorView({
     setHighQuality((q) => !q);
   }, []);
 
+  const handleToggleRoof = useCallback(() => {
+    setRoofOpen((open) => !open);
+  }, []);
+
   /** เลือกโซนจากตัวนำทาง (หรือ null = "ดูทั้งไซต์"/กลับพรีเซ็ตปกติ). */
   const handleFocusZone = useCallback((zoneId: string | null) => {
     setFocusZoneId(zoneId);
@@ -808,6 +812,8 @@ export default function LiveFloorView({
           onCameraPresetChange={setCameraPreset}
           highQuality={highQuality}
           onToggleQuality={handleToggleQuality}
+          roofOpen={roofOpen}
+          onToggleRoof={handleToggleRoof}
           zones={zoneSummaries}
           focusZoneId={focusZoneId}
           onFocusZone={handleFocusZone}

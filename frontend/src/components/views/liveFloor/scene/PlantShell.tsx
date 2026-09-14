@@ -1,7 +1,8 @@
 import { useEffect, useMemo } from "react";
 import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import type { PlantLayout } from "../../../../lib/plantLayout";
-import { SITE_GROUND_MARGIN } from "../../../../lib/plantSite";
+import { SITE_GROUND_MARGIN, type PlantBuilding } from "../../../../lib/plantSite";
 import { mergeAll, slabGeometry } from "./geometryKit";
 import { FLOOR, SHELL } from "./palette";
 // อ่าน (ไม่แก้) `excludeRanges` ตัวเดียวกับที่ `buildGreenery`/`buildRingRoad`
@@ -51,6 +52,7 @@ type ShellKey =
   | "beam"
   | "wall"
   | "building"
+  | "roof"
   | "glass"
   | "foliage"
   | "trunk"
@@ -71,6 +73,10 @@ const MATERIAL_SPECS: Record<ShellKey, { color: string; roughness: number; metal
   // ผิวสถาปัตยกรรมด้าน (ผนัง/อาคาร)
   wall: { color: SHELL.wall, roughness: 0.8, metalness: 0.05 },
   building: { color: SHELL.building, roughness: 0.8, metalness: 0.05 },
+  // หลังคาอาคารไซต์ (พาราเปต/หลังคาลาด/สันหลังคา/ชายคา) — สีเดียวกับ
+  // `SHELL.roofEdge` ที่มีอยู่แล้วในพาเลท (ใช้คู่กับ "eave" ใน siteShared.ts)
+  // จึงไม่ต้องเพิ่มโทนสีใหม่ในไฟล์ palette.ts
+  roof: { color: SHELL.roofEdge, roughness: 0.55, metalness: 0.1 },
   glass: { color: SHELL.buildingGlass, roughness: 0.08, metalness: 0.02 },
   foliage: { color: SHELL.foliage, roughness: 0.9, metalness: 0.0 },
   trunk: { color: SHELL.trunk, roughness: 0.9, metalness: 0.0 },
@@ -114,6 +120,86 @@ function pillar(
   const g = new THREE.CylinderGeometry(radius, radius * 1.08, height, segments);
   g.translate(x, y + height / 2, z);
   return g;
+}
+
+/**
+ * หลังคาจั่ว (gable) สำหรับอาคาร `roofStyle: "pitched"` — สันหลังคาโค้งมน
+ * (ทรงกระบอก) + แผ่นลาดสองผืน + ชายคายื่นโค้งมนรอบขอบ + เส้นรางน้ำใต้ชายคา
+ *
+ * เลือกแนวสันหลังคาไปตามด้านที่ยาวกว่าของอาคาร (`w` หรือ `d`) ให้ลาดข้ามด้าน
+ * สั้นเสมอ — สัดส่วนสมจริงกว่าตายตัวว่าลาดไปทาง Z เสมอแบบเดิม
+ */
+function addPitchedRoof(b: Buckets, building: PlantBuilding, topY: number): void {
+  const ridgeAlongX = building.w >= building.d;
+  const span = ridgeAlongX ? building.d : building.w; // ด้านที่หลังคาลาดข้าม
+  const ridgeLen = (ridgeAlongX ? building.w : building.d) + 1.0; // ยื่นเลยแนวสันเล็กน้อย
+  const overhang = 0.6;
+  const rise = Math.min(span * 0.22, 3.0); // "รูปทรงโค้งมน/นุ่มนวล" — จั่วเตี้ย ไม่ชันแหลม
+  const run = span / 2 + overhang;
+  const paneLen = Math.sqrt(run * run + rise * rise);
+  const angle = Math.atan2(rise, run);
+  const eaveY = topY + 0.15;
+
+  // แผ่นลาดหลังคาสองผืน
+  for (const sign of [-1, 1] as const) {
+    const g = ridgeAlongX
+      ? new THREE.BoxGeometry(ridgeLen, 0.22, paneLen)
+      : new THREE.BoxGeometry(paneLen, 0.22, ridgeLen);
+    if (ridgeAlongX) {
+      g.rotateX(sign * angle);
+      g.translate(building.x, eaveY + rise / 2, building.z + sign * (run / 2));
+    } else {
+      g.rotateZ(-sign * angle);
+      g.translate(building.x + sign * (run / 2), eaveY + rise / 2, building.z);
+    }
+    b.roof.push(g);
+  }
+
+  // สันหลังคา — ทรงกระบอกนอน (โค้งมนโดยธรรมชาติ แทนกล่องเหลี่ยมแบบเดิม)
+  const ridgeCap = new THREE.CylinderGeometry(0.26, 0.26, ridgeLen, 12);
+  if (ridgeAlongX) ridgeCap.rotateZ(Math.PI / 2);
+  else ridgeCap.rotateX(Math.PI / 2);
+  ridgeCap.translate(building.x, eaveY + rise + 0.02, building.z);
+  b.roof.push(ridgeCap);
+
+  // ชายคายื่นโค้งมน (eave fascia) + เส้นรางน้ำ รอบขอบชายคาทั้งสองฝั่ง
+  const fasciaLen = ridgeLen - 0.6;
+  for (const sign of [-1, 1] as const) {
+    const fx = ridgeAlongX ? building.x : building.x + sign * (run - 0.1);
+    const fz = ridgeAlongX ? building.z + sign * (run - 0.1) : building.z;
+    const fascia = ridgeAlongX
+      ? new RoundedBoxGeometry(fasciaLen, 0.3, 0.32, 1, 0.08)
+      : new RoundedBoxGeometry(0.32, 0.3, fasciaLen, 1, 0.08);
+    fascia.translate(fx, eaveY - 0.18, fz);
+    b.roof.push(fascia);
+
+    const gutter = new THREE.CylinderGeometry(0.06, 0.06, fasciaLen, 8);
+    if (ridgeAlongX) gutter.rotateZ(Math.PI / 2);
+    else gutter.rotateX(Math.PI / 2);
+    gutter.translate(fx, eaveY - 0.36, fz);
+    b.metal.push(gutter);
+  }
+}
+
+/**
+ * หลังคาราบ (`roofStyle` ว่าง/"flat") — พาราเปตบางรอบดาดฟ้าแทนคานยื่นก้อน
+ * ใหญ่แบบเดิม ("ฝาหลังคายื่น") พร้อมหน่วยงานระบบเล็ก ๆ บนดาดฟ้าของอาคารใหญ่
+ */
+function addFlatRoofDetail(b: Buckets, building: PlantBuilding, topY: number, isLarge: boolean): void {
+  const parapetH = 0.5;
+  const t = 0.28;
+  const ow = building.w + 0.4;
+  const od = building.d + 0.4;
+  b.roof.push(box(building.x, topY, building.z + od / 2 - t / 2, ow, parapetH, t));
+  b.roof.push(box(building.x, topY, building.z - od / 2 + t / 2, ow, parapetH, t));
+  b.roof.push(box(building.x + ow / 2 - t / 2, topY, building.z, t, parapetH, od));
+  b.roof.push(box(building.x - ow / 2 + t / 2, topY, building.z, t, parapetH, od));
+
+  if (isLarge) {
+    // หน่วยระบบบนดาดฟ้า (เช่น เครื่องปรับอากาศ) — เพิ่มรายละเอียดให้อาคารใหญ่
+    b.metal.push(box(building.x - building.w * 0.18, topY, building.z + building.d * 0.15, 1.6, 0.8, 1.2));
+    b.metal.push(box(building.x + building.w * 0.15, topY, building.z - building.d * 0.1, 1.4, 0.7, 1.4));
+  }
 }
 
 /**
@@ -279,20 +365,77 @@ function buildShell(layout: PlantLayout): Partial<Record<ShellKey, THREE.BufferG
   }
 
   // --- อาคารภายนอก (สำนักงาน ฯลฯ) พร้อมแถบกระจกต่อชั้น -------------------
+  //
+  // เดิมทุกอาคารเป็นกล่องเทาทึบ + คานยื่นแบนบนหัว ไม่เคยอ่าน `roofStyle`
+  // เลยแม้ข้อมูลจะระบุไว้ ("dead data") — ตอนนี้แยกสองทาง: อาคารที่ตั้งใจ
+  // ให้เป็นหลังคาจั่ว (`addPitchedRoof`) กับอาคารหลังคาราบ (`addFlatRoofDetail`)
+  // นอกจากนี้เพิ่มฐานคาดตีนอาคาร เสาเหลี่ยมมุมอาคาร มุลเลียนคั่นจังหวะแถบกระจก
+  // และกันสาดทางเข้าของอาคารหลังใหญ่ ให้อ่านเป็นอาคารจริงมากขึ้น
   for (const building of site.buildings) {
-    b.building.push(box(building.x, 0.14, building.z, building.w, building.h, building.d));
+    const baseY = 0.14;
+    const topY = baseY + building.h;
+    const isLarge = building.w * building.d > 150;
+
+    // ฐานคาดตีนอาคาร (plinth) — ยื่นเล็กน้อยจากผนัง บอกน้ำหนักที่ติดพื้น
+    b.wall.push(box(building.x, baseY, building.z, building.w + 0.5, 0.3, building.d + 0.5));
+
+    // ตัวอาคาร (เริ่มเหนือฐานคาดตีน)
+    b.building.push(box(building.x, baseY + 0.3, building.z, building.w, building.h - 0.3, building.d));
+
+    // เสาเหลี่ยมมุมอาคาร (pilaster) 4 ต้น — เน้นมุมอาคารให้ดูมีโครงสร้าง
+    const pilasterW = 0.32;
+    for (const cx of [-1, 1] as const) {
+      for (const cz of [-1, 1] as const) {
+        b.wall.push(
+          box(
+            building.x + cx * (building.w / 2 - pilasterW / 2),
+            baseY + 0.3,
+            building.z + cz * (building.d / 2 - pilasterW / 2),
+            pilasterW,
+            building.h - 0.3,
+            pilasterW
+          )
+        );
+      }
+    }
+
     const floors = Math.max(1, building.floors);
     for (let f = 0; f < floors; f += 1) {
-      const y = 0.14 + (building.h * (f + 0.55)) / floors;
+      const y = baseY + (building.h * (f + 0.55)) / floors;
       const bandH = (building.h / floors) * 0.4;
+      const bandW = building.w * 0.82;
+      const bandD = building.d * 0.82;
       // แถบกระจกยื่นออกจากผนัง 6 ซม. กัน z-fighting กับตัวอาคาร
-      b.glass.push(box(building.x, y, building.z + building.d / 2 + 0.03, building.w * 0.88, bandH, 0.06));
-      b.glass.push(box(building.x, y, building.z - building.d / 2 - 0.03, building.w * 0.88, bandH, 0.06));
-      b.glass.push(box(building.x + building.w / 2 + 0.03, y, building.z, 0.06, bandH, building.d * 0.88));
-      b.glass.push(box(building.x - building.w / 2 - 0.03, y, building.z, 0.06, bandH, building.d * 0.88));
+      b.glass.push(box(building.x, y, building.z + building.d / 2 + 0.03, bandW, bandH, 0.06));
+      b.glass.push(box(building.x, y, building.z - building.d / 2 - 0.03, bandW, bandH, 0.06));
+      b.glass.push(box(building.x + building.w / 2 + 0.03, y, building.z, 0.06, bandH, bandD));
+      b.glass.push(box(building.x - building.w / 2 - 0.03, y, building.z, 0.06, bandH, bandD));
+
+      // มุลเลียนคั่นจังหวะแถบกระจกหน้า/หลัง — ให้จังหวะผนังกระจกอ่านเป็นแนวเสา
+      // ไม่ใช่แผ่นกระจกเรียบแผ่นเดียว
+      const mullions = 3;
+      for (let m = 1; m < mullions; m += 1) {
+        const mx = building.x - bandW / 2 + (bandW * m) / mullions;
+        b.wall.push(box(mx, y - bandH / 2, building.z + building.d / 2 + 0.02, 0.06, bandH, 0.08));
+        b.wall.push(box(mx, y - bandH / 2, building.z - building.d / 2 - 0.02, 0.06, bandH, 0.08));
+      }
     }
-    // ฝาหลังคายื่น
-    b.beam.push(box(building.x, 0.14 + building.h, building.z, building.w + 0.8, 0.4, building.d + 0.8));
+
+    // กันสาดทางเข้า (entrance canopy) — เฉพาะอาคารหลังใหญ่ ด้านหน้า (+z)
+    if (isLarge) {
+      const canopyY = baseY + building.h * 0.32;
+      b.beam.push(box(building.x, canopyY, building.z + building.d / 2 + 1.1, building.w * 0.5, 0.18, 2.2));
+      for (const cx of [-1, 1] as const) {
+        b.metal.push(pillar(building.x + cx * building.w * 0.2, baseY, building.z + building.d / 2 + 2.1, 0.1, canopyY - baseY, 8));
+      }
+    }
+
+    // หลังคา — จั่วโค้งมนสำหรับ `roofStyle: "pitched"`, ราบ+พาราเปตสำหรับที่เหลือ
+    if (building.roofStyle === "pitched") {
+      addPitchedRoof(b, building, topY);
+    } else {
+      addFlatRoofDetail(b, building, topY, isLarge);
+    }
   }
 
   // --- โรงเก็บของ (หลังคาลาดบนเสาสี่ต้น) ----------------------------------

@@ -13,7 +13,7 @@ import {
 
 /**
  * ===========================================================================
- * WAREHOUSE RACKING — ชั้นวางพาเลทในโซน WH / FRG-B / HT-4 (roadmap step 8)
+ * WAREHOUSE RACKING — ชั้นวางพาเลทในโซน WH / FRG-A / FRG-B / HT-2..4 (roadmap step 8)
  * ===========================================================================
  *
  * โซนเหล่านี้เดิมเป็นแค่แผ่นพื้นเปล่า (`PlantShell.tsx`'s `zone` slab) — ไฟล์
@@ -22,16 +22,17 @@ import {
  * คลังเต็มทุกช่องดูปลอม)
  *
  * โซนที่เติม (`RACK_ZONE_CONFIGS` ด้านล่าง) — `WH` มีเครื่องจักรจริงอยู่แล้ว
- * (section TOOLING/PACKING) ส่วน `FRG-B`/`HT-4` เป็น 2 โซนที่ผู้ใช้ชี้ในภาพว่า
- * เป็น "ช่องว่างเปล่า" ทางฝั่งขวาของผังเครื่องจักร (วัดจริงแล้ว: ไม่มี DB
- * section ใดแม็ปมาลง `FRG-A`/`FRG-B` เลย และมีแค่ `HT-1` ในกลุ่ม `HT-1..4` ที่
- * ได้เครื่องจักรจาก DB จริง — `FRG-B` และ `HT-4` จึงว่างสนิททั้งคู่เสมอในผัง
- * ปัจจุบัน แต่ยังคงต้องเช็คชนเครื่องจักรเผื่อ DB เปลี่ยนในอนาคต) ทั้งสองโซนนี้
- * ยังมี "ท่อลมอัด" (air header, ดู `siteUtilities.ts`'s `buildAirHeaderRun`)
- * วิ่งผ่านกึ่งกลางแนวแถวของตัวเองที่ Y=7.2 ม. พร้อม drop-leg หย่อนลงมา — ผัง
- * ชั้นวางของทั้งสองโซนนี้จึงบังคับให้มีช่องทางเดินว่าง (aisle) พาดผ่านจุดกึ่ง
- * กลางโซนพอดี (ดูคอมเมนต์ `hasOverheadHeader` ด้านล่าง) กันไม่ให้ท่อ/ขาท่อ
- * ทะลุชั้นวาง
+ * (section TOOLING/PACKING) ส่วน `FRG-A`/`FRG-B`/`HT-2`/`HT-3`/`HT-4` คือ 5
+ * โซนที่ผู้ใช้ชี้ว่าเป็น "ช่องว่างเปล่า" ทั่วผังเครื่องจักร ขอเติมให้เต็มพื้นที่
+ * (วัดจริงแล้ว: ไม่มี DB section ใดแม็ปมาลง `FRG-A`/`FRG-B` เลย และมีแค่
+ * `HT-1` ในกลุ่ม `HT-1..4` ที่ได้เครื่องจักรจาก DB จริง — ทั้ง 5 โซนนี้จึงว่าง
+ * สนิทเสมอในผังปัจจุบัน แต่แต่ละโซน (ยกเว้น `WH`) ยังคงเช็คทั้ง
+ * `config.requireEmptyZone` เทียบ `layout.scale.emptyZones` แบบ data-driven
+ * และเช็คชนเครื่องจักรรายชิ้นเผื่อ DB เปลี่ยนในอนาคต) ทั้ง 5 โซนนี้ยังมี
+ * "ท่อลมอัด" (air header, ดู `siteUtilities.ts`'s `buildAirHeaderRun`) วิ่งผ่าน
+ * กึ่งกลางแนวแถวของตัวเองที่ Y=7.2 ม. พร้อม drop-leg หย่อนลงมา — ผังชั้นวางของ
+ * ทั้ง 5 โซนนี้จึงบังคับให้มีช่องทางเดินว่าง (aisle) พาดผ่านจุดกึ่งกลางโซนพอดี
+ * (ดูคอมเมนต์ `hasOverheadHeader` ด้านล่าง) กันไม่ให้ท่อ/ขาท่อทะลุชั้นวาง
  *
  * ที่มาของตำแหน่ง — ทุกอย่างอ่านจาก `layout.site.zones` จริง ไม่มีพิกัด
  * สัมบูรณ์คงที่ในไฟล์นี้เลย (`plantLayout.ts`'s zone rect เป็นค่าคงที่โดย
@@ -151,18 +152,44 @@ interface RackZoneConfig {
   occupancy: number;
   /** เกลือของ hash พาเลท กันไม่ให้ผังพาเลทของแต่ละโซนซ้ำแพทเทิร์นเดียวกัน */
   seedSalt: number;
+  /** true = ก่อนสร้างผังชั้นวาง ต้องเช็คก่อนว่า `layout.scale.emptyZones` (ผล
+   *  ข้อเท็จจริงจริงจาก `plantLayout.ts`'s `buildPlantLayout`, ไม่ใช่ค่าคงที่
+   *  ที่นี่) ยืนยันว่าโซนนี้ "ว่างเปล่าจริง ณ ตอนนี้" (ไม่มี DB section ใดแม็ป
+   *  มาลงโซนนี้เลย) ก่อน — ถ้าไม่ยืนยันคืน `null` ทิ้งชั้นวางทั้งโซนไปเลย แทน
+   *  ที่จะปล่อยให้วางแล้วพึ่งพาแค่ `collidesWithMachine` รายชิ้นช่วย (ชั้นวาง
+   *  ที่โดนข้ามเกือบทุกช่วงเพราะชนเครื่องจักรเกือบทั้งโซนจะดูเป็นบั๊กเชิงภาพ
+   *  ไม่ใช่คลังที่ตั้งใจเว้นบางช่อง) — ใช้ `false` เฉพาะ `WH` ที่ตั้งใจเติม
+   *  ชั้นวางทับพื้นที่ที่มีเครื่องจักรจริงอยู่แล้วโดยดีไซน์ (ดูคอมเมนต์ต่อจาก
+   *  รายการ config ด้านล่าง) */
+  requireEmptyZone: boolean;
 }
 
 /**
  * `WH` มีเครื่องจักรจริงอยู่แล้วและไม่มีท่อลมอัดพาดผ่าน — พฤติกรรมเดิมไม่
- * เปลี่ยน `FRG-B`/`HT-4` คือ 2 โซนว่างฝั่งขวาที่ผู้ใช้ชี้ในภาพ (ดูคอมเมนต์หัว
- * ไฟล์) — สัดส่วนพาเลทต่างกันโดยตั้งใจ (โกดังของแยกที่มักไม่เต็มเท่ากัน ไม่ใช่
- * บังเอิญเท่ากับ WH) เพื่อไม่ให้ทั้ง 3 โซนดูก็อปวางซ้ำกันเป๊ะ
+ * เปลี่ยน (`requireEmptyZone: false` เพราะการเติมชั้นวางทับพื้นที่ที่มี
+ * เครื่องจักรอยู่แล้วเป็นดีไซน์ที่ตั้งใจของโซนนี้ ไม่ใช่ข้อผิดพลาด)
+ *
+ * `FRG-A`/`FRG-B`/`HT-2`/`HT-3`/`HT-4` คือ 5 โซนที่ `plantLayout.ts` ยืนยันว่า
+ * "ไม่มี DB section ใดแม็ปมาลงเลย" เสมอ (ดู `buildPlantLayout`'s
+ * `zoneKindForSection`: ไม่มี section ไหนแม็ปเป็น `forging`, และมีแค่ section
+ * `HT` เท่านั้นที่แม็ปเป็น `heat` แล้วก็ไปลงที่ `HT-1` เพียงโซนเดียว) — คือ
+ * "ช่องว่างเปล่า" ทั้งหมดฝั่งขวาของผังเครื่องจักรที่ผู้ใช้ชี้ในภาพ ขอเติมชั้น
+ * วางให้เต็มพื้นที่ทั้ง 5 โซนนี้ (ไม่รวม `HT-1` เพราะโซนนั้นอาจมีเครื่องจักร
+ * จริงจาก DB อยู่แล้ว — `requireEmptyZone: true` เช็คซ้ำแบบ data-driven ทุก
+ * โซนในกลุ่มนี้ผ่าน `layout.scale.emptyZones` ก่อนวางเสมอ ไม่ใช่หวังพึ่งแค่
+ * ข้อเท็จจริงวันนี้ที่ hardcode ไว้ตรงนี้ — ถ้าในอนาคตมีเครื่องจักรใหม่ถูก
+ * แม็ปมาลงโซนใดโซนหนึ่งในกลุ่มนี้ ชั้นวางทั้งโซนนั้นจะหายไปเองโดยอัตโนมัติ
+ * แทนที่จะทะลุเครื่องจักร) — สัดส่วนพาเลทตั้งใจให้ต่างกันในแต่ละโซน (โกดังของ
+ * แยกที่มักไม่เต็มเท่ากัน ไม่ใช่บังเอิญเท่ากับ WH) เพื่อไม่ให้ทุกโซนดูก็อปวาง
+ * ซ้ำกันเป๊ะ
  */
 export const RACK_ZONE_CONFIGS: RackZoneConfig[] = [
-  { id: "WH", hasOverheadHeader: false, occupancy: PALLET_OCCUPANCY, seedSalt: 0 },
-  { id: "FRG-B", hasOverheadHeader: true, occupancy: 0.3, seedSalt: 5171 },
-  { id: "HT-4", hasOverheadHeader: true, occupancy: 0.62, seedSalt: 8317 },
+  { id: "WH", hasOverheadHeader: false, occupancy: PALLET_OCCUPANCY, seedSalt: 0, requireEmptyZone: false },
+  { id: "FRG-A", hasOverheadHeader: true, occupancy: 0.5, seedSalt: 2609, requireEmptyZone: true },
+  { id: "FRG-B", hasOverheadHeader: true, occupancy: 0.3, seedSalt: 5171, requireEmptyZone: true },
+  { id: "HT-2", hasOverheadHeader: true, occupancy: 0.4, seedSalt: 6473, requireEmptyZone: true },
+  { id: "HT-3", hasOverheadHeader: true, occupancy: 0.55, seedSalt: 7411, requireEmptyZone: true },
+  { id: "HT-4", hasOverheadHeader: true, occupancy: 0.62, seedSalt: 8317, requireEmptyZone: true },
 ];
 
 /** ชุด id ของทุกโซนที่มีชั้นวางพาเลทจริง (จาก `RACK_ZONE_CONFIGS`) — ให้ไฟล์
@@ -254,6 +281,11 @@ function buildZoneRackingPlan(layout: PlantLayout, config: RackZoneConfig): Rack
   const zone = layout.site.zones.find((z) => z.id === config.id);
   if (!zone) return null;
   if (zone.w <= 0 || zone.d <= 0) return null;
+  // การ์ด data-driven — ดูคอมเมนต์ `RackZoneConfig.requireEmptyZone`: โซนที่
+  // ตั้งค่านี้ไว้ true ต้องได้รับการยืนยันจริงจาก `buildPlantLayout` (ไม่ใช่
+  // ข้อสันนิษฐานที่ hardcode ไว้ใน config) ว่าไม่มีเครื่องจักร DB ตัวใดแม็ปมา
+  // ลงโซนนี้เลย ก่อนจะเติมชั้นวางทับพื้นที่ทั้งโซน
+  if (config.requireEmptyZone && !layout.scale.emptyZones.includes(config.id)) return null;
 
   // แกนที่ยาวกว่าเป็นแกน "ช่วงชั้น" (bay axis) แกนสั้นกว่าเป็นแกน "แถว" (row
   // axis) — บรรจุแถวได้มากที่สุดเท่าที่ zone จริงจะรับได้ ไม่ว่า zone จะกว้าง
@@ -532,8 +564,8 @@ export interface WarehouseRackingProps {
 }
 
 /**
- * ชั้นวางพาเลทในโซน `WH`/`FRG-B`/`HT-4` — ดูคอมเมนต์หัวไฟล์ และ
- * `RACK_ZONE_CONFIGS` สำหรับรายการโซนที่เติม
+ * ชั้นวางพาเลทในโซน `WH`/`FRG-A`/`FRG-B`/`HT-2`/`HT-3`/`HT-4` — ดูคอมเมนต์หัว
+ * ไฟล์ และ `RACK_ZONE_CONFIGS` สำหรับรายการโซนที่เติม
  */
 export function WarehouseRacking({ layout }: WarehouseRackingProps) {
   const plans = useMemo(() => buildAllRackingPlans(layout), [layout]);

@@ -95,11 +95,27 @@ export interface TrendPoint {
   value: number;
 }
 
+/** ตัวชี้วัด "รอบการผลิต" ของเครื่องจักร (ยอดผลิต/เป้าหมายกะ/รอบปัจจุบัน) */
+export interface ProductionCycleMetrics {
+  shiftTarget: number; // เป้าหมายกะ (ชิ้น)
+  produced: number; // ผลิตแล้ว (ชิ้น)
+  remaining: number; // คงเหลือ (ชิ้น) = max(0, shiftTarget - produced)
+  completionPct: number; // 0-100
+  cyclesCompletedToday: number;
+  avgCycleTimeSec: number; // ค่าเฉลี่ยใกล้เคียง cycleTime.actualSec
+  currentCycleProgress: number; // 0-1, ความคืบหน้าของรอบที่กำลังทำงานอยู่, 0 ถ้าเครื่องหยุด
+  currentCycleElapsedSec: number; // วินาทีที่ผ่านไปแล้วของรอบปัจจุบัน, 0 ถ้าเครื่องหยุด
+  estimatedFinishAt: string; // ISO string, เวลาที่คาดว่าจะผลิตครบเป้าหมายกะ
+  shiftStartedAt: string; // ISO string, เวลาเริ่มกะปัจจุบัน
+  isRunning: boolean; // false เมื่อ machine.status เป็น "error" หรือ "maintenance"
+}
+
 export interface MachineMetricsMock {
   oee: OeeMetrics;
   cycleTime: CycleTimeMetrics;
   energy: EnergyMetric[]; // เสมอ 4 รายการ ตามลำดับ: electrical, ro, coolant, air
   errorHistory: ErrorHistoryEntry[]; // 5-8 รายการ ใหม่สุดอยู่บน
+  productionCycle: ProductionCycleMetrics;
 }
 
 /* ---------------------------------------------------------------- */
@@ -172,6 +188,56 @@ function buildCycleTime(machine: Machine, rng: () => number): CycleTimeMetrics {
   const actualSec = Math.round(standardSec * (1 + deviationPct / 100));
   const partsPerHour = Math.round(3600 / Math.max(actualSec, 1));
   return { actualSec, standardSec, deviationPct, partsPerHour };
+}
+
+/** สร้างข้อมูล "รอบการผลิต" แบบ deterministic โดยอ้างอิงเวลาปัจจุบัน (คล้าย getMachineTrendSeries ที่ใช้ new Date()) */
+function buildProductionCycle(machine: Machine, rng: () => number, cycleTime: CycleTimeMetrics): ProductionCycleMetrics {
+  const isRunning = machine.status !== "error" && machine.status !== "maintenance";
+  const now = Date.now();
+
+  // เวลาเริ่มกะ: ย้อนกลับไป 1-7 ชั่วโมงก่อนหน้านี้แบบ deterministic
+  const shiftStartedAt = new Date(now - randRange(rng, 1, 7) * 3_600_000);
+  const elapsedSec = Math.max(0, (now - shiftStartedAt.getTime()) / 1000);
+
+  // เวลาเฉลี่ยต่อรอบ: ใกล้เคียง cycleTime.actualSec แต่มี jitter เล็กน้อย
+  const avgCycleTimeSec = Math.max(1, Math.round(cycleTime.actualSec * randRange(rng, 0.95, 1.05)));
+
+  const shiftTarget = Math.round(randRange(rng, 200, 900));
+
+  let cyclesCompletedToday: number;
+  if (isRunning) {
+    cyclesCompletedToday = Math.floor(elapsedSec / avgCycleTimeSec);
+  } else {
+    // เครื่องหยุดกลางกะ: จำนวนรอบที่เสร็จค้างอยู่ที่ค่าคงที่ (deterministic) น้อยกว่าที่ควรจะเป็น
+    cyclesCompletedToday = Math.floor(randRange(rng, 0, elapsedSec / avgCycleTimeSec / 2));
+  }
+
+  const producedRaw = cyclesCompletedToday; // สมมติ 1 ชิ้นต่อ 1 รอบ เพื่อความเรียบง่าย
+  const produced = Math.min(shiftTarget, producedRaw);
+  const remaining = Math.max(0, shiftTarget - produced);
+  const completionPct = round1(Math.min(100, (produced / shiftTarget) * 100));
+
+  // ความคืบหน้าของรอบปัจจุบัน (in-flight): เศษของเวลาที่ผ่านไปหารด้วยเวลาต่อรอบ
+  const currentCycleElapsedSec = isRunning ? elapsedSec % avgCycleTimeSec : 0;
+  const currentCycleProgress = isRunning ? Math.min(0.999, currentCycleElapsedSec / avgCycleTimeSec) : 0;
+
+  // เวลาที่คาดว่าจะผลิตครบเป้าหมายกะ: คำนวณจากจำนวนที่เหลือ x เวลาเฉลี่ยต่อรอบ นับจากตอนนี้
+  // (ถ้าเครื่องหยุดอยู่ ใช้สมมติฐานว่าจะกลับมาทำงานทันที เพื่อให้ยังมีค่าประมาณการให้ดู)
+  const estimatedFinishAt = new Date(now + remaining * avgCycleTimeSec * 1000).toISOString();
+
+  return {
+    shiftTarget,
+    produced,
+    remaining,
+    completionPct,
+    cyclesCompletedToday,
+    avgCycleTimeSec,
+    currentCycleProgress,
+    currentCycleElapsedSec,
+    estimatedFinishAt,
+    shiftStartedAt: shiftStartedAt.toISOString(),
+    isRunning,
+  };
 }
 
 const ENERGY_DEFS: Array<{ kind: EnergyKind; label: string; unit: string; base: [number, number] }> = [
@@ -256,12 +322,16 @@ export function getMachineMetricsMock(machine: Machine): MachineMetricsMock {
   const cycleRng = rngFor(machine.id, "cycle");
   const energyRng = rngFor(machine.id, "energy");
   const errorRng = rngFor(machine.id, "errors");
+  const productionRng = rngFor(machine.id, "productionCycle");
+
+  const cycleTime = buildCycleTime(machine, cycleRng);
 
   return {
     oee: buildOee(machine, oeeRng),
-    cycleTime: buildCycleTime(machine, cycleRng),
+    cycleTime,
     energy: buildEnergy(energyRng),
     errorHistory: buildErrorHistory(machine, errorRng),
+    productionCycle: buildProductionCycle(machine, productionRng, cycleTime),
   };
 }
 

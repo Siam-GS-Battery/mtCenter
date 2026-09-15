@@ -14,7 +14,9 @@ import { supabase } from "./supabase.js";
 import { embedOne, toVectorLiteral } from "./embeddings.js";
 
 export interface ManualSearchHit {
-  chunkId: number;
+  // null สำหรับ hit ที่มาจาก manualMarkdownSearch.ts (ค้นบน manuals.markdown_content
+  // ตรง ๆ ไม่ผ่าน manual_chunks จึงไม่มี chunk id ให้อ้างอิง)
+  chunkId: number | null;
   manualId: string;
   manualTitle: string;
   machineModel: string | null;
@@ -22,9 +24,11 @@ export interface ManualSearchHit {
   heading: string | null;
   pageLabel: string | null;
   content: string;
-  /** คะแนนความใกล้เคียง 0-1 จาก semantic search — null ถ้ามาจาก keyword search */
+  /** คะแนนความใกล้เคียง 0-1 จาก semantic search — null ถ้ามาจาก keyword/markdown search */
   similarity: number | null;
-  source: "semantic" | "keyword";
+  // "markdown" = ค้นแบบ keyword ตรงบน manuals.markdown_content เต็มเล่ม (ดู
+  // manualMarkdownSearch.ts) ต่างจาก "keyword" ซึ่งค้นบน manual_chunks ที่ index ไว้แล้ว
+  source: "semantic" | "keyword" | "markdown";
 }
 
 // เกณฑ์คะแนนขั้นต่ำ: ต่ำกว่านี้ถือว่าไม่เกี่ยวข้องพอที่จะกิน budget ของ prompt
@@ -121,6 +125,11 @@ export interface ManualSearchParams {
   /** รุ่นเครื่องที่เกี่ยวข้องกับคำถาม (ใช้เป็นตัวกรองเฉพาะเมื่อมีคู่มือตรงรุ่นจริง) */
   candidateModels?: string[];
   maxHits?: number;
+  // คู่มือที่ผู้ใช้เลือกเจาะจงในหน้าจอ (POST /api/ai/chat's manualId — ดู aiContext.ts)
+  // จำกัดผลลัพธ์ semantic search ให้อยู่ในคู่มือเล่มนี้เท่านั้น ผ่าน match_manual_chunks'
+  // filter_manual_ids ที่มีอยู่แล้ว (0015_manual_chunks.sql) — ไม่ต้องเพิ่ม migration ใหม่
+  // การจำกัดขอบเขตนี้ยังช่วยกันปัญหาโมเดลอ้างอิงคู่มือผิดเล่มเมื่อมีหลายเล่มปนกันใน context
+  manualIds?: string[];
 }
 
 /**
@@ -152,6 +161,8 @@ export async function searchManualChunks(params: ManualSearchParams): Promise<Ma
       )
     );
 
+    const manualIdFilter = params.manualIds && params.manualIds.length > 0 ? params.manualIds : null;
+
     const semanticPromise = (async () => {
       const embedding = await embedOne(prompt, "RETRIEVAL_QUERY");
       return supabase.rpc("match_manual_chunks", {
@@ -159,7 +170,7 @@ export async function searchManualChunks(params: ManualSearchParams): Promise<Ma
         match_count: MAX_SEMANTIC_HITS,
         min_similarity: MIN_SIMILARITY,
         filter_machine_models: modelFilter,
-        filter_manual_ids: null,
+        filter_manual_ids: manualIdFilter,
       });
     })();
 

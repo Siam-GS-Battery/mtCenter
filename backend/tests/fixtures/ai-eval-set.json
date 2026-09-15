@@ -1,0 +1,265 @@
+{
+  "$schemaNote": "ชุดคำถามประเมิน MT Center AI Assistant — ดูวิธีอ่าน/เพิ่มเคสใน backend/scripts/README-eval.md",
+  "sourcedAt": "2026-09-15",
+  "sourcedFrom": "Supabase project vtfcukmhhxqltthwqvui (query สดผ่าน service-role key ใน backend/.env ตอนสร้างไฟล์นี้ — ดูรหัสเครื่องจักร/ใบงาน/คู่มือด้านล่าง เป็นข้อมูลจริงในฐานข้อมูล ณ ตอนที่สร้าง ไม่ใช่ข้อมูลสมมติ)",
+  "cases": [
+    {
+      "id": "q01-machine-status-as1009",
+      "question": "เครื่อง AS-1009 ตอนนี้สถานะเป็นอย่างไร มี error code อะไรไหม",
+      "category": "machine_status",
+      "expect": {
+        "mustNotFallback": true,
+        "mustMentionAny": ["AS-1009", "ALM-2210"],
+        "maxLatencyMs": 25000
+      }
+    },
+    {
+      "id": "q02-machine-status-ma602",
+      "question": "เครื่อง MA-602 (LASER MARKER MACHINE) ตอนนี้มีอุณหภูมิ/ค่าสั่นสะเทือนเท่าไหร่ และมี error code อะไรค้างอยู่",
+      "category": "machine_status",
+      "expect": {
+        "mustNotFallback": true,
+        "mustMentionAny": ["MA-602", "ALM-3305"],
+        "maxLatencyMs": 25000
+      }
+    },
+    {
+      "id": "q03-fleet-overview",
+      "question": "ภาพรวมเครื่องจักรทั้งโรงงานตอนนี้ มีทั้งหมดกี่เครื่อง และมีกี่เครื่องที่ผิดปกติ",
+      "category": "machine_status",
+      "expect": {
+        "mustNotFallback": true,
+        "maxLatencyMs": 25000
+      }
+    },
+    {
+      "id": "q04-repair-history-wo95108",
+      "question": "ใบงาน WO95108 ของเครื่อง AS-1009 มีรายละเอียดอาการและสถานะอย่างไรบ้าง",
+      "category": "repair_history",
+      "expect": {
+        "mustNotFallback": true,
+        "mustMentionAny": ["WO95108"],
+        "maxLatencyMs": 25000
+      }
+    },
+    {
+      "id": "q05-repair-history-ma602",
+      "question": "เครื่อง MA-602 เคยมีประวัติใบงานซ่อมบำรุงอะไรมาบ้างล่าสุด",
+      "category": "repair_history",
+      "expect": {
+        "mustNotFallback": true,
+        "mustMentionAny": ["MA-602"],
+        "maxLatencyMs": 25000
+      }
+    },
+    {
+      "id": "q06-spare-parts-mtee1003",
+      "question": "อะไหล่รหัส MTEE-1003 (Servo) ตอนนี้คงเหลือในคลังสถานะเป็นอย่างไร",
+      "category": "spare_parts",
+      "expect": {
+        "mustNotFabricateCitation": true,
+        "note": "aiContext.ts (ข้อมูล ณ วันที่สร้างชุดทดสอบนี้) ไม่ได้ดึงข้อมูลจากตาราง spare_parts เข้า knowledge block เลย — คำถามนี้จึงไม่มีข้อมูลจริงให้ AI อ้างอิง คาดหวังว่าโมเดลจะตอบตรงไปตรงมาว่าไม่มีข้อมูลในระบบ ไม่ใช่แต่งสถานะอะไหล่ขึ้นมาเอง ไม่ได้ตั้งค่า mustMentionAny เพราะยังไม่มีทางตอบถูกได้จริงในสถานะปัจจุบันของระบบ (ช่องว่างของผลิตภัณฑ์ ไม่ใช่ข้อบกพร่องของชุดทดสอบ)",
+        "maxLatencyMs": 25000
+      }
+    },
+    {
+      "id": "q07-spare-parts-servo-stock",
+      "question": "อะไหล่ประเภท Servo เหลืออยู่ในคลังกี่ชุด รายการไหนใกล้หมด",
+      "category": "spare_parts",
+      "expect": {
+        "mustNotFabricateCitation": true,
+        "note": "เช่นเดียวกับ q06 — ไม่มี spare_parts ใน knowledge context ปัจจุบัน (มี MTEE-1003/1005/1009 สถานะ low_stock จริงในฐานข้อมูล แต่ AI เข้าไม่ถึงข้อมูลนี้)",
+        "maxLatencyMs": 25000
+      }
+    },
+    {
+      "id": "q08-pm-due-as1009",
+      "question": "เครื่อง AS-1009 มีกำหนดบำรุงรักษาเชิงป้องกันครั้งต่อไปวันไหน",
+      "category": "pm_due",
+      "expect": {
+        "mustNotFallback": true,
+        "mustMentionAny": ["2026-12-07"],
+        "maxLatencyMs": 25000
+      }
+    },
+    {
+      "id": "q09-pm-due-pk1502",
+      "question": "เครื่อง PK-1502 บำรุงรักษาครั้งล่าสุดเมื่อไหร่ และครั้งถัดไปกำหนดวันไหน",
+      "category": "pm_due",
+      "expect": {
+        "mustNotFallback": true,
+        "mustMentionAny": ["2026-09-07", "2026-12-06"],
+        "maxLatencyMs": 25000
+      }
+    },
+    {
+      "id": "q10-regression-all000-pm-2char",
+      "question": "คู่มือบำรุงรักษาทั่วไป (ALL-000) พูดถึงเรื่อง PM ไว้ว่าอย่างไรบ้าง",
+      "category": "manual_lookup",
+      "regression": true,
+      "regressionNote": "(a) คำค้น \"PM\" ยาวแค่ 2 ตัวอักษร ต้องยังค้นเจอและดึงเนื้อหา PM checklist จากคู่มือ ALL-000 (id 843308b3-4f4d-407a-a819-9c997f01b033) ได้ — เคยเป็นบั๊กที่คำค้นสั้นถูกกรองทิ้งจนหาไม่เจอ",
+      "expect": {
+        "mustCiteManual": true,
+        "mustMentionAny": ["ALL-000", "คู่มือซ่อมบำรุงทั่วไป"],
+        "maxLatencyMs": 30000
+      }
+    },
+    {
+      "id": "q11-regression-mrj5-troubleshooting-no-embedding",
+      "question": "คู่มือ Mitsubishi MR-J5 Servo Amplifier Troubleshooting มีขั้นตอนการแก้ไขปัญหาเบื้องต้นอย่างไรบ้าง",
+      "category": "manual_lookup",
+      "regression": true,
+      "regressionNote": "(b) คู่มือ \"Mitsubishi MR-J5 Servo Amplifier – Troubleshooting\" (id 814d1670-515a-4137-8160-52eed36869f4) ai_indexed=false ไม่มี embedding เลย ต้องยังตอบแบบอ้างอิงคู่มือได้ผ่านเส้นทาง keyword search บน markdown_content (migration 0024) ไม่ใช่ embedding เท่านั้น",
+      "expect": {
+        "mustCiteManual": true,
+        "mustMentionAny": ["MR-J5"],
+        "maxLatencyMs": 30000
+      }
+    },
+    {
+      "id": "q12-regression-fanuc-servo-no-embedding",
+      "question": "คู่มือ FANUC Servo Amplifier αi Series มีขั้นตอนบำรุงรักษาอย่างไรบ้าง",
+      "category": "manual_lookup",
+      "regression": true,
+      "regressionNote": "(b) คู่มือ \"FANUC Servo Amplifier αi Series – Maintenance Manual\" (id 32a297a3-9eb1-4be4-bb5f-ba170b2adf3f) ai_indexed=false เช่นกัน — เคสที่สองยืนยันบั๊กเดียวกับ q11 ด้วยเล่มอื่น",
+      "expect": {
+        "mustCiteManual": true,
+        "mustMentionAny": ["FANUC"],
+        "maxLatencyMs": 30000
+      }
+    },
+    {
+      "id": "q13-regression-manualid-scoping",
+      "question": "อธิบายวิธีการปลดล็อก (release) alarm ของเครื่องเลเซอร์มาร์คเกอร์นี้หน่อย",
+      "category": "manual_lookup",
+      "manualId": "2abaedec-d36f-455f-bba9-433558169344",
+      "regression": true,
+      "regressionNote": "(c) ตั้ง manualId ให้ตรงกับ \"Panasonic LP-RF200P Laser Marker – Alarm List\" โดยตรง — คำตอบต้องอ้างอิงเฉพาะคู่มือเล่มนี้เล่มเดียว ห้ามอ้างอิงคู่มือเล่มอื่นปนมาแม้เนื้อหาจะคล้ายกัน (ทดสอบว่า manualId scoping ทำงานจริง)",
+      "expect": {
+        "mustCiteManual": true,
+        "mustCiteOnlyManualTitle": "Panasonic LP-RF200P Laser Marker – Alarm List",
+        "mustMentionAny": ["Alarm", "E001"],
+        "maxLatencyMs": 30000
+      }
+    },
+    {
+      "id": "q14-alarm-lookup-panasonic",
+      "question": "รหัส alarm ตั้งแต่ E001 ถึง E599 ของเครื่องเลเซอร์มาร์คเกอร์ Panasonic หมายถึงอะไร และมีวิธีปลดล็อกอย่างไร",
+      "category": "manual_lookup",
+      "expect": {
+        "mustCiteManual": true,
+        "mustMentionAny": ["E001", "E599"],
+        "maxLatencyMs": 30000
+      }
+    },
+    {
+      "id": "q15-analytics-mtbf",
+      "question": "MTBF (Mean Time Between Failures) ของเครื่อง AS-1009 เดือนนี้เท่ากับเท่าไหร่",
+      "category": "analytics",
+      "expect": {
+        "mustNotFabricateCitation": true,
+        "note": "ยังไม่มี MTBF/downtime analytics ต่อสายเข้า buildKnowledgeContext ในโค้ดฐาน ณ วันที่สร้างชุดทดสอบนี้ (ดู backend/src/lib/aiContext.ts) — คาดหวังว่า AI ตอบตรงไปตรงมาว่าไม่มีข้อมูลนี้ในระบบ ไม่ใช่คำนวณ/แต่งตัวเลข MTBF ขึ้นมาเอง ถือเป็นช่องว่างของผลิตภัณฑ์ที่ทีมวิเคราะห์ (migration 0023/0026) กำลังทำอยู่คนละงาน",
+        "maxLatencyMs": 25000
+      }
+    },
+    {
+      "id": "q16-analytics-downtime",
+      "question": "Downtime รวมของทั้งโรงงานในเดือนนี้กี่ชั่วโมง",
+      "category": "analytics",
+      "expect": {
+        "mustNotFabricateCitation": true,
+        "note": "เช่นเดียวกับ q15 — ไม่มีแหล่งข้อมูล downtime รวมในระบบ AI ปัจจุบัน",
+        "maxLatencyMs": 25000
+      }
+    },
+    {
+      "id": "q17-multiturn-followup-workorder",
+      "question": "แล้วมีใบงานซ่อมบำรุงอะไรเกี่ยวข้องกับเครื่องนี้บ้าง",
+      "category": "multi_turn",
+      "history": [
+        { "role": "user", "content": "เครื่อง PK-1502 มีปัญหาอะไรตอนนี้บ้าง" },
+        { "role": "assistant", "content": "เครื่อง PK-1502 (PACKING TABLE M/C) ขณะนี้อยู่ในสถานะซ่อมบำรุง (maintenance) ค่า Health Score 63" }
+      ],
+      "expect": {
+        "mustNotFallback": true,
+        "mustMentionAny": ["PK-1502", "WO95"],
+        "maxLatencyMs": 25000
+      }
+    },
+    {
+      "id": "q18-multiturn-followup-manual",
+      "question": "แล้วเรื่อง LOTO (Lockout-Tagout) บอกว่าต้องทำอย่างไรบ้าง",
+      "category": "multi_turn",
+      "history": [
+        { "role": "user", "content": "คู่มือ ALL-000 บอกอะไรเรื่องความปลอดภัยก่อนเริ่มงานซ่อมบำรุงบ้าง" },
+        { "role": "assistant", "content": "คู่มือ ALL-000 กำหนดว่าห้ามเริ่มงานซ่อมบำรุงใด ๆ โดยไม่มีใบสั่งงานที่ได้รับอนุมัติ และต้องปฏิบัติตามขั้นตอนความปลอดภัยก่อนเริ่มงาน" }
+      ],
+      "expect": {
+        "mustCiteManual": true,
+        "mustMentionAny": ["LOTO"],
+        "maxLatencyMs": 30000
+      }
+    },
+    {
+      "id": "q19-out-of-scope-recipe",
+      "question": "ช่วยแนะนำสูตรทำต้มยำกุ้งอร่อย ๆ หน่อย",
+      "category": "out_of_scope",
+      "expect": {
+        "mustNotFabricateCitation": true,
+        "maxLatencyMs": 20000
+      }
+    },
+    {
+      "id": "q20-regression-out-of-scope-fake-machine",
+      "question": "เครื่องพิมพ์ 3D ที่สาขาโตเกียวของเรามีปัญหาอะไรตอนนี้บ้าง",
+      "category": "out_of_scope",
+      "regression": true,
+      "regressionNote": "(d) ถามถึงเครื่องจักร/สถานที่ที่ไม่มีอยู่จริงในระบบ (ไม่มี \"สาขาโตเกียว\" และไม่มีเครื่องพิมพ์ 3D ในฐานข้อมูลนี้) ต้องไม่ปรากฏแท็ก (อ้างอิง: ...) และห้ามแต่งข้อมูลเครื่องขึ้นมาตอบราวกับมีอยู่จริง",
+      "expect": {
+        "mustNotFabricateCitation": true,
+        "maxLatencyMs": 20000
+      }
+    },
+    {
+      "id": "q21-out-of-scope-hr-policy",
+      "question": "บริษัทมีนโยบายให้ลาป่วยได้กี่วันต่อปี",
+      "category": "out_of_scope",
+      "expect": {
+        "mustNotFabricateCitation": true,
+        "maxLatencyMs": 20000
+      }
+    },
+    {
+      "id": "q22-regression-diagnose-hydraulic",
+      "question": "(ผ่าน /api/ai/diagnose) เครื่อง AS-1009 มีอาการความดันไฮดรอลิกเกินค่าที่กำหนด (ALM-2210) ระหว่างกดขึ้นรูป วิเคราะห์อาการให้หน่อย",
+      "category": "diagnose",
+      "target": "diagnose",
+      "diagnose": {
+        "machineCode": "AS-1009",
+        "errorText": "ความดันไฮดรอลิกเกินค่าที่กำหนดขณะกดขึ้นรูป แจ้งเตือน ALM-2210 คาดว่าวาล์วนิรภัยค้างที่ตำแหน่งเปิด"
+      },
+      "regression": true,
+      "regressionNote": "(e) /api/ai/diagnose ต้องคืน JSON ที่ parse ได้จริง (diagnosis/urgency/steps/requiredParts/safetyNotice) ไม่ใช่ 502 — เคยพบว่า maxOutputTokens ไม่พอทำให้ JSON ถูกตัดกลางคันแล้ว parse ไม่ผ่าน",
+      "expect": {
+        "mustReturnParseableJson": true,
+        "maxLatencyMs": 30000
+      }
+    },
+    {
+      "id": "q23-regression-diagnose-laser",
+      "question": "(ผ่าน /api/ai/diagnose) เครื่อง MA-602 มีอาการอุณหภูมิ Laser Diode สูงเกินกำหนด (ALM-3305) วิเคราะห์อาการให้หน่อย",
+      "category": "diagnose",
+      "target": "diagnose",
+      "diagnose": {
+        "machineCode": "MA-602",
+        "errorText": "อุณหภูมิ Laser Diode เกินค่าที่กำหนดจนระบบ Safety สั่งหยุดเครื่องอัตโนมัติ แจ้งเตือน ALM-3305"
+      },
+      "regression": true,
+      "regressionNote": "(e) เคสที่สองของ diagnose JSON parse — ยืนยันด้วยอาการ/เครื่องอีกชุดหนึ่ง",
+      "expect": {
+        "mustReturnParseableJson": true,
+        "maxLatencyMs": 30000
+      }
+    }
+  ]
+}

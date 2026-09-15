@@ -21,7 +21,8 @@
     "index:manuals": "tsx scripts/index-manuals.ts",
     "check:intents": "tsx scripts/check-intents.ts",
     "seed:review-queue": "tsx scripts/seed-review-queue.ts",
-    "seed:passwords": "tsx scripts/seed-passwords.ts"
+    "seed:passwords": "tsx scripts/seed-passwords.ts",
+    "eval:ai": "tsx scripts/eval-ai.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",

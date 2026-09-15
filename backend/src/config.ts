@@ -59,14 +59,36 @@ function parseAiMode(raw: string | undefined): AiMode {
   throw new Error(`ค่า AI_MODE ไม่ถูกต้อง: "${raw}" รองรับเฉพาะ "mock" หรือ "live"`);
 }
 
+/**
+ * ผู้ให้บริการโมเดลภาษาที่ใช้ในเส้นทาง chat/diagnose (ดู src/lib/providers/)
+ *
+ * - "claude": เรียก Anthropic Claude (ค่าเริ่มต้น) — การตัดสินใจคือย้ายมาใช้ Claude
+ *   เป็นหลัก
+ * - "gemini": เรียก Google Gemini เหมือนเดิม — เก็บไว้เป็นทางหนีทีไล่ (escape hatch)
+ *   จนกว่าจะลบออกทั้งหมด ไม่ใช่เส้นทางที่แนะนำให้ใช้ต่อ
+ *
+ * หมายเหตุ: Embeddings (ค้นคู่มือ) ยังใช้ Gemini อยู่เสมอไม่ว่าค่านี้จะเป็นอะไร —
+ * ค่านี้มีผลเฉพาะเส้นทาง chat/diagnose เท่านั้น (ดู src/lib/embeddings.ts)
+ */
+export type AiProvider = "gemini" | "claude";
+
+function parseAiProvider(raw: string | undefined): AiProvider {
+  const value = (raw ?? "").trim().toLowerCase();
+  if (value === "gemini") return "gemini";
+  if (value === "claude" || value === "") return "claude";
+  throw new Error(`ค่า AI_PROVIDER ไม่ถูกต้อง: "${raw}" รองรับเฉพาะ "claude" หรือ "gemini"`);
+}
+
 export interface AppConfig {
   port: number;
   supabaseUrl: string;
   supabaseServiceRoleKey: string;
   jwtSecret: string;
   geminiApiKey: string | undefined;
+  anthropicApiKey: string | undefined;
   corsOrigins: string[];
   aiMode: AiMode;
+  aiProvider: AiProvider;
 }
 
 export const config: AppConfig = {
@@ -75,9 +97,11 @@ export const config: AppConfig = {
   supabaseServiceRoleKey: required("SUPABASE_SERVICE_ROLE_KEY"),
   jwtSecret: requiredSecret("JWT_SECRET"),
   geminiApiKey: process.env.GEMINI_API_KEY,
+  anthropicApiKey: process.env.ANTHROPIC_API_KEY,
   corsOrigins: (process.env.CORS_ORIGIN || "http://localhost:3000")
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean),
   aiMode: parseAiMode(process.env.AI_MODE),
+  aiProvider: parseAiProvider(process.env.AI_PROVIDER),
 };

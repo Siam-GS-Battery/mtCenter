@@ -903,6 +903,9 @@ export interface AiChatPayload {
   machineContext: Machine;
   role: UserRole;
   history: AiChatHistoryItem[];
+  /** เมื่อระบุ backend จะโหลดเนื้อหาคู่มือเล่มนี้ตรง ๆ แทนที่จะพึ่งการค้นหาอย่างเดียว
+   * (มาจากปุ่ม "ถาม AI" บนการ์ดคู่มือ — ดู ManualsView.tsx) */
+  manualId?: string;
 }
 
 /**
@@ -945,6 +948,133 @@ export function aiFeedback(logId: number, feedback: 1 | -1): Promise<{ logId: nu
     method: "POST",
     body: JSON.stringify({ logId, feedback }),
   });
+}
+
+// ---- AI streaming (POST /api/ai/chat/stream) ----
+// Same request body/auth as aiChat() above, but the response is a
+// Server-Sent Events stream so the UI can show step-by-step progress and
+// the answer text as it is generated, instead of a spinner for up to ~28s.
+// EventSource can't do POST/auth headers, so this reads the stream manually
+// via fetch + response.body.getReader().
+
+export interface AiChatStreamStepEvent {
+  id: string;
+  label: string;
+  status: "start" | "done" | "skip";
+  detail?: string;
+}
+
+export interface AiChatStreamDoneEvent {
+  reply: string;
+  fallback: boolean;
+  mode: string;
+  logId: string | null;
+  timestamp: string;
+}
+
+export interface AiChatStreamHandlers {
+  onStep?: (step: AiChatStreamStepEvent) => void;
+  onDelta?: (text: string) => void;
+  onDone?: (done: AiChatStreamDoneEvent) => void;
+  onError?: (message: string) => void;
+}
+
+/**
+ * แยกเฟรม SSE หนึ่งก้อน (ข้อความที่คั่นด้วยบรรทัดว่าง) เป็น {event, data}
+ * รองรับหลายบรรทัด "data:" ต่อกัน (มาตรฐาน SSE ต่อกันด้วย "\n") และข้ามบรรทัด
+ * คอมเมนต์/heartbeat ที่ขึ้นต้นด้วย ":" คืนค่า null เมื่อเฟรมนั้นไม่มี data เลย
+ * (เช่นเป็น heartbeat ล้วน ๆ) — เอกซ์พอร์ตไว้เพื่อให้ทดสอบแยกได้โดยไม่ต้องพึ่ง fetch จริง
+ */
+export function parseSseFrame(frame: string): { event: string; data: string } | null {
+  let event = "message";
+  const dataLines: string[] = [];
+  for (const rawLine of frame.split("\n")) {
+    const line = rawLine.replace(/\r$/, "");
+    if (line === "" || line.startsWith(":")) continue;
+    const colonIdx = line.indexOf(":");
+    const field = colonIdx === -1 ? line : line.slice(0, colonIdx);
+    const value = colonIdx === -1 ? "" : line.slice(colonIdx + 1).replace(/^ /, "");
+    if (field === "event") event = value;
+    else if (field === "data") dataLines.push(value);
+  }
+  if (dataLines.length === 0) return null;
+  return { event, data: dataLines.join("\n") };
+}
+
+/**
+ * เรียก /api/ai/chat/stream และแปลงผลเป็นการเรียก handler ตามลำดับ event ที่มาถึง
+ * ไม่ throw จาก event: error ของเซิร์ฟเวอร์เอง (ส่งต่อให้ onError แทน) — จะ throw ก็ต่อเมื่อ
+ * เชื่อมต่อไม่สำเร็จ (network/HTTP status ไม่ใช่ 2xx) หรือ response ไม่มี body ให้อ่าน
+ * เพื่อให้ผู้เรียกตกไปใช้เส้นทางสำรอง (aiChat แบบเดิม) ได้ในทุกกรณีที่สตรีมใช้งานไม่ได้
+ */
+export async function aiChatStream(
+  payload: AiChatPayload,
+  handlers: AiChatStreamHandlers,
+  signal?: AbortSignal
+): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/ai/chat/stream`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "text/event-stream",
+      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+    },
+    body: JSON.stringify(payload),
+    signal,
+  });
+
+  if (!res.ok || !res.body) {
+    throw new Error(`สตรีมคำตอบ AI ไม่สำเร็จ (HTTP ${res.status})`);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      // เฟรมคั่นด้วยบรรทัดว่าง ("\n\n") — เฟรมที่ยังไม่ครบ (ถูกตัดครึ่งข้าม chunk)
+      // จะไม่มี "\n\n" อยู่ใน buffer เลย จึงถูกเก็บรอ chunk ถัดไปโดยอัตโนมัติ
+      let sepIndex: number;
+      while ((sepIndex = buffer.indexOf("\n\n")) !== -1) {
+        const rawFrame = buffer.slice(0, sepIndex);
+        buffer = buffer.slice(sepIndex + 2);
+        const parsed = parseSseFrame(rawFrame);
+        if (!parsed) continue; // heartbeat/comment ล้วน ๆ — ข้าม
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- payload shape depends on `parsed.event`, narrowed by the switch below
+        let json: any;
+        try {
+          json = JSON.parse(parsed.data);
+        } catch {
+          continue; // เฟรมเสียรูป — ข้ามเฉพาะเฟรมนี้ ไม่ทำให้ทั้งสตรีมล้ม
+        }
+
+        switch (parsed.event) {
+          case "step":
+            handlers.onStep?.(json as AiChatStreamStepEvent);
+            break;
+          case "delta":
+            handlers.onDelta?.(json.text as string);
+            break;
+          case "done":
+            handlers.onDone?.(json as AiChatStreamDoneEvent);
+            break;
+          case "error":
+            handlers.onError?.(json.message as string);
+            break;
+          default:
+            break;
+        }
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
 }
 
 export async function aiChat(payload: AiChatPayload, actorId?: string): Promise<AiChatResponse> {

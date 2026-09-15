@@ -120,6 +120,9 @@ export default function App() {
   const [chatInitialPrompt, setChatInitialPrompt] = useState<string>("");
   const [isAiDrawerOpen, setIsAiDrawerOpen] = useState<boolean>(false);
   const [aiDrawerPrompt, setAiDrawerPrompt] = useState<string>("");
+  // id ของคู่มือที่ผูกมากับ aiDrawerPrompt (ปุ่ม "ถาม AI" บนการ์ดคู่มือ) — ใช้กับ
+  // แค่ข้อความแรกที่ seed เข้าไปเท่านั้น ไม่ค้างอยู่ตลอด session
+  const [aiDrawerManualId, setAiDrawerManualId] = useState<string | undefined>(undefined);
   // seed ข้อความสำเร็จรูปลงแชต AI ด้านข้างตรงๆ (ไม่ผ่าน backend) — ใช้เฉพาะ
   // ปุ่ม "ให้ AI สรุป" บนการ์ดรายงานรอบตรวจของหุ่นยนต์ (ดู handleAskAIRoundSummary)
   const [aiDrawerSeedMessages, setAiDrawerSeedMessages] =
@@ -317,11 +320,12 @@ export default function App() {
   };
 
   // Helper to open Side AI Assistant Drawer without switching pages
-  const handleAskAIWithPrompt = (prompt?: string) => {
+  const handleAskAIWithPrompt = (prompt?: string, manualId?: string) => {
     if (prompt) {
       setAiDrawerPrompt(prompt);
       setChatInitialPrompt(prompt);
     }
+    setAiDrawerManualId(manualId);
     // เคลียร์ seed ที่อาจค้างจากรอบตรวจก่อนหน้า ไม่งั้นเปิดแชตครั้งถัดไปแบบ
     // ปกติ (initialPrompt) จะยังโดน effect ของ AIAssistantDrawer เลือก seed เดิมไปแสดงซ้ำ
     setAiDrawerSeedMessages(null);
@@ -1005,11 +1009,13 @@ export default function App() {
           // sidebar (ซึ่งไม่ผ่าน handleAskAIWithPrompt) จะยังโดน effect ของ
           // AIAssistantDrawer หยิบสรุปรอบตรวจเดิมมาแสดงซ้ำ
           setAiDrawerSeedMessages(null);
+          setAiDrawerManualId(undefined);
         }}
         activeMachine={activeMachine}
         currentUserRole={currentUser.role}
         currentUserName={currentUser.name}
         initialPrompt={aiDrawerPrompt}
+        initialManualId={aiDrawerManualId}
         seedMessages={aiDrawerSeedMessages}
         onOpenFullChatPage={() => {
           setIsAiDrawerOpen(false);
@@ -1029,6 +1035,7 @@ export default function App() {
             // แชตซ้ำผ่านปุ่มนี้หลังเคยกด "ให้ AI สรุป" จะยังเห็นสรุปรอบตรวจเดิม
             setIsAiDrawerOpen((prev) => !prev);
             setAiDrawerSeedMessages(null);
+            setAiDrawerManualId(undefined);
           }}
         />
       )}

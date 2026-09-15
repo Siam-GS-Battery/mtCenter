@@ -10,9 +10,13 @@ import {
   FileText,
   AlertTriangle,
   Loader2,
+  Pencil,
+  Trash2,
 } from "lucide-react";
-import { WorkOrder, UserRole } from "../../types";
+import { Machine, WorkOrder, UserRole, SparePart, UserProfile } from "../../types";
 import { WorkOrderDetailModal } from "../WorkOrderDetailModal";
+import { EditWorkOrderModal } from "../EditWorkOrderModal";
+import { notifyFailed } from "../../lib/swal";
 import {
   WO_STATUS_LABELS,
   PRIORITY_LABELS,
@@ -38,8 +42,16 @@ interface AllWorkOrdersViewProps {
   currentUserRole?: UserRole;
   /** ชื่อผู้ใช้ปัจจุบัน — ใช้ประทับชื่อผู้เพิ่มขั้นตอนในใบงาน */
   currentUserName?: string;
-  onUpdateWorkOrder?: (updatedWO: WorkOrder) => Promise<void>;
+  onUpdateWorkOrder: (updatedWO: WorkOrder) => Promise<void>;
   onApproveWorkOrder?: (woId: string) => Promise<void>;
+  /** ลบใบงาน — ปุ่ม "ลบ" จะแสดงเฉพาะเมื่อมี prop นี้และผู้ใช้มีสิทธิ์ (engineer/supervisor) */
+  onDeleteWorkOrder?: (id: string) => Promise<void>;
+  /** รายการเครื่องจักร/อะไหล่/ช่าง — ส่งต่อให้ EditWorkOrderModal เท่านั้น */
+  machines?: Machine[];
+  spareParts?: SparePart[];
+  technicians?: Pick<UserProfile, "id" | "name">[];
+  /** ผู้ใช้ปัจจุบัน (สำหรับ EditWorkOrderModal) */
+  currentUser?: UserProfile | null;
   onAskAI: (prompt: string) => void;
   /** เรียกเมื่อมีการเบิกอะไหล่จริงสำเร็จในใบงาน — ให้ App.tsx รีเฟรช spareParts */
   onStockChanged?: () => void;
@@ -78,6 +90,11 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
   currentUserName,
   onUpdateWorkOrder,
   onApproveWorkOrder,
+  onDeleteWorkOrder,
+  machines = [],
+  spareParts = [],
+  technicians = [],
+  currentUser = null,
   onAskAI,
   onStockChanged,
 }) => {
@@ -93,6 +110,14 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [selectedWO, setSelectedWO] = useState<WorkOrder | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingWO, setEditingWO] = useState<WorkOrder | null>(null);
+  const [deletingWO, setDeletingWO] = useState<WorkOrder | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // สิทธิ์แก้ไข/ลบในหน้า "ทุกใบงาน": เฉพาะ engineer/supervisor เท่านั้น
+  // และไม่ถูกกันด้วย status "completed" ต่างจาก MyWorkOrdersView (technician)
+  const canMutate = currentUserRole === "engineer" || currentUserRole === "supervisor";
+  const canDelete = canMutate;
 
   // --- ใบงานซ่อมทั้งหมดตอนนี้มี 8,589 รายการ เกินขนาดหน้าสูงสุดของ backend
   // (1,000) ไปมาก จึงค้นหา/กรองสถานะ/ความสำคัญ/ช่วงวันที่และแบ่งหน้าที่ server
@@ -450,6 +475,7 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
                   <SortButton sortId="status" />
                 </th>
                 <th className="px-3 py-3 text-right">ผู้ช่วย AI</th>
+                {canMutate && <th className="px-3 py-3 text-right">จัดการ</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-divider text-[13px]">
@@ -503,6 +529,36 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
                         <Sparkles className="w-4 h-4" />
                       </button>
                     </td>
+                    {canMutate && (
+                      <td className="px-3 py-3 text-right">
+                        <div className="inline-flex items-center gap-1.5">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingWO(wo);
+                            }}
+                            aria-label={`แก้ไขใบงาน ${wo.code}`}
+                            title="แก้ไข"
+                            className="w-9 h-9 inline-flex items-center justify-center rounded-full text-ink-muted hover:text-primary hover:bg-primary/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          {onDeleteWorkOrder && canDelete && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeletingWO(wo);
+                              }}
+                              aria-label={`ลบใบงาน ${wo.code}`}
+                              title="ลบ"
+                              className="w-9 h-9 inline-flex items-center justify-center rounded-full text-rose-700 hover:bg-rose-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 );
               })}
@@ -581,6 +637,35 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
                         มอบหมาย: {wo.assignedDate || "—"}
                       </div>
                     </div>
+
+                    {canMutate && (
+                      <div className="flex items-center gap-2 pt-1">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingWO(wo);
+                          }}
+                          aria-label={`แก้ไขใบงาน ${wo.code}`}
+                          className="min-h-11 px-3 shrink-0 rounded-[11px] bg-pearl hover:bg-primary/5 text-ink-muted text-[13px] font-semibold cursor-pointer transition-colors border border-divider flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                        >
+                          <Pencil className="w-4 h-4 text-primary" />
+                          <span>แก้ไข</span>
+                        </button>
+                        {onDeleteWorkOrder && canDelete && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeletingWO(wo);
+                            }}
+                            aria-label={`ลบใบงาน ${wo.code}`}
+                            className="min-h-11 px-3 shrink-0 rounded-[11px] bg-rose-50 hover:bg-rose-100 text-rose-700 text-[13px] font-semibold cursor-pointer transition-colors border border-rose-200 flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus/60"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span>ลบ</span>
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </li>
                 );
               })}
@@ -614,9 +699,82 @@ export const AllWorkOrdersView: React.FC<AllWorkOrdersViewProps> = ({
         currentUserId={getCurrentUserId() ?? undefined}
         onUpdateWorkOrder={handleModalUpdate}
         onApproveWorkOrder={handleModalApprove}
+        onDeleteWorkOrder={onDeleteWorkOrder}
+        canDelete={canDelete}
         onAskAI={onAskAI}
         onStockChanged={onStockChanged}
       />
+
+      {/* Edit Work Order Modal */}
+      {editingWO && (
+        <EditWorkOrderModal
+          isOpen={!!editingWO}
+          workOrder={editingWO}
+          onClose={() => setEditingWO(null)}
+          onSubmit={async (id, draft) => {
+            try {
+              await onUpdateWorkOrder({ id, ...draft } as WorkOrder);
+              setEditingWO(null);
+              fetchPage();
+            } catch (err) {
+              await notifyFailed(
+                "แก้ไขใบงานไม่สำเร็จ",
+                toUserMessage(err, "ไม่สามารถบันทึกการแก้ไขใบงานนี้ได้ กรุณาลองอีกครั้ง")
+              );
+            }
+          }}
+          machines={machines}
+          spareParts={spareParts}
+          technicians={technicians}
+          currentUser={currentUser}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {deletingWO && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4">
+          <div className="bg-white rounded-[18px] border border-hairline p-6 max-w-sm w-full space-y-4">
+            <h3 className="text-base font-semibold text-ink">ยืนยันการลบใบงาน</h3>
+            <p className="text-sm text-ink-muted">
+              ใบงาน {deletingWO.code} — {deletingWO.title}
+              <br />
+              การลบไม่สามารถย้อนกลับได้
+            </p>
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                onClick={() => setDeletingWO(null)}
+                disabled={isDeleting}
+                className="min-h-11 px-4 rounded-full bg-pearl hover:bg-primary/5 text-ink-muted text-[13px] font-semibold cursor-pointer transition-colors border border-divider disabled:opacity-60"
+              >
+                ยกเลิก
+              </button>
+              <button
+                onClick={async () => {
+                  if (!onDeleteWorkOrder || !deletingWO) return;
+                  setIsDeleting(true);
+                  try {
+                    await onDeleteWorkOrder(deletingWO.id);
+                    setDeletingWO(null);
+                    fetchPage();
+                  } catch (err) {
+                    await notifyFailed(
+                      "ลบใบงานไม่สำเร็จ",
+                      toUserMessage(err, "ไม่สามารถลบใบงานนี้ได้ กรุณาลองอีกครั้ง")
+                    );
+                  } finally {
+                    setIsDeleting(false);
+                  }
+                }}
+                disabled={isDeleting}
+                className="min-h-11 px-4 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-[13px] font-semibold cursor-pointer transition-colors disabled:opacity-60 inline-flex items-center gap-1.5"
+              >
+                {isDeleting && <Loader2 className="w-4 h-4 animate-spin" />}
+                <span>ลบ</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

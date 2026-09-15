@@ -65,7 +65,8 @@ const MAX_DISTANCE = 900;
 const MAX_POLAR_ANGLE = Math.PI * 0.488;
 
 const CAMERA_FOV = 45;
-const CAMERA_NEAR = 0.5;
+/** เผื่อไว้เหนือ `MIN_DISTANCE` (3) พอสมควร กัน depth buffer แม่นยำหายตอนซูมเข้าใกล้ */
+const CAMERA_NEAR = 1.5;
 /** ค่าเริ่มต้นของ frustum ก่อน `CameraRig` คำนวณจากขนาดไซต์จริง */
 const CAMERA_FAR_FALLBACK = 1400;
 
@@ -660,6 +661,7 @@ export function FloorScene({
       gl={{
         antialias: true,
         powerPreference: "high-performance",
+        logarithmicDepthBuffer: true,
       }}
       camera={{ fov: CAMERA_FOV, near: CAMERA_NEAR, far: CAMERA_FAR_FALLBACK }}
       onCreated={({ scene, gl }) => {

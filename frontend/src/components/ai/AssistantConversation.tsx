@@ -62,6 +62,9 @@ export function userRoleLabel(role: UserRole): string {
 const AI_ERROR_TEXT =
   "เชื่อมต่อผู้ช่วย AI ไม่สำเร็จ คำถามยังไม่ถูกส่ง ตรวจสอบสัญญาณเครือข่ายแล้วกดลองอีกครั้ง";
 
+// ความสูงสูงสุดของกล่องพิมพ์ (px) — ต้องตรงกับ max-h-30 ใน Tailwind (7.5rem)
+const MAX_TEXTAREA_HEIGHT_PX = 120;
+
 // คำตอบสำรองแบบออฟไลน์ (ทุกโมเดล AI เรียกไม่สำเร็จ) — เตือนให้ตรวจสอบก่อนเชื่อ ไม่ใช่คำตอบจาก AI จริง
 const AI_FALLBACK_NOTICE =
   "⚠️ ระบบ AI ไม่พร้อมใช้งานชั่วคราว — นี่เป็นคำตอบทั่วไปแบบออฟไลน์ ไม่ได้อ้างอิงข้อมูลเครื่องจักรจริง";
@@ -502,10 +505,22 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
     chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
+  // ปรับความสูงกล่องพิมพ์ตามเนื้อหา
+  // หมายเหตุ: drawer ถูก mount ไว้ตลอดโดยใช้ display:none ตอนปิด ช่วงนั้น scrollHeight = 0
+  // ถ้าเผลอเซ็ตความสูงตอนซ่อนอยู่ จะได้ height: 0px ค้างไว้จนพิมพ์ไม่ได้ จึงต้องข้ามไปก่อน
   useEffect(() => {
-    if (!textareaRef.current) return;
-    textareaRef.current.style.height = "auto";
-    textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const isHidden = textarea.offsetParent === null;
+    if (isHidden) {
+      // ล้าง inline height ทิ้ง ให้กลับไปใช้ความสูงตาม rows={1} เมื่อถูกแสดงอีกครั้ง
+      textarea.style.height = "";
+      return;
+    }
+
+    textarea.style.height = "auto";
+    textarea.style.height = `${Math.min(textarea.scrollHeight, MAX_TEXTAREA_HEIGHT_PX)}px`;
   }, [inputPrompt]);
 
   const handleSubmit = () => {

@@ -20,6 +20,13 @@ interface AIChatViewProps {
   /** ชื่อผู้ใช้ปัจจุบัน — แสดงในแผงยืนยันก่อนสร้างใบงาน */
   currentUserName?: string;
   initialPrompt?: string;
+  /**
+   * เรียกกลับทันทีหลังจาก initialPrompt ถูกส่งไปถามแล้ว — ผู้เรียก (App.tsx)
+   * ควรเคลียร์ prompt เป็น "" ทันที เพราะ AIChatView นี้ถูก mount/unmount
+   * ตามแท็บ ("chat" tab เท่านั้น) ถ้าไม่เคลียร์ ครั้งถัดไปที่ผู้ใช้ออกจากแท็บ
+   * แชตแล้วกลับเข้ามาใหม่ (remount) จะเจอ initialPrompt เดิมค้างอยู่และยิงถามซ้ำ
+   */
+  onInitialPromptConsumed?: () => void;
   onAutoCreateWorkOrder?: (prefilled: WorkOrderPrefill) => void;
   onOpenCreateWorkOrderModal?: (prefilled: WorkOrderPrefill) => void;
 }
@@ -36,6 +43,7 @@ export const AIChatView: React.FC<AIChatViewProps> = ({
   currentUserRole,
   currentUserName,
   initialPrompt = "",
+  onInitialPromptConsumed,
   onAutoCreateWorkOrder,
   onOpenCreateWorkOrderModal,
 }) => {
@@ -156,10 +164,22 @@ export const AIChatView: React.FC<AIChatViewProps> = ({
     };
   }, []);
 
+  // ลายเซ็นของ prompt ล่าสุดที่ส่งไปแล้ว — กันยิงซ้ำสองครั้งจาก React 19
+  // StrictMode (dev mode เรียก effect เดิมซ้ำด้วย props ชุดเดิม) เคลียร์เป็น
+  // null ทุกครั้งที่ prompt ว่าง เพื่อให้ถามคำถามเดิมซ้ำได้จริงถ้าตั้งใจกดถามอีกครั้ง
+  const consumedPromptRef = useRef<string | null>(null);
   useEffect(() => {
-    if (initialPrompt && initialPrompt.trim() !== "") {
-      chat.send(initialPrompt);
+    if (!initialPrompt || initialPrompt.trim() === "") {
+      consumedPromptRef.current = null;
+      return;
     }
+    if (consumedPromptRef.current === initialPrompt) return;
+    consumedPromptRef.current = initialPrompt;
+    chat.send(initialPrompt);
+    // ใช้ prompt นี้ไปแล้ว — บอกผู้เรียกให้เคลียร์ทันที (one-shot consume) ไม่งั้น
+    // ออกจากแท็บแชตแล้วกลับเข้ามาใหม่ (component นี้ mount/unmount ตามแท็บ) จะเจอ
+    // initialPrompt เดิมค้างอยู่ตอน mount รอบใหม่ และยิงถามซ้ำ
+    onInitialPromptConsumed?.();
     // ส่งคำถามตั้งต้นเมื่อมีคำถามใหม่ส่งเข้ามาจากหน้าอื่นเท่านั้น
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialPrompt]);

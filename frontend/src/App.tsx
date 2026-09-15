@@ -831,6 +831,7 @@ export default function App() {
               currentUserRole={currentUser.role}
               currentUserName={currentUser.name}
               initialPrompt={chatInitialPrompt}
+              onInitialPromptConsumed={() => setChatInitialPrompt("")}
               onAutoCreateWorkOrder={handleAutoCreateWorkOrder}
               onOpenCreateWorkOrderModal={handleOpenCreateWorkOrderModal}
             />
@@ -1005,11 +1006,12 @@ export default function App() {
         isOpen={isAiDrawerOpen}
         onClose={() => {
           setIsAiDrawerOpen(false);
-          // เคลียร์ seed ตอนปิดด้วย ไม่งั้นเปิดแชตครั้งถัดไปผ่านปุ่ม toggle ที่
-          // sidebar (ซึ่งไม่ผ่าน handleAskAIWithPrompt) จะยังโดน effect ของ
-          // AIAssistantDrawer หยิบสรุปรอบตรวจเดิมมาแสดงซ้ำ
+          // เคลียร์ seed/prompt ตอนปิดด้วย ไม่งั้นเปิดแชตครั้งถัดไปผ่านปุ่ม toggle
+          // ที่ sidebar (ซึ่งไม่ผ่าน handleAskAIWithPrompt) จะยังโดน effect ของ
+          // AIAssistantDrawer หยิบ prompt/สรุปรอบตรวจเดิมมาถาม/แสดงซ้ำ
           setAiDrawerSeedMessages(null);
           setAiDrawerManualId(undefined);
+          setAiDrawerPrompt("");
         }}
         activeMachine={activeMachine}
         currentUserRole={currentUser.role}
@@ -1017,6 +1019,14 @@ export default function App() {
         initialPrompt={aiDrawerPrompt}
         initialManualId={aiDrawerManualId}
         seedMessages={aiDrawerSeedMessages}
+        onInitialPromptConsumed={() => {
+          // one-shot consume: prompt นี้ถูกส่งไปถาม AI แล้ว เคลียร์ทันทีไม่ให้
+          // ค้างอยู่ ไม่งั้นแค่ปิดแล้วเปิดแชตใหม่ (ตั้งใจแค่จะอ่าน) จะถามคำถาม
+          // เดิมซ้ำทุกครั้ง — แต่ถ้าผู้ใช้กดถามคำถามเดิมซ้ำจริงๆ ในภายหลัง ค่าจะ
+          // เปลี่ยนจาก "" -> prompt เดิมอีกครั้ง ทำงานได้ปกติ
+          setAiDrawerPrompt("");
+          setAiDrawerManualId(undefined);
+        }}
         onOpenFullChatPage={() => {
           setIsAiDrawerOpen(false);
           setActiveTab("chat");
@@ -1025,17 +1035,25 @@ export default function App() {
         onOpenCreateWorkOrderModal={handleOpenCreateWorkOrderModal}
       />
 
-      {/* ซ่อนปุ่ม AI ผู้ช่วยเมื่อไม่ได้อยู่หน้าหลักของบทบาทผู้ใช้ เพื่อไม่ให้ปุ่มลอยรบกวนหน้าอื่น */}
-      {!!currentRole && activeTab === getRoleDefaultTab(currentRole) && activeTab !== "chat" && (
+      {/* แสดงปุ่ม AI ผู้ช่วยทุกหน้า ยกเว้นหน้าแชตเต็มจอ (ตัวมันเองคือผู้ช่วยอยู่แล้ว) */}
+      {/* และซ่อนขณะมี modal เปิดอยู่ (ตั้งค่า/ช่วยเหลือ/สร้างใบงาน) เพราะปุ่มลอย z-60 จะทับ backdrop ของ modal (z-50) */}
+      {!!currentRole &&
+        activeTab !== "chat" &&
+        !isSettingsOpen &&
+        !isHelpOpen &&
+        !isCreateWOModalOpen && (
         <AIAssistantToggleButton
           isOpen={isAiDrawerOpen}
+          avoidQrPill={activeTab === "scan" && !!activeMachine}
           onToggle={() => {
             // เหมือนกับ onClose ด้านบน — ปุ่ม toggle นี้ปิด/เปิดแชตตรงๆ โดยไม่ผ่าน
-            // handleAskAIWithPrompt เลย จึงต้องเคลียร์ seed ที่นี่ด้วย ไม่งั้นเปิด
-            // แชตซ้ำผ่านปุ่มนี้หลังเคยกด "ให้ AI สรุป" จะยังเห็นสรุปรอบตรวจเดิม
+            // handleAskAIWithPrompt เลย จึงต้องเคลียร์ seed/prompt ที่นี่ด้วย ไม่งั้น
+            // เปิดแชตซ้ำผ่านปุ่มนี้หลังเคยกด "ให้ AI สรุป"/ถามคำถามจากที่อื่น จะยัง
+            // เห็นสรุปรอบตรวจเดิม หรือถามคำถามเดิมซ้ำ
             setIsAiDrawerOpen((prev) => !prev);
             setAiDrawerSeedMessages(null);
             setAiDrawerManualId(undefined);
+            setAiDrawerPrompt("");
           }}
         />
       )}

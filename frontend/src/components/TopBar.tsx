@@ -9,12 +9,7 @@ import {
 } from "lucide-react";
 import { Machine, WorkOrder } from "../types";
 import { evaluateMachine } from "../lib/thresholds";
-import {
-  machineStatusChipClass,
-  machineStatusDotClass,
-  machineStatusLabel,
-  machineStatusTextClass,
-} from "../lib/pillStyles";
+import { machineStatusDotClass, machineStatusLabel } from "../lib/pillStyles";
 import { NO_DATA } from "../lib/format";
 
 /** Where a notification sends the user when it is activated. */
@@ -60,6 +55,14 @@ const ALERT_ICON_COLORS: Record<AlertKind, string> = {
   overdue: "text-rose-600",
   review: "text-purple-600",
   "machine-warning": "text-amber-700",
+};
+
+/** Soft tinted backdrop behind each alert icon, matching ALERT_ICON_COLORS. */
+const ALERT_ICON_BG: Record<AlertKind, string> = {
+  "machine-error": "bg-rose-50",
+  overdue: "bg-rose-50",
+  review: "bg-purple-50",
+  "machine-warning": "bg-amber-50",
 };
 
 /** วันที่วันนี้แบบตัดเวลาออก ใช้เทียบกับ dueDate รูปแบบ YYYY-MM-DD */
@@ -209,25 +212,31 @@ export const TopBar: React.FC<TopBarProps> = ({
         {/* Machine Status Chip — read-only indicator of the active machine.
             Selection now happens from the technician's main tab. */}
         <div
-          className={`flex items-center px-3 min-h-11 rounded-full border select-none ${machineStatusChipClass(activeMachine.status)}`}
+          className="flex items-center min-h-11 select-none"
           id="machine-switcher-chip"
           title={`เครื่องจักรที่กำลังตรวจสอบ: ${activeMachine.code ?? NO_DATA} ${activeMachine.name}`}
           aria-label={`เครื่องจักรที่กำลังตรวจสอบ: ${activeMachine.code ?? NO_DATA} ${activeMachine.name}`}
         >
           <span className={`${machineStatusDotClass(activeMachine.status)} mr-1.5`} />
-          <span
-            className={`text-xs sm:text-sm font-semibold truncate max-w-[90px] min-[420px]:max-w-[120px] sm:max-w-[200px] mr-1 ${machineStatusTextClass(activeMachine.status)}`}
-          >
-            {activeMachine.code ?? NO_DATA}
-            <span className="hidden sm:inline"> · {activeMachine.name}</span>
+          <span className="text-xs sm:text-sm font-semibold text-ink truncate max-w-[110px] min-[420px]:max-w-[150px] sm:max-w-[220px]">
+            {activeMachine.name}
+            <span className="hidden sm:inline font-normal text-ink-faint">
+              {" "}
+              · {activeMachine.code ?? NO_DATA}
+            </span>
           </span>
+          <span className="sr-only"> — {machineStatusLabel(activeMachine.status)}</span>
         </div>
 
         {/* Notification Bell — count and rows come from live machine and work-order data */}
         <div className="relative" ref={notificationsRef}>
           <button
             onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-            className="min-w-11 min-h-11 flex items-center justify-center rounded-full bg-chip-translucent/60 hover:bg-chip-translucent active:scale-95 transition-all text-ink cursor-pointer relative"
+            className={`min-w-11 min-h-11 flex items-center justify-center rounded-full border cursor-pointer relative outline-none transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-focus ${
+              isNotificationsOpen
+                ? "bg-primary/10 border-primary/30 text-primary"
+                : "bg-chip-translucent/60 border-hairline text-ink hover:bg-chip-translucent active:scale-95"
+            }`}
             aria-label={
               alerts.length > 0
                 ? `รายการที่ต้องดำเนินการ ${alerts.length} รายการ`
@@ -239,17 +248,23 @@ export const TopBar: React.FC<TopBarProps> = ({
           >
             <Bell className="w-5 h-5" />
             {alerts.length > 0 && (
-              <span className="absolute top-0.5 right-0.5 min-w-5 h-5 px-1 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center border-2 border-white">
-                {alerts.length}
-              </span>
+              <>
+                <span
+                  className="absolute top-0.5 right-0.5 w-[18px] h-[18px] rounded-full bg-primary/50 animate-ping motion-reduce:hidden z-0 pointer-events-none"
+                  aria-hidden="true"
+                />
+                <span className="absolute top-0.5 right-0.5 z-10 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-white text-[10px] font-bold tabular-nums leading-none flex items-center justify-center border-2 border-white">
+                  {alerts.length > 9 ? "9+" : alerts.length}
+                </span>
+              </>
             )}
           </button>
 
           {/* Notifications Dropdown Panel */}
           {isNotificationsOpen && (
             <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-24px)] bg-white rounded-[18px] shadow-2xl border border-hairline py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-              <div className="px-3 py-2 border-b border-divider">
-                <span className="text-sm font-semibold text-ink">
+              <div className="px-4 py-3 border-b border-divider">
+                <span className="text-sm font-semibold text-ink tracking-[-0.01em]">
                   รายการที่ต้องดำเนินการ
                 </span>
               </div>
@@ -263,9 +278,14 @@ export const TopBar: React.FC<TopBarProps> = ({
                   {alerts.map((alert) => {
                     const Icon = ALERT_ICONS[alert.kind];
                     const iconColor = ALERT_ICON_COLORS[alert.kind];
+                    const iconBg = ALERT_ICON_BG[alert.kind];
                     const body = (
                       <>
-                        <Icon className={`w-4 h-4 shrink-0 mt-0.5 ${iconColor}`} />
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${iconBg}`}
+                        >
+                          <Icon className={`w-4 h-4 ${iconColor}`} />
+                        </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-ink font-semibold leading-snug">
                             {alert.title}

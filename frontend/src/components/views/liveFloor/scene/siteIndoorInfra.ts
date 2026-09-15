@@ -19,6 +19,16 @@ import {
   eaveYOf,
   type Buckets,
 } from "./siteShared";
+import { computeVault, vaultPatch, vaultPatchZ, archTopChord, archTopChordZ, vaultYAt } from "./vaultGeometry";
+
+/** กล่องจุดศูนย์กลางอยู่ที่ (x, y, z) ตรง ๆ — ใช้กับคาน/แปที่รู้จุดกลางอยู่แล้ว
+ *  (เช่น สัน/แปบนส่วนโค้งวอลต์ที่ตำแหน่ง y มาจาก `vaultYAt` ตรง ๆ) ต่างจาก
+ *  `box()` ของ `siteShared.ts` ที่รับ y เป็นฐานล่างแล้วบวกครึ่งความสูงเอง */
+function boxC(x: number, y: number, z: number, w: number, h: number, d: number): THREE.BufferGeometry {
+  const g = new THREE.BoxGeometry(w, h, d);
+  g.translate(x, y, z);
+  return g;
+}
 
 /**
  * ===========================================================================
@@ -194,10 +204,15 @@ export function buildIndoorRoads(hallW: number, hallD: number, b: Buckets) {
  *
  * ความสูงเชิงชาย = 0.78 ของความสูงโรง ต่ำกว่าคานขอบโรงที่ `PlantShell` วาง
  * ไว้ที่ระดับ `hall.h` พอดี จึงอ่านเป็นอาคารย่อยอยู่ *ใน* โรง ไม่ใช่ชนกัน
+ *
+ * bucket `eave` (คานเชิงชายรอบโซน) กับ `truss` (โครงถักโค้ง/อกไก่/แป) แยกก้อน
+ * กันโดยเจตนา: `eave` เป็นเค้าโครงอาคารที่ระดับเชิงชาย ยังอยู่เสมอไม่ว่าจะ
+ * เปิด/ปิดหลังคา ส่วน `truss` เป็นเหล็กโครงหลังคาล้วน ๆ (ไม่มีเสา ไม่มีอะไรที่
+ * ไม่ใช่ชิ้นส่วนหลังคาปนอยู่) จึงซ่อนได้ทั้งก้อนตอน "เปิดหลังคา" — ดูจุดเลือก
+ * render ที่ `SiteEnvironment.tsx`
  */
 export function buildLineHalls(zones: PlantZone[], hallHeight: number, bay: number, b: Buckets) {
   const eaveY = eaveYOf(hallHeight);
-  const ridgeRise = hallHeight * 0.12;
 
   for (const zone of zones) {
     const x0 = zone.x - zone.w / 2;
@@ -217,7 +232,7 @@ export function buildLineHalls(zones: PlantZone[], hallHeight: number, bay: numb
     b.eave.push(box(x0, eaveY, zone.z, t, t, zone.d + t));
     b.eave.push(box(x1, eaveY, zone.z, t, t, zone.d + t));
 
-    // --- โครงถักหลังคา: หลังคาหลายช่วง (multi-bay) --------------------
+    // --- โครงถักหลังคา: หลังคาโค้งบาร์เรลวอลต์หลายช่วง (multi-bay) ------
     //
     // จันทันพาดตาม **ด้านสั้น** ของโซน แต่ห้ามพาดเต็มด้านนั้นทีเดียว: โซน
     // LINES จริงกว้าง 295 x 408 ม. ช่วงพาดเดียว 295 ม. ไม่มีอยู่จริงในงาน
@@ -225,8 +240,11 @@ export function buildLineHalls(zones: PlantZone[], hallHeight: number, bay: numb
     // ยักษ์หลังเดียวคลุมทั้งโรง
     //
     // จึงซอยด้านสั้นเป็นช่วงพาดย่อยกว้างไม่เกิน `MAX_ROOF_SPAN` แต่ละช่วงมี
-    // จันทัน/อกไก่/แปของตัวเอง — ได้หลังคาลูกฟูกหลายลูกเหมือนโรงงานหลายช่วง
-    // จริง และได้เงาคานตกเป็นแถบซ้ำ ๆ ซึ่งช่วยให้อ่านสเกลของโรงออก
+    // โครงถักโค้ง/สัน/แปของตัวเอง — ได้หลังคาโค้งหลายลูกเหมือนโรงงานหลายช่วง
+    // จริง (เหมือน `HallRoof.tsx`'s barrel vault) และได้เงาคานตกเป็นแถบซ้ำ ๆ
+    // ซึ่งช่วยให้อ่านสเกลของโรงออก — ใช้สูตรโค้งชุดเดียวกับ `HallRoof.tsx`
+    // จาก `./vaultGeometry.ts` (`computeVault`/`vaultYAt`) เพื่อให้แผ่น
+    // หลังคาโค้งไปตามโครงถักโค้งจริง ไม่ใช่ระนาบลาดตรงแบบเดิม
     const spanAlongX = zone.w <= zone.d;
     const shortLen = spanAlongX ? zone.w : zone.d;
     const runLen = spanAlongX ? zone.d : zone.w;
@@ -235,85 +253,69 @@ export function buildLineHalls(zones: PlantZone[], hallHeight: number, bay: numb
     const frames = Math.max(2, Math.round(runLen / bay));
     const shortStart = spanAlongX ? x0 : z0;
     const runStart = spanAlongX ? z0 : x0;
+    // ตำแหน่งคงที่ตามแกนพาดยาว (run axis) ของสัน/แป/แผ่นหลังคา — เท่ากับ
+    // จุดกึ่งกลางโซนบนแกนนั้นพอดี (runStart + runLen/2)
+    const runCenter = spanAlongX ? zone.z : zone.x;
+
+    const chordR = 0.11;
+    const ridgeSize = 0.24;
+    const purlinH = 0.12;
+    const purlinW = 0.12;
+    const deckSegs = 32;
 
     for (let bayIndex = 0; bayIndex < roofBays; bayIndex += 1) {
-      // จุดกลางของช่วงพาดย่อยนี้ บนแกนด้านสั้น
+      // จุดกลางของช่วงพาดย่อยนี้ บนแกนด้านสั้น (spanwise)
       const c = shortStart + spanLen * (bayIndex + 0.5);
+      // เรขาคณิตส่วนโค้งของช่วงนี้ — สปริงกิ้งไลน์ที่ระดับเชิงชาย (`eaveY`)
+      // เหมือน `HallRoof.tsx` ใช้ `hall.h` เป็นสปริงกิ้งไลน์ของหลังคาทั้งโรง
+      const v = computeVault(spanLen, eaveY);
 
+      // --- โครงถักโค้งต่อเฟรม (แทนจันทันตรง + เสาค้ำอกไก่เดิม) -----------
       for (let f = 0; f <= frames; f += 1) {
         const u = runStart + (runLen * f) / frames;
-
-        // จันทันสองท่อนเอียงขึ้นหาอกไก่ของช่วงนี้
-        for (const side of [-1, 1]) {
-          const rafter = new THREE.BoxGeometry(spanLen / 2, 0.2, 0.2);
-          // เอียงตามความชันจริงของหลังคา (rise / ครึ่งช่วงพาด)
-          const pitch = Math.atan2(ridgeRise, spanLen / 2) * -side;
-          if (spanAlongX) {
-            rafter.rotateZ(pitch);
-            rafter.translate(c + (side * spanLen) / 4, eaveY + ridgeRise / 2, u);
-          } else {
-            rafter.rotateX(-pitch);
-            rafter.translate(u, eaveY + ridgeRise / 2, c + (side * spanLen) / 4);
-          }
-          b.truss.push(rafter);
-        }
-
-        // เสาค้ำอกไก่ — สั้น อยู่บนโครงหลังคา ไม่ลงถึงพื้น จึงไม่บังเครื่อง
-        b.truss.push(
-          spanAlongX
-            ? box(c, eaveY, u, 0.16, ridgeRise, 0.16)
-            : box(u, eaveY, c, 0.16, ridgeRise, 0.16)
-        );
+        b.truss.push(spanAlongX ? archTopChordZ(v, u, c, chordR) : archTopChord(v, u, c, chordR));
         // เดิมมีเสารับปลายจันทันที่รอยต่อระหว่างช่วงหลังคาลงถึงพื้นด้วย —
         // ตัดออกพร้อมเสาอื่นทั้งหมด (399 ต้นเฉพาะรอยต่อ) ตามเหตุผลข้างบน
-        // รอยต่อระหว่างช่วงยังอ่านออกจากแนวจันทันที่หักลงมาบรรจบกัน
+        // รอยต่อระหว่างช่วงยังอ่านออกจากแนวโครงถักที่หักลงมาบรรจบกัน
       }
 
-      // อกไก่ตลอดความยาวสันหลังคาของช่วงนี้
+      // อกไก่ตลอดความยาวสันหลังคาของช่วงนี้ — อยู่ที่ `v.crownY` จริง
+      // (จุดสูงสุดของส่วนโค้ง) ไม่ใช่ `eaveY + ridgeRise` คงที่แบบเดิม
       b.truss.push(
         spanAlongX
-          ? box(c, eaveY + ridgeRise, zone.z, 0.24, 0.24, runLen)
-          : box(zone.x, eaveY + ridgeRise, c, runLen, 0.24, 0.24)
+          ? boxC(c, v.crownY, runCenter, ridgeSize, ridgeSize, runLen)
+          : boxC(runCenter, v.crownY, c, runLen, ridgeSize, ridgeSize)
       );
 
-      // แปพาดขวางจันทัน 4 เส้นต่อช่วง — ให้โครงหลังคาอ่านเป็นตะแกรง
+      // แปพาดขวางโครงถัก 4 เส้นต่อช่วง — วางบนส่วนโค้งจริงผ่าน `vaultYAt`
+      // ให้อ่านเป็นตะแกรงหลังคาที่โค้งไปตามผิวจริง ไม่ใช่แนวตรงตัดผ่านอากาศ
       for (let i = 1; i <= 4; i += 1) {
         const frac = i / 5;
-        const drop = ridgeRise * (1 - Math.abs(frac - 0.5) * 2);
-        const p = -spanLen / 2 + spanLen * frac;
+        const crossRel = -v.halfSpan + 2 * v.halfSpan * frac;
+        const y = vaultYAt(v, crossRel);
         b.truss.push(
           spanAlongX
-            ? box(c + p, eaveY + drop, zone.z, 0.12, 0.12, runLen)
-            : box(zone.x, eaveY + drop, c + p, runLen, 0.12, 0.12)
+            ? boxC(c + crossRel, y, runCenter, purlinW, purlinH, runLen)
+            : boxC(runCenter, y, c + crossRel, runLen, purlinH, purlinW)
         );
       }
 
-      // --- แผ่นหลังคาเมทัลชีต: สองผืนลาดจากเชิงชายขึ้นหาอกไก่ ----------
+      // --- แผ่นหลังคาเมทัลชีต: ผืนโค้งเดียวคลุมทั้งช่วงพาด (barrel vault) --
       //
-      // ผืนละครึ่งช่วงพาด เอียงด้วยความชันเดียวกับจันทัน จึงวางแนบบนโครงพอดี
-      // ยกขึ้นจากจันทัน 0.12 ม. กัน z-fighting กับตัวจันทันที่อยู่ใต้แผ่น
+      // ยกรัศมีขึ้นเล็กน้อยจากโครงถักโค้ง (`chordR` + ระยะเผื่อ) กัน
+      // z-fighting กับท่อโครงถักที่อยู่ใต้แผ่น — เหมือนหลักการเดิมที่ยกแผ่น
+      // ขึ้น 0.12 ม. จากจันทัน เพียงแต่ตอนนี้ยกในแนวรัศมีของส่วนโค้งแทน
       //
-      // ผืนนี้ไปอยู่ bucket `roofDeck` ซึ่งเป็นก้อนเดียวที่โหมด "เปิดหลังคา"
-      // เลือกไม่เรนเดอร์ ตัวโครงถัก/เชิงชายยังอยู่ จึงยังเห็นเป็นโครงอาคาร
-      for (const side of [-1, 1]) {
-        const pitch = Math.atan2(ridgeRise, spanLen / 2) * -side;
-        // ความยาวแผ่นวัดตามความลาด (ด้านตรงข้ามมุมฉาก) ไม่ใช่ระยะราบ ไม่งั้น
-        // แผ่นจะสั้นกว่าจันทันและเปิดช่องโหว่ที่อกไก่
-        const sheetLen = Math.hypot(spanLen / 2, ridgeRise);
-        // สร้างให้แกนกว้าง/ลึกตรงกับทิศที่ช่วงพาดวางตัวตั้งแต่แรก แล้วหมุน
-        // รอบเดียว — หมุนสองรอบ (rotateX แล้ว rotateY) ทำให้ระนาบแผ่นเพี้ยน
-        const sheet = spanAlongX
-          ? new THREE.BoxGeometry(sheetLen, 0.1, runLen)
-          : new THREE.BoxGeometry(runLen, 0.1, sheetLen);
-        if (spanAlongX) {
-          sheet.rotateZ(pitch);
-          sheet.translate(c + (side * spanLen) / 4, eaveY + ridgeRise / 2 + 0.12, zone.z);
-        } else {
-          sheet.rotateX(-pitch);
-          sheet.translate(zone.x, eaveY + ridgeRise / 2 + 0.12, c + (side * spanLen) / 4);
-        }
-        b.roofDeck.push(sheet);
-      }
+      // ผืนนี้ไปอยู่ bucket `roofDeck` — โหมด "เปิดหลังคา" (roofOpen) ซ่อนทั้ง
+      // `roofDeck` และ `truss` (โครงถักโค้ง/อกไก่/แปทั้งหมดข้างบน ดูคอมเมนต์
+      // หัวฟังก์ชัน) เหลือแค่คานเชิงชายรอบโซน (`eave`) ให้ยังอ่านเป็นเค้าโครง
+      // อาคาร — ดูจุดเลือก render ที่ `SiteEnvironment.tsx`
+      const deckOffset = chordR + 0.06;
+      b.roofDeck.push(
+        spanAlongX
+          ? vaultPatchZ(v, deckOffset, v.alpha, runLen, c, runCenter, deckSegs)
+          : vaultPatch(v, deckOffset, v.alpha, runLen, runCenter, c, deckSegs)
+      );
     }
 
     // --- ป้ายชื่อโซนแขวนที่เชิงชายด้านหน้า (DXF: SIGN BOARD) ----------

@@ -87,8 +87,10 @@ import { buildSiteBuildings } from "./siteEntrance";
 export interface SiteEnvironmentProps {
   layout: PlantLayout;
   /**
-   * true = "เปิดหลังคา" ไม่วาดแผ่นหลังคาของอาคารไลน์ผลิต เหลือแต่โครงถัก
-   * จึงมองลงไปเห็นเครื่องจักรข้างในได้ แบบมุมมองบ้านในเกม The Sims
+   * true = "เปิดหลังคา" ไม่วาดทั้งแผ่นหลังคาและโครงถักโค้ง/อกไก่/แปของ
+   * อาคารไลน์ผลิต (`truss` bucket) เหลือแค่คานเชิงชายรอบโซน (`eave`) ให้ยัง
+   * อ่านเป็นเค้าโครงอาคาร จึงมองลงไปเห็นเครื่องจักรข้างในได้ แบบมุมมองบ้าน
+   * ในเกม The Sims
    *
    * เรขาคณิตหลังคาถูกสร้างไว้เสมอและ cache ตาม `layout` — การสลับค่านี้แค่
    * เลือกไม่ render mesh ก้อนนั้น ไม่ได้สร้างไซต์ใหม่ จึงสลับได้ทันทีไม่กระตุก
@@ -207,7 +209,12 @@ export function SiteEnvironment({ layout, roofOpen = false }: SiteEnvironmentPro
       {ENV_KEYS.map((key) => {
         const geometry = merged[key];
         if (!geometry) return null;
-        if (key === "roofDeck" && roofOpen) return null;
+        // "เปิดหลังคา" (roofOpen=true) ต้องซ่อนเหล็กโครงหลังคาทุกชิ้น ไม่ใช่แค่
+        // แผ่นหลังคา — `truss` bucket ที่ `buildLineHalls` เติม มีแต่โครงถักโค้ง/
+        // อกไก่/แประดับหลังคาล้วน ๆ (ดูคอมเมนต์ที่ `buildLineHalls`) จึงซ่อนทั้ง
+        // ก้อนได้เลยโดยไม่ต้องแยก — คานเชิงชายรอบโซน (`eave`) ยังอยู่เสมอ เพื่อให้
+        // ยังอ่านเป็นเค้าโครงอาคารที่ระดับเชิงชาย
+        if ((key === "roofDeck" || key === "truss") && roofOpen) return null;
         const spec = MATERIAL_SPECS[key];
         // แผ่นพื้น/สีตีเส้นไม่ทอดเงา (เงาของแผ่นบางบนแผ่นบางให้แต่ noise)
         // แต่ต้องรับเงาจากเสา คานหลังคา และเครื่องจักร

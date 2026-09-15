@@ -1019,7 +1019,8 @@ export default function App() {
         onOpenCreateWorkOrderModal={handleOpenCreateWorkOrderModal}
       />
 
-      {activeTab !== "chat" && (
+      {/* ซ่อนปุ่ม AI ผู้ช่วยเมื่อไม่ได้อยู่หน้าหลักของบทบาทผู้ใช้ เพื่อไม่ให้ปุ่มลอยรบกวนหน้าอื่น */}
+      {!!currentRole && activeTab === getRoleDefaultTab(currentRole) && activeTab !== "chat" && (
         <AIAssistantToggleButton
           isOpen={isAiDrawerOpen}
           onToggle={() => {

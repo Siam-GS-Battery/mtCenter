@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import PixelAILogo from "./PixelAILogo";
 
@@ -18,12 +18,32 @@ const AIAssistantToggleButton: React.FC<AIAssistantToggleButtonProps> = ({ isOpe
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const label = "เปิดผู้ช่วย AI";
 
+  // ป้องกันปุ่ม AI ทับปุ่มสแกน QR โดยคำนวณระยะห่างจากตำแหน่งจริงของปุ่มสแกน QR
+  // ที่ต่างกันระหว่างมือถือ (bottom-4/right-4, py-2.5) กับจอ sm+ (bottom-6/right-6, py-3.5)
+  // แล้วบวกช่องว่างเพิ่มอีก QR_PILL_GAP เพื่อไม่ให้ปุ่มสองอันชิดกันเกินไป
+  const [isDesktop, setIsDesktop] = useState<boolean>(() =>
+    typeof window !== "undefined" ? window.matchMedia("(min-width: 640px)").matches : false
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 640px)");
+    const handleChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    setIsDesktop(mediaQuery.matches);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
   if (isOpen) return null;
+
+  // ตำแหน่ง (offset) และความสูงของปุ่มสแกน QR ต่อ breakpoint บวกช่องว่างที่ต้องการ
+  const QR_PILL_GAP = 24;
+  const QR_PILL_OFFSET = isDesktop ? 24 : 16;
+  const QR_PILL_HEIGHT = isDesktop ? 56 : 44;
 
   const buttonStyle: React.CSSProperties = {
     position: "fixed",
-    bottom: 88,
-    right: 20,
+    bottom: QR_PILL_OFFSET + QR_PILL_HEIGHT + QR_PILL_GAP,
+    right: isDesktop ? 24 : 16,
     zIndex: 60,
     width: 56,
     height: 56,

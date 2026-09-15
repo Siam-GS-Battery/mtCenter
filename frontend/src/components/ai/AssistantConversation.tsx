@@ -29,7 +29,14 @@ import { Machine, UserRole, ChatMessage } from "../../types";
 import PixelAILogo from "../PixelAILogo";
 import { MicDictationButton } from "../MicDictationButton";
 import { MachineAttachMenu } from "./MachineAttachMenu";
-import { aiChat, aiFeedback, type AiMode } from "../../services/apiService";
+import { ThinkingSteps } from "./ThinkingSteps";
+import {
+  aiChat,
+  aiChatStream,
+  aiFeedback,
+  type AiMode,
+  type AiChatStreamStepEvent,
+} from "../../services/apiService";
 import {
   hasWorkOrderAction,
   buildWorkOrderPrefill,
@@ -67,6 +74,11 @@ export type ChatMessageWithFallback = ChatMessage & {
   fallback?: boolean;
   mode?: AiMode;
   logId?: number | null;
+  /** ขั้นตอนที่ backend รายงานระหว่างสตรีมคำตอบนี้ — undefined/ว่างเมื่อข้อความนี้
+   * ไม่ได้มาจากการสตรีม (เช่นข้อความต้อนรับ หรือคำตอบที่ตกไปใช้เส้นทางสำรอง) */
+  steps?: AiChatStreamStepEvent[];
+  /** true ระหว่างกำลังสตรีมคำตอบนี้อยู่ (ยังไม่ถึง event: done หรือ fallback เสร็จ) */
+  streaming?: boolean;
 };
 
 const chatMarkdownComponents: Components = {
@@ -100,7 +112,7 @@ export interface AssistantChat {
   isLoading: boolean;
   /** prompt ที่ส่งไม่สำเร็จ อ้างอิงด้วย id ของข้อความแจ้งข้อผิดพลาด */
   failedPrompts: Record<string, string>;
-  send: (prompt: string) => void;
+  send: (prompt: string, manualId?: string) => void;
   retry: (errorMessageId: string) => void;
   reset: () => void;
   /**
@@ -162,6 +174,11 @@ export function useAssistantChat(
     onMessagesChangeRef.current?.(messages);
   }, [messages]);
 
+  // ตัวควบคุมการยกเลิกคำขอสตรีมที่กำลังทำอยู่ — ยกเลิกเมื่อ hook นี้ unmount (เช่น
+  // ปิดหน้าแชตเต็มหน้า/ออกจากแอป) เพื่อไม่ให้ยังเชื่อมต่อค้างอยู่เบื้องหลังโดยไม่มีใครฟัง
+  const abortRef = useRef<AbortController | null>(null);
+  useEffect(() => () => abortRef.current?.abort(), []);
+
   // เปลี่ยนเครื่องจักร = บริบทใหม่ ทักทายด้วยค่าจริงของเครื่องนั้น (หรือทักทายแบบภาพรวม
   // ทั้งฟลีตถ้าไม่มีเครื่องจักรเลือกอยู่ — activeMachine เป็น null ได้)
   //
@@ -183,7 +200,7 @@ export function useAssistantChat(
     setMessages([welcome()]);
   }, [activeMachine?.id]);
 
-  const send = async (prompt: string) => {
+  const send = async (prompt: string, manualId?: string) => {
     const textToSend = prompt.trim();
     if (!textToSend || isLoading) return;
 
@@ -202,50 +219,142 @@ export function useAssistantChat(
     setMessages((prev) => [...prev, userMsg]);
     setIsLoading(true);
 
+    // apiService.ts types AiChatPayload.machineContext as a non-null `Machine`
+    // (that file is out of scope for this change — other agents own it), but
+    // aiChat()/aiChatStream() only JSON.stringify the payload and never
+    // dereference machineContext, and the backend already treats a
+    // null/omitted machineContext as a fleet-wide question. Only this field
+    // is cast; the rest of the payload keeps full type-checking. The null
+    // value flows through unchanged at runtime.
+    const requestPayload = {
+      prompt: textToSend,
+      machineContext: activeMachine as Machine,
+      role: currentUserRole,
+      history,
+      // เว้น key นี้ไปเลยเมื่อไม่มีค่า แทนที่จะส่ง manualId: undefined ใน JSON
+      ...(manualId ? { manualId } : {}),
+    };
+
+    // ข้อความคำตอบของผู้ช่วย — สร้างว่างไว้ก่อนแล้วเติมสด ๆ ทีละขั้นตอน/ทีละท่อนข้อความ
+    // ระหว่างสตรีม แทนที่จะรอให้คำตอบเสร็จทั้งหมดก่อนแสดง
+    const assistantId = `ai-${Date.now()}`;
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: assistantId,
+        sender: "assistant",
+        text: "",
+        timestamp: nowTime(),
+        steps: [],
+        streaming: true,
+      },
+    ]);
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    // เส้นทางสำรอง: ใช้เมื่อสตรีมใช้งานไม่ได้เลย (เครือข่ายล้ม, endpoint ยังไม่มี/404,
+    // SSE เพี้ยน) หรือสตรีมจบโดยไม่มี event: done มาถึง — ต้องไม่ปล่อยให้ผู้ใช้ค้างเห็น
+    // สปินเนอร์ตาย ๆ เมื่อฟีเจอร์สตรีมมิ่งใช้งานไม่ได้ด้วยเหตุผลใดก็ตาม
+    const runLegacyFallback = async () => {
+      try {
+        const data = await aiChat(requestPayload);
+        if (!data.success || !data.reply) throw new Error("ai_unavailable");
+
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? {
+                  ...m,
+                  text: data.reply as string,
+                  // ธงนี้เป็นของข้อความนี้เท่านั้น คำถามอื่นในบทสนทนาเดียวกันอาจได้คำตอบจริงตามปกติ
+                  fallback: data.fallback === true,
+                  mode: data.mode,
+                  logId: data.logId ?? null,
+                  streaming: false,
+                  steps: undefined,
+                }
+              : m
+          )
+        );
+      } catch {
+        const errorId = `err-${Date.now()}`;
+        setFailedPrompts((prev) => ({ ...prev, [errorId]: textToSend }));
+        setMessages((prev) => [
+          ...prev.filter((m) => m.id !== assistantId),
+          {
+            id: errorId,
+            sender: "assistant",
+            text: AI_ERROR_TEXT,
+            timestamp: nowTime(),
+          },
+        ]);
+      }
+    };
+
     try {
-      // apiService.ts types AiChatPayload.machineContext as a non-null `Machine`
-      // (that file is out of scope for this change — other agents own it), but
-      // aiChat() itself only JSON.stringifies the payload and never dereferences
-      // machineContext, and the backend already treats a null/omitted
-      // machineContext as a fleet-wide question. Only this field is cast; the
-      // rest of the payload keeps full type-checking. The null value flows
-      // through unchanged at runtime.
-      const data = await aiChat({
-        prompt: textToSend,
-        machineContext: activeMachine as Machine,
-        role: currentUserRole,
-        history,
-      });
+      let receivedDone = false;
 
-      if (!data.success || !data.reply) throw new Error("ai_unavailable");
-
-      setMessages((prev) => [
-        ...prev,
+      await aiChatStream(
+        requestPayload,
         {
-          id: `ai-${Date.now()}`,
-          sender: "assistant",
-          text: data.reply as string,
-          timestamp: nowTime(),
-          // ธงนี้เป็นของข้อความนี้เท่านั้น คำถามอื่นในบทสนทนาเดียวกันอาจได้คำตอบจริงตามปกติ
-          fallback: data.fallback === true,
-          mode: data.mode,
-          logId: data.logId ?? null,
+          onStep: (step) => {
+            setMessages((prev) =>
+              prev.map((m) => {
+                if (m.id !== assistantId) return m;
+                const steps = m.steps ? [...m.steps] : [];
+                const idx = steps.findIndex((s) => s.id === step.id);
+                if (idx === -1) steps.push(step);
+                else steps[idx] = step;
+                return { ...m, steps };
+              })
+            );
+          },
+          onDelta: (text) => {
+            setMessages((prev) =>
+              prev.map((m) => (m.id === assistantId ? { ...m, text: m.text + text } : m))
+            );
+          },
+          onDone: (doneEvent) => {
+            receivedDone = true;
+            // backend ส่ง logId เป็น string ในสัญญาสตรีม แต่ปุ่มให้ผลตอบรับ (aiFeedback)
+            // ใช้เลข — แปลงที่นี่จุดเดียว ไม่ให้ NaN หลุดเข้าไปแทน null
+            const parsedLogId = Number(doneEvent.logId);
+            const logId =
+              doneEvent.logId != null && !Number.isNaN(parsedLogId) ? parsedLogId : null;
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantId
+                  ? {
+                      ...m,
+                      text: doneEvent.reply,
+                      fallback: doneEvent.fallback === true,
+                      mode: doneEvent.mode as AiMode,
+                      logId,
+                      streaming: false,
+                    }
+                  : m
+              )
+            );
+          },
+          onError: () => {
+            // ไม่ throw ที่นี่ (event: error ไม่ใช่ exception) — ปล่อยให้ตกไปเส้นทาง
+            // สำรองด้านล่างเมื่อสตรีมจบโดยไม่มี event: done ตามหลัง
+          },
         },
-      ]);
+        controller.signal
+      );
+
+      if (!receivedDone) {
+        await runLegacyFallback();
+      }
     } catch {
-      const errorId = `err-${Date.now()}`;
-      setFailedPrompts((prev) => ({ ...prev, [errorId]: textToSend }));
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: errorId,
-          sender: "assistant",
-          text: AI_ERROR_TEXT,
-          timestamp: nowTime(),
-        },
-      ]);
+      // ถูกยกเลิกเพราะ hook นี้ unmount ไปแล้ว — ไม่ต้องยิงคำขอสำรองซ้ำ
+      if (controller.signal.aborted) return;
+      await runLegacyFallback();
     } finally {
       setIsLoading(false);
+      if (abortRef.current === controller) abortRef.current = null;
     }
   };
 
@@ -272,11 +381,14 @@ export function useAssistantChat(
   };
 
   const reset = () => {
+    // เริ่มบทสนทนาใหม่ระหว่างสตรีมคำตอบอยู่ — ยกเลิกคำขอเดิมไม่ให้มาแทรกข้อความใหม่ทีหลัง
+    abortRef.current?.abort();
     setFailedPrompts({});
     setMessages([welcome()]);
   };
 
   const hydrate = (nextMessages: ChatMessageWithFallback[]) => {
+    abortRef.current?.abort();
     skipNextResetRef.current = true;
     setFailedPrompts({});
     setMessages(nextMessages.length > 0 ? nextMessages : [welcome()]);
@@ -341,8 +453,20 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
   const [feedbackGiven, setFeedbackGiven] = useState<Record<string, 1 | -1>>({});
   const [feedbackPending, setFeedbackPending] = useState<string | null>(null);
   const [feedbackError, setFeedbackError] = useState<Record<string, string>>({});
+  // แผงขั้นตอนของแต่ละข้อความ (ต่อ msg.id) — เริ่มพับหลังคำตอบเสร็จ ผู้ใช้กดกางเองได้
+  // เก็บเป็น UI state ล้วน ๆ ในนี้ ไม่ต้องคงอยู่ข้าม session เหมือน messages
+  const [expandedSteps, setExpandedSteps] = useState<Record<string, boolean>>({});
 
   const chatBottomRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  // ผู้ใช้อยู่ใกล้ล่างสุดของบทสนทนาอยู่หรือไม่ — ใช้กันไม่ให้ auto-scroll ระหว่างสตรีม
+  // คำตอบ (ซึ่งอัปเดตถี่มาก) ไปแย่งการเลื่อนดูข้อความเก่าที่ผู้ใช้ตั้งใจเลื่อนขึ้นไปดู
+  const isNearBottomRef = useRef(true);
+  const handleScroll = () => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    isNearBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+  };
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const machinePickerRef = useRef<HTMLDivElement>(null);
   const [isMachinePickerOpen, setIsMachinePickerOpen] = useState(false);
@@ -374,6 +498,7 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
   const hasUserMessage = messages.some((m) => m.sender === "user");
 
   useEffect(() => {
+    if (!isNearBottomRef.current) return;
     chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
@@ -433,6 +558,8 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
     <div className="flex-1 min-h-0 flex flex-col">
       {/* Conversation */}
       <div
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
         className={`flex-1 overflow-y-auto ${isPage ? "" : "bg-divider px-4 py-4"}`}
         aria-live="polite"
         aria-busy={isLoading}
@@ -488,7 +615,9 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
                 );
               }
 
-              const showActionCard = hasWorkOrderAction(msg.text);
+              // ระหว่างสตรีมข้อความยังมาไม่ครบ (token ของ [ACTION:...] อาจถูกตัดครึ่ง) —
+              // รอให้คำตอบนิ่งก่อน (!msg.streaming) ค่อยตรวจหา action token/แบนเนอร์ความปลอดภัย
+              const showActionCard = !msg.streaming && hasWorkOrderAction(msg.text);
               // เปิดใบงานซ่อมต้องมีเครื่องจักรจริงเสมอ (buildWorkOrderPrefill ต้องการ
               // Machine ไม่ใช่ null) — ถ้ายังไม่มีเครื่องจักรเลือกอยู่ ให้แสดงคำแนะนำ
               // ให้เลือก/สแกนเครื่องก่อน แทนปุ่มสร้างใบงาน
@@ -497,6 +626,7 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
                   ? buildWorkOrderPrefill(activeMachine, msg.text)
                   : null;
               const retryPrompt = failedPrompts[msg.id];
+              const isThinkingExpanded = !!msg.streaming || !!expandedSteps[msg.id];
 
               return (
                 <div key={msg.id} className="group flex items-start gap-3">
@@ -507,10 +637,34 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    {msg.text.includes("ข้อควรระวังความปลอดภัย") && (
+                    {!msg.streaming && msg.text.includes("ข้อควรระวังความปลอดภัย") && (
                       <div className="mb-2 p-2.5 rounded-[18px] bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold flex items-center gap-1.5">
                         <AlertOctagon className="w-4 h-4 text-amber-700 shrink-0" />
                         <span>โปรดใช้อุปกรณ์เซฟตี้ (PPE) และ Lockout-Tagout ก่อนเริ่มงาน</span>
+                      </div>
+                    )}
+
+                    {msg.steps && (
+                      <ThinkingSteps
+                        steps={msg.steps}
+                        streaming={!!msg.streaming}
+                        expanded={isThinkingExpanded}
+                        onToggleExpanded={() =>
+                          setExpandedSteps((prev) => ({ ...prev, [msg.id]: !prev[msg.id] }))
+                        }
+                      />
+                    )}
+
+                    {/* ยังไม่มีขั้นตอนหรือข้อความมาถึงเลย (เพิ่งเริ่มสตรีม หรือกำลังตกไปใช้
+                        เส้นทางสำรอง) — ไม่ปล่อยให้ผู้ใช้เห็นฟองข้อความว่างเปล่าเฉย ๆ */}
+                    {msg.streaming && (!msg.steps || msg.steps.length === 0) && !msg.text && (
+                      <div className="flex items-center gap-2 text-ink-muted text-sm mb-1">
+                        <span className="flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-ink-muted animate-pulse motion-reduce:animate-none [animation-delay:-0.3s]" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-ink-muted animate-pulse motion-reduce:animate-none [animation-delay:-0.15s]" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-ink-muted animate-pulse motion-reduce:animate-none" />
+                        </span>
+                        <span>กำลังคิด…</span>
                       </div>
                     )}
 
@@ -713,23 +867,6 @@ export const AssistantConversation: React.FC<AssistantConversationProps> = ({
               );
             })}
 
-            {isLoading && (
-              <div className="flex items-center gap-3">
-                <div
-                  className={`rounded-full bg-primary text-white flex items-center justify-center shrink-0 ${isPage ? "w-8 h-8" : "w-7 h-7"}`}
-                >
-                  <PixelAILogo className={isPage ? "w-5 h-5" : "w-4 h-4"} />
-                </div>
-                <div className="flex items-center gap-2 text-ink-muted text-sm">
-                  <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-ink-muted animate-pulse [animation-delay:-0.3s]" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-ink-muted animate-pulse [animation-delay:-0.15s]" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-ink-muted animate-pulse" />
-                  </span>
-                  <span>กำลังคิด…</span>
-                </div>
-              </div>
-            )}
           </div>
         )}
 

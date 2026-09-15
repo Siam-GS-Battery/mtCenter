@@ -20,6 +20,9 @@ interface AIAssistantDrawerProps {
   /** ชื่อผู้ใช้ปัจจุบัน — แสดงในแผงยืนยันก่อนสร้างใบงาน */
   currentUserName?: string;
   initialPrompt?: string;
+  /** id ของคู่มือที่ initialPrompt มาจาก (ปุ่ม "ถาม AI" บนการ์ดคู่มือ) — ส่งไปกับ
+   * เฉพาะข้อความแรกที่ seed เข้ามาเท่านั้น ไม่ค้างอยู่ตลอด session */
+  initialManualId?: string;
   /**
    * ข้อความที่พร้อมใช้อยู่แล้ว (ไม่ต้องเรียก backend) — ใช้ seed บทสนทนาตรงๆ
    * ผ่าน `chat.hydrate` แทนการส่ง `initialPrompt` ไปถาม AI จริง เมื่อมีค่านี้
@@ -44,6 +47,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
   currentUserRole,
   currentUserName,
   initialPrompt = "",
+  initialManualId,
   seedMessages = null,
   onOpenFullChatPage,
   onAutoCreateWorkOrder,
@@ -60,10 +64,11 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
       return;
     }
     if (initialPrompt && initialPrompt.trim() !== "") {
-      chat.send(initialPrompt);
+      chat.send(initialPrompt, initialManualId);
     }
     // ส่งคำถามตั้งต้นเมื่อเปิดผู้ช่วยพร้อมคำถามจากหน้าจออื่น
-  }, [isOpen, initialPrompt, seedMessages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, initialPrompt, initialManualId, seedMessages]);
 
   useEffect(() => {
     if (!isOpen) return;

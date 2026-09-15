@@ -19,6 +19,16 @@ export interface AiInteractionLogInput {
   mode: "mock" | "live" | "fallback";
   replyChars: number;
   manualCitations?: number;
+  // ฟิลด์เพิ่มเติมสำหรับสังเกตคุณภาพคำตอบ (0026_ai_quality_metrics.sql) — ทั้งหมด
+  // optional โดยเจตนา เพื่อไม่ให้ผู้เรียกเดิม (routes/ai.ts) ต้องแก้เพื่อคอมไพล์ผ่าน
+  provider?: string | null;
+  modelUsed?: string | null;
+  inputTokens?: number | null;
+  outputTokens?: number | null;
+  cacheReadTokens?: number | null;
+  latencyMs?: number | null;
+  manualHitCount?: number | null;
+  fallback?: boolean | null;
 }
 
 // จำกัดความยาว prompt ที่เก็บ — คำถามจริงยาวไม่เกินไม่กี่ร้อยตัวอักษร ค่าที่ยาวกว่านี้
@@ -43,6 +53,14 @@ export async function logAiInteraction(input: AiInteractionLogInput): Promise<nu
         mode: input.mode,
         reply_chars: input.replyChars,
         manual_citations: input.manualCitations ?? 0,
+        provider: input.provider ?? null,
+        model_used: input.modelUsed ?? null,
+        input_tokens: input.inputTokens ?? null,
+        output_tokens: input.outputTokens ?? null,
+        cache_read_tokens: input.cacheReadTokens ?? null,
+        latency_ms: input.latencyMs ?? null,
+        manual_hit_count: input.manualHitCount ?? null,
+        fallback: input.fallback ?? null,
       })
       .select("id")
       .single();

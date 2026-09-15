@@ -76,7 +76,7 @@ const DraftApprovalBadge: React.FC<{ ocrStatus: ManualDoc["ocrStatus"]; markdown
 interface ManualsViewProps {
   /** เครื่องจักรที่กำลังทำงานอยู่ (จาก TopBar) — เปิดใช้ตัวกรองคู่มือเฉพาะรุ่นของเครื่องนี้ */
   activeMachine?: Machine;
-  onAskAI: (prompt: string) => void;
+  onAskAI: (prompt: string, manualId?: string) => void;
   /** เมื่อระบุ จะแสดงปุ่มพาไปหน้าอัปโหลดคู่มือในแบนเนอร์ด้านบน */
   onGoToUpload?: () => void;
   /** เมื่อเป็น true จะแสดงปุ่ม "แก้ไข" และ "ลบ" บนคู่มือแต่ละเล่ม (สิทธิ์วิศวกร/หัวหน้างาน) */
@@ -748,7 +748,11 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
                   <span className="tabular-nums">{doc.uploadDate}</span>
                 </div>
 
-                {doc.aiIndexed && (
+                {/* เดิม gate ด้วย aiIndexed (มีแค่ 4/26 เล่มที่ index embedding สำเร็จ ที่เหลือ
+                    ติด quota ฟรีของ Gemini) แต่ migration 0024 เพิ่มการค้นหาแบบ keyword
+                    บน markdown_content ตรง ๆ แล้ว ทำให้แทบทุกเล่มที่มี markdown ถามด้วย AI
+                    ได้จริง จึงเปลี่ยนมา gate ด้วย hasMarkdown แทน */}
+                {doc.hasMarkdown && (
                   <div className="inline-flex items-center gap-1 text-[13px] text-primary font-semibold">
                     <BadgeCheck className="w-3.5 h-3.5" />
                     <span>ค้นหาด้วย AI ได้</span>
@@ -791,7 +795,8 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
                 <button
                   onClick={() =>
                     onAskAI(
-                      `ช่วยสรุปขั้นตอนสำคัญและตารางวิเคราะห์ปัญหาจากคู่มือ "${doc.title}" สำหรับเครื่องรุ่น ${doc.machineModel}`
+                      `ช่วยสรุปขั้นตอนสำคัญและตารางวิเคราะห์ปัญหาจากคู่มือ "${doc.title}" สำหรับเครื่องรุ่น ${doc.machineModel}`,
+                      doc.id
                     )
                   }
                   className="px-3 py-2.5 rounded-full bg-primary hover:bg-primary-focus text-white text-[13px] font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all shrink-0 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11"
@@ -874,7 +879,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
                   อัปโหลดโดย {selectedDoc.uploadedBy} ·{" "}
                   <span className="tabular-nums">{selectedDoc.uploadDate}</span>
                 </span>
-                {selectedDoc.aiIndexed && (
+                {selectedDoc.hasMarkdown && (
                   <span className="inline-flex items-center gap-1 text-primary font-semibold">
                     <BadgeCheck className="w-3.5 h-3.5" />
                     ค้นหาด้วย AI ได้
@@ -1077,7 +1082,7 @@ export const ManualsView: React.FC<ManualsViewProps> = ({
               )}
               <button
                 onClick={() => {
-                  onAskAI(`ขอขั้นตอนซ่อมและวิเคราะห์ปัญหาจากคู่มือ ${selectedDoc.title}`);
+                  onAskAI(`ขอขั้นตอนซ่อมและวิเคราะห์ปัญหาจากคู่มือ ${selectedDoc.title}`, selectedDoc.id);
                   setSelectedDoc(null);
                 }}
                 className="flex-1 sm:flex-initial px-5 py-2.5 rounded-full bg-primary hover:bg-primary-focus text-white font-semibold text-xs cursor-pointer active:scale-95 transition-all flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-primary-focus/40 min-h-11"

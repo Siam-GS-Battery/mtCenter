@@ -21,10 +21,15 @@
 //   npm run import:manuals -- --only=laser_mark             (case-insensitive substring filter on file path)
 //   npm run import:manuals -- --upload-date=2026-08-01      (override upload_date, default = today)
 //   npm run import:manuals -- --uploaded-by="ชื่อผู้ใช้"     (override uploaded_by)
+//   npm run import:manuals -- --update                      (push edited markdown into existing rows instead of skipping)
 //   npm run import:manuals                                  (LIVE import — writes to Supabase, one row at a time)
 //
 // Idempotent: existing `manuals` rows are matched by exact `title`; a manual
 // whose title already exists is skipped (logged [skip]), so re-running is safe.
+// Pass --update to instead push the catalogued file's current markdown_content
+// (and derived file_size/pages_count) into that existing row. This does NOT
+// touch manual_chunks (the AI search index) — see the warning the script
+// prints when --update touches a row that had already been indexed.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -37,6 +42,7 @@ import { supabase } from "../src/lib/supabase.js";
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes("--dry-run");
+const UPDATE = args.includes("--update");
 
 const onlyArg = args.find((a) => a.startsWith("--only="));
 const ONLY = onlyArg ? onlyArg.slice("--only=".length).trim().toLowerCase() : null;
@@ -380,7 +386,7 @@ interface FileReportEntry {
   fileSizeBytes: number;
   fileSize: string;
   metadataTableConverted: boolean;
-  status: "would-insert" | "inserted" | "skipped-existing" | "FAILED";
+  status: "would-insert" | "inserted" | "skipped-existing" | "would-update" | "updated" | "FAILED";
   error?: string;
 }
 
@@ -391,7 +397,7 @@ const results: FileReportEntry[] = [];
 // ---------------------------------------------------------------------------
 
 async function main() {
-  console.log(`Import starting. dryRun=${DRY_RUN} only=${ONLY ?? "(all files)"} uploadDate=${UPLOAD_DATE} uploadedBy="${UPLOADED_BY}"`);
+  console.log(`Import starting. dryRun=${DRY_RUN} only=${ONLY ?? "(all files)"} update=${UPDATE} uploadDate=${UPLOAD_DATE} uploadedBy="${UPLOADED_BY}"`);
   console.log(`Manual_MD dir: ${MANUAL_MD_DIR}`);
 
   // Verify every catalogued file exists BEFORE doing anything else — fail
@@ -412,16 +418,22 @@ async function main() {
   // Done even in --dry-run so the report accurately reflects what a real run
   // would do; if this fails (env/network), surface the failure rather than
   // silently pretending nothing exists yet.
-  console.log("Fetching existing manuals (id, title) for idempotency check...");
-  const { data: existingRows, error: fetchErr } = await supabase.from("manuals").select("id,title");
+  console.log("Fetching existing manuals (id, title, chunk_count) for idempotency check...");
+  const { data: existingRows, error: fetchErr } = await supabase
+    .from("manuals")
+    .select("id,title,chunk_count");
   if (fetchErr) {
     throw new Error(`Failed to fetch existing manuals titles: ${fetchErr.message}`);
   }
-  const existingTitles = new Set((existingRows ?? []).map((r: { title: string }) => r.title));
-  console.log(`Found ${existingTitles.size} existing manual row(s) in the database.\n`);
+  type ExistingRow = { id: string; title: string; chunk_count: number | null };
+  const existingByTitle = new Map<string, ExistingRow>(
+    (existingRows ?? []).map((r: ExistingRow) => [r.title, r])
+  );
+  console.log(`Found ${existingByTitle.size} existing manual row(s) in the database.\n`);
 
   const toProcess = MANUALS.filter((m) => wants(m.file));
   let failedCount = 0;
+  let staleIndexCount = 0;
 
   for (const m of toProcess) {
     const abs = resolveManualPath(m.file);
@@ -432,7 +444,8 @@ async function main() {
       const fileSizeBytes = fs.statSync(abs).size;
       const fileSize = formatFileSize(fileSizeBytes);
 
-      if (existingTitles.has(m.title)) {
+      const existing = existingByTitle.get(m.title);
+      if (existing && !UPDATE) {
         console.log(`[skip] "${m.title}" (${m.file}) — already exists in manuals table`);
         results.push({
           file: m.file,
@@ -444,6 +457,58 @@ async function main() {
           fileSize,
           metadataTableConverted: converted,
           status: "skipped-existing",
+        });
+        continue;
+      }
+
+      if (existing && UPDATE) {
+        const wasIndexed = existing.chunk_count != null;
+        if (DRY_RUN) {
+          console.log(
+            `[ok]   (dry-run) would update "${m.title}" | id=${existing.id} | pages=${pagesCount} | size=${fileSize} | metadataTableConverted=${converted}`
+          );
+          results.push({
+            file: m.file,
+            title: m.title,
+            machineModel: m.machineModel,
+            category: m.category,
+            pagesCount,
+            fileSizeBytes,
+            fileSize,
+            metadataTableConverted: converted,
+            status: "would-update",
+          });
+          continue;
+        }
+
+        console.log(`Updating "${m.title}" (${m.file}, ${fileSize})...`);
+        const { error: updErr } = await supabase
+          .from("manuals")
+          .update({
+            markdown_content: content,
+            file_size: fileSize,
+            pages_count: pagesCount,
+          })
+          .eq("id", existing.id);
+        if (updErr) throw new Error(updErr.message);
+
+        console.log(`[ok]   "${m.title}" updated (id=${existing.id}).`);
+        if (wasIndexed) {
+          staleIndexCount++;
+          console.warn(
+            `[warn] "${m.title}" (id=${existing.id}) had an existing AI index (chunk_count=${existing.chunk_count}) that is now STALE — markdown_content changed. Rebuild it via POST /api/manuals/${existing.id}/index.`
+          );
+        }
+        results.push({
+          file: m.file,
+          title: m.title,
+          machineModel: m.machineModel,
+          category: m.category,
+          pagesCount,
+          fileSizeBytes,
+          fileSize,
+          metadataTableConverted: converted,
+          status: "updated",
         });
         continue;
       }
@@ -534,6 +599,8 @@ async function main() {
   const inserted = results.filter((r) => r.status === "inserted").length;
   const wouldInsert = results.filter((r) => r.status === "would-insert").length;
   const skipped = results.filter((r) => r.status === "skipped-existing").length;
+  const updated = results.filter((r) => r.status === "updated").length;
+  const wouldUpdate = results.filter((r) => r.status === "would-update").length;
 
   console.log("\n=== Import Summary ===");
   console.log(
@@ -552,9 +619,16 @@ async function main() {
       r.status.padStart(16)
     );
   }
-  console.log(`\nCatalogued: ${MANUALS.length}  Processed: ${toProcess.length}  Inserted: ${inserted}  WouldInsert(dry-run): ${wouldInsert}  Skipped(existing): ${skipped}  Failed: ${failedCount}`);
+  console.log(
+    `\nCatalogued: ${MANUALS.length}  Processed: ${toProcess.length}  Inserted: ${inserted}  WouldInsert(dry-run): ${wouldInsert}  Skipped(existing): ${skipped}  Updated: ${updated}  WouldUpdate(dry-run): ${wouldUpdate}  Failed: ${failedCount}`
+  );
   if (DRY_RUN) {
-    console.log("(dry-run: no DB writes performed; 'would-insert' rows above are what a real run would insert)");
+    console.log("(dry-run: no DB writes performed; 'would-insert'/'would-update' rows above are what a real run would do)");
+  }
+  if (staleIndexCount > 0) {
+    console.log(
+      `\n[warn] ${staleIndexCount} manual(s) updated above had an existing AI index that is now STALE. Rebuild each via POST /api/manuals/:id/index (see [warn] lines above for the affected ids).`
+    );
   }
   console.log(`Report written to ${reportPath}`);
 

@@ -58,4 +58,3 @@ Hr.) พบว่าบอร์ดมีอายุการใช้งาน
 3)Check startup 10 cycle => PASS
 
 ---
-

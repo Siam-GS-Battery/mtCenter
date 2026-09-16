@@ -7,6 +7,7 @@
 | **วิธีสกัดข้อความ** | text layer (embedded) |
 
 ---
+
 ## หน้า 1
 
 ภาพ LD Power Supply (SN : 912121)

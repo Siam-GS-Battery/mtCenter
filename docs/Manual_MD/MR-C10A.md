@@ -7,6 +7,7 @@
 | **วิธีสกัดข้อความ** | OCR ทั้งเล่ม (lang=eng+jpn) |
 
 ---
+
 ## หน้า 1
 
 MITSUBISHI
@@ -432,6 +433,7 @@ of the servo amplifier to the protective earth (PE) of the control box.
 the cables to the terminals one-to-one.
 
 G③Ao o
+
 | a PE terminals ©,
 
 PE terminals
@@ -1185,7 +1187,9 @@ KG) し リフ ロー ate tee 17 |MRRHー- ト ナーー ト | 2 IMRRI| 2 [MRR E
 FP Piet apts 6 [MO ローー ト ーーH 4 |MD 4 [MO
 CO ae 16 |MDHHー キ エゴ ーー 5 [MORM 5 |MOR
 = sig if 515 ロ Plate SD トッ ar が 9 |SHOM 9 [SHO a,
+
 | SG | a | 1 ; ノ ; NPY? Securely connect the
+
 4VDC. トー テニ ーーーーーー て SD ] 11 shield to the ground
 d 0.2A or more plate in the connector.
 an 24VDC + V24| 20
@@ -1370,7 +1374,9 @@ Em
 HOS ee (ee 16 [MDRHー ト っ 5 5 [MOR
 i | 」 」 5 2 ニー ニー ニー こま
 cousvopimia | (i | 8 Patel SD トッ cc ペイ 9 5HD 有 L9 [SHOP | \_Y/
+
 | S6 [a | RP {16/16 XN 1 フー : NP | 7 Securely connect the
+
 」 24VDC, 0.2A or more プー 人 TSD 1 1 NT
 LL 24vDC 4 tM V24[ 20
 = ower
@@ -2101,6 +2107,7 @@ a
 2
 
 |
+
 上
 
 mi
@@ -2287,7 +2294,9 @@ Refer to Section §~ 2-2.
 P I The digital output signal can be forcibly switched on/off. For
 Output signal foroed output ]1 1 1 1 『 I] lmore information, refer to (2) in this section.
 The servo motor can be operated without pulse train input. Dur-
+
 | | Y | fing test operation, speed control servo is provided. :
+
 Test operation mode | ー』 コ The status display values of the droop pulses, cumulative com-
 =~ mand pulses and command pulse frequency do not change.
 For details, refer to (3) in this section.
@@ -2332,6 +2341,7 @@ Z
 / Z
 Input ーー SON
 signals Lit: ON
+
 | mee) Gn) an Cau) -
 
 Output
@@ -2403,6 +2413,7 @@ SET
 dences between segments and signals are as in the output
 
 | ユ
+
 ドーー ク へ /,
 
 ie
@@ -2424,7 +2435,9 @@ mim
 
 IN
 シーー ペ ツーー へ
+
 | (
+
 (LIS
 
 UP
@@ -3055,7 +3068,9 @@ fitted to use the communication function.
 14 | *DMD |Status display selection, alarm history clear: 000 000 to 10Ah
 Used to select the status display shown at power-on.
 0
+
 | “TH Status display at power-on
+
 0: Cumulative feedback pulses (Jower 3 digits)
 1: Cumulative feedback pulses (upper 3 digits)
 2: Servo motor speed
@@ -3968,7 +3983,9 @@ The power supply and its common line are shown below,
 V24
 VS V+
 24VDC+10%
+
 | ⑳ 大
+
 ALM
 ¥ NN PF
 SON
@@ -4062,7 +4079,9 @@ ra Always connect it to
 og Do not connect it directly
 oe to protective earth of contro! box.
 Outer
+
 | Earth plate | box
+
 = Earth
 
 Note: When using the EN Standard-, UL/C-UL Standard-compliant
@@ -4166,6 +4185,7 @@ to a stop. Switch power off in the external sequence. To reset the alarm, remove
 alarm and switch power on.
 
 | 5s or more |
+
 ON
 Main circuit power supply D
 OFF 一 一 /
@@ -4892,7 +4912,9 @@ No. 28 Speed control gain 2
 No. 29 Speed integral compensation
 Adjustment 1
 Step Operation Description
+
 | Set 001 in parameter No. 1. Auto tuning is selected.
+
 Response setting is set to slow response.
 2 Set 001 in parameter No. 24. Machine resonance frequency: 1125Hz
 3 Switch servo on and perform operation several times. Auto tuning is performed.
@@ -5049,7 +5071,9 @@ Reverse rotation pulse train NP LPLALEL 000
 o | Pulse train +
 Z si NP 001
 gn H | L
+
 | 本
+
 A phase pulse train PP | | |
 B phase pulse train NP | | | | 002
 
@@ -5068,6 +5092,7 @@ Note: “4 indicate the timings at which the command pulses are imported.
 Connect as shown below: Servo amplifier
 
 | OPC
+
 PP About 2kQ.
 
 About 2kQ
@@ -5093,6 +5118,7 @@ pulse train 1
 Connect as shown below: Servo amplifier
 
 | < イコ [ro
+
 SSE
 
 a し Js
@@ -5116,6 +5142,7 @@ Pe_ | | | | | |
 |
 
 | Reverse rotaion | | | |
+
 pulse train
 
 me LTLTLT
@@ -5244,7 +5271,9 @@ S ・ SON
 ervo-on ( ) OFF |
 
 Alarm . ie ,
+
 | | 25ms or less | | 10ms or less 10ms or less
+
 Ready (RD) OFF |
 
 c. Electromagnetic brake interlock
@@ -5391,7 +5420,9 @@ Forward rotation ON
 start (ST1) OFF
 Reverse rotation ; ON |
 start (ST2) OFF
+
 | | 2ms or more
+
 Speed :
 。 ON
 Speed selection (DI1) command (1 Speed
@@ -5443,6 +5474,7 @@ O00 90
 
 | Encoder cable
 | 10m (32ft) or less CN2 ーー
+
 24VDC_
 
 power ょ レー CN1 Encoder
@@ -5697,7 +5729,9 @@ Deceleration torque [%]
 
 ) Input power supply voitage Note: If the input power supply voltage may become higher
 -*-MR-C40A 200VAC than the power supply voltage indicated in this graph,
+
 | -m- MR-C40A 230VAC reduce the load inertia ratio or use the regenerative
+
 0 Ae +, 」 7 brake option.
 3 4
 Load Inertia moment ratio GDL?/GDm?
@@ -5835,11 +5869,15 @@ C oH shown below. -
 や
 -(é}- a Panel
 ] ! | (> ao
+
 |_| | 1 4O;- O1- レ
+
 1 ン Ms screw
 CW x Eh. _\. uw iH 4
 ] * _ @ A. Te
+
 |} an ( @
+
 cc ln i + Lj Lt レ
 A D
 1 |
@@ -5875,8 +5913,10 @@ Servo motor Servo amplifier 9)
 fl 5) Positioning
 CN1 ーー Us unit
 1) 2) i
+
 | i
 | EE に] [ |
+
 vf :
 3) - 3) CN3 4) ti Operation
 ヒー ゴ い - ro る panel
@@ -5951,6 +5991,7 @@ indicated here.
 33.0 (1.30
 
 : LU
+
 | 29.7 (1.17) _|
 
 [Unit: mm}
@@ -5967,7 +6008,9 @@ Mt s | で
 』 rigs ーー エコーー バ |
 14.0 aS ace >.
 pa 22.0 (0.87) (0.55) | Logo, ete. are 8 gl 7 る 「・! 人 @| 1 | S|
+
 | indicated here. + by LL: = ~ i ら
+
 co ロ “ele -
 て a anos}
 ns ' a= 【 4.2 (0.17)
@@ -6016,6 +6059,7 @@ ground plate securely as shown below.
 a. Termination of external conductor
 
 か エマ 古
+
 |
 
 External Sheath Core External Sheath
@@ -6107,7 +6151,9 @@ NP. 13 B4 [ 7
 NG 14 A4 ナ 8
 PP 4 B5 f 9
 PG 15 A5 + 10
+
 | SG 5 AS f 12
+
 CR 16 B7 ナ 13
 LSN 6 A7 f 14
 LSP 17 BB + 15
@@ -6157,7 +6203,9 @@ Personal computer side RS232Coptionunit Personal computer side RS232C option uni
 に ーーーーー Plate| FG に ーーーーー] Plate| FG
 テーーーーーーー ラ ーーーーーー > を 、 セーーーーーーー テ ーーーーーー= 人 を
 SD 2 [ 2 |RXD TXD | 3 [ 2 | RXD
+
 | a 1 LG l 4 1 LG
+
 RD 3 f 12 | TXD RXD | 2 f 12 | TXD
 SG 7 ブ 11 | LG GND 5 ゴ 11 | LG
 RS 4 ーー ニー ニーーーー こ ーー ニーーーーー っ ーー RTS 了 ーー ニーーーーーーーーー ニ ーー ニー ニー ミー"
@@ -6186,6 +6234,7 @@ CTBLO5SM) as a set. A connection example is shown below:
 |
 |
 |
+
 Always use the junction terminal block (MR-TB20) with the junction terminal block cable(MR-
 
 Servo amplifier
@@ -6362,13 +6411,17 @@ side off.
 
 95 (3.74) 100 (3.94)
 ry s90nn
+
 | i) “AB
+
 [ 1
 ! :
 1
 前 | ib Po poe 5 a
 loom! 2.8 (0.10) | 6 (0.24) | iS,
+
 | po レーーーーー J a
+
 i ro iRSNNh
 ンーー… ヴー ! [es °
 9 | ンー ニキ ーTT 3 _-
@@ -6376,7 +6429,9 @@ me OE Lio ed ie a
 Orr Bars g = / ra ーー ュー… 4 2
 ==" = [- pees ae a ng
 ane 7; o:6 ー
+
 | 40 [fram Sate 105 (4.13)『1 (0.04)
+
 (1.57) j ;
 
 ---
@@ -6442,19 +6497,26 @@ Outline drawing and connection diagram of the power factor improving reactor
 
 PLOT 3 IUnit mm]
 ー
+
 | | Servo amplifier
+
 to NFB FR-BAL
 +
 エ ーー コ ョ
 ー?| 5 一 6 | Li
 Power 1
+
 | | | | supply 一 一 つの の 〇 ーーー 〇 1z
+
 ーー Ti Z
+
 | W | D1+5 00s
+
 Mounting screw - L
 
 aya hi Servo Dimensions [mm (in)] Mounting|Terminal Weight
 SS、 Amplifier Model screw screw [k lb)
+
 | RI SIYTz P W Wit H D D1 C size size 9
 
 し J し
@@ -6633,13 +6695,17 @@ DE
 アーーーーーーーーーーーーーーー ーーーーーーーーーーーーーーーーーーー| ーーーーーーーーー こ 寺 ーーーーーーー ー ヽ
 i ‘
 :7) 7)!
+
 | 7) 2)
+
 ァ ーーーーーーーーー]-ー ペーーーーーーーーーー + ーー 」
 1 H a -J Sensor
 1 H ! | ower
 1 ! 1) supply
 0 0 Y Servo ! !
+
 | on 1 ~~ 2 amplifier ! ! ta
+
 nstru- 1 ょ ご !
 ment Recent So ! | tg)
 , Pe
@@ -6855,7 +6921,9 @@ mola | | we ほお ー ャ 『
 Nn —
 に 2 : a. 2
 m | 4 」 て : 1
+
 |
+
 6 (0.24) | 22 (0.87)
 一 |
 M4 screw*
@@ -7988,9 +8056,13 @@ This chapter gives the specifications of the servo.
 SELECTION -
 
 INTRODUCTION CHAPTER 1
+
 | OPERATION CHAPTER 2
+
 WIRING CHAPTER 3
+
 | INSTALLATION CHAPTER 4
+
 ADJUSTMENTS AND APPLICATION OPERATIONS |CHAPTER 5
 OPTIONS AND AUXILIARY EQUIPMENT CHAPTER 6
 MAINTENANCE AND INSPECTION CHAPTER 7
@@ -8066,6 +8138,7 @@ Item 033 053 | 13 23 43
 Corresponding servo amplifier model MR-C10A (1) MR-G20A (1) MR-C40A
 Continuous Rated output{W] 30 50 100 200 400
 running duty [Nrm] 0.095 0.16 0,32 0.64 1.27
+
 | (Note 2} Rated torque ー-
 
 foz-in] 13.45 22.66 45.32 90.63 184.1
@@ -8357,7 +8430,9 @@ MR-C10A(1), MR-C20A(1) °
 
 $5 Instalation hole 95 (3,74) 100 (3.94)
 R 5 (0.20) 5 (0.20)
+
 | 0 人 0
+
 1 :
 TE1 T
 icone ー A ーー
@@ -8369,6 +8444,7 @@ apr ae “L..ti pool 000000000000
 S 5 (0.20) 8 | yb
 7 ar le
 Cl
+
 |
 
 80 (3.15)
@@ -8442,6 +8518,7 @@ Screw size: M4:
 100 (3.94)
 
 /
+
 |
 
 o
@@ -8558,12 +8635,16 @@ Motor plate 5 2.5 2- の 4.5
 i (Opposite side) ンー
 i Z \
 Motor plate
+
 | a] WA で te x
 | 4 oS 4
+
 Bottom Sr に
 1 ! JI 上 NN
 Bottom Top 9 、] Bo
+
 |
+
 ! ©
 a * H wy ょ
 三男
@@ -8598,7 +8679,9 @@ Top Top 3 NJ くる
 Bottom rs i oo
 Up | tees を S
 Caution plate 10.6 9.9 ml x U |
+
 | [25.2 ーー DPMHT
+
 ーー = 4
 20
 Power supply lead 4-AWG19 0.3m
@@ -8672,7 +8755,9 @@ Pe 内
 ! の | o
 Top 1 > > SS
 Caution plate ご KL
+
 | | 25.2 mf 。。 中 £9 q
+
 = UHHU
 20
 Brake lead Power supply lead 4-AWG19 0.3m
@@ -8831,7 +8916,9 @@ L 74 Os0
 O60 10; 8 45° 4-69
 Motor plate 30 35 |
 (Opposite side) 1 Il レ し
+
 | ; VE
+
 Motor plate 2, ン f } i 8 \
 i £ <T 1、 の % ‘we
 Bottom Bottom ras 還 i)
@@ -9120,7 +9207,9 @@ Bottom Bottom dig 8 5 ト
 Top Bottom 1 Top SiSESS
 SL Top Ge に iQ
 Caution plate LE fiz)
+
 | | 252 23 EF 3.9 KL = N ーー デ ッ
+
 Loe
 ピコ HU mae denn 8
 20
@@ -9158,7 +9247,9 @@ Motor plate |
 ーー ング
 Motor plate fa / sw
 Ns z の ow
+
 |
+
 Bottom Boltom Zu) x| 5 の の] \
 Top | Boltom Top 319 SZ)
 !
@@ -9184,7 +9275,9 @@ HC-PQ13G2 100 BK1-09B-01MEKA 179 0,072 3min.max. 1.8
 HC-PQ13G2 100 BK2-20B-01MEKA 1/20 0.122 3min.max. 3.0
 HC-PQ13G2 100 . BK2-29B-01MEKA 1/29 0.096 3min.max. 3.0 [Unit: mm]
 Model Output Variable Dimensions — Reduction
+
 |LAitgliclLpliElFlLeluHlLK| L {LR ]kKL{ WZ] a] sj P Ratio
+
 HC-PQ13G2 100 80 | 65 | 95 | 70 6 48 8 60 | 23 | 1345/55 | 93 | 66} 25 | 16 | M4 8 15
 HC-PQ13G2 100 80 | 65 | 95 } 70 6 48 8 60 | 23 | 150.5] 55 | 109) 66] 25 | 16 | M4 8 149
 HC-PQ13G2 100 100] 80 | 115] 85 6 65 | 10 | 74 | 33 | 156.5] 75 | 115] 66] 35 | 20 | M5} 10 4/20
@@ -9211,7 +9304,9 @@ L LR HLD
 _/ a % rh
 ©
 Motor plate に こ 1 L | あ . \
+
 || る | we
+
 Fd ° に 、 See
 Bottom Bottom bar) pert (iG ・
 Tk ME
@@ -9539,20 +9634,26 @@ Output | Variable Dimensions | inertia Moment | Weight
 Model L KL J lx10*kgam21 [kg]
 HC-PQ033-UE 30 73.5 31.5 0.014 0.4
 HC-PQ053-UE 50 79.5 37.5 0.019 0.5
+
 | HC-PQ13-UE 100 94.5 52.5 0.03 0.6
+
 1
+
 | 98 30 6Q
 | 。 4- み 5.8
 | TUV plate ・ Motor plate ; 7 3 45°
 | {Opposite side} |
 | Meter plate
+
 plate \ | レ
 。 \ Bottom Ss 1 2 eg 7
 cup poem も = 1 や
 一 中 ご ー !
 Bottom 39 mal V tL る S
 - 1 Top! Bottom | に
+
 | ー ル エ - ン し
+
 ! Top | る | H
 Top —s=—— 1 ilxt | BW hoo \ 、
 に ッ 】
@@ -9771,7 +9872,9 @@ i 4.181 rm 012.362.
 Motor plate 0.276] , 0.118 Ao
 {Opposite side) 460.228
 Motor plate teal 7 1 を + 2)
+
 | @
+
 oO
 / | |
 Bottom Bottom 8 「N
@@ -9852,7 +9955,9 @@ Bottom Bottom 9 「N
 Top Top る NJ Bo > }
 Bottom 3 3
 ba) し ( Top ー | | で > で
+
 | fo ° KL ーー。
+
 Caution plate TI] 0.447 で づ 0.39 :
 1 6.992 2 264 0 we
 - 0.787
@@ -9903,7 +10008,9 @@ Top | Bottom 8 | oP sis/a
 HOP f =| 1 き
 ルー 1
 Caution plate / て
+
 | f 0.992 0,336 939 KL し ー」
+
 上 は し i
 im LOY) M4 threads,
 0.787 \ depth 0.315
@@ -9936,7 +10043,9 @@ Bottom Bottom S| Sl S
 3 | 8
 Top Bottom Had 1 Top PSE
 * =
+
 | Top ji = 2
+
 て t
 Caution plate a ht
 中 0.336 0.39
@@ -9983,7 +10092,9 @@ for Gi
 Top ョ ーー ニーー] fe) me [| 3
 Bottom ey ]
 6 Top f|- て ] |
+
 | 0.417 8
+
 Caution plate iW 0.992 «| 0,39) KL
 = . ; u U pe (breads,
 depth 0.472
@@ -10262,7 +10373,9 @@ For forward rotation command INN
 8.78 3.54 03.94
 2.362 Motor plate 0.38] , 0.39 4-6 0.354 の <・
 Motor plate (Opposite side) 0.512, 0.63 1.97
+
 |Z m=
+
 S rsx] | 1 四
 Et 1 Lt
 Bottom Botlom a | 」 5 2 き
@@ -10609,7 +10722,9 @@ For forward rotation command
 “Rotation direction"
 
 LR
+
 | - tél, te ニン ーー
+
 12.362 Motor piate Lk Q is
 {Opposite side) レ
 Motor plate = ON
@@ -10785,7 +10900,9 @@ TUV plate
 Motor plate {, \ Bollom
 PP
 cou] PETS
+
 | Top
+
 Top . ig
 
 4.843
@@ -10850,11 +10967,15 @@ Motor plate 0.197 0.088
 2
 Boliom ol 4
 Top S35
+
 | ーー ー ーー Betlom S
+
 1 ; 19 = マ Top 8
 1 オーー N Vring
 “tov plate -
+
 | KL V-10A
+
 0.39 敵 YUL
 Brake iead Power supply lead 4-AWG19 11.8in 9797
 2-0.3 11.8in. (With end -insulated round '
@@ -10926,7 +11047,9 @@ LU [-0.992 LJ Tiss
 . / Power supply lead 4-AWG1¢ 14.8in
 Encoder cable 11.8in
 (With end -insulated round
+
 | aa Brake lead 2-0.37 11.8in . crimping terminal 1.25-4)
+
 (With end -insulated round Red ‘Phase U
 ie oa — crimping terminal 1.25-4) White ‘Phase V
 mie - Black :Phase W
@@ -11080,11 +11203,15 @@ With Key D Cut L Cut
 27 (1.06) に 3 さ
 トー ドー QK g 26.5 (1) ご 1 (0.04)
 F | (0-79) || 3 (0.12) eo a 「 1 fe" = sp
+
 | ~~ 5 ーーー]
+
 is 5 a — | oSh6 $14h6 (0.55)
 wet ae s 「 La 和 -
 —s. ご
+
 | -£.@-}--4
+
 AY Capacity Variable Dimensions
 a! 814h6 (90.55) [WI R QK S
 M4x0.7 screw depth 15 25 20.5 8
@@ -11686,7 +11813,9 @@ When rotary shaft and cylinder W o> 2
 shaft areoff R Jo = O+8RD eee (11-23)
 Rotary shaft
 2 2
+
 | R ee ーー 間際 (11-24)
+
 Square b W : Square block weight [Kg]
 block | Nb a, b, R : Left diagram [cm]
 Rotary shaft
@@ -11704,7 +11833,9 @@ D 2
 Object that \ ツ
 is hung ト つ Servo Jp : Pulley inertia [kg-cm*]
 with pulley motor D : Pulley diameter [cm]
+
 | W_: Object weight [kg]
+
 W
 ・ N 2 N 2
 Js LoadB Js Jus Jit + (dattdzztda) fo? | 4 (Jortde) Foe | ee (11-27)
@@ -11756,6 +11887,7 @@ Creep speed Vs
 Zero pulse signal ON 7 OFF
 
 LTTHT7 本 LJ
+
 |
 
 Considering the variations of the actuator signal, adjust
@@ -11876,11 +12008,15 @@ Movement amount 2 = 400[mm]
 77777777777 7 の 77Z 人 7 し 。
 Lt Positioning time te = 1[s] or less
 Servo motor = Number of feeds 40[times/min.]
+
 | (Operation cycle t =1.5[s]
+
 Gear ratio 5:8 Gear ratio n = 8/5
 Servo
 amplifier Moving part weight W = 60[kg]
+
 | Pulse train 昌利 し Drive system efficiency n =0.8
+
 EX-1GM Friction coefficient uw =0.2
 Ball screw lead Po = 16[mm]
 Ball screw diameter 20[mm]
@@ -12188,7 +12324,9 @@ Black ‘Phase W
 Greenfyellow :Earth
 (Unit: mm]
 Model Output | Variable Dimensions | Inertia Moment | Weight
+
 | L KL J pto*kgem?] {kg]
+
 HC-PQ033N 30 70.5 28.5 0,014 0.4
 HC-PQ053N 50 76.5 34.5 0.019 0.5
 HC-PQ13N 100 91.5 49.5 0.030 0.6
@@ -12304,7 +12442,9 @@ HC-PQ053NB 50 104.5 34.5 0.32 0.022 0.7
 HC-PQ13NB 100 119.5 49.5 0.32 0.032 09
 Motor plate 1 L 30
 O60 713
+
 | Motor plate . TT
+
 Av - さ 4 (Opposite side} =
 ta
 . \ + ©
@@ -12316,7 +12456,9 @@ i Top : っ
 Ru i ra
 6
 B| le ー
+
 | し oan
+
 へ て LTTY x
 20 Caution plate だ つ
 25.2 \ Caution
@@ -12405,14 +12547,18 @@ O60 71 3 3・
 TUV plate : Motor plate j
 し \ ] ] her) (Opposite side) C7] - 「
 / i 1 M4 / &
+
 | lp し a \
+
 + Bottom + OF ©
 3 9 ヒーm Tl wo & 7 9b
 meV“ | UB  -LL-_ 248 く 2
 Botton a ep _ | Bottom H | |
 Top ! ‘7 Top 3
 4
+
 | i lalg へ Ving る
+
 di r a .
 ww ノ に 1 F 2 V-16A 、 > ッ
 て / Zz = a. BY
@@ -12460,7 +12606,9 @@ LC (Opposite side) 7 、
 oe 7 =| 77, oo:
 [2 Fels] a sl8 TENS
 Top Bottom | A
+
 |
+
 Ler | s
 IN vring 5
 oo V ring >
@@ -12485,7 +12633,9 @@ HC-PQ43NB-UE | 400 155 81.1 13 0.197 2.3
 0157.6 4-652
 O40 L 20
 Motor piate ] Motor plate 5 2.5
+
 | (Opposite side) \ - 日
+
 stoma =| MP tia 3 10
 o mee 「 ; a
 H 3
@@ -12967,7 +13117,9 @@ Top Top に 1 al
 i
 7 | wl w
 7 8 3 —
+
 | BB) . \
+
 ‘a ~P-| 9.9
 \ | on
 . Encoder cable 0.3m KL
@@ -13064,7 +13216,9 @@ H85 4-@6.5
 Motor plate L 37 70 エ 0.35 a
 uso woh?
 - Motor plate
+
 | (Opposite side) ーー
+
 +ー モ =
 wad. s g
 Bottom - . Bottom | 2 ら
@@ -13072,7 +13226,9 @@ Top Top に 4 8
 生 / 9.9 4
 ; DU KL 画
 Caution plate / 20
+
 | | t,25.2 Power supply lead 4-AWG19 0.3m
+
 Encoder Brake cable 2-0.37 0.3m (With end -insulated round
 cable 0.3m (With end -insulated round
 
@@ -13431,7 +13587,9 @@ loo 4 る Q
 lie Fe A
 Z Ci
 に | 0.39
+
 | / ゴゴ
+
 i / Kt
 Caution plate 0.787 rf
 0.992 Power supply lead 4-AWG19 11.8in
@@ -13505,13 +13663,17 @@ S| キー る Je < ンー =
 Bottom Top Boitom_ } 3 NN 9
 Top Top } S “TT g
 L_TP 」 8 Wo に
+
 | 。 Vring で N
+
 =e ロ VA
 1 . 1 .
 ~O- ~OH y 0.39 KL ‘> a Ly
 \ 1_/ | cS N i Y 7
 0.787 に =
+
 | | 0.992 Power supply lead 4-AWG19 11.8in
+
 - (With end -insulated round
 Encoder cable 11.8in crimping terminal 1.25-4)
 Red ‘Phase U
@@ -13576,7 +13738,9 @@ TUV plate Motor plate
 \ | {Opposite side) =
 Bottom i 1 H 8
 ordux [oe H a io x
+
 | 49 Fal マ HH | | eae る 8
+
 Top : Bottom } 3 g
 + N 一
 i op } 8 8
@@ -13584,7 +13748,9 @@ i op } 8 8
 N に |
 ! Qo th B=)
 19 Hl
+
 | \ Chr i
+
 dy \ Vring 1 O74
 Eat 1 フ V_16A ーー ロ
 0.787 | + \ Caution plate [am . _
@@ -13722,7 +13888,9 @@ Pulse train input interface DI-2 [Open collector system]
 * Interface example e Input pulse specification
 
 Servo amplifier to tHL
+
 | OPC Max. input pulse
+
 frequency 200kpps —§_ go a
 About 1502 P 10%
 te |} tLH tF
@@ -13749,7 +13917,9 @@ The power supply and its common line are shown below.
 V24 ーー
 〇 |
 V5 V+ |
+
 | て - — ro e 内
+
 5VDC+5% AM RA) 六 T
 NN
 SON vv “SS PF

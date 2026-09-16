@@ -7,6 +7,7 @@
 | **วิธีสกัดข้อความ** | text layer (embedded) |
 
 ---
+
 ## หน้า 1
 
 LD Power Supply BWD2 09/02/24

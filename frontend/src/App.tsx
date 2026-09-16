@@ -930,6 +930,11 @@ export default function App() {
               currentUserName={currentUser.name}
               onUpdateWorkOrder={handleUpdateWorkOrder}
               onApproveWorkOrder={handleApproveWorkOrder}
+              onDeleteWorkOrder={handleDeleteWorkOrder}
+              machines={machines}
+              spareParts={spareParts}
+              technicians={technicians}
+              currentUser={currentUser}
               onAskAI={handleAskAIWithPrompt}
               onStockChanged={() => setReloadToken((t) => t + 1)}
             />

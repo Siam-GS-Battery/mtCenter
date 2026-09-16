@@ -7,46 +7,47 @@
 | **วิธีสกัดข้อความ** | text layer (embedded) |
 
 ---
+
 ## หน้า 1
 
 8/1/2022
 
 
-    —
-    Basic Programming
-    OmniCore/RobotWare 7 - Presentation
+—
+Basic Programming
+OmniCore/RobotWare 7 - Presentation
 
 
 1
 
 
-    —
-    Table of contents
+—
+Table of contents
 
-    ■   Health and Safety
-    ■   Introduction to OmniCore and ABB Robots
-    ■   Introduction to the FlexPendant
-    ■   Jogging
-    ■   Programming Basic Movements
-    ■   RobotStudio - RAPID Editor
-    ■   Program Structure
-    ■   Handling Inputs and Outputs
-    ■   I/O Instructions
-    ■   Revolution Counters
-    ■   Tools
-    ■   Work Objects
-    ■   Saving Data
-    ■   Virtual Controller
-    ■   Assessment Exercise - Programming: Draw Shapes
-    ■   Basic Functions
-    ■   Assessment Exercise - Programming: Pick & Place
-    ■   Basic Instructions and Program Logic
-    ■   Creating Custom Cards and Dashboards
-    ■   Add a Digital Input/Output Signal
+■   Health and Safety
+■   Introduction to OmniCore and ABB Robots
+■   Introduction to the FlexPendant
+■   Jogging
+■   Programming Basic Movements
+■   RobotStudio - RAPID Editor
+■   Program Structure
+■   Handling Inputs and Outputs
+■   I/O Instructions
+■   Revolution Counters
+■   Tools
+■   Work Objects
+■   Saving Data
+■   Virtual Controller
+■   Assessment Exercise - Programming: Draw Shapes
+■   Basic Functions
+■   Assessment Exercise - Programming: Pick & Place
+■   Basic Instructions and Program Logic
+■   Creating Custom Cards and Dashboards
+■   Add a Digital Input/Output Signal
 
 
-    August 1, 2022     Slide 2   OmniCore - Basic Programming
-                                                                       1
+August 1, 2022     Slide 2   OmniCore - Basic Programming
+   1
 2
 
 ---
@@ -56,26 +57,26 @@
 8/1/2022
 
 
-    —
-    Health and Safety
+—
+Health and Safety
 
 
 3
 
 
-    —
-    Health and Safety
-    Objectives
+—
+Health and Safety
+Objectives
 
 
-    After this chapter you should be able to:
-    – Participate in all course activities safely
-    – Safely evacuate the premises in case of fire or other emergency
-    – Describe what happens to the robot when brake release is used
+After this chapter you should be able to:
+– Participate in all course activities safely
+– Safely evacuate the premises in case of fire or other emergency
+– Describe what happens to the robot when brake release is used
 
 
-    August 1, 2022    Slide 4   OmniCore - Basic Programming
-                                                                               2
+August 1, 2022    Slide 4   OmniCore - Basic Programming
+   2
 4
 
 ---
@@ -85,45 +86,45 @@
 8/1/2022
 
 
-    —
-    Health and Safety
-    Course Safety
+—
+Health and Safety
+Course Safety
 
 
-    For the duration of this course, please:
-    – Pay attention to the trainer
-    – Report any unsafe behavior to the trainer
-    – Ask for help if you are unsure how to perform a task
-    – Do not perform any task that you feel is unsafe; talk to your trainer for reassurance
+For the duration of this course, please:
+– Pay attention to the trainer
+– Report any unsafe behavior to the trainer
+– Ask for help if you are unsure how to perform a task
+– Do not perform any task that you feel is unsafe; talk to your trainer for reassurance
 
 
-                                                                 ALWAYS put safety first!
+ALWAYS put safety first!
 
 
-    August 1, 2022      Slide 5   OmniCore - Basic Programming
+August 1, 2022      Slide 5   OmniCore - Basic Programming
 
 
 5
 
 
-    —
-    Health and Safety
-    Local Safety
+—
+Health and Safety
+Local Safety
 
 
-    In case of emergency
-    – Fire exits/escape routes
-    – Rallying point
-    – First aid kit
-    – Emergency stops
-    – (Heart starter)
+In case of emergency
+– Fire exits/escape routes
+– Rallying point
+– First aid kit
+– Emergency stops
+– (Heart starter)
 
 
-                                                                 ALWAYS put safety first!
+ALWAYS put safety first!
 
 
-    August 1, 2022      Slide 6   OmniCore - Basic Programming
-                                                                                                     3
+August 1, 2022      Slide 6   OmniCore - Basic Programming
+   3
 6
 
 ---
@@ -133,44 +134,44 @@
 8/1/2022
 
 
-    —
-    Health and Safety
-    Safety risks when working with robots
+—
+Health and Safety
+Safety risks when working with robots
 
 
-    – Always set the robot to manual before entering the robot cell
-    – Always bring the FlexPendant along when entering the safeguarded space, preventing people outside the robot cell from operating the
-      robot.
-    – Make sure any rotating tools, such as milling cutters or saws, are stopped before approaching the robot.
-    – Watch out for hot surfaces, both workpieces and the robot’s motors can become very hot.
-    – Be careful when opening and closing grippers; make sure the workpiece is in a secure position before opening the grip tool.
-    – Keep away from hydraulic, pneumatic and live electric parts. Even with power off, the residual energy can be very dangerous.
+– Always set the robot to manual before entering the robot cell
+– Always bring the FlexPendant along when entering the safeguarded space, preventing people outside the robot cell from operating the
+  robot.
+– Make sure any rotating tools, such as milling cutters or saws, are stopped before approaching the robot.
+– Watch out for hot surfaces, both workpieces and the robot’s motors can become very hot.
+– Be careful when opening and closing grippers; make sure the workpiece is in a secure position before opening the grip tool.
+– Keep away from hydraulic, pneumatic and live electric parts. Even with power off, the residual energy can be very dangerous.
 
 
-                                   Be careful! Robots may perform unexpected and irrational movements!
+Be careful! Robots may perform unexpected and irrational movements!
 
 
-    August 1, 2022      Slide 7   OmniCore - Basic Programming
+August 1, 2022      Slide 7   OmniCore - Basic Programming
 
 
 7
 
 
-    —
-    Health and Safety
-    Safety Stops
+—
+Health and Safety
+Safety Stops
 
 
-    External Safeguards                                                                          Danger!
-    – Emergency stops                                                                            When a stop is triggered the braking
-    – Door interlocks                                                                            distance of a robot is heavily affected by
-                                                                                                 the robot’s current speed and load
-    – Light curtains
-    – Safety mats
+External Safeguards                                                                          Danger!
+– Emergency stops                                                                            When a stop is triggered the braking
+– Door interlocks                                                                            distance of a robot is heavily affected by
+   the robot’s current speed and load
+– Light curtains
+– Safety mats
 
 
-    August 1, 2022      Slide 8   OmniCore - Basic Programming
-                                                                                                                                                     4
+August 1, 2022      Slide 8   OmniCore - Basic Programming
+   4
 8
 
 ---
@@ -180,53 +181,53 @@
 8/1/2022
 
 
-     —
-     Health and Safety
-     Brake Release
+—
+Health and Safety
+Brake Release
 
 
-     Important                                             IRB 1200 Brake Release     IRB 6700 Brake Release
-     – All axes have mechanical brakes
-     – Brake release disable brakes
-     – Does not work in case of power failure
-     – Robots with counter weights or
-       balancing cylinders may move upward
+Important                                             IRB 1200 Brake Release     IRB 6700 Brake Release
+– All axes have mechanical brakes
+– Brake release disable brakes
+– Does not work in case of power failure
+– Robots with counter weights or
+  balancing cylinders may move upward
 
 
-     Pressing brake release will cause axes to
-     give way to gravitational force!
+Pressing brake release will cause axes to
+give way to gravitational force!
 
 
-                          Pressing brake release to loosen someone that is stuck may cause further damage!
+Pressing brake release to loosen someone that is stuck may cause further damage!
 
 
-     August 1, 2022   Slide 9    OmniCore - Basic Programming
+August 1, 2022   Slide 9    OmniCore - Basic Programming
 
 
 9
 
 
-     —
-     Health and Safety
-     Safety Questions
+—
+Health and Safety
+Safety Questions
 
 
-     – What operating mode should be active when entering the robot
-       cell?
+– What operating mode should be active when entering the robot
+  cell?
 
 
-     – What should you do if someone is acting in an unsafe manner?
+– What should you do if someone is acting in an unsafe manner?
 
 
-     – What happens if the brake release button for axis 3 is pushed?
+– What happens if the brake release button for axis 3 is pushed?
 
 
-     – Do you feel adequately informed about how to act in case of an
-       emergency?
+– Do you feel adequately informed about how to act in case of an
+  emergency?
 
 
-     August 1, 2022   Slide 10   OmniCore - Basic Programming
-                                                                                                                      5
+August 1, 2022   Slide 10   OmniCore - Basic Programming
+   5
 10
 
 ---
@@ -236,26 +237,26 @@
 8/1/2022
 
 
-     —
-     Introduction to OmniCore and ABB Robots
+—
+Introduction to OmniCore and ABB Robots
 
 
 11
 
 
-     —
-     Introduction to OmniCore and ABB Robots
-     Objectives
+—
+Introduction to OmniCore and ABB Robots
+Objectives
 
 
-     After this chapter you should be able to:
-     – Explain what a controller and manipulator is
-     – Explain what an axis is and point them out on a robot
-     – Name the two most common operating modes for an ABB robot
+After this chapter you should be able to:
+– Explain what a controller and manipulator is
+– Explain what an axis is and point them out on a robot
+– Name the two most common operating modes for an ABB robot
 
 
-     August 1, 2022   Slide 12   OmniCore - Basic Programming
-                                                                          6
+August 1, 2022   Slide 12   OmniCore - Basic Programming
+   6
 12
 
 ---
@@ -265,27 +266,27 @@
 8/1/2022
 
 
-     —
-     Introduction to OmniCore and ABB Robots
-     The Manipulator
+—
+Introduction to OmniCore and ABB Robots
+The Manipulator
 
 
-     August 1, 2022   Slide 13   OmniCore - Basic Programming
+August 1, 2022   Slide 13   OmniCore - Basic Programming
 
 
 13
 
 
-     —
-     Introduction to OmniCore and ABB Robots
-     The Controller
+—
+Introduction to OmniCore and ABB Robots
+The Controller
 
 
-     IRC5 Single Controller (5th gen)                           OmniCore C30 Controller (6th gen)
+IRC5 Single Controller (5th gen)                           OmniCore C30 Controller (6th gen)
 
 
-     August 1, 2022   Slide 14   OmniCore - Basic Programming
-                                                                                                           7
+August 1, 2022   Slide 14   OmniCore - Basic Programming
+   7
 14
 
 ---
@@ -295,40 +296,40 @@
 8/1/2022
 
 
-     —
-     Introduction to OmniCore and ABB Robots
-     Operating Modes
+—
+Introduction to OmniCore and ABB Robots
+Operating Modes
 
 
-     Manual                                                  Automatic                               Manual Full Speed
-     – Test programs                                         – Normal production                     – Use with CAUTION, dangerous operating
-     – Max 250 mm/s speed limit                              – Operate at full speed                   mode!
+Manual                                                  Automatic                               Manual Full Speed
+– Test programs                                         – Normal production                     – Use with CAUTION, dangerous operating
+– Max 250 mm/s speed limit                              – Operate at full speed                   mode!
 
-     – No force limit                                        – No enabling device                    – Ignores Auto stop; can run programs at
-                                                                                                       full speed with personnel inside cell
-     – Requires operator to hold enabling                    – No personnel inside cell
-       device                                                                                        – Requires operator to hold enabling
-                                                                                                       device and start button
-     – Jog robot
-                                                                                                     – Cannot be used for jogging
+– No force limit                                        – No enabling device                    – Ignores Auto stop; can run programs at
+   full speed with personnel inside cell
+– Requires operator to hold enabling                    – No personnel inside cell
+  device                                                                                        – Requires operator to hold enabling
+   device and start button
+– Jog robot
+   – Cannot be used for jogging
 
 
-     August 1, 2022     Slide 15   OmniCore - Basic Programming
+August 1, 2022     Slide 15   OmniCore - Basic Programming
 
 
 15
 
 
-     —
-     Introduction to OmniCore and ABB Robots
-     Connecting to the Controller
+—
+Introduction to OmniCore and ABB Robots
+Connecting to the Controller
 
 
-     Flexpendant                                                                       RobotStudio
+Flexpendant                                                                       RobotStudio
 
 
-     August 1, 2022     Slide 16   OmniCore - Basic Programming
-                                                                                                                                                       8
+August 1, 2022     Slide 16   OmniCore - Basic Programming
+   8
 16
 
 ---
@@ -338,25 +339,25 @@
 8/1/2022
 
 
-     —
-     Introduction to the FlexPendant
+—
+Introduction to the FlexPendant
 
 
 17
 
 
-     —
-     Introduction to the FlexPendant
-     Objectives
+—
+Introduction to the FlexPendant
+Objectives
 
 
-     After this chapter you should be able to:
-     – Navigate in the FlexPendant's user interface (Quickset menu, applications)
-     – Explain each function of the FlexPendant's physical controls/buttons
+After this chapter you should be able to:
+– Navigate in the FlexPendant's user interface (Quickset menu, applications)
+– Explain each function of the FlexPendant's physical controls/buttons
 
 
-     August 1, 2022   Slide 18   OmniCore - Basic Programming
-                                                                                           9
+August 1, 2022   Slide 18   OmniCore - Basic Programming
+   9
 18
 
 ---
@@ -366,38 +367,38 @@
 8/1/2022
 
 
-     —
-     Introduction to the FlexPendant
-     FlexPendant
+—
+Introduction to the FlexPendant
+FlexPendant
 
 
-     Buttons/Controls
-     – Emergency stop
-     – Programmable keys
-     – Jogging options
-            • Switch mechanical unit
-            • Linear/reoriented jogging
-            • Axis-by-axis group 1/2
-     – Program Control
-            • Start/stop
-            • Stepwise forward/backward
-     – Joystick
-            • 3-axis movement
+Buttons/Controls
+– Emergency stop
+– Programmable keys
+– Jogging options
+   • Switch mechanical unit
+   • Linear/reoriented jogging
+   • Axis-by-axis group 1/2
+– Program Control
+   • Start/stop
+   • Stepwise forward/backward
+– Joystick
+   • 3-axis movement
 
 
-     August 1, 2022    Slide 19   OmniCore - Basic Programming
+August 1, 2022    Slide 19   OmniCore - Basic Programming
 
 
 19
 
 
-     —
-     Introduction to the FlexPendant
-     Home Screen / Applications Menu
+—
+Introduction to the FlexPendant
+Home Screen / Applications Menu
 
 
-     August 1, 2022    Slide 20   OmniCore - Basic Programming
-                                                                       10
+August 1, 2022    Slide 20   OmniCore - Basic Programming
+   10
 20
 
 ---
@@ -407,43 +408,43 @@
 8/1/2022
 
 
-     —
-     Introduction to the FlexPendant
-     Status Bar
+—
+Introduction to the FlexPendant
+Status Bar
 
 
-     A. Applications
-     B. Messages
-     C. Event log
-     D. Back (virtual only)
-     E. Program Status
-     F. Operating Mode
-     G. Motor Status
-     H. Program Speed
+A. Applications
+B. Messages
+C. Event log
+D. Back (virtual only)
+E. Program Status
+F. Operating Mode
+G. Motor Status
+H. Program Speed
 
 
-     August 1, 2022    Slide 21   OmniCore - Basic Programming
+August 1, 2022    Slide 21   OmniCore - Basic Programming
 
 
 21
 
 
-     —
-     Introduction to the FlexPendant
-     Quickset Menu - Overview
+—
+Introduction to the FlexPendant
+Quickset Menu - Overview
 
 
-     A. Quickset Menu
-     B. Control Panel - Opreating Mode, Motors On, Speed etc
-     C. Jog Settings - Work Object, Tool, Jog Speed etc
-     D. Execution Settings - Run Mode, Step Mode etc
-     E. Visualization - 3D robot view, position, orientation etc
-     F. System Info - RobotWare, IP address etc
-     G. Connection - Restart, log out, connected services status etc
+A. Quickset Menu
+B. Control Panel - Opreating Mode, Motors On, Speed etc
+C. Jog Settings - Work Object, Tool, Jog Speed etc
+D. Execution Settings - Run Mode, Step Mode etc
+E. Visualization - 3D robot view, position, orientation etc
+F. System Info - RobotWare, IP address etc
+G. Connection - Restart, log out, connected services status etc
 
 
-     August 1, 2022    Slide 22   OmniCore - Basic Programming
-                                                                             11
+August 1, 2022    Slide 22   OmniCore - Basic Programming
+   11
 22
 
 ---
@@ -453,41 +454,41 @@
 8/1/2022
 
 
-     —
-     Introduction to the FlexPendant
-     Quickset - Control Panel
+—
+Introduction to the FlexPendant
+Quickset - Control Panel
 
 
-     – Mode
-     – Motors
-     – Speed
-     – Edit Program Pointer
-     – Play/Pause
-     – Prev/Next
+– Mode
+– Motors
+– Speed
+– Edit Program Pointer
+– Play/Pause
+– Prev/Next
 
 
-     August 1, 2022   Slide 23   OmniCore - Basic Programming
+August 1, 2022   Slide 23   OmniCore - Basic Programming
 
 
 23
 
 
-     —
-     Introduction to the FlexPendant
-     Quickset - Jog Settings
+—
+Introduction to the FlexPendant
+Quickset - Jog Settings
 
 
-     – Mechanical Unit
-     – Work Object
-     – Tool
-     – Load
-     – Jog Speed
-     – Jog Mode
-     – Coordinate System
+– Mechanical Unit
+– Work Object
+– Tool
+– Load
+– Jog Speed
+– Jog Mode
+– Coordinate System
 
 
-     August 1, 2022   Slide 24   OmniCore - Basic Programming
-                                                                      12
+August 1, 2022   Slide 24   OmniCore - Basic Programming
+   12
 24
 
 ---
@@ -497,44 +498,44 @@
 8/1/2022
 
 
-     —
-     Introduction to the FlexPendant
-     Quickset - Execution Settings
+—
+Introduction to the FlexPendant
+Quickset - Execution Settings
 
 
-     – Run Mode
-            • Single
-            • Continuous
-     – Step Mode
-            • Step Over
-            • Step Into
-            • Step Out
-            • Step Move
-     – Non Motion Execution
-     – Enable/Disable tasks
+– Run Mode
+   • Single
+   • Continuous
+– Step Mode
+   • Step Over
+   • Step Into
+   • Step Out
+   • Step Move
+– Non Motion Execution
+– Enable/Disable tasks
 
 
-     August 1, 2022       Slide 25   OmniCore - Basic Programming
+August 1, 2022       Slide 25   OmniCore - Basic Programming
 
 
 25
 
 
-     —
-     Introduction to the FlexPendant
-     Quickset - Visualization
+—
+Introduction to the FlexPendant
+Quickset - Visualization
 
 
-     – Motion Mode
-     – Coordinate System
-     – Mechanical Unit
-     – Position
-     – Coordinate Directions
-     – Joystick Directions
+– Motion Mode
+– Coordinate System
+– Mechanical Unit
+– Position
+– Coordinate Directions
+– Joystick Directions
 
 
-     August 1, 2022       Slide 26   OmniCore - Basic Programming
-                                                                          13
+August 1, 2022       Slide 26   OmniCore - Basic Programming
+   13
 26
 
 ---
@@ -544,30 +545,30 @@
 8/1/2022
 
 
-     —
-     Introduction to the FlexPendant
-     Jog Application
+—
+Introduction to the FlexPendant
+Jog Application
 
 
-     Axis-by-axis Jogging
+Axis-by-axis Jogging
 
 
-     August 1, 2022   Slide 27   OmniCore - Basic Programming
+August 1, 2022   Slide 27   OmniCore - Basic Programming
 
 
 27
 
 
-     —
-     Introduction to the FlexPendant
-     Jog Application
+—
+Introduction to the FlexPendant
+Jog Application
 
 
-     Linear Jogging
+Linear Jogging
 
 
-     August 1, 2022   Slide 28   OmniCore - Basic Programming
-                                                                      14
+August 1, 2022   Slide 28   OmniCore - Basic Programming
+   14
 28
 
 ---
@@ -577,38 +578,38 @@
 8/1/2022
 
 
-     —
-     Introduction to the FlexPendant
-     I/O Application - Overview
+—
+Introduction to the FlexPendant
+I/O Application - Overview
 
 
-     Side Menu
-     – I/O Networks
-     – I/O Devices
-     – Signals
-     – Favorite Signals
-     – Configuration
+Side Menu
+– I/O Networks
+– I/O Devices
+– Signals
+– Favorite Signals
+– Configuration
 
 
-     August 1, 2022    Slide 29   OmniCore - Basic Programming
+August 1, 2022    Slide 29   OmniCore - Basic Programming
 
 
 29
 
 
-     —
-     Introduction to the FlexPendant
-     I/O Application - Signals
+—
+Introduction to the FlexPendant
+I/O Application - Signals
 
 
-     – Use Search and Filter to find signals
-     – Favorite Signals are user defined
-     – Signals can be set/reset (output only)
-     – Signals can be simulated
+– Use Search and Filter to find signals
+– Favorite Signals are user defined
+– Signals can be set/reset (output only)
+– Signals can be simulated
 
 
-     August 1, 2022    Slide 30   OmniCore - Basic Programming
-                                                                       15
+August 1, 2022    Slide 30   OmniCore - Basic Programming
+   15
 30
 
 ---
@@ -618,49 +619,49 @@
 8/1/2022
 
 
-     —
-     Introduction to the FlexPendant
-     Code Application
+—
+Introduction to the FlexPendant
+Code Application
 
 
-     Modules
-     – Create/save/load/rename programs
-     – Create/save/load/rename/delete modules
-     – Switch between tasks
+Modules
+– Create/save/load/rename programs
+– Create/save/load/rename/delete modules
+– Switch between tasks
 
 
-     Code Editor
-     – Modify and test code
-     – Teach Positions
-     – Check program for errors
-     – Add instructions
+Code Editor
+– Modify and test code
+– Teach Positions
+– Check program for errors
+– Add instructions
 
 
-     RAPID Data
-     – View, change and create data
+RAPID Data
+– View, change and create data
 
 
-     August 1, 2022    Slide 31   OmniCore - Basic Programming
+August 1, 2022    Slide 31   OmniCore - Basic Programming
 
 
 31
 
 
-     —
-     Introduction to the FlexPendant
-     Operate Application
+—
+Introduction to the FlexPendant
+Operate Application
 
 
-     Operate -> Advanced View
-     – Load programs
-     – Restart program from main
-     – Teach positions
-     – Show Program Pointer
-     – Show Motion Pointer
+Operate -> Advanced View
+– Load programs
+– Restart program from main
+– Teach positions
+– Show Program Pointer
+– Show Motion Pointer
 
 
-     August 1, 2022    Slide 32   OmniCore - Basic Programming
-                                                                       16
+August 1, 2022    Slide 32   OmniCore - Basic Programming
+   16
 32
 
 ---
@@ -670,38 +671,38 @@
 8/1/2022
 
 
-     —
-     Introduction to the FlexPendant
-     Operate Application
+—
+Introduction to the FlexPendant
+Operate Application
 
 
-     Dashboards
-     – Create your own dashboard(s)
-     – Display important information specifically for
-       your production
-     – Use pre made system cards or create your
-       own
+Dashboards
+– Create your own dashboard(s)
+– Display important information specifically for
+  your production
+– Use pre made system cards or create your
+  own
 
 
-     August 1, 2022    Slide 33   OmniCore - Basic Programming
+August 1, 2022    Slide 33   OmniCore - Basic Programming
 
 
 33
 
 
-     —
-     Introduction to the FlexPendant
-     Operate Application
+—
+Introduction to the FlexPendant
+Operate Application
 
 
-     Operate -> Service Routines
-     – Pre made routines that perform service tasks
-     – Tap a service routine to run it, then follow the
-       instructions
+Operate -> Service Routines
+– Pre made routines that perform service tasks
+– Tap a service routine to run it, then follow the
+  instructions
 
 
-     August 1, 2022    Slide 34   OmniCore - Basic Programming
-                                                                       17
+August 1, 2022    Slide 34   OmniCore - Basic Programming
+   17
 34
 
 ---
@@ -711,25 +712,25 @@
 8/1/2022
 
 
-     —
-     Jogging
+—
+Jogging
 
 
 35
 
 
-     —
-     Jogging
-     Objectives
+—
+Jogging
+Objectives
 
 
-     After this chapter you should be able to:
-     – Explain and set up the different jogging parameters
-     – Jog the robot to any desired position — with ease
+After this chapter you should be able to:
+– Explain and set up the different jogging parameters
+– Jog the robot to any desired position — with ease
 
 
-     August 1, 2022   Slide 36   OmniCore - Basic Programming
-                                                                      18
+August 1, 2022   Slide 36   OmniCore - Basic Programming
+   18
 36
 
 ---
@@ -739,40 +740,40 @@
 8/1/2022
 
 
-     —
-     Jogging
-     Different Types of Jogging
+—
+Jogging
+Different Types of Jogging
 
 
-     Axis-by-axis                                            Linear                                 Reoriented
+Axis-by-axis                                            Linear                                 Reoriented
 
 
-                                                          Choosing the correct motion mode is key
+Choosing the correct motion mode is key
 
 
-     August 1, 2022     Slide 37   OmniCore - Basic Programming
+August 1, 2022     Slide 37   OmniCore - Basic Programming
 
 
 37
 
 
-     —
-     Jogging
-     The Jogging Window
+—
+Jogging
+The Jogging Window
 
 
-     Properties
-     A. Mechanical unit
-     B. Motion Mode
-     C. Coordinate system
-     D. Tool
-     E. Work object
-     F. Joystick lock
-     G. Increment
+Properties
+A. Mechanical unit
+B. Motion Mode
+C. Coordinate system
+D. Tool
+E. Work object
+F. Joystick lock
+G. Increment
 
 
-     August 1, 2022     Slide 38   OmniCore - Basic Programming
-                                                                                                                       19
+August 1, 2022     Slide 38   OmniCore - Basic Programming
+   19
 38
 
 ---
@@ -782,35 +783,35 @@
 8/1/2022
 
 
-     —
-     Jogging
-     Axis-by-axis
+—
+Jogging
+Axis-by-axis
 
 
-     What is it used for?
-     – Moving between stations in robotcell
-     – Get away from singularity
-     – Jog to sync position
+What is it used for?
+– Moving between stations in robotcell
+– Get away from singularity
+– Jog to sync position
 
 
-     August 1, 2022   Slide 39   OmniCore - Basic Programming
+August 1, 2022   Slide 39   OmniCore - Basic Programming
 
 
 39
 
 
-     —
-     Jogging
-     Linear in Base
+—
+Jogging
+Linear in Base
 
 
-     What is it used for?
-     – Moving TCP to specific positions
-     – Moving along linear paths
+What is it used for?
+– Moving TCP to specific positions
+– Moving along linear paths
 
 
-     August 1, 2022   Slide 40   OmniCore - Basic Programming
-                                                                      20
+August 1, 2022   Slide 40   OmniCore - Basic Programming
+   20
 40
 
 ---
@@ -820,41 +821,41 @@
 8/1/2022
 
 
-     —
-     Jogging
-     Exercise - Jogging Axis-by-axis and Linear in Base
+—
+Jogging
+Exercise - Jogging Axis-by-axis and Linear in Base
 
 
-     Task
-     – Jog axis-by-axis until the pen is aligned normal
-       to the surface, slightly above the paper
-     – Carefully jog linear in base coordinate system
-       until the pen touches the paper in the A-circle
-     – Continue jogging linear in base coordinate
-       system to draw a line between A-B-C-D-A
-     – Try to draw a straight line between A and C,
-       still jogging linear in base coordinate system
+Task
+– Jog axis-by-axis until the pen is aligned normal
+  to the surface, slightly above the paper
+– Carefully jog linear in base coordinate system
+  until the pen touches the paper in the A-circle
+– Continue jogging linear in base coordinate
+  system to draw a line between A-B-C-D-A
+– Try to draw a straight line between A and C,
+  still jogging linear in base coordinate system
 
 
-     August 1, 2022    Slide 41   OmniCore - Basic Programming
+August 1, 2022    Slide 41   OmniCore - Basic Programming
 
 
 41
 
 
-     —
-     Jogging
-     Jogging Linear in Tool Coordinate System
+—
+Jogging
+Jogging Linear in Tool Coordinate System
 
 
-     What is it used for?
-     – Moving the robot in the tool’s directions, e.g.,
-       when the base coordinates does not line up
-       with where you want to go.
+What is it used for?
+– Moving the robot in the tool’s directions, e.g.,
+  when the base coordinates does not line up
+  with where you want to go.
 
 
-     August 1, 2022    Slide 42   OmniCore - Basic Programming
-                                                                       21
+August 1, 2022    Slide 42   OmniCore - Basic Programming
+   21
 42
 
 ---
@@ -864,42 +865,42 @@
 8/1/2022
 
 
-     —
-     Jogging
-     Jogging Reoriented
+—
+Jogging
+Jogging Reoriented
 
 
-     What is it used for?
-     – Reorienting the tool, e.g., when aligning with a
-       product.
+What is it used for?
+– Reorienting the tool, e.g., when aligning with a
+  product.
 
 
-     August 1, 2022    Slide 43   OmniCore - Basic Programming
+August 1, 2022    Slide 43   OmniCore - Basic Programming
 
 
 43
 
 
-     —
-     Jogging
-     Exercise - Jogging Axis-by-axis and Linear in Base
+—
+Jogging
+Exercise - Jogging Axis-by-axis and Linear in Base
 
 
-     Task                                                                     Reorienting
-     – Jog the robot in motion mode of your choice until you reach the
-       circle marked -1-
-     – Change motion mode to reoriented, coordinate system to Tool
-       and choose the correct tool
-     – If needed, reorient the robot until one of the coordinate axes for
-       the active tool points toward the next circle
-     – Change motion mode to linear, make sure coordinate system is
-       still tool, then jog towards the next circle in a straight line, you   Jogging in Tool Coordinate System
-       are only allowed to jog in 1 direction at a time, x or y.
-     – Repeat step 2-4 until you have completed the path
+Task                                                                     Reorienting
+– Jog the robot in motion mode of your choice until you reach the
+  circle marked -1-
+– Change motion mode to reoriented, coordinate system to Tool
+  and choose the correct tool
+– If needed, reorient the robot until one of the coordinate axes for
+  the active tool points toward the next circle
+– Change motion mode to linear, make sure coordinate system is
+  still tool, then jog towards the next circle in a straight line, you   Jogging in Tool Coordinate System
+  are only allowed to jog in 1 direction at a time, x or y.
+– Repeat step 2-4 until you have completed the path
 
 
-     August 1, 2022    Slide 44   OmniCore - Basic Programming
-                                                                                                                        22
+August 1, 2022    Slide 44   OmniCore - Basic Programming
+   22
 44
 
 ---
@@ -909,26 +910,26 @@
 8/1/2022
 
 
-     —
-     Programming Basic Movements
+—
+Programming Basic Movements
 
 
 45
 
 
-     —
-     Programming Basic Movements
-     Objectives
+—
+Programming Basic Movements
+Objectives
 
 
-     After this chapter you should be able to:
-     – Explain the difference between MoveL, MoveJ and MoveC
-     – Describe the zone and speed parameters of a move instruction
-     – Program the robot to draw a shape with an already mounted pen tool
+After this chapter you should be able to:
+– Explain the difference between MoveL, MoveJ and MoveC
+– Describe the zone and speed parameters of a move instruction
+– Program the robot to draw a shape with an already mounted pen tool
 
 
-     August 1, 2022   Slide 46   OmniCore - Basic Programming
-                                                                                  23
+August 1, 2022   Slide 46   OmniCore - Basic Programming
+   23
 46
 
 ---
@@ -938,39 +939,39 @@
 8/1/2022
 
 
-     —
-     Programming Basic Movements
-     Movement Types
+—
+Programming Basic Movements
+Movement Types
 
 
-     MoveJ                                                                MoveL
-     – Non-linear movement                                                – Linear motion to the target
-     – All axes reach the destination position at the same time
+MoveJ                                                                MoveL
+– Non-linear movement                                                – Linear motion to the target
+– All axes reach the destination position at the same time
 
 
-                                      MoveL is normally only used when a linear motion is explicitly desired
+MoveL is normally only used when a linear motion is explicitly desired
 
 
-     August 1, 2022     Slide 47   OmniCore - Basic Programming
+August 1, 2022     Slide 47   OmniCore - Basic Programming
 
 
 47
 
 
-     —
-     Programming Basic Movements
-     MoveJ/MoveL Instructions
+—
+Programming Basic Movements
+MoveJ/MoveL Instructions
 
 
-     MoveJ/MoveL Elements                                                 D. Zone (z50 = 50mm)
-     – A. Movement type
-     – B. Destination
-     – C. Speed (v1000 = 1000 mm/s)
-     – E. Tool
+MoveJ/MoveL Elements                                                 D. Zone (z50 = 50mm)
+– A. Movement type
+– B. Destination
+– C. Speed (v1000 = 1000 mm/s)
+– E. Tool
 
 
-     August 1, 2022     Slide 48   OmniCore - Basic Programming
-                                                                                                                     24
+August 1, 2022     Slide 48   OmniCore - Basic Programming
+   24
 48
 
 ---
@@ -980,35 +981,35 @@
 8/1/2022
 
 
-     —
-     Programming Basic Movements
-     Inline Positions vs Named Positions
+—
+Programming Basic Movements
+Inline Positions vs Named Positions
 
 
-                                        It is good programming practice to name all robtargets (positions)
+It is good programming practice to name all robtargets (positions)
 
 
-     August 1, 2022      Slide 49   OmniCore - Basic Programming
+August 1, 2022      Slide 49   OmniCore - Basic Programming
 
 
 49
 
 
-     —
-     Programming Basic Movements
-     Exercise - Draw a Shape
+—
+Programming Basic Movements
+Exercise - Draw a Shape
 
 
-     Steps
-     – Open program editor
-     – Create new program
-     – Jog to position
-     – Create move-instruction
-     – Name position
+Steps
+– Open program editor
+– Create new program
+– Jog to position
+– Create move-instruction
+– Name position
 
 
-     August 1, 2022      Slide 50   OmniCore - Basic Programming
-                                                                                                                   25
+August 1, 2022      Slide 50   OmniCore - Basic Programming
+   25
 50
 
 ---
@@ -1018,44 +1019,44 @@
 8/1/2022
 
 
-     —
-     Programming Basic Movements
-     MoveC Instruction
+—
+Programming Basic Movements
+MoveC Instruction
 
 
-     General                                                     MoveC Elements
-     – Circular movement towards target                          – A. Movement type
-     – Two position arguments, circle point and                  – B. Circle point
-       desination point                                          – C. Destination point
-     – Circle point half way for best accuracy                   – D. Speed
-                                                                 – E. Zone
-                                                                 – F. Tool
+General                                                     MoveC Elements
+– Circular movement towards target                          – A. Movement type
+– Two position arguments, circle point and                  – B. Circle point
+  desination point                                          – C. Destination point
+– Circle point half way for best accuracy                   – D. Speed
+   – E. Zone
+   – F. Tool
 
 
-                          If circle point is too close to start/destination point, a warning message will appear
+If circle point is too close to start/destination point, a warning message will appear
 
 
-     August 1, 2022    Slide 51   OmniCore - Basic Programming
+August 1, 2022    Slide 51   OmniCore - Basic Programming
 
 
 51
 
 
-     —
-     Programming Basic Movements
-     Exercise - Draw a Circle
+—
+Programming Basic Movements
+Exercise - Draw a Circle
 
 
-     Steps
-     – Create new program
-     – Jog to circle point
-     – Create MoveC-instruction
-     – Jog to destination point
-     – Modify position
+Steps
+– Create new program
+– Jog to circle point
+– Create MoveC-instruction
+– Jog to destination point
+– Modify position
 
 
-     August 1, 2022    Slide 52   OmniCore - Basic Programming
-                                                                                                                         26
+August 1, 2022    Slide 52   OmniCore - Basic Programming
+   26
 52
 
 ---
@@ -1065,28 +1066,28 @@
 8/1/2022
 
 
-     —
-     RobotStudio - RAPID Editor
+—
+RobotStudio - RAPID Editor
 
 
 53
 
 
-     —
-     RobotStudio - RAPID Editor
-     Objectives
+—
+RobotStudio - RAPID Editor
+Objectives
 
 
-     After this chapter you should be able to:
-     – Connect to a controller from RobotStudio
-     – Find the most common buttons and windows in the user interface
-     – Recall some of the most common features
-     – Add instructions without knowing their syntax
-     – Edit backup and individual modules
+After this chapter you should be able to:
+– Connect to a controller from RobotStudio
+– Find the most common buttons and windows in the user interface
+– Recall some of the most common features
+– Add instructions without knowing their syntax
+– Edit backup and individual modules
 
 
-     August 1, 2022   Slide 54   OmniCore - Basic Programming
-                                                                              27
+August 1, 2022   Slide 54   OmniCore - Basic Programming
+   27
 54
 
 ---
@@ -1096,41 +1097,41 @@
 8/1/2022
 
 
-     —
-     RobotStudio - RAPID Editor
-     Connecting to Controller
+—
+RobotStudio - RAPID Editor
+Connecting to Controller
 
 
-     Controller tab -> Add Controller
-     – A. Connect to a controller via service port
-     – B. Connect to a controller on same network
-     – C. Start a virtual controller and connect to it
+Controller tab -> Add Controller
+– A. Connect to a controller via service port
+– B. Connect to a controller on same network
+– C. Start a virtual controller and connect to it
 
 
-     August 1, 2022    Slide 55   OmniCore - Basic Programming
+August 1, 2022    Slide 55   OmniCore - Basic Programming
 
 
 55
 
 
-     —
-     RobotStudio - RAPID Editor
-     RAPID-Tab Overview
+—
+RobotStudio - RAPID Editor
+RAPID-Tab Overview
 
 
-     – A. Request/Release write access                     – F. Snippet, Insert premade or custom        – K. Apply changes, pushes changes to
-     – B. Synchronize to Station/RAPID                       made code snippets                            controller
+– A. Request/Release write access                     – F. Snippet, Insert premade or custom        – K. Apply changes, pushes changes to
+– B. Synchronize to Station/RAPID                       made code snippets                            controller
 
-     – C. Comment/Uncomment,                               – G. Instruction lists, insert instructions   – L. Options for Tasks, Runmode and
-       Indent/Unindent, Cut, Copy Paste                      from list                                     program
+– C. Comment/Uncomment,                               – G. Instruction lists, insert instructions   – L. Options for Tasks, Runmode and
+  Indent/Unindent, Cut, Copy Paste                      from list                                     program
 
-     – D. Format, options to automatically                 – H. Navigate in your code                    – M. Adjust robtargets
-       indent and adjust case of RAPID code                – I. Find/Replace                             – N. Modify Position
-     – E. Expand/Collapse all outlining                    – J. Compare, compare files or folders        – O. Options for testing and debugging
+– D. Format, options to automatically                 – H. Navigate in your code                    – M. Adjust robtargets
+  indent and adjust case of RAPID code                – I. Find/Replace                             – N. Modify Position
+– E. Expand/Collapse all outlining                    – J. Compare, compare files or folders        – O. Options for testing and debugging
 
 
-     August 1, 2022    Slide 56   OmniCore - Basic Programming
-                                                                                                                                                        28
+August 1, 2022    Slide 56   OmniCore - Basic Programming
+   28
 56
 
 ---
@@ -1140,37 +1141,37 @@
 8/1/2022
 
 
-     —
-     RobotStudio - RAPID Editor
-     Windows
+—
+RobotStudio - RAPID Editor
+Windows
 
 
-     Code Window
-     – A. Controller
-     – B. Open files related to controller (Modules)
-     – C. Text size settings
-     – D. Editor
+Code Window
+– A. Controller
+– B. Open files related to controller (Modules)
+– C. Text size settings
+– D. Editor
 
 
-     August 1, 2022    Slide 57   OmniCore - Basic Programming
+August 1, 2022    Slide 57   OmniCore - Basic Programming
 
 
 57
 
 
-     —
-     RobotStudio - RAPID Editor
-     Windows
+—
+RobotStudio - RAPID Editor
+Windows
 
 
-     Controller Window
-     – Shows all connected controllers, both real and
-       virtual
-     – Open modules with double click
+Controller Window
+– Shows all connected controllers, both real and
+  virtual
+– Open modules with double click
 
 
-     August 1, 2022    Slide 58   OmniCore - Basic Programming
-                                                                       29
+August 1, 2022    Slide 58   OmniCore - Basic Programming
+   29
 58
 
 ---
@@ -1180,36 +1181,36 @@
 8/1/2022
 
 
-     —
-     RobotStudio - RAPID Editor
-     Windows
+—
+RobotStudio - RAPID Editor
+Windows
 
 
-     Files Window
-     – Shows all opened backups
-     – Shows separately opened modules
+Files Window
+– Shows all opened backups
+– Shows separately opened modules
 
 
-     August 1, 2022    Slide 59   OmniCore - Basic Programming
+August 1, 2022    Slide 59   OmniCore - Basic Programming
 
 
 59
 
 
-     —
-     RobotStudio - RAPID Editor
-     Windows
+—
+RobotStudio - RAPID Editor
+Windows
 
 
-     RAPID Watch
-     – Shows current value
-       for any variable
-     – Right click a variable
-       to add watch
+RAPID Watch
+– Shows current value
+  for any variable
+– Right click a variable
+  to add watch
 
 
-     August 1, 2022    Slide 60   OmniCore - Basic Programming
-                                                                       30
+August 1, 2022    Slide 60   OmniCore - Basic Programming
+   30
 60
 
 ---
@@ -1219,35 +1220,35 @@
 8/1/2022
 
 
-     —
-     RobotStudio - RAPID Editor
-     Features
+—
+RobotStudio - RAPID Editor
+Features
 
 
-     Format document
-     – Formats your code with correct indentation and character case
-     – Works for references to custom data/routines as well as built in data/routines
+Format document
+– Formats your code with correct indentation and character case
+– Works for references to custom data/routines as well as built in data/routines
 
 
-     August 1, 2022    Slide 61   OmniCore - Basic Programming
+August 1, 2022    Slide 61   OmniCore - Basic Programming
 
 
 61
 
 
-     —
-     RobotStudio - RAPID Editor
-     Features
+—
+RobotStudio - RAPID Editor
+Features
 
 
-     Snippet
-     – Insert prepared code snippets
-            • Use built-in snippet from RobotStudio
-            • Save your own snippets
+Snippet
+– Insert prepared code snippets
+   • Use built-in snippet from RobotStudio
+   • Save your own snippets
 
 
-     August 1, 2022    Slide 62   OmniCore - Basic Programming
-                                                                                              31
+August 1, 2022    Slide 62   OmniCore - Basic Programming
+   31
 62
 
 ---
@@ -1257,41 +1258,41 @@
 8/1/2022
 
 
-     —
-     RobotStudio - RAPID Editor
-     Features
+—
+RobotStudio - RAPID Editor
+Features
 
 
-     Instruction List
-     – Add complete instructions from list
-     – Reflects the lists found in FlexPendant
-     – Custom lists (M.C 1-3) configurable in MMC
+Instruction List
+– Add complete instructions from list
+– Reflects the lists found in FlexPendant
+– Custom lists (M.C 1-3) configurable in MMC
 
 
-     August 1, 2022    Slide 63   OmniCore - Basic Programming
+August 1, 2022    Slide 63   OmniCore - Basic Programming
 
 
 63
 
 
-     —
-     RobotStudio - RAPID Editor
-     Features
+—
+RobotStudio - RAPID Editor
+Features
 
 
-     Navigation
-     Quickly navigate your
-     code with:
-     – A. Navigate
-       backward/forward
-     – B. QuickFind
-     – C. Go to line
-     – D. Routine picklist
-     – E. Go to definition
+Navigation
+Quickly navigate your
+code with:
+– A. Navigate
+  backward/forward
+– B. QuickFind
+– C. Go to line
+– D. Routine picklist
+– E. Go to definition
 
 
-     August 1, 2022    Slide 64   OmniCore - Basic Programming
-                                                                       32
+August 1, 2022    Slide 64   OmniCore - Basic Programming
+   32
 64
 
 ---
@@ -1301,49 +1302,49 @@
 8/1/2022
 
 
-     —
-     RobotStudio - RAPID Editor
-     Features
+—
+RobotStudio - RAPID Editor
+Features
 
 
-     Compare*
-     Easily compare:
-     – Folders, e.g., compare two backups
-     – Files, any textfiles can be compared
-     – Controller Version and Editor
-     – Controller Version and File
-     – Editor and file
+Compare*
+Easily compare:
+– Folders, e.g., compare two backups
+– Files, any textfiles can be compared
+– Controller Version and Editor
+– Controller Version and File
+– Editor and file
 
 
-     With possibility to ignore:
-     – Insignificant changes in backinfo
-     – PERS variable values
-     – Comments, character case and white spaces
+With possibility to ignore:
+– Insignificant changes in backinfo
+– PERS variable values
+– Comments, character case and white spaces
 
 
-     *This function needs premium license
+*This function needs premium license
 
 
-     August 1, 2022      Slide 65   OmniCore - Basic Programming
+August 1, 2022      Slide 65   OmniCore - Basic Programming
 
 
 65
 
 
-     —
-     RobotStudio - RAPID Editor
-     Features
+—
+RobotStudio - RAPID Editor
+Features
 
 
-     Adjust Robtargets*
-     Easily change wobj or tool used in path
+Adjust Robtargets*
+Easily change wobj or tool used in path
 
 
-     *This function needs premium license
+*This function needs premium license
 
 
-     August 1, 2022      Slide 66   OmniCore - Basic Programming
-                                                                         33
+August 1, 2022      Slide 66   OmniCore - Basic Programming
+   33
 66
 
 ---
@@ -1353,45 +1354,45 @@
 8/1/2022
 
 
-     —
-     RobotStudio - RAPID Editor
-     Features
+—
+RobotStudio - RAPID Editor
+Features
 
 
-     RAPID Data Editor*
-     – Direct access to RAPID data
-     – Show one datatype at the time
-     – Editable value
-     – Editable names (References also renamed)
-     – Show robtarget orientation as Euler ZYX
+RAPID Data Editor*
+– Direct access to RAPID data
+– Show one datatype at the time
+– Editable value
+– Editable names (References also renamed)
+– Show robtarget orientation as Euler ZYX
 
 
-     *This function needs premium license
+*This function needs premium license
 
 
-     August 1, 2022     Slide 67   OmniCore - Basic Programming
+August 1, 2022     Slide 67   OmniCore - Basic Programming
 
 
 67
 
 
-     —
-     RobotStudio - RAPID Editor
-     Features
+—
+RobotStudio - RAPID Editor
+Features
 
 
-     Auto Complete
-     – List shows up with options when typing
-     – Select option and press TAB to complete word
-     – Press TAB twice to insert complete
-       instruction/declaration
-     – Use Ctrl+SPACE to make list appear
-     – Auto Complete works for data, instructions,
-       routine calls, declarations
+Auto Complete
+– List shows up with options when typing
+– Select option and press TAB to complete word
+– Press TAB twice to insert complete
+  instruction/declaration
+– Use Ctrl+SPACE to make list appear
+– Auto Complete works for data, instructions,
+  routine calls, declarations
 
 
-     August 1, 2022     Slide 68   OmniCore - Basic Programming
-                                                                        34
+August 1, 2022     Slide 68   OmniCore - Basic Programming
+   34
 68
 
 ---
@@ -1401,42 +1402,42 @@
 8/1/2022
 
 
-     —
-     RobotStudio - RAPID Editor
-     Edit a Backup
+—
+RobotStudio - RAPID Editor
+Edit a Backup
 
 
-     – Opening a module file in a backup opens the
-       complete backup
-     – Auto complete works between modules
-     – Easy to navigate between modules with files-
-       window
+– Opening a module file in a backup opens the
+  complete backup
+– Auto complete works between modules
+– Easy to navigate between modules with files-
+  window
 
 
-     August 1, 2022     Slide 69   OmniCore - Basic Programming
+August 1, 2022     Slide 69   OmniCore - Basic Programming
 
 
 69
 
 
-     —
-     RobotStudio - RAPID Editor
-     Programs and Modules
+—
+RobotStudio - RAPID Editor
+Programs and Modules
 
 
-     Right-click a task in the RAPID-node in the
-     Controller window for program and module
-     options
-     – Load Program...
-     – Save Program As...
-     – Rename Program...
-     – Delete Program (Unload from controller)
-     – New Module...
-     – Load Module...
+Right-click a task in the RAPID-node in the
+Controller window for program and module
+options
+– Load Program...
+– Save Program As...
+– Rename Program...
+– Delete Program (Unload from controller)
+– New Module...
+– Load Module...
 
 
-     August 1, 2022     Slide 70   OmniCore - Basic Programming
-                                                                        35
+August 1, 2022     Slide 70   OmniCore - Basic Programming
+   35
 70
 
 ---
@@ -1446,29 +1447,29 @@
 8/1/2022
 
 
-     —
-     RobotStudio - RAPID Editor
-     Exercise - RobotStudio Basics (create a module and add code)
+—
+RobotStudio - RAPID Editor
+Exercise - RobotStudio Basics (create a module and add code)
 
 
-     Create a new module and add code using auto
-     complete and snippet, then apply changes.
+Create a new module and add code using auto
+complete and snippet, then apply changes.
 
 
-     Answer the questions in your student manual.
+Answer the questions in your student manual.
 
 
-     August 1, 2022   Slide 71   OmniCore - Basic Programming
+August 1, 2022   Slide 71   OmniCore - Basic Programming
 
 
 71
 
 
-     —
-     Program Structure
+—
+Program Structure
 
 
-                                                                          36
+36
 72
 
 ---
@@ -1478,38 +1479,38 @@
 8/1/2022
 
 
-     —
-     Program Structure
-     Objectives
+—
+Program Structure
+Objectives
 
 
-     After this chapter you should be able to:
-     – Differentiate between program and system modules
-     – Use a suitable module to store different data and routines in order to implement a good program structure
-     – Describe the difference between constant, persistent and variable data
+After this chapter you should be able to:
+– Differentiate between program and system modules
+– Use a suitable module to store different data and routines in order to implement a good program structure
+– Describe the difference between constant, persistent and variable data
 
 
-     August 1, 2022   Slide 73   OmniCore - Basic Programming
+August 1, 2022   Slide 73   OmniCore - Basic Programming
 
 
 73
 
 
-     —
-     Program Structure
-     Overview
+—
+Program Structure
+Overview
 
 
-     – Modules: Textfiles for structuring Data and Routines
-     – Program: All loaded Program modules
-     – Data: Variables and constants
-     – Routines: sets of instructions
-     – Instructions: Command for the controller, e.g.,
-       MoveJ/MoveL/MoveC
+– Modules: Textfiles for structuring Data and Routines
+– Program: All loaded Program modules
+– Data: Variables and constants
+– Routines: sets of instructions
+– Instructions: Command for the controller, e.g.,
+  MoveJ/MoveL/MoveC
 
 
-     August 1, 2022   Slide 74   OmniCore - Basic Programming
-                                                                                                                         37
+August 1, 2022   Slide 74   OmniCore - Basic Programming
+   37
 74
 
 ---
@@ -1519,45 +1520,45 @@
 8/1/2022
 
 
-     —
-     Program Structure
-     Modules
+—
+Program Structure
+Modules
 
 
-     Overview                                                               Structuring Example 1
-     – Modules are text files that may contain data and/or routines
-       (sets of instructions)
-     – Modules are used to structure your program
-     – Different companies use different structuring methods
-     – No limit how many modules can be used
+Overview                                                               Structuring Example 1
+– Modules are text files that may contain data and/or routines
+  (sets of instructions)
+– Modules are used to structure your program
+– Different companies use different structuring methods
+– No limit how many modules can be used
 
 
-                                                                            Structuring Example 2
+Structuring Example 2
 
 
-     August 1, 2022   Slide 75   OmniCore - Basic Programming
+August 1, 2022   Slide 75   OmniCore - Basic Programming
 
 
 75
 
 
-     —
-     Program Structure
-     Modules
+—
+Program Structure
+Modules
 
 
-     System Module                                                          Program Module
-     – Persists in memory when changing programs                            – Unloads together with program
-     – Used for routines and data that is not program specific, such as:    – Used for program specific routines and data, for example:
-            • Tools                                                              • Process routines
-            • Work Objects
+System Module                                                          Program Module
+– Persists in memory when changing programs                            – Unloads together with program
+– Used for routines and data that is not program specific, such as:    – Used for program specific routines and data, for example:
+   • Tools                                                              • Process routines
+   • Work Objects
 
 
-                                                  Modules are text files used to structure your code
+Modules are text files used to structure your code
 
 
-     August 1, 2022   Slide 76   OmniCore - Basic Programming
-                                                                                                                                                38
+August 1, 2022   Slide 76   OmniCore - Basic Programming
+   38
 76
 
 ---
@@ -1567,44 +1568,44 @@
 8/1/2022
 
 
-     —
-     Program Structure
-     Program
+—
+Program Structure
+Program
 
 
-     – Program = Loaded program modules
-     – Saving program saves all Program modules
-     – Unloading a program unloads all program modules
-     – Loading a program loads modules in .pgf-file
+– Program = Loaded program modules
+– Saving program saves all Program modules
+– Unloading a program unloads all program modules
+– Loading a program loads modules in .pgf-file
 
 
-                                           Saving/Loading a program does not affect system modules!
+Saving/Loading a program does not affect system modules!
 
 
-     August 1, 2022    Slide 77   OmniCore - Basic Programming
+August 1, 2022    Slide 77   OmniCore - Basic Programming
 
 
 77
 
 
-     —
-     Program Structure
-     Data
+—
+Program Structure
+Data
 
 
-     Overview
-     – Data is information stored in memory,
-       accessed by its name
-     – The data declaration declares the name of the
-       data and the initial value
-     – Any reference to a data will refer to the data
-       stored in memory
-     – Data can be predefined or user defined
-     – Data can be variable or constant
+Overview
+– Data is information stored in memory,
+  accessed by its name
+– The data declaration declares the name of the
+  data and the initial value
+– Any reference to a data will refer to the data
+  stored in memory
+– Data can be predefined or user defined
+– Data can be variable or constant
 
 
-     August 1, 2022    Slide 78   OmniCore - Basic Programming
-                                                                                                            39
+August 1, 2022    Slide 78   OmniCore - Basic Programming
+   39
 78
 
 ---
@@ -1614,41 +1615,41 @@
 8/1/2022
 
 
-     —
-     Program Structure
-     Data
+—
+Program Structure
+Data
 
 
-     Predefined Data                                                                User Defined Data
-     Some data are predefined in RAPID, for example:                                The user can define data, some examples:
-     – Speeddata (v100, v500, v2000, etc.)                                          – Robtargets (positions for the robot)
-     – Tooldata (tool0)                                                             – Numeric data (keep track of number of produced parts, etc.)
-     – Zonedata (fine, z1, z50)                                                     – Speeddata
+Predefined Data                                                                User Defined Data
+Some data are predefined in RAPID, for example:                                The user can define data, some examples:
+– Speeddata (v100, v500, v2000, etc.)                                          – Robtargets (positions for the robot)
+– Tooldata (tool0)                                                             – Numeric data (keep track of number of produced parts, etc.)
+– Zonedata (fine, z1, z50)                                                     – Speeddata
 
 
-                      If predefined data don’t cover your needs, you can always create your own data instead
+If predefined data don’t cover your needs, you can always create your own data instead
 
 
-     August 1, 2022   Slide 79    OmniCore - Basic Programming
+August 1, 2022   Slide 79    OmniCore - Basic Programming
 
 
 79
 
 
-     —
-     Program Structure
-     Data
+—
+Program Structure
+Data
 
 
-     Constant                                               Persistent                                    Variable
-     – Constantly declared data                             – Persistent variable                         – Can be changed by program
-     – Cannot be changed by the program                     – Can be changed by program                   – Goes back to initial value on program
-                                                            – Does not loose its value on program           restart
-                                                              restart
+Constant                                               Persistent                                    Variable
+– Constantly declared data                             – Persistent variable                         – Can be changed by program
+– Cannot be changed by the program                     – Can be changed by program                   – Goes back to initial value on program
+   – Does not loose its value on program           restart
+   restart
 
 
-     August 1, 2022   Slide 80    OmniCore - Basic Programming
-                                                                                                                                                          40
+August 1, 2022   Slide 80    OmniCore - Basic Programming
+   40
 80
 
 ---
@@ -1658,42 +1659,42 @@
 8/1/2022
 
 
-     —
-     Program Structure
-     Instructions
+—
+Program Structure
+Instructions
 
 
-     Information
-     Instructions are commands you can give the
-     controller, such as:
-     – MoveJ ...
-     – Incr ...
-     – Set ...
-     – + hundreds more
+Information
+Instructions are commands you can give the
+controller, such as:
+– MoveJ ...
+– Incr ...
+– Set ...
+– + hundreds more
 
 
-     August 1, 2022   Slide 81   OmniCore - Basic Programming
+August 1, 2022   Slide 81   OmniCore - Basic Programming
 
 
 81
 
 
-     —
-     Program Structure
-     Routines
+—
+Program Structure
+Routines
 
 
-     Information
-     – A set of instructions that can be called from
-       the program
-     – Can be either a Procedure or a Function
-     – Can be called from anywhere* in the task by
-       typing its name followed by a semicolon, e.g.,
-       RoutineExample;
+Information
+– A set of instructions that can be called from
+  the program
+– Can be either a Procedure or a Function
+– Can be called from anywhere* in the task by
+  typing its name followed by a semicolon, e.g.,
+  RoutineExample;
 
 
-     August 1, 2022   Slide 82   OmniCore - Basic Programming
-                                                                      41
+August 1, 2022   Slide 82   OmniCore - Basic Programming
+   41
 82
 
 ---
@@ -1703,51 +1704,51 @@
 8/1/2022
 
 
-     —
-     Program Structure
-     Exercise - Create a Program Structure
+—
+Program Structure
+Exercise - Create a Program Structure
 
 
-     Create a Module                                       Create a Routine                            Create a User Data
-     – Create a new program                                – Add a routine                             – Add a numeric data variable to one of
-     – Add a new program module                            – Add an instruction in your routine          your program modules
+Create a Module                                       Create a Routine                            Create a User Data
+– Create a new program                                – Add a routine                             – Add a numeric data variable to one of
+– Add a new program module                            – Add an instruction in your routine          your program modules
 
-     – Add a system module                                 – Add a procedure call to your routine in   – Increase the value of the data in your
-                                                             main                                        routine (AddIncr instruction)
+– Add a system module                                 – Add a procedure call to your routine in   – Increase the value of the data in your
+   main                                        routine (AddIncr instruction)
 
-                                                           – Test run the program from main (PP to     – Check the new value
-                                                             main)
+– Test run the program from main (PP to     – Check the new value
+  main)
 
 
-     August 1, 2022   Slide 83   OmniCore - Basic Programming
+August 1, 2022   Slide 83   OmniCore - Basic Programming
 
 
 83
 
 
-     —
-     Program Structure
-     Exercise - Program Structure Questions
+—
+Program Structure
+Exercise - Program Structure Questions
 
 
-     Answer the questions in your student manual
+Answer the questions in your student manual
 
 
-     – In what type of module would you put a routine that moves a part from a fixture to a pallet?
-     – Why?
+– In what type of module would you put a routine that moves a part from a fixture to a pallet?
+– Why?
 
 
-     – In what type of module would you store the definition of a pallet work object?
-     – Why?
+– In what type of module would you store the definition of a pallet work object?
+– Why?
 
 
-     – If you have a program that is stacking boxes on a pallet and it can only stack 5 boxes on top of each other, would you use variable or
-       persistent data to keep track of the current amount of stacked boxes?
-     – Why?
+– If you have a program that is stacking boxes on a pallet and it can only stack 5 boxes on top of each other, would you use variable or
+  persistent data to keep track of the current amount of stacked boxes?
+– Why?
 
 
-     August 1, 2022   Slide 84   OmniCore - Basic Programming
-                                                                                                                                                        42
+August 1, 2022   Slide 84   OmniCore - Basic Programming
+   42
 84
 
 ---
@@ -1757,27 +1758,27 @@
 8/1/2022
 
 
-     —
-     Handling Inputs and Outputs
+—
+Handling Inputs and Outputs
 
 
 85
 
 
-     —
-     Handling Inputs and Outputs
-     Objectives
+—
+Handling Inputs and Outputs
+Objectives
 
 
-     After this chapter you should be able to:
-     – Find I/O signals in the FlexPendant
-     – Set and simulate I/O signals
-     – Change the content of the Favorite Signals list
-     – Change the behavior of the programmable keys
+After this chapter you should be able to:
+– Find I/O signals in the FlexPendant
+– Set and simulate I/O signals
+– Change the content of the Favorite Signals list
+– Change the behavior of the programmable keys
 
 
-     August 1, 2022   Slide 86   OmniCore - Basic Programming
-                                                                      43
+August 1, 2022   Slide 86   OmniCore - Basic Programming
+   43
 86
 
 ---
@@ -1787,40 +1788,40 @@
 8/1/2022
 
 
-     —
-     Handling Inputs and Outputs
-     The I/O Application
+—
+Handling Inputs and Outputs
+The I/O Application
 
 
-     Applications -> I/O -> Signals
-     A. Filter
-     B. Search
-     C. Value
-     D. Simulate
+Applications -> I/O -> Signals
+A. Filter
+B. Search
+C. Value
+D. Simulate
 
 
-     August 1, 2022    Slide 87   OmniCore - Basic Programming
+August 1, 2022    Slide 87   OmniCore - Basic Programming
 
 
 87
 
 
-     —
-     Handling Inputs and Outputs
-     Set and Simulate Signals
+—
+Handling Inputs and Outputs
+Set and Simulate Signals
 
 
-     Set Signals                                                       Simulate Signals
-     – Set to 1 or 0                                                   – Press the more options button (...) on a signal to simulate
-     – Tap a signals value to change it                                – Programs act according to simulated value
-     – Only output signals can be set                                  – Signals are not physically changed when simulated
-     – Changes the physical value of the signal to the corresponding   – Not all input/output signals can be simulated
-       value
-     – Not all outputs can be manipulated this way
+Set Signals                                                       Simulate Signals
+– Set to 1 or 0                                                   – Press the more options button (...) on a signal to simulate
+– Tap a signals value to change it                                – Programs act according to simulated value
+– Only output signals can be set                                  – Signals are not physically changed when simulated
+– Changes the physical value of the signal to the corresponding   – Not all input/output signals can be simulated
+  value
+– Not all outputs can be manipulated this way
 
 
-     August 1, 2022    Slide 88   OmniCore - Basic Programming
-                                                                                                                                             44
+August 1, 2022    Slide 88   OmniCore - Basic Programming
+   44
 88
 
 ---
@@ -1830,45 +1831,45 @@
 8/1/2022
 
 
-     —
-     Handling Inputs and Outputs
-     Programmable Keys
+—
+Handling Inputs and Outputs
+Programmable Keys
 
 
-     Input                                                  Output                                           System
-     – Pulse - Signal is pulsed to its inverted             Pulse - Signal is pulsed to its inverted value   – Move PP to Main - Moves Program
-       value                                                Set to 1 - Signal is set to 1                      Pointer to main
-     – Input can only be pulsed                             Set to 0 - Signal is set to 0
-                                                            Toggle - Signal's current value is inverted
-                                                            Press/Release - Signal is 1 while pressed (0
-                                                            for inverted signals)
+Input                                                  Output                                           System
+– Pulse - Signal is pulsed to its inverted             Pulse - Signal is pulsed to its inverted value   – Move PP to Main - Moves Program
+  value                                                Set to 1 - Signal is set to 1                      Pointer to main
+– Input can only be pulsed                             Set to 0 - Signal is set to 0
+   Toggle - Signal's current value is inverted
+   Press/Release - Signal is 1 while pressed (0
+   for inverted signals)
 
 
-                                                      Remember to check the Allow in Auto option
+Remember to check the Allow in Auto option
 
 
-     August 1, 2022    Slide 89   OmniCore - Basic Programming
+August 1, 2022    Slide 89   OmniCore - Basic Programming
 
 
 89
 
 
-     —
-     Handling Inputs and Outputs
-     Exercise - Using a Signal to Control the Grip Tool
+—
+Handling Inputs and Outputs
+Exercise - Using a Signal to Control the Grip Tool
 
 
-     Open/Close the Grip Tool
-     – Try to figure out which signal that controls the
-       grip tool
-     – Add the grip tool's signal to Favorite Signals
-     – Toggle the signal and observe its behavior
-     – Configure a Programmable Key to open and
-       close the grip tool
+Open/Close the Grip Tool
+– Try to figure out which signal that controls the
+  grip tool
+– Add the grip tool's signal to Favorite Signals
+– Toggle the signal and observe its behavior
+– Configure a Programmable Key to open and
+  close the grip tool
 
 
-     August 1, 2022    Slide 90   OmniCore - Basic Programming
-                                                                                                                                                       45
+August 1, 2022    Slide 90   OmniCore - Basic Programming
+   45
 90
 
 ---
@@ -1878,25 +1879,25 @@
 8/1/2022
 
 
-     —
-     I/O Instructions
+—
+I/O Instructions
 
 
 91
 
 
-     —
-     I/O Instructions
-     Objectives
+—
+I/O Instructions
+Objectives
 
 
-     After this chapter you should be able to:
-     – Implement the most common RAPID instructions for inputs and outputs
-     – Check the current value of an I/O signal
+After this chapter you should be able to:
+– Implement the most common RAPID instructions for inputs and outputs
+– Check the current value of an I/O signal
 
 
-     August 1, 2022   Slide 92   OmniCore - Basic Programming
-                                                                                   46
+August 1, 2022   Slide 92   OmniCore - Basic Programming
+   46
 92
 
 ---
@@ -1906,50 +1907,50 @@
 8/1/2022
 
 
-     —
-     I/O Instructions
-     General Information
+—
+I/O Instructions
+General Information
 
 
-     IO Principle
-     Electrical signals to and from the robot controller
+IO Principle
+Electrical signals to and from the robot controller
 
 
-     – A. Sensor
-     – B. 24V signal
-     – C. IO-unit
-     – D. Fieldbus cable
-     – E. Main computer
-     – F. Program example, accessing a signal
+– A. Sensor
+– B. 24V signal
+– C. IO-unit
+– D. Fieldbus cable
+– E. Main computer
+– F. Program example, accessing a signal
 
 
-     DO=Digital output, signal from the controller to external
-     equipment, can be either 0 (low) or 1 (high)
-     DI=Digital input, signal from external equipment to the controller,
-     can be either 0 (low) or 1 (high)
+DO=Digital output, signal from the controller to external
+equipment, can be either 0 (low) or 1 (high)
+DI=Digital input, signal from external equipment to the controller,
+can be either 0 (low) or 1 (high)
 
 
-     August 1, 2022    Slide 93   OmniCore - Basic Programming
+August 1, 2022    Slide 93   OmniCore - Basic Programming
 
 
 93
 
 
-     —
-     I/O Instructions
-     Examples of IO instructions
+—
+I/O Instructions
+Examples of IO instructions
 
 
-     Manipulate digital outputs
-     – Set <Signal> - Sets digital output to 1
-     – Reset <Signal> - Resets digital output to 0
-     – SetDO <Signal>, <Value> - Sets digital output to value (1 or 0)
-     – InvertDO <Signal> - Inverts the value of a signal
-     – PulseDO <Signal> - Pulses a signal
+Manipulate digital outputs
+– Set <Signal> - Sets digital output to 1
+– Reset <Signal> - Resets digital output to 0
+– SetDO <Signal>, <Value> - Sets digital output to value (1 or 0)
+– InvertDO <Signal> - Inverts the value of a signal
+– PulseDO <Signal> - Pulses a signal
 
 
-     August 1, 2022    Slide 94   OmniCore - Basic Programming
-                                                                                 47
+August 1, 2022    Slide 94   OmniCore - Basic Programming
+   47
 94
 
 ---
@@ -1959,41 +1960,41 @@
 8/1/2022
 
 
-     —
-     I/O Instructions
-     Examples of IO instructions
+—
+I/O Instructions
+Examples of IO instructions
 
 
-     Read or wait for signal
-     Read value of signal
-     – DI, compare with 1 or 0 (IF di1=1 THEN)
-     – DO, DOutput (<Signal>) ( IF Doutput(do4)=1 THEN)
-     Wait for signal
-     – WaitDI <Signal>, <Value> - Waits for digital input
-     – WaitDO <Signal>, <Value> - Waits for digital output
+Read or wait for signal
+Read value of signal
+– DI, compare with 1 or 0 (IF di1=1 THEN)
+– DO, DOutput (<Signal>) ( IF Doutput(do4)=1 THEN)
+Wait for signal
+– WaitDI <Signal>, <Value> - Waits for digital input
+– WaitDO <Signal>, <Value> - Waits for digital output
 
 
-     August 1, 2022     Slide 95   OmniCore - Basic Programming
+August 1, 2022     Slide 95   OmniCore - Basic Programming
 
 
 95
 
 
-     —
-     I/O Instructions
-     Exercise - Implement I/O Instructions
+—
+I/O Instructions
+Exercise - Implement I/O Instructions
 
 
-     Add the following functionality to a program
-     – Wait for input
-     – Set digital output
-     – Run program
-     – Reset digital output
-     – Pulse digital output
+Add the following functionality to a program
+– Wait for input
+– Set digital output
+– Run program
+– Reset digital output
+– Pulse digital output
 
 
-     August 1, 2022     Slide 96   OmniCore - Basic Programming
-                                                                        48
+August 1, 2022     Slide 96   OmniCore - Basic Programming
+   48
 96
 
 ---
@@ -2003,26 +2004,26 @@
 8/1/2022
 
 
-     —
-     Revolution Counters
+—
+Revolution Counters
 
 
 97
 
 
-     —
-     Revolution Counters
-     Objectives
+—
+Revolution Counters
+Objectives
 
 
-     After this chapter you should be able to:
-     – Explain what a revolution counter is and its purpose
-     – Perform a revolution counter update
-     – Check if a revolution counter update is needed
+After this chapter you should be able to:
+– Explain what a revolution counter is and its purpose
+– Perform a revolution counter update
+– Check if a revolution counter update is needed
 
 
-     August 1, 2022   Slide 98   OmniCore - Basic Programming
-                                                                      49
+August 1, 2022   Slide 98   OmniCore - Basic Programming
+   49
 98
 
 ---
@@ -2032,46 +2033,46 @@
 8/1/2022
 
 
-     —
-     Revolution Counters
-     Motor Positioning
+—
+Revolution Counters
+Motor Positioning
 
 
-     – Each motor has a device that reads the
-       position of current motor revolution in
-       radians, normally a resolver
-     – Reset to 0 after full revolution
+– Each motor has a device that reads the
+  position of current motor revolution in
+  radians, normally a resolver
+– Reset to 0 after full revolution
 
 
-     August 1, 2022    Slide 99    OmniCore - Basic Programming
+August 1, 2022    Slide 99    OmniCore - Basic Programming
 
 
 99
 
 
-     —
-     Revolution Counters
-     What are Revolution Counters?
+—
+Revolution Counters
+What are Revolution Counters?
 
 
-     – Keeps track of how many completed motor
-       revolutions
-     – Essential for controller to know current
-       position of axes
+– Keeps track of how many completed motor
+  revolutions
+– Essential for controller to know current
+  position of axes
 
 
-     Example:
-     Full revolution = π * 2 (~ 6.28 radians)
-     Revolution counter: 3
-     Current revolution: 2.54
+Example:
+Full revolution = π * 2 (~ 6.28 radians)
+Revolution counter: 3
+Current revolution: 2.54
 
 
-     Motor position = 3 * 6.28 + 2.54 = 21.38 radians
-     21.38 * gear ratio = Axis position
+Motor position = 3 * 6.28 + 2.54 = 21.38 radians
+21.38 * gear ratio = Axis position
 
 
-     August 1, 2022    Slide 100   OmniCore - Basic Programming
-                                                                        50
+August 1, 2022    Slide 100   OmniCore - Basic Programming
+   50
 100
 
 ---
@@ -2086,7 +2087,7 @@
   Revolution Counter Update
 
 
-                                                                       Sync Position Indicators
+Sync Position Indicators
   – No special equipment
   – Visual approximation
   – Can only be updated to 0
@@ -2112,11 +2113,11 @@
   – The robot's axes have moved while powered off
 
 
-                   Updating revolution counters is NOT the same as Calibration, which requires special equipment
+Updating revolution counters is NOT the same as Calibration, which requires special equipment
 
 
   August 1, 2022      Slide 102   OmniCore - Basic Programming
-                                                                                                                         51
+51
 102
 
 ---
@@ -2149,7 +2150,7 @@
   Tools
 
 
-                                                                                                52
+52
 104
 
 ---
@@ -2191,7 +2192,7 @@
 
 
   August 1, 2022   Slide 106   OmniCore - Basic Programming
-                                                                    53
+53
 106
 
 ---
@@ -2211,7 +2212,7 @@
   – Jog reorient
   – Jog in tool coordinates
   – Easy replacement if tool is
-    changed
+changed
 
 
   August 1, 2022   Slide 107   OmniCore - Basic Programming
@@ -2233,11 +2234,11 @@
   – Do not use tool0 when a tool is mounted
 
 
-                         Using tool0 while tool is mounted may reduce the robot's accuracy and life span
+Using tool0 while tool is mounted may reduce the robot's accuracy and life span
 
 
   August 1, 2022   Slide 108   OmniCore - Basic Programming
-                                                                                                                           54
+54
 108
 
 ---
@@ -2271,11 +2272,11 @@
   – F. Moment of inertia
 
 
-                            Not defining tool load correctly may reduce the robot's accuracy and life span
+Not defining tool load correctly may reduce the robot's accuracy and life span
 
 
   August 1, 2022    Slide 110   OmniCore - Basic Programming
-                                                                                                                   55
+55
 110
 
 ---
@@ -2292,12 +2293,12 @@
 
   Steps
   – Create a new tool from the jogging-/program
-    data window
+data window
   – Define the TCP with 4 points and z
   – Enter the mass and center of gravity values
   – Test TCP by jogging reoriented
   – Test orientation of TCP by jogging in tool
-    coordinates
+coordinates
 
 
   August 1, 2022   Slide 111   OmniCore - Basic Programming
@@ -2310,7 +2311,7 @@
   Work Objects
 
 
-                                                                    56
+56
 112
 
 ---
@@ -2342,15 +2343,15 @@
 
 
   – User defined
-    coordinate system
+coordinate system
   – Has user frame,
-    defined in world
+defined in world
   – Has object frame,
-    defined in user frame
+defined in user frame
 
 
   August 1, 2022   Slide 114   OmniCore - Basic Programming
-                                                                    57
+57
 114
 
 ---
@@ -2366,12 +2367,12 @@
 
 
   – User frame is relative
-    to world coordinate
-    system
+to world coordinate
+system
   – Object frame is
-    relative to user frame
+relative to user frame
   – Positions are relative
-    to object frame
+to object frame
 
 
   August 1, 2022    Slide 115   OmniCore - Basic Programming
@@ -2387,11 +2388,11 @@
 
   Jogging                                                 Offline Programming                          Easy to Redefine
   – Jog in work object directions                         – Program offline in RobotStudio, redefine   – Just redefine work object if a fixture
-                                                            work objects in real robot cell              moves after positions are programmed
+work objects in real robot cell              moves after positions are programmed
 
 
   August 1, 2022    Slide 116   OmniCore - Basic Programming
-                                                                                                                                                        58
+58
 116
 
 ---
@@ -2422,14 +2423,14 @@
   – Define with three points
   – Check work object
   – Create a routine to draw a shape in work
-    object
+object
   – Test run
   – Move paper and redefine work object
   – Test run
 
 
   August 1, 2022   Slide 118   OmniCore - Basic Programming
-                                                                    59
+59
 118
 
 ---
@@ -2458,7 +2459,7 @@
 
 
   August 1, 2022   Slide 120   OmniCore - Basic Programming
-                                                                    60
+60
 120
 
 ---
@@ -2475,7 +2476,7 @@
 
   – Saving program only saves program modules
   – Loading program unload all current program
-    modules
+modules
   – System modules unaffected
 
 
@@ -2495,7 +2496,7 @@
 
 
   August 1, 2022   Slide 122   OmniCore - Basic Programming
-                                                                    61
+61
 122
 
 ---
@@ -2510,19 +2511,19 @@
   Save a System Backup
 
 
-                                                                    Settings -> Backup & Recovery -> Backup
+Settings -> Backup & Recovery -> Backup
   – Saves as a folder by default
   – Save as .tar-archive possible
   Contains:
   – BACKINFO, Information about the backup, safety configuration,
-    RobotWare license, etc
+RobotWare license, etc
   – HOME, a copy of the systems HOME-folder
   – RAPID, All modules in all tasks, including hidden
   – SYSPAR, all the controllers system parameters
   – System.xml, information about the system
 
 
-                           Backup can be performed from FlexPendant, RobotStudio and via System input
+Backup can be performed from FlexPendant, RobotStudio and via System input
 
 
   August 1, 2022    Slide 123   OmniCore - Basic Programming
@@ -2536,14 +2537,14 @@
   Restore a System Backup
 
 
-                                                                    Settings -> Backup & Recovery -> Restore
+Settings -> Backup & Recovery -> Restore
   – Restores System Parameters, RAPID and HOME-folder
   – Possible to restore Safety configuration
   – Not possible to restore an edited backup in RobotWare 7
 
 
   August 1, 2022    Slide 124   OmniCore - Basic Programming
-                                                                                                                     62
+62
 124
 
 ---
@@ -2570,7 +2571,7 @@
 
 
   August 1, 2022   Slide 126   OmniCore - Basic Programming
-                                                                                      63
+63
 126
 
 ---
@@ -2609,12 +2610,12 @@
   Background
   – Create virtual copy from system backup
   – System can be started in a virtual controller and used for offline
-    programming
+programming
   – Can have a transfer relation with a real controller
 
 
   August 1, 2022    Slide 128   OmniCore - Basic Programming
-                                                                                                 64
+64
 128
 
 ---
@@ -2651,7 +2652,7 @@
 
 
   August 1, 2022    Slide 130   OmniCore - Basic Programming
-                                                                                                       65
+65
 130
 
 ---
@@ -2683,7 +2684,7 @@
 
 
   August 1, 2022   Slide 132   OmniCore - Basic Programming
-                                                                                                                          66
+66
 132
 
 ---
@@ -2720,10 +2721,10 @@
   Steps
 
 
-                                                                             Structure Example
+Structure Example
   – Create an overview-structure for your program
-         • Decide how to split your programs in routines
-         • Decide where to put Routines and Data
+• Decide how to split your programs in routines
+• Decide where to put Routines and Data
   – Create a tool
   – Create a work object
   – Create Modules and routines according to your structure
@@ -2734,7 +2735,7 @@
 
 
   August 1, 2022    Slide 134   OmniCore - Basic Programming
-                                                                                                       67
+67
 134
 
 ---
@@ -2762,7 +2763,7 @@
 
 
   August 1, 2022   Slide 136   OmniCore - Basic Programming
-                                                                               68
+68
 136
 
 ---
@@ -2803,13 +2804,13 @@
 
 
   – Offset robtarget's position in object coordinate system        A. Robtarget to offset
-                                                                   X. 10 mm offset in the x-direction
-                                                                   Y. 15 mm offset in the y-direction
-                                                                   Z. 35 mm offset in the Z-direction
+X. 10 mm offset in the x-direction
+Y. 15 mm offset in the y-direction
+Z. 35 mm offset in the Z-direction
 
 
   August 1, 2022    Slide 138   OmniCore - Basic Programming
-                                                                                                              69
+69
 138
 
 ---
@@ -2826,7 +2827,7 @@
 
   Draw a square using only one robtarget and Offs               Example
   – Create robtarget at first corner ON the paper, not at the
-    approach position. Why?
+approach position. Why?
   – How is your work object oriented?
   – Do you need to offset using negative values?
 
@@ -2846,15 +2847,15 @@
 
 
   – Offset robtarget's position and/or rotation in the tool     A. Robtarget to offset
-    coordinate system                                           B. 10° rotational offset around the tool's x-axis (optional)
-                                                                C. 25° rotational offset around the tool's z-axis (optional)
-                                                                X. 5 mm offset in the tool's x-direction
-                                                                Y. 0 mm offset in the tool's y-direction
-                                                                Z. -40 mm offset in the tool's z-direction
+coordinate system                                           B. 10° rotational offset around the tool's x-axis (optional)
+   C. 25° rotational offset around the tool's z-axis (optional)
+   X. 5 mm offset in the tool's x-direction
+   Y. 0 mm offset in the tool's y-direction
+   Z. -40 mm offset in the tool's z-direction
 
 
   August 1, 2022   Slide 140   OmniCore - Basic Programming
-                                                                                                                                     70
+70
 140
 
 ---
@@ -2893,7 +2894,7 @@
 
 
   August 1, 2022   Slide 142   OmniCore - Basic Programming
-                                                                              71
+71
 142
 
 ---
@@ -2934,7 +2935,7 @@
 
 
   August 1, 2022   Slide 144   OmniCore - Basic Programming
-                                                                              72
+72
 144
 
 ---
@@ -2964,7 +2965,7 @@
 
 
   August 1, 2022   Slide 146   OmniCore - Basic Programming
-                                                                                                                          73
+73
 146
 
 ---
@@ -3006,11 +3007,11 @@
   – What tools, work objects and signals will you use?
 
 
-                   Comments can be useful to create an outline of your program and make it easier to understand
+Comments can be useful to create an outline of your program and make it easier to understand
 
 
   August 1, 2022      Slide 148   OmniCore - Basic Programming
-                                                                                                                        74
+74
 148
 
 ---
@@ -3041,7 +3042,7 @@
 
 
   August 1, 2022   Slide 150   OmniCore - Basic Programming
-                                                                    75
+75
 150
 
 ---
@@ -3059,11 +3060,11 @@
   Statements                                                  Instructions
   RAPID is formally built of statements                       Most commonly used instructions can be categorized in the
   In this chapter we refer to statements as instructions      following groups:
-                                                              – Assign instructions
-                                                              – Choice instructions
-                                                              – Loop instructions
-                                                              – Stop instructions
-                                                              – Operator communication instructions
+– Assign instructions
+– Choice instructions
+– Loop instructions
+– Stop instructions
+– Operator communication instructions
 
 
   August 1, 2022   Slide 151   OmniCore - Basic Programming
@@ -3085,7 +3086,7 @@
 
 
   August 1, 2022   Slide 152   OmniCore - Basic Programming
-                                                                                                                                76
+76
 152
 
 ---
@@ -3104,8 +3105,8 @@
   Do something depending on a condition                               Used when a single instruction is to be executed when a condition
   – IF                                                                is met
 
-         • ELSEIF
-         • ELSE
+• ELSEIF
+• ELSE
 
 
   A = Condition
@@ -3114,7 +3115,7 @@
   to either TRUE or FALSE)                                            (Any expression evaluating to either TRUE or FALSE)
 
   B = Instructions                                                    B = Instruction
-                                                                      (A single instruction to be executed if condition is met)
+(A single instruction to be executed if condition is met)
 
 
   August 1, 2022     Slide 153   OmniCore - Basic Programming
@@ -3136,11 +3137,11 @@
   A. Value to test
   B. Test values
   C. If the value to test does not equal any of the test values the
-     code after DEFAULT: will be executed.
+code after DEFAULT: will be executed.
 
 
   August 1, 2022     Slide 154   OmniCore - Basic Programming
-                                                                                                                                                77
+77
 154
 
 ---
@@ -3182,11 +3183,11 @@
   A. Condition to continue looping
 
 
-                                                               Watch out for infinite loops
+Watch out for infinite loops
 
 
   August 1, 2022    Slide 156   OmniCore - Basic Programming
-                                                                                                    78
+78
 156
 
 ---
@@ -3203,7 +3204,7 @@
 
   3 Instructions
   – Stop, stops program execution after the robot has finished the
-    current movement
+current movement
 
 
   – Break, stops program execution immediately
@@ -3227,18 +3228,18 @@
   None of the following instructions wait for a response from the
   operator
   – TPWrite, writes a text to the operator window, successive
-    TPWrite is showed as a list
+TPWrite is showed as a list
   – TPErase, clears all texts from the operator window
 
 
   – UIMsgWrite, Shows a message in the operator window,
-    successive UIMsgWrite replaces previous UIMsgWrite
+successive UIMsgWrite replaces previous UIMsgWrite
   – UIMsgWriteAbort, removes UIMsgWrite message from the
-    operator window
+operator window
 
 
   August 1, 2022   Slide 158   OmniCore - Basic Programming
-                                                                           79
+79
 158
 
 ---
@@ -3256,7 +3257,7 @@
   Two Way Communication
   Messages that needs confirmation from operator
   – UIMsgBox, Writes a message on the screen that needs the
-    operator to press ok before it continues
+operator to press ok before it continues
 
 
   August 1, 2022   Slide 159   OmniCore - Basic Programming
@@ -3284,7 +3285,7 @@
 
 
   August 1, 2022   Slide 160   OmniCore - Basic Programming
-                                                                                                                              80
+80
 160
 
 ---
@@ -3313,7 +3314,7 @@
 
 
   August 1, 2022   Slide 162   OmniCore - Basic Programming
-                                                                                  81
+81
 162
 
 ---
@@ -3328,18 +3329,18 @@
   Overview
 
 
-                                                              Dashboards
-                                                              – Custom build dashboards with up to 6 different cards.
-                                                              – Up to 30 customized dashboards at the same time.
-                                                              – Switch easily between dashboards to find values of interest for
-                                                                your job role.
+Dashboards
+– Custom build dashboards with up to 6 different cards.
+– Up to 30 customized dashboards at the same time.
+– Switch easily between dashboards to find values of interest for
+  your job role.
 
 
-                                                              Cards
-                                                              – Display controller parameters, RAPID data, I/O signal values and
-                                                                more on your custom cards.
-                                                              – Possible to hundreds of custom cards at the same time.
-                                                              – Use several pre-made system cards.
+Cards
+– Display controller parameters, RAPID data, I/O signal values and
+  more on your custom cards.
+– Possible to hundreds of custom cards at the same time.
+– Use several pre-made system cards.
 
 
   August 1, 2022   Slide 163   OmniCore - Basic Programming
@@ -3362,7 +3363,7 @@
 
 
   August 1, 2022   Slide 164   OmniCore - Basic Programming
-                                                                                                                                         82
+82
 164
 
 ---
@@ -3389,7 +3390,7 @@
 
 
   August 1, 2022   Slide 166   OmniCore - Basic Programming
-                                                                    83
+83
 166
 
 ---
@@ -3420,6 +3421,6 @@
 167
 
 
-                                                                    84
+84
 
 ---

@@ -7,6 +7,7 @@
 | **วิธีสกัดข้อความ** | text layer (embedded) |
 
 ---
+
 ## หน้า 1
 
 Maintenance Course
@@ -17,7 +18,7 @@ Maintenance Course
    IAI ROBOT(THAILAND) Co., Ltd.   REV.2022
 
 
-                    1
+1
 
 ---
 
@@ -63,13 +64,13 @@ Maintenance Course
 
      1.   Check whether dust or other foreign matter has gotten inside
      2.   Check the lubrication state.
-     The lubrication may have turned brown. This is not a problem as long as the moving surface still coating
-     with shiny grease.
-     If the grease is mixed with dust and does not have a shiny appearance, or if the grease has lost its efficacy
-     due to prolonged use, then clean each section and reapply grease.
+The lubrication may have turned brown. This is not a problem as long as the moving surface still coating
+with shiny grease.
+If the grease is mixed with dust and does not have a shiny appearance, or if the grease has lost its efficacy
+due to prolonged use, then clean each section and reapply grease.
 
 
-                                                   4
+4
 
 ---
 
@@ -135,7 +136,7 @@ Caution:
 Supplying too much grease may increase sliding resistance and load to the motor, resulting in a drop of performance.
 
 
-                                                        7
+7
 
 ---
 
@@ -179,13 +180,13 @@ Supplying too much grease may increase sliding resistance and load to the motor,
                2. Apply grease using a finger
                3. Move the slider back and forth several times to let the grease spread evenly.
                4. Remove excess grease.
-               Be careful not to deform the stainless sheet by accidentally touching the sheet.
+Be careful not to deform the stainless sheet by accidentally touching the sheet.
 
 
-                                ทำตามภาพ
+ทำตามภาพ
 
 
-                                                 10
+10
 
 ---
 
@@ -273,11 +274,11 @@ Supplying too much grease may increase sliding resistance and load to the motor,
                   4.    Wipe off any excess grease
 
 
-           Open cover
-                                                  Grease up for both side
+Open cover
+   Grease up for both side
 
 
-                                                   16
+16
 
 ---
 
@@ -375,10 +376,10 @@ Only Guide
  There are grease nipples on a slider, one each on both sides of it.
 
 
-                                              This example for W-slider
+This example for W-slider
 
 
-                                                      22
+22
 
 ---
 
@@ -437,9 +438,9 @@ Only Guide
      1. Never use spray oil instead of grease. always use spray grease.
      2. keep the spraying time to within 1 second.
      3. Do not spray grease continuously for more than 1 second or repeat spraying twice or more.
-     If an excess amount of grease is applied, oil may flow into the electronic components and cause malfunction
+If an excess amount of grease is applied, oil may flow into the electronic components and cause malfunction
 
-                                                    25
+25
 
 ---
 
@@ -475,7 +476,7 @@ Only Guide
 
  When grease is applied from the grease nipple, grease is supplied to the ball screw and the guides on both sides.
 
-                                                     27
+27
 
 ---
 
@@ -495,7 +496,7 @@ Only Guide
 
  When grease is applied from the grease nipple, grease is supplied to the ball screw and the guides on both sides.
 
-                                                     28
+28
 
 ---
 
@@ -593,9 +594,9 @@ Only Guide
 
 
 You should see the gears through this opening.
-            Apply grease on the tooth surface
+Apply grease on the tooth surface
 
-                                                              34
+34
 
 ---
 
@@ -718,7 +719,7 @@ You should see the gears through this opening.
  Use Parameter home return offset        slider distance from the mechanical
  distance for each controller type.      end depend on actuator model
 
-                                                      40
+40
 
 ---
 
@@ -752,11 +753,11 @@ You should see the gears through this opening.
      1. Straight type (Coupling)
      2. Reverse type
 
-     Motor will delivered by unit (include actuator cable). But some actuator it will delivered only motor.
-     It can check on each manual of actuator – topic Maintenance -> motor replacement.
+Motor will delivered by unit (include actuator cable). But some actuator it will delivered only motor.
+It can check on each manual of actuator – topic Maintenance -> motor replacement.
 
 
-                                                  42
+42
 
 ---
 
@@ -871,7 +872,7 @@ You should see the gears through this opening.
  ** Pay attention to the power cables so they would not get into the screw guides. Also avoid the
  cables getting pinched between the main unit, motor cover, end cover, etc.
 
-                                                   47
+47
 
 ---
 
@@ -964,11 +965,11 @@ You should see the gears through this opening.
      1. Straight type (Coupling)
      2. Reverse type
 
-     Motor will delivered by unit (include actuator cable). But some actuator it will delivered only motor.
-     It can check on each manual of actuator – topic Maintenance -> motor replacement.
+Motor will delivered by unit (include actuator cable). But some actuator it will delivered only motor.
+It can check on each manual of actuator – topic Maintenance -> motor replacement.
 
 
-                                                  52
+52
 
 ---
 
@@ -1156,13 +1157,13 @@ You should see the gears through this opening.
 ## หน้า 66
 
 2.CONTROLLER - Backup data Positioner type (CON)
-     Position type controller        Combination of Position type with Gateway
+Position type controller        Combination of Position type with Gateway
 
 
-            DCON
+DCON
 
 
-                                66
+66
 
 ---
 
@@ -1170,7 +1171,7 @@ You should see the gears through this opening.
 
 2.CONTROLLER - Backup data Positioner type (CON)
 
-                                             Use program “ PC Interface software for RC/EC”
+Use program “ PC Interface software for RC/EC”
 
 
  Connection to SIO port
@@ -1179,11 +1180,11 @@ You should see the gears through this opening.
   it is possible to save all data at once (position data + parameter data)
 
 
-                                                                Controller → ＰＣ
-                                                                ＰＣ → Controller
+Controller → ＰＣ
+ＰＣ → Controller
 
 
-                                           67
+67
 
 ---
 
@@ -1195,7 +1196,7 @@ You should see the gears through this opening.
   That will backup gateway setup data also.
 
 
-                            Use program “ GW parameter configuration tool”
+Use program “ GW parameter configuration tool”
 
 
     1. Select unit type and “Read” data from gateway
@@ -1239,10 +1240,10 @@ You should see the gears through this opening.
 2.CONTROLLER - Backup data Program type (SEL)
 
 
-    ASEL / PSEL / SSEL    MSEL
+ASEL / PSEL / SSEL    MSEL
 
 
-                              71
+71
 
 ---
 
@@ -1250,15 +1251,15 @@ You should see the gears through this opening.
 
 2.CONTROLLER - Backup data Program type (SEL)
 
-                     Use program “ PC Interface software for XSEL”
+Use program “ PC Interface software for XSEL”
 
 
-                                                              Controller   →    ＰＣ
+Controller   →    ＰＣ
 
-                                                              ＰＣ     →     Controller
+ＰＣ     →     Controller
 
 
-                                 72
+72
 
 ---
 
@@ -1267,14 +1268,14 @@ You should see the gears through this opening.
 2.CONTROLLER - Trouble check Positioner type (CON)
 
 
-    The time is shown after
+The time is shown after
    power on to the controller
 
 
-     Note : Emergency Stop / Low voltage Motor power does not show in the list.
+Note : Emergency Stop / Low voltage Motor power does not show in the list.
 
 
-                                            73
+73
 
 ---
 
@@ -1283,7 +1284,7 @@ You should see the gears through this opening.
 2.CONTROLLER - Trouble check   Program type (SEL)
 
 
-                          74
+74
 
 ---
 
@@ -1292,18 +1293,18 @@ You should see the gears through this opening.
 2.CONTROLLER - Trouble check   Program type (SEL)
 
 
-                          75
+75
 
 ---
 
 ## หน้า 76
 
 2.CONTROLLER - Trouble check                              Program type
-                 Positioner type
+Positioner type
 
 
   Check on controller manual of trouble controller
-                                                     76
+76
 
 ---
 
@@ -1312,7 +1313,7 @@ You should see the gears through this opening.
 2.CONTROLLER - Trouble check
 
 
-                          77
+77
 
 ---
 
@@ -1321,7 +1322,7 @@ You should see the gears through this opening.
 2.CONTROLLER - Trouble check
 
 
-                          78
+78
 
 ---
 
@@ -1337,14 +1338,14 @@ USA
 https://www.intelligentactuator.com/welcome-to-our-members-area/
 
 
-                                      79
+79
 
 ---
 
 ## หน้า 80
 
 2.CONTROLLER - Controller spare part
-    Positioner type (CON)
+Positioner type (CON)
 
                   - C / CF       Motor size
 
@@ -1360,14 +1361,14 @@ https://www.intelligentactuator.com/welcome-to-our-members-area/
                                                              - CFB
 
 
-                                  80
+80
 
 ---
 
 ## หน้า 81
 
 2.CONTROLLER - Controller spare part
-    Positioner type (CON)
+Positioner type (CON)
 
                   - C
                   - CA / CB               Motor capacity (Watt)
@@ -1390,59 +1391,59 @@ https://www.intelligentactuator.com/welcome-to-our-members-area/
 ## หน้า 82
 
 2.CONTROLLER - Controller spare part
-    Program type (SEL)
+Program type (SEL)
 
 
-            ASEL / PSEL / SSEL            MSEL-PC        MSEL-PCF
+ASEL / PSEL / SSEL            MSEL-PC        MSEL-PCF
 
 
-                  Part and controller are common to each model
+Part and controller are common to each model
 
 
-                                     82
+82
 
 ---
 
 ## หน้า 83
 
 2.CONTROLLER - Controller spare part
-     Program type (SEL)
-                                                   Panel board
+Program type (SEL)
+   Panel board
 
 
-                                                                             Brake
+Brake
 
 
-                                                                              AB-5
+AB-5
 
 
-                                                                      Field network
+Field network
 Electrical drive power    Power motor
-                                             Interface board   Main CPU
+Interface board   Main CPU
 
-                                        83
+83
 
 ---
 
 ## หน้า 84
 
 2.CONTROLLER - Controller spare part
-    Program type (SEL)
+Program type (SEL)
 
-    Example model for XSEL-P/Q controller part for motor power are common
-    Motor Power board ( IADP XXXX) 1 board / 2 axes
-                               axis 1               axis2
+Example model for XSEL-P/Q controller part for motor power are common
+Motor Power board ( IADP XXXX) 1 board / 2 axes
+   axis 1               axis2
 
-             IADP 2020       60W – 200W         60W – 200W
+IADP 2020       60W – 200W         60W – 200W
 
-             IADP 7575       400W – 750W       400W – 750W
+IADP 7575       400W – 750W       400W – 750W
 
-             IADP 2003       60W – 200W         20W – 30W
+IADP 2003       60W – 200W         20W – 30W
 
-             IADP 2075        20W – 30W        400W – 750W
+IADP 2075        20W – 30W        400W – 750W
 
 
-                                     84
+84
 
 ---
 
@@ -1452,7 +1453,7 @@ Electrical drive power    Power motor
    Battery for backup absolute encoder data and controller system data
 
 
-                                       85
+85
 
 ---
 
@@ -1462,7 +1463,7 @@ Electrical drive power    Power motor
    Battery for backup absolute encoder data and controller system data
 
 
-                                       86
+86
 
 ---
 
@@ -1472,7 +1473,7 @@ Electrical drive power    Power motor
    How to check cable for spare part
 
 
-                                       87
+87
 
 ---
 
@@ -1483,19 +1484,19 @@ Electrical drive power    Power motor
    For XSEL-J/K to newest XSEL model
 
 
-                                            CB – XPQ – PJ***
+CB – XPQ – PJ***
 
 
-                                       88
+88
 
 ---
 
 ## หน้า 89
 
 Thank you very much for
-    the attendance !
+the attendance !
 
 
-           70
+70
 
 ---

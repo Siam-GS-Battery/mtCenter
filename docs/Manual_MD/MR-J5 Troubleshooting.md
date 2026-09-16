@@ -7,6 +7,7 @@
 | **วิธีสกัดข้อความ** | text layer (embedded) |
 
 ---
+
 ## หน้า 1
 
 Mitsubishi Electric AC Servo System
@@ -43,60 +44,60 @@ through this manual, installation guide, and appended documents carefully. Do no
 knowledge of the equipment, safety information and instructions.
 In this manual, the safety instruction levels are classified into "WARNING" and "CAUTION".
 
-                                  Indicates that incorrect handling may cause hazardous conditions, resulting in
-        WARNING                   death or severe injury.
+   Indicates that incorrect handling may cause hazardous conditions, resulting in
+WARNING                   death or severe injury.
 
-                                  Indicates that incorrect handling may cause hazardous conditions, resulting in
-        CAUTION                   medium or slight injury.
+   Indicates that incorrect handling may cause hazardous conditions, resulting in
+CAUTION                   medium or slight injury.
 
 Note that the CAUTION level may lead to a serious consequence depending on conditions.
 Please follow the instructions of both levels because they are important to personnel safety.
 Forbidden actions and required actions are indicated by the following diagrammatic symbols.
 
 
-        Indicates a forbidden action. For example, "No Fire" is indicated by              .
+Indicates a forbidden action. For example, "No Fire" is indicated by              .
 
-        Indicates a required action. For example, grounding is indicated by               .
+Indicates a required action. For example, grounding is indicated by               .
 
 In this manual, precautions for hazards that can lead to property damage, instructions for other functions, and other
 information are shown separately in the "Point" area.
 After reading this manual, keep it accessible to the operator.
 
 
-                                                                                                                             1
+1
 
 ---
 
 ## หน้า 4
 
 [Installation/wiring]
-        WARNING
-    ● To prevent an electric shock, turn off the power and wait for 15 minutes or more (20 minutes or more
-      for the converter unit and drive unit) before starting wiring and/or inspection.
-    ● To prevent an electric shock, ground the servo amplifier.
-    ● To prevent an electric shock, any person who is involved in wiring should be fully competent to do the
-      work.
-    ● To prevent an electric shock, mount the servo amplifier before wiring.
-    ● To prevent an electric shock, connect the protective earth (PE) terminal of the servo amplifier to the
-      protective earth (PE) terminal of the cabinet, then connect the grounding lead wire to the ground.
-    ● To prevent an electric shock, do not touch the conductive parts.
+   WARNING
+● To prevent an electric shock, turn off the power and wait for 15 minutes or more (20 minutes or more
+  for the converter unit and drive unit) before starting wiring and/or inspection.
+● To prevent an electric shock, ground the servo amplifier.
+● To prevent an electric shock, any person who is involved in wiring should be fully competent to do the
+  work.
+● To prevent an electric shock, mount the servo amplifier before wiring.
+● To prevent an electric shock, connect the protective earth (PE) terminal of the servo amplifier to the
+  protective earth (PE) terminal of the cabinet, then connect the grounding lead wire to the ground.
+● To prevent an electric shock, do not touch the conductive parts.
 
 
-    [Setting/adjustment]
-        WARNING
-    ● To prevent an electric shock, do not operate the switches with wet hands.
+[Setting/adjustment]
+   WARNING
+● To prevent an electric shock, do not operate the switches with wet hands.
 
 
-    [Operation]
-        WARNING
-    ● To prevent an electric shock, do not operate the switches with wet hands.
+[Operation]
+   WARNING
+● To prevent an electric shock, do not operate the switches with wet hands.
 
 
-    [Maintenance]
-        WARNING
-    ● To prevent an electric shock, any person who is involved in inspection should be fully competent to do
-      the work.
-    ● To prevent an electric shock, do not operate the switches with wet hands.
+[Maintenance]
+   WARNING
+● To prevent an electric shock, any person who is involved in inspection should be fully competent to do
+  the work.
+● To prevent an electric shock, do not operate the switches with wet hands.
 
 
 2
@@ -107,13 +108,13 @@ After reading this manual, keep it accessible to the operator.
 
 ABOUT THE MANUAL
 
-                e-Manuals are Mitsubishi Electric FA electronic book manuals that can be browsed with a dedicated tool.
-                e-Manuals enable the following:
-                 • Searching for desired information in multiple manuals at the same time (manual cross searching)
-                 • Jumping from a link in a manual to another manual for reference
-                 • Browsing for hardware specifications by scrolling over the components shown in product illustrations
-                 • Bookmarking frequently referenced information
-                 • Copying sample programs to engineering software
+e-Manuals are Mitsubishi Electric FA electronic book manuals that can be browsed with a dedicated tool.
+e-Manuals enable the following:
+ • Searching for desired information in multiple manuals at the same time (manual cross searching)
+ • Jumping from a link in a manual to another manual for reference
+ • Browsing for hardware specifications by scrolling over the components shown in product illustrations
+ • Bookmarking frequently referenced information
+ • Copying sample programs to engineering software
 
 If using the servo for the first time, prepare and use the following related manuals to ensure that the servo is used safely. For
 the related manuals, refer to the User's Manual (Introduction).
@@ -122,34 +123,34 @@ the related manuals, refer to the User's Manual (Introduction).
  Introduction
 
 
-                                                                               This manual is necessary primarily for installing, wiring, and
-                                                  Rotary Servo Motor           using options.
-                 Hardware                         Linear Servo Motor
-                                                  Direct Drive Motor
+   This manual is necessary primarily for installing, wiring, and
+   Rotary Servo Motor           using options.
+Hardware                         Linear Servo Motor
+   Direct Drive Motor
 
 
-                                                  Partner Encoder
+Partner Encoder
 
 
-                                                                               The manual is necessary for operation of servo amplifiers.
-                 Function                                                      For the usage of each function, refer to this manual.
+   The manual is necessary for operation of servo amplifiers.
+Function                                                      For the usage of each function, refer to this manual.
 
 
-                 Communication Function                                        The manual is necessary for using communication functions.
+Communication Function                                        The manual is necessary for using communication functions.
 
 
-                 Adjustment                                                    The manual is necessary for adjustment of operation status.
+Adjustment                                                    The manual is necessary for adjustment of operation status.
 
 
-                                                                               The manual is necessary for specifying the causes of alarms
-                 Troubleshooting
-                                                                               and warnings.
+   The manual is necessary for specifying the causes of alarms
+Troubleshooting
+   and warnings.
 
 
-                                                  Parameters                   It describes the parameters of the servo amplifier.
+Parameters                   It describes the parameters of the servo amplifier.
 
 
-                                                  Object Dictionary            It describes the objects for the servo amplifier.
+Object Dictionary            It describes the objects for the servo amplifier.
 
 
 This manual covers the following servo amplifiers.
@@ -163,26 +164,26 @@ In this manual, the servo amplifier names are abbreviated as shown below.
 When reading this manual to use a drive unit, substitute "drive unit" for "servo amplifier".
 
 
-                                                                                                                                                3
+3
 
 ---
 
 ## หน้า 6
 
 Global standards and regulations
-    Compliance with the indicated global standards and regulations is current as of the release date of this manual. Some
-    standards and regulations may have been modified or withdrawn.
+Compliance with the indicated global standards and regulations is current as of the release date of this manual. Some
+standards and regulations may have been modified or withdrawn.
 
 
-    U.S. CUSTOMARY UNITS
-    U.S. customary units are not shown in this manual. Convert the values if necessary according to the following table.
-     Quantity                                 SI (metric) unit                          U.S. customary unit
-     Mass                                     1 [kg]                                    2.2046 [lb]
-     Length                                   1 [mm]                                    0.03937 [inch]
-     Torque                                   1 [N•m]                                   141.6 [oz•inch]
-     Moment of inertia                        1 [(× 10-4 kg•m2)]                        5.4675 [oz•inch2]
-     Load (thrust load/axial load)            1 [N]                                     0.2248 [lbf]
-     Temperature                              N [°C] × 9/5 + 32                         N [°F]
+U.S. CUSTOMARY UNITS
+U.S. customary units are not shown in this manual. Convert the values if necessary according to the following table.
+ Quantity                                 SI (metric) unit                          U.S. customary unit
+ Mass                                     1 [kg]                                    2.2046 [lb]
+ Length                                   1 [mm]                                    0.03937 [inch]
+ Torque                                   1 [N•m]                                   141.6 [oz•inch]
+ Moment of inertia                        1 [(× 10-4 kg•m2)]                        5.4675 [oz•inch2]
+ Load (thrust load/axial load)            1 [N]                                     0.2248 [lbf]
+ Temperature                              N [°C] × 9/5 + 32                         N [°F]
 
 
 4
@@ -201,107 +202,107 @@ CHAPTER 1                  SERVO AMPLIFIER TROUBLESHOOTING                      
 1.2      List of alarm No./warning No.. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
 
 
-                                                                                                                                                                                           CONTENTS
-         Explanation of the list . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
-         List . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14
+   CONTENTS
+Explanation of the list . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+List . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14
 1.3      Handling methods for alarms/warnings . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
-         [AL. 010_Undervoltage]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
-         [AL. 011_Switch setting error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 34
-         [AL. 012_Memory error 1 (RAM)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 35
-         [AL. 013_CPU error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 36
-         [AL. 014_Control process error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 37
-         [AL. 016_Encoder initial communication error 1]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 38
-         [AL. 017_Board error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 41
-         [AL. 019_Memory error 3] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 43
-         [AL. 01A_Servo motor combination error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 44
-         [AL. 01B_Protection coordination error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 47
-         [AL. 01E_Encoder initial communication error 2] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 48
-         [AL. 01F_Encoder initial communication error 3]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 49
-         [AL. 020_Encoder normal communication error 1] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 50
-         [AL. 021_Encoder normal communication error 2] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 52
-         [AL. 024_Main circuit error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 54
-         [AL. 025_Absolute position erased]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 55
-         [AL. 027_Initial magnetic pole detection error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 58
-         [AL. 028_Linear encoder error 2]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 60
-         [AL. 02A_Linear encoder error 1] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 61
-         [AL. 02B_Encoder counter error]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 62
-         [AL. 030_Regenerative error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 63
-         [AL. 031_Overspeed]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 65
-         [AL. 032_Overcurrent] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 66
-         [AL. 033_Overvoltage]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 68
-         [AL. 034_SSCNET receive error 1] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 69
-         [AL. 035_Command frequency error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 70
-         [AL. 036_SSCNET receive error 2] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 71
-         [AL. 037_Parameter error]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 72
-         [AL. 03A_Inrush current suppression circuit error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 73
-         [AL. 03D_Driver communication parameter setting error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 74
-         [AL. 03E_Operation mode error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 74
-         [AL. 042_Servo control error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 75
-         [AL. 045_Main circuit device overheat] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 78
-         [AL. 046_Servo motor overheat] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 79
-         [AL. 047_Cooling fan error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 81
-         [AL. 050_Overload 1]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 82
-         [AL. 051_Overload 2]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 84
-         [AL. 052_Excessive error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 85
+[AL. 010_Undervoltage]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
+[AL. 011_Switch setting error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 34
+[AL. 012_Memory error 1 (RAM)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 35
+[AL. 013_CPU error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 36
+[AL. 014_Control process error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 37
+[AL. 016_Encoder initial communication error 1]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 38
+[AL. 017_Board error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 41
+[AL. 019_Memory error 3] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 43
+[AL. 01A_Servo motor combination error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 44
+[AL. 01B_Protection coordination error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 47
+[AL. 01E_Encoder initial communication error 2] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 48
+[AL. 01F_Encoder initial communication error 3]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 49
+[AL. 020_Encoder normal communication error 1] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 50
+[AL. 021_Encoder normal communication error 2] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 52
+[AL. 024_Main circuit error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 54
+[AL. 025_Absolute position erased]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 55
+[AL. 027_Initial magnetic pole detection error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 58
+[AL. 028_Linear encoder error 2]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 60
+[AL. 02A_Linear encoder error 1] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 61
+[AL. 02B_Encoder counter error]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 62
+[AL. 030_Regenerative error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 63
+[AL. 031_Overspeed]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 65
+[AL. 032_Overcurrent] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 66
+[AL. 033_Overvoltage]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 68
+[AL. 034_SSCNET receive error 1] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 69
+[AL. 035_Command frequency error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 70
+[AL. 036_SSCNET receive error 2] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 71
+[AL. 037_Parameter error]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 72
+[AL. 03A_Inrush current suppression circuit error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 73
+[AL. 03D_Driver communication parameter setting error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 74
+[AL. 03E_Operation mode error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 74
+[AL. 042_Servo control error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 75
+[AL. 045_Main circuit device overheat] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 78
+[AL. 046_Servo motor overheat] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 79
+[AL. 047_Cooling fan error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 81
+[AL. 050_Overload 1]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 82
+[AL. 051_Overload 2]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 84
+[AL. 052_Excessive error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 85
 
 
-                                                                                                                                                                                           5
+5
 
 ---
 
 ## หน้า 8
 
 [AL. 054_Oscillation detection] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 87
-    [AL. 056_Forced stop error]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 88
-    [AL. 061_Operation error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 89
-    [AL. 063_STO timing error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 90
-    [AL. 066_Encoder initial communication error (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 91
-    [AL. 067_Encoder normal communication error 1 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 92
-    [AL. 068_STO diagnosis error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 93
-    [AL. 069_Command error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 94
-    [AL. 070_Load-side encoder initial communication error 1] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 96
-    [AL. 071_Load-side encoder normal communication error 1] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 99
-    [AL. 072_Load-side encoder normal communication error 2] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 101
-    [AL. 076_Load-side encoder error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 102
-    [AL. 082_Master-slave operation error 1] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 103
-    [AL. 086_Network communication error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 104
-    [AL. 088_Watchdog 1]/[AL. 888_Watchdog 1]/[AL. 88888_Watchdog 1] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 105
-    [AL. 08A_Serial communication time-out error]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 106
-    [AL. 08E_Serial communication error]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 107
-    [AL. 08F_Two-digit alarm No. display alarm]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 108
-    [AL. 090_Homing incomplete warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 110
-    [AL. 091_Servo amplifier overheat warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 111
-    [AL. 092_Battery cable disconnection warning]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 112
-    [AL. 093_ABS data transfer warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 113
-    [AL. 095_STO warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 114
-    [AL. 096_Home position setting warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 115
-    [AL. 098_Software position limit warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 116
-    [AL. 099_Stroke limit warning]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 117
-    [AL. 09B_Excessive error warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 119
-    [AL. 09C_Converter warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 120
-    [AL. 09E_Network warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 121
-    [AL. 09F_Battery warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 123
-    [AL. 0E0_Excessive regeneration warning]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 124
-    [AL. 0E1_Overload warning 1]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 125
-    [AL. 0E2_Servo motor overheat warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 127
-    [AL. 0E3_Absolute position counter warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 128
-    [AL. 0E4_Parameter warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 129
-    [AL. 0E5_ABS time-out warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 130
-    [AL. 0E6_Servo forced stop warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 131
-    [AL. 0E7_Controller forced stop warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 132
-    [AL. 0E8_Decreased cooling fan speed warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 133
-    [AL. 0E9_Main circuit off warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 134
-    [AL. 0EA_ABS servo-on warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 136
-    [AL. 0EB_The other axis error warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 137
-    [AL. 0EC_Overload warning 2] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 138
-    [AL. 0ED_Output watt excess warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 139
-    [AL. 0EF_Reverse-side stop warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 140
-    [AL. 0F0_Tough drive warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 141
-    [AL. 0F2_Drive recorder warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 142
-    [AL. 0F3_Oscillation detection warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 143
-    [AL. 0F4_Positioning warning]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 144
-    [AL. 0F7_Machine diagnosis warning]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 145
-    [AL. 0FE_Two-digit warning No. display warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 147
+[AL. 056_Forced stop error]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 88
+[AL. 061_Operation error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 89
+[AL. 063_STO timing error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 90
+[AL. 066_Encoder initial communication error (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 91
+[AL. 067_Encoder normal communication error 1 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 92
+[AL. 068_STO diagnosis error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 93
+[AL. 069_Command error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 94
+[AL. 070_Load-side encoder initial communication error 1] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 96
+[AL. 071_Load-side encoder normal communication error 1] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 99
+[AL. 072_Load-side encoder normal communication error 2] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 101
+[AL. 076_Load-side encoder error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 102
+[AL. 082_Master-slave operation error 1] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 103
+[AL. 086_Network communication error] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 104
+[AL. 088_Watchdog 1]/[AL. 888_Watchdog 1]/[AL. 88888_Watchdog 1] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 105
+[AL. 08A_Serial communication time-out error]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 106
+[AL. 08E_Serial communication error]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 107
+[AL. 08F_Two-digit alarm No. display alarm]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 108
+[AL. 090_Homing incomplete warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 110
+[AL. 091_Servo amplifier overheat warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 111
+[AL. 092_Battery cable disconnection warning]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 112
+[AL. 093_ABS data transfer warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 113
+[AL. 095_STO warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 114
+[AL. 096_Home position setting warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 115
+[AL. 098_Software position limit warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 116
+[AL. 099_Stroke limit warning]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 117
+[AL. 09B_Excessive error warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 119
+[AL. 09C_Converter warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 120
+[AL. 09E_Network warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 121
+[AL. 09F_Battery warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 123
+[AL. 0E0_Excessive regeneration warning]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 124
+[AL. 0E1_Overload warning 1]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 125
+[AL. 0E2_Servo motor overheat warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 127
+[AL. 0E3_Absolute position counter warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 128
+[AL. 0E4_Parameter warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 129
+[AL. 0E5_ABS time-out warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 130
+[AL. 0E6_Servo forced stop warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 131
+[AL. 0E7_Controller forced stop warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 132
+[AL. 0E8_Decreased cooling fan speed warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 133
+[AL. 0E9_Main circuit off warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 134
+[AL. 0EA_ABS servo-on warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 136
+[AL. 0EB_The other axis error warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 137
+[AL. 0EC_Overload warning 2] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 138
+[AL. 0ED_Output watt excess warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 139
+[AL. 0EF_Reverse-side stop warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 140
+[AL. 0F0_Tough drive warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 141
+[AL. 0F2_Drive recorder warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 142
+[AL. 0F3_Oscillation detection warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 143
+[AL. 0F4_Positioning warning]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 144
+[AL. 0F7_Machine diagnosis warning]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 145
+[AL. 0FE_Two-digit warning No. display warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 147
 
 
 6
@@ -321,7 +322,7 @@ CHAPTER 1                  SERVO AMPLIFIER TROUBLESHOOTING                      
 [AL. 16A_Master-slave operation simultaneous stop error]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 158
 
 
-                                                                                                                                                                   CONTENTS
+CONTENTS
 [AL. 17A_Load-side linear encoder error 1]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 159
 [AL. 182_Driver communication error]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 160
 [AL. 188_Watchdog 2] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 161
@@ -366,63 +367,63 @@ CHAPTER 1                  SERVO AMPLIFIER TROUBLESHOOTING                      
 [AL. 547_Internal diagnosis error 7 (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 200
 
 
-                                                                                                                                                                   7
+7
 
 ---
 
 ## หน้า 10
 
 [AL. 549_Internal diagnosis error 8 (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 201
-          [AL. 54A_Internal diagnosis error 9 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 202
-          [AL. 54D_Internal diagnosis error 10 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 203
-          [AL. 54F_Safety software error (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 204
-          [AL. 550_Internal diagnosis error 11 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 205
-          [AL. 551_Internal diagnosis error 12 (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 206
-          [AL. 552_Internal diagnosis error 13 (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 207
-          [AL. 553_Input device diagnosis error (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 208
-          [AL. 554_Input device internal diagnosis error (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 209
-          [AL. 555_Output device diagnosis error 1 (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 210
-          [AL. 556_Output device diagnosis error 2 (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 211
-          [AL. 557_Input device mismatch detection (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 212
-          [AL. 560_Stop error (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 214
-          [AL. 561_Safety speed monitor error 1 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 216
-          [AL. 562_Safety speed monitor error 2 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 218
-          [AL. 563_Deceleration monitor error (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 220
-          [AL. 564_Increment monitor error (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 222
-          [AL. 565_Direction monitor error (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 223
-          [AL. 568_Torque monitor error 1 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 225
-          [AL. 569_Torque monitor error 2 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 227
-          [AL. 580_Safety communication setting error (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 229
-          [AL. 581_Safety communication error 1 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 230
-          [AL. 582_Safety communication error 2 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 232
-          [AL. 583_Safety communication error 3 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 233
-          [AL. 584_FSoE communication setting error (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 234
-          [AL. 585_FSoE communication error 1 (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 235
-          [AL. 586_FSoE communication error 2 (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 237
-          [AL. 587_FSoE communication error 3 (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 239
-          [AL. 595_STO command off warning (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 241
-          [AL. 596_SS1 time-out warning (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 242
-          [AL. 59D_Internal diagnosis error (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 243
-          [AL. 5E0_Safety input device fixing diagnosis incomplete warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 244
-          [AL. 5E1_Test mode setting mismatch warning (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 245
-          [AL. 5E2_Safety communication warning (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 246
-          [AL. 5E6_SS1 command off warning (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 247
-    1.4   Trouble which does not trigger an alarm/warning . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 248
-          The display shows "A" (unconnected to the controller) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 248
-          The display shows "r##" . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 248
-          The display shows "b##" . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 249
-          The display shows "TST". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 249
-          The display shows "off" . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 249
-          The display is off . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 249
-          The servo motor does not operate . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 250
-          The increase in the servo motor speed is insufficient or excessive. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 252
-          Vibration of servo motor at low frequency . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 252
-          There is an unusual noise in the servo motor . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 253
-          The servo motor vibrates. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 253
-          Poor speed accuracy (Unstable speed of servo motor) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 254
-          The machine vibrates unsteadily when it stops . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 254
-          Overshoot/undershoot occurs . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 254
-          The servo motor starts moving immediately after the power-on of the servo amplifier or servo-on . . . . . . . . . 255
+   [AL. 54A_Internal diagnosis error 9 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 202
+   [AL. 54D_Internal diagnosis error 10 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 203
+   [AL. 54F_Safety software error (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 204
+   [AL. 550_Internal diagnosis error 11 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 205
+   [AL. 551_Internal diagnosis error 12 (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 206
+   [AL. 552_Internal diagnosis error 13 (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 207
+   [AL. 553_Input device diagnosis error (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 208
+   [AL. 554_Input device internal diagnosis error (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 209
+   [AL. 555_Output device diagnosis error 1 (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 210
+   [AL. 556_Output device diagnosis error 2 (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 211
+   [AL. 557_Input device mismatch detection (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 212
+   [AL. 560_Stop error (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 214
+   [AL. 561_Safety speed monitor error 1 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 216
+   [AL. 562_Safety speed monitor error 2 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 218
+   [AL. 563_Deceleration monitor error (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 220
+   [AL. 564_Increment monitor error (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 222
+   [AL. 565_Direction monitor error (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 223
+   [AL. 568_Torque monitor error 1 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 225
+   [AL. 569_Torque monitor error 2 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 227
+   [AL. 580_Safety communication setting error (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 229
+   [AL. 581_Safety communication error 1 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 230
+   [AL. 582_Safety communication error 2 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 232
+   [AL. 583_Safety communication error 3 (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 233
+   [AL. 584_FSoE communication setting error (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 234
+   [AL. 585_FSoE communication error 1 (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 235
+   [AL. 586_FSoE communication error 2 (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 237
+   [AL. 587_FSoE communication error 3 (safety sub-function)]. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 239
+   [AL. 595_STO command off warning (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 241
+   [AL. 596_SS1 time-out warning (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 242
+   [AL. 59D_Internal diagnosis error (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 243
+   [AL. 5E0_Safety input device fixing diagnosis incomplete warning] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 244
+   [AL. 5E1_Test mode setting mismatch warning (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 245
+   [AL. 5E2_Safety communication warning (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 246
+   [AL. 5E6_SS1 command off warning (safety sub-function)] . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 247
+1.4   Trouble which does not trigger an alarm/warning . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 248
+   The display shows "A" (unconnected to the controller) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 248
+   The display shows "r##" . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 248
+   The display shows "b##" . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 249
+   The display shows "TST". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 249
+   The display shows "off" . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 249
+   The display is off . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 249
+   The servo motor does not operate . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 250
+   The increase in the servo motor speed is insufficient or excessive. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 252
+   Vibration of servo motor at low frequency . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 252
+   There is an unusual noise in the servo motor . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 253
+   The servo motor vibrates. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 253
+   Poor speed accuracy (Unstable speed of servo motor) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 254
+   The machine vibrates unsteadily when it stops . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 254
+   Overshoot/undershoot occurs . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 254
+   The servo motor starts moving immediately after the power-on of the servo amplifier or servo-on . . . . . . . . . 255
 
 
 8
@@ -432,80 +433,80 @@ CHAPTER 1                  SERVO AMPLIFIER TROUBLESHOOTING                      
 ## หน้า 11
 
 The home position deviates at the homing . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 255
-          The position deviates during operation after the homing. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 256
-          A position mismatch occurs at power restoration in an absolute position detection system . . . . . . . . . . . . . . . 257
-          Communication with the servo amplifier fails using MR Configurator2 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 257
-          Electromagnetic brake went out . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 258
-          Electromagnetic brake cannot be released . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 258
-          The vertical axis falls when the SBC output is used . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 258
-          Coasting distance of the servo motor became longer . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 258
-          Executed point table does not work. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 259
+The position deviates during operation after the homing. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 256
+A position mismatch occurs at power restoration in an absolute position detection system . . . . . . . . . . . . . . . 257
+Communication with the servo amplifier fails using MR Configurator2 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 257
+Electromagnetic brake went out . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 258
+Electromagnetic brake cannot be released . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 258
+The vertical axis falls when the SBC output is used . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 258
+Coasting distance of the servo motor became longer . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 258
+Executed point table does not work. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 259
 
 
-                                                                                                                                                                         CONTENTS
-          RS-422 communication (Mitsubishi Electric AC servo protocol) cannot be used . . . . . . . . . . . . . . . . . . . . . . . 259
+   CONTENTS
+RS-422 communication (Mitsubishi Electric AC servo protocol) cannot be used . . . . . . . . . . . . . . . . . . . . . . . 259
 1.5       Two-digit display of alarm/warning number . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 260
 REVISIONS . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .262
 WARRANTY . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .263
 TRADEMARKS . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .264
 
 
-                                                                                                                                                                         9
+9
 
 ---
 
 ## หน้า 12
 
 1             SERVO AMPLIFIER TROUBLESHOOTING
-       Precautions
-     • In the MR-J5 series, the alarm No. and warning No. are shown with three digits, followed by one digit indicating the detail
-       No. This has changed since the MR-J4 series, in which these numbers were shown with two digits and one digit,
-       respectively.
+  Precautions
+• In the MR-J5 series, the alarm No. and warning No. are shown with three digits, followed by one digit indicating the detail
+  No. This has changed since the MR-J4 series, in which these numbers were shown with two digits and one digit,
+  respectively.
 
 
-     1.1               Outline
-     If an error occurs in the servo system, the corresponding alarm or warning is displayed. When an alarm occurs, ALM
-     (Malfunction) turns off.
-     If an alarm or warning is displayed, take appropriate measures according to the following:
-     Page 32 Handling methods for alarms/warnings
+1.1               Outline
+If an error occurs in the servo system, the corresponding alarm or warning is displayed. When an alarm occurs, ALM
+(Malfunction) turns off.
+If an alarm or warning is displayed, take appropriate measures according to the following:
+Page 32 Handling methods for alarms/warnings
 
 
-     Restrictions
-     • The following alarms are not recorded in the alarm history.
-     [AL. 010.1 Voltage drop in the control circuit power]
-     [AL. 037 Parameter error]
-     [AL. 537 Parameter setting range error (safety sub-function)]
-     [AL. 53A Parameter verification error (safety sub-function)]
-     • With the exception of [AL. 0F0 Tough drive warning], warnings are not recorded in the alarm history.
-     • Alarms marked with "" in the "Alarm deactivation" column have the deactivation conditions shown in the following table.
-      Detail No.                 Alarm deactivation condition
-      030.1                      Approximately 30 minutes of cooling time have passed since the cause of the alarm occurrence was removed.
-      042.1                      Set the servo parameters as follows.
-                                 When in fully closed loop control: Set [Pr. PE03.3 Fully closed loop control error - Reset selection] to "1".
-      042.2
-                                 When a linear servo motor or a direct drive motor is used: Set [Pr. PL04.3 [AL. 042 Servo control error] detection controller
-      042.3                      reset condition selection] to "1".
-      042.8
-      042.9
-      042.A
-      046.1                      Approximately 30 minutes of cooling time have passed since the cause of the alarm occurrence was removed.
-      046.2
-      046.3
-      046.4
-      046.5
-      046.6
-      050.1
-      050.2
-      050.3
-      050.4
-      050.5
-      050.6
-      051.1
-      051.2
-      130.1
+Restrictions
+• The following alarms are not recorded in the alarm history.
+[AL. 010.1 Voltage drop in the control circuit power]
+[AL. 037 Parameter error]
+[AL. 537 Parameter setting range error (safety sub-function)]
+[AL. 53A Parameter verification error (safety sub-function)]
+• With the exception of [AL. 0F0 Tough drive warning], warnings are not recorded in the alarm history.
+• Alarms marked with "" in the "Alarm deactivation" column have the deactivation conditions shown in the following table.
+ Detail No.                 Alarm deactivation condition
+ 030.1                      Approximately 30 minutes of cooling time have passed since the cause of the alarm occurrence was removed.
+ 042.1                      Set the servo parameters as follows.
+   When in fully closed loop control: Set [Pr. PE03.3 Fully closed loop control error - Reset selection] to "1".
+ 042.2
+   When a linear servo motor or a direct drive motor is used: Set [Pr. PL04.3 [AL. 042 Servo control error] detection controller
+ 042.3                      reset condition selection] to "1".
+ 042.8
+ 042.9
+ 042.A
+ 046.1                      Approximately 30 minutes of cooling time have passed since the cause of the alarm occurrence was removed.
+ 046.2
+ 046.3
+ 046.4
+ 046.5
+ 046.6
+ 050.1
+ 050.2
+ 050.3
+ 050.4
+ 050.5
+ 050.6
+ 051.1
+ 051.2
+ 130.1
 
 
-          1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 10        1.1 Outline
 
 ---
@@ -547,46 +548,46 @@ Precautions
   the operation can still be continued, but an alarm may occur.
 
 
-                                                                                 1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                                          1.1 Outline           11
+1 SERVO AMPLIFIER TROUBLESHOOTING
+   1.1 Outline           11
 
 ---
 
 ## หน้า 14
 
 1.2             List of alarm No./warning No.
-     Explanation of the list
+Explanation of the list
 
-     Motor stop method
-     Alarms and warnings which have "SD" in the "Motor stop method" column stop the servo motor with the dynamic brake after
-     forced stop deceleration. Alarms and warnings which have "DB" or "EDB" in the "Motor stop method" column stop the servo
-     motor with the dynamic brake.
+Motor stop method
+Alarms and warnings which have "SD" in the "Motor stop method" column stop the servo motor with the dynamic brake after
+forced stop deceleration. Alarms and warnings which have "DB" or "EDB" in the "Motor stop method" column stop the servo
+motor with the dynamic brake.
 
-     ■Stop method at occurrence of alarms/warnings
-     The servo amplifier has the following stop methods:
-     Motor stop method        Description
-     DB                       Dynamic brake stop (for a servo amplifier without dynamic brake, the servo motor coasts)
-     SD                       Forced stop deceleration
-                              This stop method is applicable when [Pr. PA04 Function selection A-1] is set to the initial value. The stop method can be
-                              changed from SD to DB with [Pr. PA04].
-     EDB                      Stop with an electronic dynamic brake (enabled only for specific servo motors)
-                              Refer to "Stop method at occurrence of alarms/warnings" in the following manual for the specific servo motors.
-                              MR-J5 User's Manual (Function)
-     STO/DB                   Dynamic brake stop by the STO function (for a servo amplifier without dynamic brake, the servo motor coasts)
-     SS1/SD                   Forced stop deceleration by the SS1 function
-                              The stop method is applicable when [Pr. PA04] is set to the initial value. The stop method can be changed from SS1/SD to
-                              SS1/DB with [Pr. PA04].
-     SS1/EDB                  Stop with an electronic dynamic brake (enabled only for specific servo motors)
-                              Refer to "Stop method at occurrence of alarms/warnings" in the following manual for the specific servo motors.
-                              MR-J5 User's Manual (Function)
-                              The stop method of SS1/DB is applicable to servo motors other than the said specific servo motors.
-
-
-     ■Specific stop methods
-     Quick stop or slow stop can be selected with [Pr. PD30 Function selection D-1] if the MR-J5-_A_ is used.
+■Stop method at occurrence of alarms/warnings
+The servo amplifier has the following stop methods:
+Motor stop method        Description
+DB                       Dynamic brake stop (for a servo amplifier without dynamic brake, the servo motor coasts)
+SD                       Forced stop deceleration
+   This stop method is applicable when [Pr. PA04 Function selection A-1] is set to the initial value. The stop method can be
+   changed from SD to DB with [Pr. PA04].
+EDB                      Stop with an electronic dynamic brake (enabled only for specific servo motors)
+   Refer to "Stop method at occurrence of alarms/warnings" in the following manual for the specific servo motors.
+   MR-J5 User's Manual (Function)
+STO/DB                   Dynamic brake stop by the STO function (for a servo amplifier without dynamic brake, the servo motor coasts)
+SS1/SD                   Forced stop deceleration by the SS1 function
+   The stop method is applicable when [Pr. PA04] is set to the initial value. The stop method can be changed from SS1/SD to
+   SS1/DB with [Pr. PA04].
+SS1/EDB                  Stop with an electronic dynamic brake (enabled only for specific servo motors)
+   Refer to "Stop method at occurrence of alarms/warnings" in the following manual for the specific servo motors.
+   MR-J5 User's Manual (Function)
+   The stop method of SS1/DB is applicable to servo motors other than the said specific servo motors.
 
 
-           1 SERVO AMPLIFIER TROUBLESHOOTING
+■Specific stop methods
+Quick stop or slow stop can be selected with [Pr. PD30 Function selection D-1] if the MR-J5-_A_ is used.
+
+
+1 SERVO AMPLIFIER TROUBLESHOOTING
 12         1.2 List of alarm No./warning No.
 
 ---
@@ -595,7 +596,7 @@ Precautions
 
 Converter main circuit stop target
 If alarms and warnings have "○" in the "Converter main circuit stop target" column occur, the main circuit power supply of the
-                                                                                                                                        1
+1
 converter unit connected with a protection coordination cable is shut off. During servo-on in the drive unit connected with a
 protection coordination cable, [AL. 01B Protection coordination error] occurs and the servo motor stops with the dynamic
 brake.
@@ -603,8 +604,8 @@ brake.
 
 Alarm deactivation
 
-                 When using servo motors with functional safety, executing software reset may trigger [AL. 016 Encoder initial
-                 communication error 1]. If [AL. 016] occurs, cycle the power.
+When using servo motors with functional safety, executing software reset may trigger [AL. 016 Encoder initial
+communication error 1]. If [AL. 016] occurs, cycle the power.
 
 After the cause of the alarm has been removed, the alarm can be deactivated by using the methods marked with "" in the
 "Alarm deactivation" column. Alarms marked with "" in the "Alarm deactivation" column have the deactivation conditions.
@@ -635,66 +636,66 @@ stops.
 : The safety sub-function does not stop.
 
 
-                                                                                 1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                          1.2 List of alarm No./warning No.        13
+1 SERVO AMPLIFIER TROUBLESHOOTING
+   1.2 List of alarm No./warning No.        13
 
 ---
 
 ## หน้า 16
 
 List
-     No.      Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation                         Motor     Safety
-              No.      Warning   stop     system      main        Safety   Alarm   Communication   Power     stop      sub-
-                                 method               circuit     reset    reset   reset           cycling   warning   function
-                                                      stop                                                             stopped
-                                                      target
-     010      010.1    Alarm     EDB      All axes                                                               
-              010.2    Alarm     SD       All axes                                                               
-     011      011.1    Alarm     DB       All axes                                                               
-              011.2    Alarm     DB       All axes                                                               
-     012      012.1    Alarm     DB       All axes                                                               
-              012.2    Alarm     DB       All axes                                                               
-              012.4    Alarm     DB       All axes                                                               
-              012.5    Alarm     DB       All axes                                                               
-              012.6    Alarm     DB       All axes                                                               
-              012.7    Alarm     DB       All axes                                                               
-              012.8    Alarm     DB       All axes                                                               
-              012.9    Alarm     DB       All axes                                                               
-     013      013.1    Alarm     DB       All axes                                                               
-              013.2    Alarm     DB       All axes                                                               
-              013.4    Alarm     DB       All axes                                                               
-              013.5    Alarm     DB       All axes                                                               
-     014      014.1    Alarm     DB       All axes                                                               
-              014.2    Alarm     DB       All axes                                                               
-              014.3    Alarm     DB       All axes                                                               
-              014.4    Alarm     DB       All axes                                                               
-              014.5    Alarm     DB       All axes                                                               
-              014.8    Alarm     DB       All axes                                                               
-              014.9    Alarm     DB       All axes                                                               
-              014.C    Alarm     DB       All axes                                                               
-     016      016.1    Alarm     DB       Each axis                                                              
-              016.2    Alarm     DB       Each axis                                                              
-              016.3    Alarm     DB       Each axis                                                              
-              016.5    Alarm     DB       Each axis                                                              
-              016.6    Alarm     DB       Each axis                                                              
-              016.7    Alarm     DB       Each axis                                                              
-              016.A    Alarm     DB       Each axis                                                              
-              016.B    Alarm     DB       Each axis                                                              
-              016.C    Alarm     DB       Each axis                                                              
-              016.D    Alarm     DB       Each axis                                                              
-              016.E    Alarm     DB       Each axis                                                              
-              016.F    Alarm     DB       Each axis                                                              
-     017      017.1    Alarm     DB       All axes                                                               
-              017.3    Alarm     DB       All axes                                                               
-              017.4    Alarm     DB       All axes                                                               
-              017.5    Alarm     DB       All axes                                                               
-              017.6    Alarm     DB       All axes                                                               
-              017.7    Alarm     DB       All axes                                                               
-              017.9    Alarm     DB       All axes                                                               
-              017.A    Alarm     DB       All axes                                                               
+No.      Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation                         Motor     Safety
+   No.      Warning   stop     system      main        Safety   Alarm   Communication   Power     stop      sub-
+   method               circuit     reset    reset   reset           cycling   warning   function
+   stop                                                             stopped
+   target
+010      010.1    Alarm     EDB      All axes                                                               
+   010.2    Alarm     SD       All axes                                                               
+011      011.1    Alarm     DB       All axes                                                               
+   011.2    Alarm     DB       All axes                                                               
+012      012.1    Alarm     DB       All axes                                                               
+   012.2    Alarm     DB       All axes                                                               
+   012.4    Alarm     DB       All axes                                                               
+   012.5    Alarm     DB       All axes                                                               
+   012.6    Alarm     DB       All axes                                                               
+   012.7    Alarm     DB       All axes                                                               
+   012.8    Alarm     DB       All axes                                                               
+   012.9    Alarm     DB       All axes                                                               
+013      013.1    Alarm     DB       All axes                                                               
+   013.2    Alarm     DB       All axes                                                               
+   013.4    Alarm     DB       All axes                                                               
+   013.5    Alarm     DB       All axes                                                               
+014      014.1    Alarm     DB       All axes                                                               
+   014.2    Alarm     DB       All axes                                                               
+   014.3    Alarm     DB       All axes                                                               
+   014.4    Alarm     DB       All axes                                                               
+   014.5    Alarm     DB       All axes                                                               
+   014.8    Alarm     DB       All axes                                                               
+   014.9    Alarm     DB       All axes                                                               
+   014.C    Alarm     DB       All axes                                                               
+016      016.1    Alarm     DB       Each axis                                                              
+   016.2    Alarm     DB       Each axis                                                              
+   016.3    Alarm     DB       Each axis                                                              
+   016.5    Alarm     DB       Each axis                                                              
+   016.6    Alarm     DB       Each axis                                                              
+   016.7    Alarm     DB       Each axis                                                              
+   016.A    Alarm     DB       Each axis                                                              
+   016.B    Alarm     DB       Each axis                                                              
+   016.C    Alarm     DB       Each axis                                                              
+   016.D    Alarm     DB       Each axis                                                              
+   016.E    Alarm     DB       Each axis                                                              
+   016.F    Alarm     DB       Each axis                                                              
+017      017.1    Alarm     DB       All axes                                                               
+   017.3    Alarm     DB       All axes                                                               
+   017.4    Alarm     DB       All axes                                                               
+   017.5    Alarm     DB       All axes                                                               
+   017.6    Alarm     DB       All axes                                                               
+   017.7    Alarm     DB       All axes                                                               
+   017.9    Alarm     DB       All axes                                                               
+   017.A    Alarm     DB       All axes                                                               
 
 
-           1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 14         1.2 List of alarm No./warning No.
 
 ---
@@ -702,117 +703,117 @@ List
 ## หน้า 17
 
 No.   Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation                            Motor     Safety
-      No.      Warning   stop     system      main        Safety   Alarm    Communication     Power     stop      sub-
-                         method               circuit                                                   warning   function
-                                              stop
-                                                          reset    reset    reset             cycling
-                                                                                                                  stopped         1
-                                              target
+No.      Warning   stop     system      main        Safety   Alarm    Communication     Power     stop      sub-
+   method               circuit                                                   warning   function
+   stop
+   reset    reset    reset             cycling
+   stopped         1
+   target
 019   019.1    Alarm     DB       All axes                                                                  
-      019.2    Alarm     DB       All axes                                                                  
-      019.3    Alarm     DB       All axes                                                                  
-      019.6    Alarm     DB       All axes                                                                  
+019.2    Alarm     DB       All axes                                                                  
+019.3    Alarm     DB       All axes                                                                  
+019.6    Alarm     DB       All axes                                                                  
 01A   01A.1    Alarm     DB       Each axis                                                                 
-      01A.2    Alarm     DB       Each axis                                                                 
-      01A.3    Alarm     DB       Each axis                                                                 
-      01A.4    Alarm     DB       Each axis                                                                 
-      01A.5    Alarm     DB       Each axis                                                                 
-      01A.6    Alarm     DB       Each axis                                                                 
+01A.2    Alarm     DB       Each axis                                                                 
+01A.3    Alarm     DB       Each axis                                                                 
+01A.4    Alarm     DB       Each axis                                                                 
+01A.5    Alarm     DB       Each axis                                                                 
+01A.6    Alarm     DB       Each axis                                                                 
 01B   01B.1    Alarm     DB       All axes                                                                  
-      01B.4    Alarm     DB       All axes                                                                  
+01B.4    Alarm     DB       All axes                                                                  
 01E   01E.1    Alarm     DB       Each axis                                                                 
-      01E.2    Alarm     DB       Each axis                                                                 
+01E.2    Alarm     DB       Each axis                                                                 
 01F   01F.1    Alarm     DB       Each axis                                                                 
-      01F.2    Alarm     DB       Each axis                                                                 
+01F.2    Alarm     DB       Each axis                                                                 
 020   020.1    Alarm     EDB      Each axis                                                                 
-      020.2    Alarm     EDB      Each axis                                                                 
-      020.3    Alarm     EDB      Each axis                                                                 
-      020.5    Alarm     EDB      Each axis                                                                 
-      020.6    Alarm     EDB      Each axis                                                                 
-      020.7    Alarm     EDB      Each axis                                                                 
-      020.C    Alarm     EDB      Each axis                                                                 
-      020.D    Alarm     EDB      Each axis                                                                 
+020.2    Alarm     EDB      Each axis                                                                 
+020.3    Alarm     EDB      Each axis                                                                 
+020.5    Alarm     EDB      Each axis                                                                 
+020.6    Alarm     EDB      Each axis                                                                 
+020.7    Alarm     EDB      Each axis                                                                 
+020.C    Alarm     EDB      Each axis                                                                 
+020.D    Alarm     EDB      Each axis                                                                 
 021   021.1    Alarm     EDB      Each axis                                                                 
-      021.2    Alarm     EDB      Each axis                                                                 
-      021.3    Alarm     EDB      Each axis                                                                 
-      021.4    Alarm     EDB      Each axis                                                                 
-      021.5    Alarm     EDB      Each axis                                                                 
-      021.6    Alarm     EDB      Each axis                                                                 
+021.2    Alarm     EDB      Each axis                                                                 
+021.3    Alarm     EDB      Each axis                                                                 
+021.4    Alarm     EDB      Each axis                                                                 
+021.5    Alarm     EDB      Each axis                                                                 
+021.6    Alarm     EDB      Each axis                                                                 
 024   024.1    Alarm     DB       All axes                                                                  
-      024.2    Alarm     DB       All axes                                                                  
+024.2    Alarm     DB       All axes                                                                  
 025   025.1    Alarm     DB       Each axis                                                                 
-      025.2    Alarm     DB       Each axis                                                                 
+025.2    Alarm     DB       Each axis                                                                 
 027   027.1    Alarm     DB       Each axis                                                                 
-      027.2    Alarm     DB       Each axis                                                                 
-      027.3    Alarm     DB       Each axis                                                                 
-      027.4    Alarm     DB       Each axis                                                                 
-      027.5    Alarm     DB       Each axis                                                                 
-      027.6    Alarm     DB       Each axis                                                                 
-      027.7    Alarm     DB       Each axis                                                                 
+027.2    Alarm     DB       Each axis                                                                 
+027.3    Alarm     DB       Each axis                                                                 
+027.4    Alarm     DB       Each axis                                                                 
+027.5    Alarm     DB       Each axis                                                                 
+027.6    Alarm     DB       Each axis                                                                 
+027.7    Alarm     DB       Each axis                                                                 
 028   028.1    Alarm     EDB      Each axis                                                                 
-      028.2    Alarm     EDB      Each axis                                                                 
+028.2    Alarm     EDB      Each axis                                                                 
 
 
-                                                                           1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                    1.2 List of alarm No./warning No.        15
+1 SERVO AMPLIFIER TROUBLESHOOTING
+   1.2 List of alarm No./warning No.        15
 
 ---
 
 ## หน้า 18
 
 No.      Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation                         Motor     Safety
-              No.      Warning   stop     system      main        Safety   Alarm   Communication   Power     stop      sub-
-                                 method               circuit     reset    reset   reset           cycling   warning   function
-                                                      stop                                                             stopped
-                                                      target
-     02A      02A.1    Alarm     EDB      Each axis                                                              
-              02A.2    Alarm     EDB      Each axis                                                              
-              02A.3    Alarm     EDB      Each axis                                                              
-              02A.4    Alarm     EDB      Each axis                                                              
-              02A.5    Alarm     EDB      Each axis                                                              
-              02A.6    Alarm     EDB      Each axis                                                              
-              02A.7    Alarm     EDB      Each axis                                                              
-              02A.8    Alarm     EDB      Each axis                                                              
-     02B      02B.1    Alarm     EDB      Each axis                                                              
-              02B.2    Alarm     EDB      Each axis                                                              
-     030      030.1    Alarm     DB       All axes                                                               
-              030.2    Alarm     DB       All axes                                                               
-              030.3    Alarm     DB       All axes                                                               
-     031      031.1    Alarm     SD       Each axis                                                              
-     032      032.1    Alarm     DB       All axes                                                               
-              032.2    Alarm     DB       All axes                                                               
-              032.3    Alarm     DB       All axes                                                               
-              032.4    Alarm     DB       All axes                                                               
-     033      033.1    Alarm     EDB      All axes                                                               
-     034      034.1    Alarm     SD       All axes                                                               
-              034.2    Alarm     SD       All axes                                                               
-              034.3    Alarm     SD       Each axis                                                              
-              034.4    Alarm     SD       All axes                                                               
-              034.7    Alarm     SD       All axes                                                               
-     035      035.1    Alarm     SD       Each axis                                                              
-     036      036.1    Alarm     SD       Each axis                                                              
-     037      037.1    Alarm     DB       Each axis                                                              
-              037.2    Alarm     DB       All axes                                                               
-              037.3    Alarm     DB       Each axis                                                              
-              037.6    Alarm     DB       Each axis                                                              
-              037.7    Alarm     DB       Each axis                                                              
-     03A      03A.1    Alarm     EDB      All axes                                                               
-     03D      03D.1    Alarm     DB       Each axis                                                              
-              03D.2    Alarm     DB       Each axis                                                              
-     03E      03E.4    Alarm     DB       Each axis                                                              
-              03E.5    Alarm     DB       Each axis                                                              
-     03E      03E.9    Alarm     DB       Each axis                                                              
-     042      042.1    Alarm     EDB      Each axis                                                              
-              042.2    Alarm     EDB      Each axis                                                              
-              042.3    Alarm     EDB      Each axis                                                              
-              042.8    Alarm     EDB      Each axis                                                              
-              042.9    Alarm     EDB      Each axis                                                              
-              042.A    Alarm     EDB      Each axis                                                              
-     045      045.1    Alarm     EDB      All axes                                                               
-              045.2    Alarm     EDB      All axes                                                               
+   No.      Warning   stop     system      main        Safety   Alarm   Communication   Power     stop      sub-
+   method               circuit     reset    reset   reset           cycling   warning   function
+   stop                                                             stopped
+   target
+02A      02A.1    Alarm     EDB      Each axis                                                              
+   02A.2    Alarm     EDB      Each axis                                                              
+   02A.3    Alarm     EDB      Each axis                                                              
+   02A.4    Alarm     EDB      Each axis                                                              
+   02A.5    Alarm     EDB      Each axis                                                              
+   02A.6    Alarm     EDB      Each axis                                                              
+   02A.7    Alarm     EDB      Each axis                                                              
+   02A.8    Alarm     EDB      Each axis                                                              
+02B      02B.1    Alarm     EDB      Each axis                                                              
+   02B.2    Alarm     EDB      Each axis                                                              
+030      030.1    Alarm     DB       All axes                                                               
+   030.2    Alarm     DB       All axes                                                               
+   030.3    Alarm     DB       All axes                                                               
+031      031.1    Alarm     SD       Each axis                                                              
+032      032.1    Alarm     DB       All axes                                                               
+   032.2    Alarm     DB       All axes                                                               
+   032.3    Alarm     DB       All axes                                                               
+   032.4    Alarm     DB       All axes                                                               
+033      033.1    Alarm     EDB      All axes                                                               
+034      034.1    Alarm     SD       All axes                                                               
+   034.2    Alarm     SD       All axes                                                               
+   034.3    Alarm     SD       Each axis                                                              
+   034.4    Alarm     SD       All axes                                                               
+   034.7    Alarm     SD       All axes                                                               
+035      035.1    Alarm     SD       Each axis                                                              
+036      036.1    Alarm     SD       Each axis                                                              
+037      037.1    Alarm     DB       Each axis                                                              
+   037.2    Alarm     DB       All axes                                                               
+   037.3    Alarm     DB       Each axis                                                              
+   037.6    Alarm     DB       Each axis                                                              
+   037.7    Alarm     DB       Each axis                                                              
+03A      03A.1    Alarm     EDB      All axes                                                               
+03D      03D.1    Alarm     DB       Each axis                                                              
+   03D.2    Alarm     DB       Each axis                                                              
+03E      03E.4    Alarm     DB       Each axis                                                              
+   03E.5    Alarm     DB       Each axis                                                              
+03E      03E.9    Alarm     DB       Each axis                                                              
+042      042.1    Alarm     EDB      Each axis                                                              
+   042.2    Alarm     EDB      Each axis                                                              
+   042.3    Alarm     EDB      Each axis                                                              
+   042.8    Alarm     EDB      Each axis                                                              
+   042.9    Alarm     EDB      Each axis                                                              
+   042.A    Alarm     EDB      Each axis                                                              
+045      045.1    Alarm     EDB      All axes                                                               
+   045.2    Alarm     EDB      All axes                                                               
 
 
-           1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 16         1.2 List of alarm No./warning No.
 
 ---
@@ -820,123 +821,123 @@ No.      Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation 
 ## หน้า 19
 
 No.   Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation                            Motor     Safety
-      No.      Warning   stop     system      main        Safety   Alarm    Communication     Power     stop      sub-
-                         method               circuit                                                   warning   function
-                                              stop
-                                                          reset    reset    reset             cycling
-                                                                                                                  stopped         1
-                                              target
+No.      Warning   stop     system      main        Safety   Alarm    Communication     Power     stop      sub-
+   method               circuit                                                   warning   function
+   stop
+   reset    reset    reset             cycling
+   stopped         1
+   target
 046   046.1    Alarm     SD       Each axis                                                                 
-      046.2    Alarm     SD       Each axis                                                                 
-      046.3    Alarm     SD       Each axis                                                                 
-      046.4    Alarm     SD       Each axis                                                                 
-      046.5    Alarm     DB       Each axis                                                                 
-      046.6    Alarm     DB       Each axis                                                                 
-      046.7    Alarm     DB       Each axis                                                                 
+046.2    Alarm     SD       Each axis                                                                 
+046.3    Alarm     SD       Each axis                                                                 
+046.4    Alarm     SD       Each axis                                                                 
+046.5    Alarm     DB       Each axis                                                                 
+046.6    Alarm     DB       Each axis                                                                 
+046.7    Alarm     DB       Each axis                                                                 
 047   047.1    Alarm     SD       All axes                                                                  
-      047.2    Alarm     SD       All axes                                                                  
+047.2    Alarm     SD       All axes                                                                  
 050   050.1    Alarm     SD       Each axis                                                                 
-      050.2    Alarm     SD       Each axis                                                                 
-      050.3    Alarm     SD       Each axis                                                                 
-      050.4    Alarm     SD       Each axis                                                                 
-      050.5    Alarm     SD       Each axis                                                                 
-      050.6    Alarm     SD       Each axis                                                                 
+050.2    Alarm     SD       Each axis                                                                 
+050.3    Alarm     SD       Each axis                                                                 
+050.4    Alarm     SD       Each axis                                                                 
+050.5    Alarm     SD       Each axis                                                                 
+050.6    Alarm     SD       Each axis                                                                 
 051   051.1    Alarm     DB       Each axis                                                                 
-      051.2    Alarm     DB       Each axis                                                                 
+051.2    Alarm     DB       Each axis                                                                 
 052   052.1    Alarm     SD       Each axis                                                                 
-      052.3    Alarm     SD       Each axis                                                                 
-      052.4    Alarm     SD       Each axis                                                                 
-      052.5    Alarm     EDB      Each axis                                                                 
-      052.6    Alarm     SD       Each axis                                                                 
+052.3    Alarm     SD       Each axis                                                                 
+052.4    Alarm     SD       Each axis                                                                 
+052.5    Alarm     EDB      Each axis                                                                 
+052.6    Alarm     SD       Each axis                                                                 
 054   054.1    Alarm     EDB      Each axis                                                                 
 056   056.2    Alarm     EDB      Each axis                                                                 
-      056.3    Alarm     EDB      Each axis                                                                 
-      056.5    Alarm     EDB      Each axis                                                                 
+056.3    Alarm     EDB      Each axis                                                                 
+056.5    Alarm     EDB      Each axis                                                                 
 061   061.1    Alarm     DB       Each axis                                                                 
 063   063.1    Alarm     DB       Each axis                                                                 
-      063.2    Alarm     DB       Each axis                                                                 
+063.2    Alarm     DB       Each axis                                                                 
 066   066.1    Alarm     DB       Each axis                                                                 
-      066.2    Alarm     DB       Each axis                                                                 
-      066.3    Alarm     DB       Each axis                                                                 
-      066.7    Alarm     DB       Each axis                                                                 
-      066.9    Alarm     DB       Each axis                                                                 
+066.2    Alarm     DB       Each axis                                                                 
+066.3    Alarm     DB       Each axis                                                                 
+066.7    Alarm     DB       Each axis                                                                 
+066.9    Alarm     DB       Each axis                                                                 
 067   067.1    Alarm     EDB      Each axis                                                                 
-      067.2    Alarm     EDB      Each axis                                                                 
-      067.3    Alarm     EDB      Each axis                                                                 
-      067.4    Alarm     EDB      Each axis                                                                 
-      067.7    Alarm     EDB      Each axis                                                                 
+067.2    Alarm     EDB      Each axis                                                                 
+067.3    Alarm     EDB      Each axis                                                                 
+067.4    Alarm     EDB      Each axis                                                                 
+067.7    Alarm     EDB      Each axis                                                                 
 068   068.1    Alarm     DB       All axes                                                                  
 069   069.1    Alarm     SD       Each axis                                                                 
-      069.2    Alarm     SD       Each axis                                                                 
-      069.3    Alarm     SD       Each axis                                                                 
-      069.4    Alarm     SD       Each axis                                                                 
-      069.5    Alarm     SD       Each axis                                                                 
-      069.6    Alarm     SD       Each axis                                                                 
+069.2    Alarm     SD       Each axis                                                                 
+069.3    Alarm     SD       Each axis                                                                 
+069.4    Alarm     SD       Each axis                                                                 
+069.5    Alarm     SD       Each axis                                                                 
+069.6    Alarm     SD       Each axis                                                                 
 
 
-                                                                           1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                    1.2 List of alarm No./warning No.        17
+1 SERVO AMPLIFIER TROUBLESHOOTING
+   1.2 List of alarm No./warning No.        17
 
 ---
 
 ## หน้า 20
 
 No.        Detail     Alarm/    Motor    Stop        Converter   Alarm deactivation                         Motor     Safety
-                No.        Warning   stop     system      main        Safety   Alarm   Communication   Power     stop      sub-
-                                     method               circuit     reset    reset   reset           cycling   warning   function
-                                                          stop                                                             stopped
-                                                          target
-     070        070.1      Alarm     DB       Each axis                                                              
-                070.2      Alarm     DB       Each axis                                                              
-                070.3      Alarm     DB       Each axis                                                              
-                070.5      Alarm     DB       Each axis                                                              
-                070.6      Alarm     DB       Each axis                                                              
-                070.7      Alarm     DB       Each axis                                                              
-                070.A      Alarm     DB       Each axis                                                              
-                070.B      Alarm     DB       Each axis                                                              
-                070.C      Alarm     DB       Each axis                                                              
-                070.D      Alarm     DB       Each axis                                                              
-                070.E      Alarm     DB       Each axis                                                              
-                070.F      Alarm     DB       Each axis                                                              
-     071        071.1      Alarm     EDB      Each axis                                                              
-                071.2      Alarm     EDB      Each axis                                                              
-                071.3      Alarm     EDB      Each axis                                                              
-                071.4      Alarm     EDB      Each axis                                                              
-                071.5      Alarm     EDB      Each axis                                                              
-                071.6      Alarm     EDB      Each axis                                                              
-                071.7      Alarm     EDB      Each axis                                                              
-                071.C      Alarm     EDB      Each axis                                                              
-                071.D      Alarm     EDB      Each axis                                                              
-     072        072.1      Alarm     EDB      Each axis                                                              
-                072.2      Alarm     EDB      Each axis                                                              
-                072.3      Alarm     EDB      Each axis                                                              
-                072.4      Alarm     EDB      Each axis                                                              
-                072.5      Alarm     EDB      Each axis                                                              
-                072.6      Alarm     EDB      Each axis                                                              
-     076        076.2      Alarm     DB       Each axis                                                              
-                076.3      Alarm     DB       Each axis                                                              
-     082        082.1      Alarm     EDB      Each axis                                                              
-     086        086.1      Alarm     SD       All axes                                                               
-                086.2      Alarm     SD       All axes                                                               
-                086.3      Alarm     SD       All axes                                                               
-                086.4      Alarm     SD       All axes                                                               
-                086.5      Alarm     SD       All axes                                                               
-                086.6      Alarm     SD       All axes                                                               
-     088/888/   088.1/     Alarm     DB       All axes                                                               
-     88888      088/888/
-                88888
-                088.2      Alarm     DB       All axes                                                               
-                088.4      Alarm     DB       All axes                                                               
-                088.8      Alarm     DB       All axes                                                               
-     08A        08A.1      Alarm     SD       All axes                                                               
-     08E        08E.1      Alarm     SD       All axes                                                               
-                08E.2      Alarm     SD       All axes                                                               
-                08E.3      Alarm     SD       All axes                                                               
-                08E.4      Alarm     SD       All axes                                                               
-                08E.5      Alarm     SD       All axes                                                               
+   No.        Warning   stop     system      main        Safety   Alarm   Communication   Power     stop      sub-
+   method               circuit     reset    reset   reset           cycling   warning   function
+   stop                                                             stopped
+   target
+070        070.1      Alarm     DB       Each axis                                                              
+   070.2      Alarm     DB       Each axis                                                              
+   070.3      Alarm     DB       Each axis                                                              
+   070.5      Alarm     DB       Each axis                                                              
+   070.6      Alarm     DB       Each axis                                                              
+   070.7      Alarm     DB       Each axis                                                              
+   070.A      Alarm     DB       Each axis                                                              
+   070.B      Alarm     DB       Each axis                                                              
+   070.C      Alarm     DB       Each axis                                                              
+   070.D      Alarm     DB       Each axis                                                              
+   070.E      Alarm     DB       Each axis                                                              
+   070.F      Alarm     DB       Each axis                                                              
+071        071.1      Alarm     EDB      Each axis                                                              
+   071.2      Alarm     EDB      Each axis                                                              
+   071.3      Alarm     EDB      Each axis                                                              
+   071.4      Alarm     EDB      Each axis                                                              
+   071.5      Alarm     EDB      Each axis                                                              
+   071.6      Alarm     EDB      Each axis                                                              
+   071.7      Alarm     EDB      Each axis                                                              
+   071.C      Alarm     EDB      Each axis                                                              
+   071.D      Alarm     EDB      Each axis                                                              
+072        072.1      Alarm     EDB      Each axis                                                              
+   072.2      Alarm     EDB      Each axis                                                              
+   072.3      Alarm     EDB      Each axis                                                              
+   072.4      Alarm     EDB      Each axis                                                              
+   072.5      Alarm     EDB      Each axis                                                              
+   072.6      Alarm     EDB      Each axis                                                              
+076        076.2      Alarm     DB       Each axis                                                              
+   076.3      Alarm     DB       Each axis                                                              
+082        082.1      Alarm     EDB      Each axis                                                              
+086        086.1      Alarm     SD       All axes                                                               
+   086.2      Alarm     SD       All axes                                                               
+   086.3      Alarm     SD       All axes                                                               
+   086.4      Alarm     SD       All axes                                                               
+   086.5      Alarm     SD       All axes                                                               
+   086.6      Alarm     SD       All axes                                                               
+088/888/   088.1/     Alarm     DB       All axes                                                               
+88888      088/888/
+   88888
+   088.2      Alarm     DB       All axes                                                               
+   088.4      Alarm     DB       All axes                                                               
+   088.8      Alarm     DB       All axes                                                               
+08A        08A.1      Alarm     SD       All axes                                                               
+08E        08E.1      Alarm     SD       All axes                                                               
+   08E.2      Alarm     SD       All axes                                                               
+   08E.3      Alarm     SD       All axes                                                               
+   08E.4      Alarm     SD       All axes                                                               
+   08E.5      Alarm     SD       All axes                                                               
 
 
-           1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 18         1.2 List of alarm No./warning No.
 
 ---
@@ -944,122 +945,122 @@ No.        Detail     Alarm/    Motor    Stop        Converter   Alarm deactivat
 ## หน้า 21
 
 No.   Detail   Alarm/    Motor       Stop           Converter     Alarm deactivation                               Motor     Safety
-      No.      Warning   stop        system         main          Safety     Alarm     Communication     Power     stop      sub-
-                         method                     circuit                                                        warning   function
-                                                    stop
-                                                                  reset      reset     reset             cycling
-                                                                                                                             stopped         1
-                                                    target
+No.      Warning   stop        system         main          Safety     Alarm     Communication     Power     stop      sub-
+   method                     circuit                                                        warning   function
+   stop
+   reset      reset     reset             cycling
+   stopped         1
+   target
 08F   08F.1    Alarm     Refer to the alarm columns with alarm No. in 100s ([AL. 1_ _]).
-      08F.2    Alarm     Refer to the alarm columns with alarm No. in 200s ([AL. 2_ _]).
-      08F.3    Alarm     For manufacturer setting
-      08F.4    Alarm     For manufacturer setting
-      08F.5    Alarm     Refer to the alarm columns with alarm No. in 500s ([AL. 5_ _]).
-      08F.6    Alarm     For manufacturer setting
-      08F.7    Alarm     For manufacturer setting
-      08F.8    Alarm     For manufacturer setting
-      08F.9    Alarm     For manufacturer setting
-      08F.A    Alarm     For manufacturer setting
-      08F.B    Alarm     For manufacturer setting
-      08F.C    Alarm     For manufacturer setting
-      08F.D    Alarm     For manufacturer setting
-      08F.E    Alarm     For manufacturer setting
-      08F.F    Alarm     For manufacturer setting
+08F.2    Alarm     Refer to the alarm columns with alarm No. in 200s ([AL. 2_ _]).
+08F.3    Alarm     For manufacturer setting
+08F.4    Alarm     For manufacturer setting
+08F.5    Alarm     Refer to the alarm columns with alarm No. in 500s ([AL. 5_ _]).
+08F.6    Alarm     For manufacturer setting
+08F.7    Alarm     For manufacturer setting
+08F.8    Alarm     For manufacturer setting
+08F.9    Alarm     For manufacturer setting
+08F.A    Alarm     For manufacturer setting
+08F.B    Alarm     For manufacturer setting
+08F.C    Alarm     For manufacturer setting
+08F.D    Alarm     For manufacturer setting
+08F.E    Alarm     For manufacturer setting
+08F.F    Alarm     For manufacturer setting
 090   090.1    Warning                                                                                               
-      090.2    Warning                                                                                               
-      090.5    Warning                                                                                               
+090.2    Warning                                                                                               
+090.5    Warning                                                                                               
 091   091.1    Warning                                                                                               
 092   092.1    Warning                                                                                               
-      092.2    Warning                                                                                               
-      092.3    Warning                                                                                               
+092.2    Warning                                                                                               
+092.3    Warning                                                                                               
 093   093.1    Warning                                                                                               
 095   095.1    Warning   DB          Each axis                                                                         
-      095.2    Warning   DB          Each axis                                                                         
+095.2    Warning   DB          Each axis                                                                         
 096   096.1    Warning    *1                                                                                         
-                             *1
-      096.2    Warning                                                                                               
-      096.3    Warning    *1                                                                                         
-                             *1
-      096.4    Warning                                                                                               
+   *1
+096.2    Warning                                                                                               
+096.3    Warning    *1                                                                                         
+   *1
+096.4    Warning                                                                                               
 098   098.1    Warning   DB          Each axis                                                                         
-      098.2    Warning   DB          Each axis                                                                         
+098.2    Warning   DB          Each axis                                                                         
 099   099.1    Warning    *2                                                                                         
-      099.2    Warning    *2                                                                                         
-      099.4    Warning    *2                                                                                         
-                             *2
-      099.5    Warning                                                                                               
-      099.6    Warning    *2                                                                                         
-                             *2
-      099.7    Warning                                                                                               
-      099.8    Warning    *2                                                                                         
-      099.9    Warning    *2                                                                                         
+099.2    Warning    *2                                                                                         
+099.4    Warning    *2                                                                                         
+   *2
+099.5    Warning                                                                                               
+099.6    Warning    *2                                                                                         
+   *2
+099.7    Warning                                                                                               
+099.8    Warning    *2                                                                                         
+099.9    Warning    *2                                                                                         
 09B   09B.1    Warning                                                                                               
-      09B.3    Warning                                                                                               
-      09B.4    Warning                                                                                               
+09B.3    Warning                                                                                               
+09B.4    Warning                                                                                               
 09C   09C.1    Warning                                                                                               
 
 
-                                                                                      1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                               1.2 List of alarm No./warning No.        19
+1 SERVO AMPLIFIER TROUBLESHOOTING
+   1.2 List of alarm No./warning No.        19
 
 ---
 
 ## หน้า 22
 
 No.      Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation                         Motor     Safety
-              No.      Warning   stop     system      main        Safety   Alarm   Communication   Power     stop      sub-
-                                 method               circuit     reset    reset   reset           cycling   warning   function
-                                                      stop                                                             stopped
-                                                      target
-     09E      09E.2    Warning   DB       All axes                                                               
-              09E.3    Warning   DB       All axes                                                               
-              09E.4    Warning   DB       All axes                                                               
-              09E.5    Warning   DB       All axes                                                               
-              09E.6    Warning   DB       All axes                                                               
-              09E.7    Warning   DB       All axes                                                               
-              09E.8    Warning   DB       All axes                                                               
-              09E.9    Warning   DB       All axes                                                               
-              09E.A    Warning   DB       All axes                                                               
-              09E.B    Warning   DB       All axes                                                               
-     09F      09F.1    Warning                                                                                 
-              09F.2    Warning                                                                                 
-     0E0      0E0.1    Warning                                                                                 
-     0E1      0E1.1    Warning                                                                                 
-              0E1.2    Warning                                                                                 
-              0E1.3    Warning                                                                                 
-              0E1.4    Warning                                                                                 
-              0E1.5    Warning                                                                                 
-              0E1.6    Warning                                                                                 
-              0E1.7    Warning                                                                                 
-              0E1.8    Warning                                                                                 
-     0E2      0E2.1    Warning                                                                                 
-              0E2.2    Warning                                                                                 
-     0E3      0E3.1    Warning                                                                                 
-              0E3.2    Warning                                                                                 
-              0E3.5    Warning                                                                                 
-              0E3.6    Warning                                                                                 
-     0E4      0E4.1    Warning                                                                                 
-     0E5      0E5.1    Warning                                                                                 
-              0E5.2    Warning                                                                                 
-              0E5.3    Warning                                                                                 
-     0E6      0E6.1    Warning   SD       All axes                                                               
-     0E7      0E7.1    Warning   SD       All axes                                                               
-     0E8      0E8.1    Warning                                                                                 
-              0E8.2    Warning                                                                                 
-     0E9      0E9.1    Warning   DB       All axes                                                               
-              0E9.2    Warning   DB       All axes                                                               
-              0E9.3    Warning   DB       All axes                                                               
-              0E9.4    Warning   DB       All axes                                                               
-     0EA      0EA.1    Warning                                                                                 
-     0EB      0EB.1    Warning   DB       Each axis                                                              
-     0EC      0EC.1    Warning                                                                                 
-     0ED      0ED.1    Warning                                                                                 
-     0EF      0EF.1    Warning                                                                                 
-     0F0      0F0.1    Warning                                                                                 
-              0F0.3    Warning                                                                                 
+   No.      Warning   stop     system      main        Safety   Alarm   Communication   Power     stop      sub-
+   method               circuit     reset    reset   reset           cycling   warning   function
+   stop                                                             stopped
+   target
+09E      09E.2    Warning   DB       All axes                                                               
+   09E.3    Warning   DB       All axes                                                               
+   09E.4    Warning   DB       All axes                                                               
+   09E.5    Warning   DB       All axes                                                               
+   09E.6    Warning   DB       All axes                                                               
+   09E.7    Warning   DB       All axes                                                               
+   09E.8    Warning   DB       All axes                                                               
+   09E.9    Warning   DB       All axes                                                               
+   09E.A    Warning   DB       All axes                                                               
+   09E.B    Warning   DB       All axes                                                               
+09F      09F.1    Warning                                                                                 
+   09F.2    Warning                                                                                 
+0E0      0E0.1    Warning                                                                                 
+0E1      0E1.1    Warning                                                                                 
+   0E1.2    Warning                                                                                 
+   0E1.3    Warning                                                                                 
+   0E1.4    Warning                                                                                 
+   0E1.5    Warning                                                                                 
+   0E1.6    Warning                                                                                 
+   0E1.7    Warning                                                                                 
+   0E1.8    Warning                                                                                 
+0E2      0E2.1    Warning                                                                                 
+   0E2.2    Warning                                                                                 
+0E3      0E3.1    Warning                                                                                 
+   0E3.2    Warning                                                                                 
+   0E3.5    Warning                                                                                 
+   0E3.6    Warning                                                                                 
+0E4      0E4.1    Warning                                                                                 
+0E5      0E5.1    Warning                                                                                 
+   0E5.2    Warning                                                                                 
+   0E5.3    Warning                                                                                 
+0E6      0E6.1    Warning   SD       All axes                                                               
+0E7      0E7.1    Warning   SD       All axes                                                               
+0E8      0E8.1    Warning                                                                                 
+   0E8.2    Warning                                                                                 
+0E9      0E9.1    Warning   DB       All axes                                                               
+   0E9.2    Warning   DB       All axes                                                               
+   0E9.3    Warning   DB       All axes                                                               
+   0E9.4    Warning   DB       All axes                                                               
+0EA      0EA.1    Warning                                                                                 
+0EB      0EB.1    Warning   DB       Each axis                                                              
+0EC      0EC.1    Warning                                                                                 
+0ED      0ED.1    Warning                                                                                 
+0EF      0EF.1    Warning                                                                                 
+0F0      0F0.1    Warning                                                                                 
+   0F0.3    Warning                                                                                 
 
 
-           1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 20         1.2 List of alarm No./warning No.
 
 ---
@@ -1067,124 +1068,124 @@ No.      Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation 
 ## หน้า 23
 
 No.   Detail   Alarm/    Motor       Stop           Converter     Alarm deactivation                              Motor     Safety
-      No.      Warning   stop        system         main          Safety    Alarm      Communication    Power     stop      sub-
-                         method                     circuit                                                       warning   function
-                                                    stop
-                                                                  reset     reset      reset            cycling
-                                                                                                                            stopped         1
-                                                    target
+No.      Warning   stop        system         main          Safety    Alarm      Communication    Power     stop      sub-
+   method                     circuit                                                       warning   function
+   stop
+   reset     reset      reset            cycling
+   stopped         1
+   target
 0F2   0F2.1    Warning                                                                                              
-      0F2.2    Warning                                                                                              
-      0F2.3    Warning                                                                                              
-      0F2.4    Warning                                                                                              
-      0F2.5    Warning                                                                                              
-      0F2.6    Warning                                                                                              
+0F2.2    Warning                                                                                              
+0F2.3    Warning                                                                                              
+0F2.4    Warning                                                                                              
+0F2.5    Warning                                                                                              
+0F2.6    Warning                                                                                              
 0F3   0F3.1    Warning                                                                                              
 0F4   0F4.4    Warning                                                                                              
-      0F4.6    Warning                                                                                              
-      0F4.7    Warning                                                                                              
-      0F4.8    Warning                                                                                              
-      0F4.A    Warning                                                                                              
+0F4.6    Warning                                                                                              
+0F4.7    Warning                                                                                              
+0F4.8    Warning                                                                                              
+0F4.A    Warning                                                                                              
 0F7   0F7.1    Warning                                                                                              
-      0F7.2    Warning                                                                                              
-      0F7.3    Warning                                                                                              
-      0F7.4    Warning                                                                                              
-      0F7.5    Warning                                                                                              
-      0F7.6    Warning                                                                                              
+0F7.2    Warning                                                                                              
+0F7.3    Warning                                                                                              
+0F7.4    Warning                                                                                              
+0F7.5    Warning                                                                                              
+0F7.6    Warning                                                                                              
 0FE   0FE.1    Warning   Refer to the warning columns with warning No. in 100s ([AL. 1_ _]).
-      0FE.2    Warning   Refer to the warning columns with warning No. in 200s ([AL. 2_ _]).
-      0FE.3    Warning   For manufacturer setting
-      0FE.4    Warning   For manufacturer setting
-      0FE.5    Warning   Refer to the warning columns with warning No. in 500s ([AL. 5_ _]).
-      0FE.6    Warning   For manufacturer setting
-      0FE.7    Warning   For manufacturer setting
-      0FE.8    Warning   For manufacturer setting
-      0FE.9    Warning   For manufacturer setting
-      0FE.A    Warning   For manufacturer setting
-      0FE.B    Warning   For manufacturer setting
-      0FE.C    Warning   For manufacturer setting
-      0FE.D    Warning   For manufacturer setting
-      0FE.E    Warning   For manufacturer setting
-      0FE.F    Warning   For manufacturer setting
+0FE.2    Warning   Refer to the warning columns with warning No. in 200s ([AL. 2_ _]).
+0FE.3    Warning   For manufacturer setting
+0FE.4    Warning   For manufacturer setting
+0FE.5    Warning   Refer to the warning columns with warning No. in 500s ([AL. 5_ _]).
+0FE.6    Warning   For manufacturer setting
+0FE.7    Warning   For manufacturer setting
+0FE.8    Warning   For manufacturer setting
+0FE.9    Warning   For manufacturer setting
+0FE.A    Warning   For manufacturer setting
+0FE.B    Warning   For manufacturer setting
+0FE.C    Warning   For manufacturer setting
+0FE.D    Warning   For manufacturer setting
+0FE.E    Warning   For manufacturer setting
+0FE.F    Warning   For manufacturer setting
 118   118.1    Alarm     DB          All axes                                                                         
 119   119.1    Alarm     DB          All axes                                                                         
-      119.2    Alarm     DB          All axes                                                                         
-      119.3    Alarm     DB          All axes                                                                         
-      119.4    Alarm     DB          All axes                                                                         
-      119.5    Alarm     DB          All axes                                                                         
-      119.6    Alarm     DB          All axes                                                                         
-      119.7    Alarm     DB          All axes                                                                         
-      119.8    Alarm     DB          All axes                                                                         
+119.2    Alarm     DB          All axes                                                                         
+119.3    Alarm     DB          All axes                                                                         
+119.4    Alarm     DB          All axes                                                                         
+119.5    Alarm     DB          All axes                                                                         
+119.6    Alarm     DB          All axes                                                                         
+119.7    Alarm     DB          All axes                                                                         
+119.8    Alarm     DB          All axes                                                                         
 11A   11A.1    Alarm     DB          Each axis                                                                        
-      11A.2    Alarm     DB          Each axis                                                                        
-      11A.3    Alarm     DB          Each axis                                                                        
+11A.2    Alarm     DB          Each axis                                                                        
+11A.3    Alarm     DB          Each axis                                                                        
 11B   11B.1    Alarm     DB          All axes                                                                         
 130   130.1    Alarm     DB          All axes                                                                         
 
 
-                                                                                     1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                              1.2 List of alarm No./warning No.        21
+1 SERVO AMPLIFIER TROUBLESHOOTING
+   1.2 List of alarm No./warning No.        21
 
 ---
 
 ## หน้า 24
 
 No.        Detail   Alarm/    Motor       Stop           Converter   Alarm deactivation                         Motor     Safety
-                No.      Warning   stop        system         main        Safety   Alarm   Communication   Power     stop      sub-
-                                   method                     circuit     reset    reset   reset           cycling   warning   function
-                                                              stop                                                             stopped
-                                                              target
-     139        139.1    Alarm     DB          All axes                                                                  
-                139.2    Alarm     DB          Each axis                                                                 
-                139.3    Alarm     DB          Each axis                                                                 
-                139.4    Alarm     DB          Each axis                                                                 
-     13D        13D.1    Alarm     DB          All axes                                                                  
-                13D.2    Alarm     DB          All axes                                                                  
-                13D.3    Alarm     DB          All axes                                                                  
-     168        168.1    Alarm     DB          All axes                                                                  
-     16A        16A.1    Alarm     DB          Each axis                                                                 
-                16A.2    Alarm     DB          Each axis                                                                 
-     17A        17A.1    Alarm     EDB         Each axis                                                                 
-                17A.2    Alarm     EDB         Each axis                                                                 
-                17A.3    Alarm     EDB         Each axis                                                                 
-                17A.4    Alarm     EDB         Each axis                                                                 
-                17A.5    Alarm     EDB         Each axis                                                                 
-                17A.6    Alarm     EDB         Each axis                                                                 
-                17A.7    Alarm     EDB         Each axis                                                                 
-                17A.8    Alarm     EDB         Each axis                                                                 
-     182        182.1    Alarm     DB          Each axis                                                                 
-                182.2    Alarm     DB          Each axis                                                                 
-     188        188.1    Alarm     DB          All axes                                                                  
-     19D        19D.1    Warning                                                                                       
-                19D.2    Warning                                                                                       
-     19E        19E.1    Warning                                                                                       
-                19E.2    Warning                                                                                       
-                19E.3    Warning                                                                                       
-                19E.4    Warning                                                                                       
-                19E.5    Warning              Each axis                                                                 
-                19E.6    Warning              Each axis                                                                 
-     1BD        1BD.1    Warning   DB          All axes                                                                  
-                1BD.2    Warning   DB          All axes                                                                  
-                1BD.3    Warning   DB          All axes                                                                  
-                1BD.4    Warning   DB          All axes                                                                  
-     1E9        1E9.1    Warning                                                                                       
-     1EA        1EA.1    Warning              Each axis                                                                 
-                1EA.2    Warning              Each axis                                                                 
-     1F6        1F6.1    Warning              Each axis                                                                 
-                1F6.2    Warning              Each axis                                                                 
-                1F6.3    Warning              Each axis                                                                 
-                1F6.4    Warning              Each axis                                                                 
-                1F6.5    Warning              Each axis                                                                 
-                1F6.6    Warning              Each axis                                                                 
-     1F8        1F8.1    Warning                                                                                       
-                1F8.2    Warning                                                                                       
-     201 -              Alarm     For manufacturer setting
-     28F
-     290 -              Warning   For manufacturer setting
-     2FF
+   No.      Warning   stop        system         main        Safety   Alarm   Communication   Power     stop      sub-
+   method                     circuit     reset    reset   reset           cycling   warning   function
+   stop                                                             stopped
+   target
+139        139.1    Alarm     DB          All axes                                                                  
+   139.2    Alarm     DB          Each axis                                                                 
+   139.3    Alarm     DB          Each axis                                                                 
+   139.4    Alarm     DB          Each axis                                                                 
+13D        13D.1    Alarm     DB          All axes                                                                  
+   13D.2    Alarm     DB          All axes                                                                  
+   13D.3    Alarm     DB          All axes                                                                  
+168        168.1    Alarm     DB          All axes                                                                  
+16A        16A.1    Alarm     DB          Each axis                                                                 
+   16A.2    Alarm     DB          Each axis                                                                 
+17A        17A.1    Alarm     EDB         Each axis                                                                 
+   17A.2    Alarm     EDB         Each axis                                                                 
+   17A.3    Alarm     EDB         Each axis                                                                 
+   17A.4    Alarm     EDB         Each axis                                                                 
+   17A.5    Alarm     EDB         Each axis                                                                 
+   17A.6    Alarm     EDB         Each axis                                                                 
+   17A.7    Alarm     EDB         Each axis                                                                 
+   17A.8    Alarm     EDB         Each axis                                                                 
+182        182.1    Alarm     DB          Each axis                                                                 
+   182.2    Alarm     DB          Each axis                                                                 
+188        188.1    Alarm     DB          All axes                                                                  
+19D        19D.1    Warning                                                                                       
+   19D.2    Warning                                                                                       
+19E        19E.1    Warning                                                                                       
+   19E.2    Warning                                                                                       
+   19E.3    Warning                                                                                       
+   19E.4    Warning                                                                                       
+   19E.5    Warning              Each axis                                                                 
+   19E.6    Warning              Each axis                                                                 
+1BD        1BD.1    Warning   DB          All axes                                                                  
+   1BD.2    Warning   DB          All axes                                                                  
+   1BD.3    Warning   DB          All axes                                                                  
+   1BD.4    Warning   DB          All axes                                                                  
+1E9        1E9.1    Warning                                                                                       
+1EA        1EA.1    Warning              Each axis                                                                 
+   1EA.2    Warning              Each axis                                                                 
+1F6        1F6.1    Warning              Each axis                                                                 
+   1F6.2    Warning              Each axis                                                                 
+   1F6.3    Warning              Each axis                                                                 
+   1F6.4    Warning              Each axis                                                                 
+   1F6.5    Warning              Each axis                                                                 
+   1F6.6    Warning              Each axis                                                                 
+1F8        1F8.1    Warning                                                                                       
+   1F8.2    Warning                                                                                       
+201 -              Alarm     For manufacturer setting
+28F
+290 -              Warning   For manufacturer setting
+2FF
 
 
-             1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 22           1.2 List of alarm No./warning No.
 
 ---
@@ -1192,125 +1193,125 @@ No.        Detail   Alarm/    Motor       Stop           Converter   Alarm deact
 ## หน้า 25
 
 No.   Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation                            Motor     Safety
-      No.      Warning   stop     system      main        Safety   Alarm    Communication     Power     stop      sub-
-                         method               circuit                                                   warning   function
-                                              stop
-                                                          reset    reset    reset             cycling
-                                                                                                                  stopped         1
-                                              target
+No.      Warning   stop     system      main        Safety   Alarm    Communication     Power     stop      sub-
+   method               circuit                                                   warning   function
+   stop
+   reset    reset    reset             cycling
+   stopped         1
+   target
 510   510.1    Alarm     STO/DB   All axes                                                                  
-      510.2    Alarm     STO/DB   All axes                                                                  
-      510.7    Alarm     STO/DB   All axes                                                                  
-      510.9    Alarm     STO/DB   All axes                                                                  
-      510.A    Alarm     STO/DB   All axes                                                                  
-      510.B    Alarm     STO/DB   All axes                                                                  
-      510.C    Alarm     STO/DB   All axes                                                                  
-      510.D    Alarm     STO/DB   All axes                                                                  
-      510.E    Alarm     STO/DB   All axes                                                                  
-      510.F    Alarm     STO/DB   All axes                                                                  
+510.2    Alarm     STO/DB   All axes                                                                  
+510.7    Alarm     STO/DB   All axes                                                                  
+510.9    Alarm     STO/DB   All axes                                                                  
+510.A    Alarm     STO/DB   All axes                                                                  
+510.B    Alarm     STO/DB   All axes                                                                  
+510.C    Alarm     STO/DB   All axes                                                                  
+510.D    Alarm     STO/DB   All axes                                                                  
+510.E    Alarm     STO/DB   All axes                                                                  
+510.F    Alarm     STO/DB   All axes                                                                  
 512   512.2    Alarm     STO/DB   All axes                                                                  
-      512.3    Alarm     STO/DB   All axes                                                                  
-      512.A    Alarm     STO/DB   All axes                                                                  
-      512.B    Alarm     STO/DB   All axes                                                                  
+512.3    Alarm     STO/DB   All axes                                                                  
+512.A    Alarm     STO/DB   All axes                                                                  
+512.B    Alarm     STO/DB   All axes                                                                  
 514   514.9    Alarm     STO/DB   All axes                                                                  
-      514.A    Alarm     STO/DB   All axes                                                                  
+514.A    Alarm     STO/DB   All axes                                                                  
 515   515.9    Alarm     STO/DB   All axes                                                                  
-      515.A    Alarm     STO/DB   All axes                                                                  
+515.A    Alarm     STO/DB   All axes                                                                  
 516   516.1    Alarm     STO/DB   Each axis                                                                 
-      516.2    Alarm     STO/DB   Each axis                                                                 
-      516.3    Alarm     STO/DB   Each axis                                                                 
-      516.4    Alarm     STO/DB   Each axis                                                                 
-      516.5    Alarm     STO/DB   Each axis                                                                 
-      516.9    Alarm     STO/DB   Each axis                                                                 
-      516.A    Alarm     STO/DB   Each axis                                                                 
-      516.B    Alarm     STO/DB   Each axis                                                                 
-      516.C    Alarm     STO/DB   Each axis                                                                 
-      516.D    Alarm     STO/DB   Each axis                                                                 
+516.2    Alarm     STO/DB   Each axis                                                                 
+516.3    Alarm     STO/DB   Each axis                                                                 
+516.4    Alarm     STO/DB   Each axis                                                                 
+516.5    Alarm     STO/DB   Each axis                                                                 
+516.9    Alarm     STO/DB   Each axis                                                                 
+516.A    Alarm     STO/DB   Each axis                                                                 
+516.B    Alarm     STO/DB   Each axis                                                                 
+516.C    Alarm     STO/DB   Each axis                                                                 
+516.D    Alarm     STO/DB   Each axis                                                                 
 517   517.2    Alarm     STO/DB   All axes                                                                  
-      517.9    Alarm     STO/DB   All axes                                                                  
+517.9    Alarm     STO/DB   All axes                                                                  
 518   518.2    Alarm     STO/DB   All axes                                                                  
-      518.A    Alarm     STO/DB   All axes                                                                  
+518.A    Alarm     STO/DB   All axes                                                                  
 519   519.2    Alarm     STO/DB   All axes                                                                  
-      519.A    Alarm     STO/DB   All axes                                                                  
+519.A    Alarm     STO/DB   All axes                                                                  
 520   520.1    Alarm     STO/DB   Each axis                                                                 
-      520.2    Alarm     STO/DB   Each axis                                                                 
-      520.3    Alarm     STO/DB   Each axis                                                                 
-      520.4    Alarm     STO/DB   Each axis                                                                 
-      520.9    Alarm     STO/DB   Each axis                                                                 
-      520.A    Alarm     STO/DB   Each axis                                                                 
-      520.B    Alarm     STO/DB   Each axis                                                                 
-      520.C    Alarm     STO/DB   Each axis                                                                 
+520.2    Alarm     STO/DB   Each axis                                                                 
+520.3    Alarm     STO/DB   Each axis                                                                 
+520.4    Alarm     STO/DB   Each axis                                                                 
+520.9    Alarm     STO/DB   Each axis                                                                 
+520.A    Alarm     STO/DB   Each axis                                                                 
+520.B    Alarm     STO/DB   Each axis                                                                 
+520.C    Alarm     STO/DB   Each axis                                                                 
 521   521.1    Alarm     STO/DB   Each axis                                                                 
-      521.2    Alarm     STO/DB   Each axis                                                                 
-      521.3    Alarm     STO/DB   Each axis                                                                 
-      521.9    Alarm     STO/DB   Each axis                                                                 
-      521.A    Alarm     STO/DB   Each axis                                                                 
-      521.B    Alarm     STO/DB   Each axis                                                                 
+521.2    Alarm     STO/DB   Each axis                                                                 
+521.3    Alarm     STO/DB   Each axis                                                                 
+521.9    Alarm     STO/DB   Each axis                                                                 
+521.A    Alarm     STO/DB   Each axis                                                                 
+521.B    Alarm     STO/DB   Each axis                                                                 
 
 
-                                                                           1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                    1.2 List of alarm No./warning No.        23
+1 SERVO AMPLIFIER TROUBLESHOOTING
+   1.2 List of alarm No./warning No.        23
 
 ---
 
 ## หน้า 26
 
 No.      Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation                         Motor     Safety
-              No.      Warning   stop     system      main        Safety   Alarm   Communication   Power     stop      sub-
-                                 method               circuit     reset    reset   reset           cycling   warning   function
-                                                      stop                                                             stopped
-                                                      target
-     522      522.1    Alarm     STO/DB   Each axis                                                              
-              522.2    Alarm     STO/DB   Each axis                                                              
-              522.3    Alarm     STO/DB   Each axis                                                              
-              522.4    Alarm     STO/DB   Each axis                                                              
-              522.9    Alarm     STO/DB   Each axis                                                              
-              522.A    Alarm     STO/DB   Each axis                                                              
-              522.B    Alarm     STO/DB   Each axis                                                              
-              522.C    Alarm     STO/DB   Each axis                                                              
-     523      523.1    Alarm     STO/DB   Each axis                                                              
-              523.2    Alarm     STO/DB   Each axis                                                              
-              523.3    Alarm     STO/DB   Each axis                                                              
-              523.4    Alarm     STO/DB   Each axis                                                              
-              523.9    Alarm     STO/DB   Each axis                                                              
-              523.A    Alarm     STO/DB   Each axis                                                              
-              523.B    Alarm     STO/DB   Each axis                                                              
-              523.C    Alarm     STO/DB   Each axis                                                              
-     524      524.1    Alarm     STO/DB   Each axis                                                              
-              524.2    Alarm     STO/DB   Each axis                                                              
-              524.3    Alarm     STO/DB   Each axis                                                              
-              524.4    Alarm     STO/DB   Each axis                                                              
-              524.9    Alarm     STO/DB   Each axis                                                              
-              524.A    Alarm     STO/DB   Each axis                                                              
-              524.B    Alarm     STO/DB   Each axis                                                              
-              524.C    Alarm     STO/DB   Each axis                                                              
-     525      525.1    Alarm     STO/DB   Each axis                                                              
-              525.2    Alarm     STO/DB   Each axis                                                              
-              525.3    Alarm     STO/DB   Each axis                                                              
-              525.4    Alarm     STO/DB   Each axis                                                              
-              525.9    Alarm     STO/DB   Each axis                                                              
-              525.A    Alarm     STO/DB   Each axis                                                              
-              525.B    Alarm     STO/DB   Each axis                                                              
-              525.C    Alarm     STO/DB   Each axis                                                              
-     526      526.1    Alarm     STO/DB   Each axis                                                              
-              526.2    Alarm     STO/DB   Each axis                                                              
-              526.3    Alarm     STO/DB   Each axis                                                              
-              526.4    Alarm     STO/DB   Each axis                                                              
-              526.9    Alarm     STO/DB   Each axis                                                              
-              526.A    Alarm     STO/DB   Each axis                                                              
-              526.B    Alarm     STO/DB   Each axis                                                              
-              526.C    Alarm     STO/DB   Each axis                                                              
-     527      527.1    Alarm     STO/DB   Each axis                                                              
-              527.2    Alarm     STO/DB   Each axis                                                              
-              527.3    Alarm     STO/DB   Each axis                                                              
-              527.4    Alarm     STO/DB   Each axis                                                              
-              527.9    Alarm     STO/DB   Each axis                                                              
-              527.A    Alarm     STO/DB   Each axis                                                              
-              527.B    Alarm     STO/DB   Each axis                                                              
-              527.C    Alarm     STO/DB   Each axis                                                              
+   No.      Warning   stop     system      main        Safety   Alarm   Communication   Power     stop      sub-
+   method               circuit     reset    reset   reset           cycling   warning   function
+   stop                                                             stopped
+   target
+522      522.1    Alarm     STO/DB   Each axis                                                              
+   522.2    Alarm     STO/DB   Each axis                                                              
+   522.3    Alarm     STO/DB   Each axis                                                              
+   522.4    Alarm     STO/DB   Each axis                                                              
+   522.9    Alarm     STO/DB   Each axis                                                              
+   522.A    Alarm     STO/DB   Each axis                                                              
+   522.B    Alarm     STO/DB   Each axis                                                              
+   522.C    Alarm     STO/DB   Each axis                                                              
+523      523.1    Alarm     STO/DB   Each axis                                                              
+   523.2    Alarm     STO/DB   Each axis                                                              
+   523.3    Alarm     STO/DB   Each axis                                                              
+   523.4    Alarm     STO/DB   Each axis                                                              
+   523.9    Alarm     STO/DB   Each axis                                                              
+   523.A    Alarm     STO/DB   Each axis                                                              
+   523.B    Alarm     STO/DB   Each axis                                                              
+   523.C    Alarm     STO/DB   Each axis                                                              
+524      524.1    Alarm     STO/DB   Each axis                                                              
+   524.2    Alarm     STO/DB   Each axis                                                              
+   524.3    Alarm     STO/DB   Each axis                                                              
+   524.4    Alarm     STO/DB   Each axis                                                              
+   524.9    Alarm     STO/DB   Each axis                                                              
+   524.A    Alarm     STO/DB   Each axis                                                              
+   524.B    Alarm     STO/DB   Each axis                                                              
+   524.C    Alarm     STO/DB   Each axis                                                              
+525      525.1    Alarm     STO/DB   Each axis                                                              
+   525.2    Alarm     STO/DB   Each axis                                                              
+   525.3    Alarm     STO/DB   Each axis                                                              
+   525.4    Alarm     STO/DB   Each axis                                                              
+   525.9    Alarm     STO/DB   Each axis                                                              
+   525.A    Alarm     STO/DB   Each axis                                                              
+   525.B    Alarm     STO/DB   Each axis                                                              
+   525.C    Alarm     STO/DB   Each axis                                                              
+526      526.1    Alarm     STO/DB   Each axis                                                              
+   526.2    Alarm     STO/DB   Each axis                                                              
+   526.3    Alarm     STO/DB   Each axis                                                              
+   526.4    Alarm     STO/DB   Each axis                                                              
+   526.9    Alarm     STO/DB   Each axis                                                              
+   526.A    Alarm     STO/DB   Each axis                                                              
+   526.B    Alarm     STO/DB   Each axis                                                              
+   526.C    Alarm     STO/DB   Each axis                                                              
+527      527.1    Alarm     STO/DB   Each axis                                                              
+   527.2    Alarm     STO/DB   Each axis                                                              
+   527.3    Alarm     STO/DB   Each axis                                                              
+   527.4    Alarm     STO/DB   Each axis                                                              
+   527.9    Alarm     STO/DB   Each axis                                                              
+   527.A    Alarm     STO/DB   Each axis                                                              
+   527.B    Alarm     STO/DB   Each axis                                                              
+   527.C    Alarm     STO/DB   Each axis                                                              
 
 
-           1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 24         1.2 List of alarm No./warning No.
 
 ---
@@ -1318,122 +1319,122 @@ No.      Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation 
 ## หน้า 27
 
 No.   Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation                            Motor     Safety
-      No.      Warning   stop     system      main        Safety   Alarm    Communication     Power     stop      sub-
-                         method               circuit                                                   warning   function
-                                              stop
-                                                          reset    reset    reset             cycling
-                                                                                                                  stopped         1
-                                              target
+No.      Warning   stop     system      main        Safety   Alarm    Communication     Power     stop      sub-
+   method               circuit                                                   warning   function
+   stop
+   reset    reset    reset             cycling
+   stopped         1
+   target
 528   528.1    Alarm     STO/DB   Each axis                                                                 
-      528.2    Alarm     STO/DB   Each axis                                                                 
-      528.3    Alarm     STO/DB   Each axis                                                                 
-      528.4    Alarm     STO/DB   Each axis                                                                 
-      528.9    Alarm     STO/DB   Each axis                                                                 
-      528.A    Alarm     STO/DB   Each axis                                                                 
-      528.B    Alarm     STO/DB   Each axis                                                                 
-      528.C    Alarm     STO/DB   Each axis                                                                 
+528.2    Alarm     STO/DB   Each axis                                                                 
+528.3    Alarm     STO/DB   Each axis                                                                 
+528.4    Alarm     STO/DB   Each axis                                                                 
+528.9    Alarm     STO/DB   Each axis                                                                 
+528.A    Alarm     STO/DB   Each axis                                                                 
+528.B    Alarm     STO/DB   Each axis                                                                 
+528.C    Alarm     STO/DB   Each axis                                                                 
 529   529.1    Alarm     STO/DB   Each axis                                                                 
-      529.9    Alarm     STO/DB   Each axis                                                                 
+529.9    Alarm     STO/DB   Each axis                                                                 
 52A   52A.1    Alarm     STO/DB   Each axis                                                                 
-      52A.9    Alarm     STO/DB   Each axis                                                                 
+52A.9    Alarm     STO/DB   Each axis                                                                 
 52B   52B.1    Alarm     STO/DB   Each axis                                                                 
-      52B.9    Alarm     STO/DB   Each axis                                                                 
+52B.9    Alarm     STO/DB   Each axis                                                                 
 537   537.1    Alarm     STO/DB   Each axis                                                                 
-      537.2    Alarm     STO/DB   Each axis                                                                 
-      537.3    Alarm     STO/DB   Each axis                                                                 
-      537.9    Alarm     STO/DB   Each axis                                                                 
-      537.A    Alarm     STO/DB   Each axis                                                                 
+537.2    Alarm     STO/DB   Each axis                                                                 
+537.3    Alarm     STO/DB   Each axis                                                                 
+537.9    Alarm     STO/DB   Each axis                                                                 
+537.A    Alarm     STO/DB   Each axis                                                                 
 53A   53A.2    Alarm     STO/DB   All axes                                                                  
-      53A.A    Alarm     STO/DB   All axes                                                                  
+53A.A    Alarm     STO/DB   All axes                                                                  
 540   540.1    Alarm     STO/DB   All axes                                                                  
-      540.2    Alarm     STO/DB   All axes                                                                  
-      540.3    Alarm     STO/DB   All axes                                                                  
-      540.4    Alarm     STO/DB   All axes                                                                  
-      540.9    Alarm     STO/DB   All axes                                                                  
-      540.A    Alarm     STO/DB   All axes                                                                  
+540.2    Alarm     STO/DB   All axes                                                                  
+540.3    Alarm     STO/DB   All axes                                                                  
+540.4    Alarm     STO/DB   All axes                                                                  
+540.9    Alarm     STO/DB   All axes                                                                  
+540.A    Alarm     STO/DB   All axes                                                                  
 541   541.1    Alarm     STO/DB   All axes                                                                  
-      541.2    Alarm     STO/DB   All axes                                                                  
-      541.3    Alarm     STO/DB   All axes                                                                  
-      541.4    Alarm     STO/DB   All axes                                                                  
-      541.5    Alarm     STO/DB   All axes                                                                  
-      541.9    Alarm     STO/DB   All axes                                                                  
-      541.A    Alarm     STO/DB   All axes                                                                  
-      541.B    Alarm     STO/DB   All axes                                                                  
-      541.C    Alarm     STO/DB   All axes                                                                  
-      541.D    Alarm     STO/DB   All axes                                                                  
+541.2    Alarm     STO/DB   All axes                                                                  
+541.3    Alarm     STO/DB   All axes                                                                  
+541.4    Alarm     STO/DB   All axes                                                                  
+541.5    Alarm     STO/DB   All axes                                                                  
+541.9    Alarm     STO/DB   All axes                                                                  
+541.A    Alarm     STO/DB   All axes                                                                  
+541.B    Alarm     STO/DB   All axes                                                                  
+541.C    Alarm     STO/DB   All axes                                                                  
+541.D    Alarm     STO/DB   All axes                                                                  
 542   542.1    Alarm     STO/DB   All axes                                                                  
-      542.9    Alarm     STO/DB   All axes                                                                  
+542.9    Alarm     STO/DB   All axes                                                                  
 543   543.1    Alarm     STO/DB   All axes                                                                  
-      543.2    Alarm     STO/DB   All axes                                                                  
-      543.3    Alarm     STO/DB   All axes                                                                  
-      543.9    Alarm     STO/DB   All axes                                                                  
-      543.A    Alarm     STO/DB   All axes                                                                  
-      543.B    Alarm     STO/DB   All axes                                                                  
-      543.C    Alarm     STO/DB   All axes                                                                  
-      543.D    Alarm     STO/DB   All axes                                                                  
-      543.E    Alarm     STO/DB   All axes                                                                  
+543.2    Alarm     STO/DB   All axes                                                                  
+543.3    Alarm     STO/DB   All axes                                                                  
+543.9    Alarm     STO/DB   All axes                                                                  
+543.A    Alarm     STO/DB   All axes                                                                  
+543.B    Alarm     STO/DB   All axes                                                                  
+543.C    Alarm     STO/DB   All axes                                                                  
+543.D    Alarm     STO/DB   All axes                                                                  
+543.E    Alarm     STO/DB   All axes                                                                  
 
 
-                                                                           1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                    1.2 List of alarm No./warning No.        25
+1 SERVO AMPLIFIER TROUBLESHOOTING
+   1.2 List of alarm No./warning No.        25
 
 ---
 
 ## หน้า 28
 
 No.      Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation                         Motor     Safety
-              No.      Warning   stop     system      main        Safety   Alarm   Communication   Power     stop      sub-
-                                 method               circuit     reset    reset   reset           cycling   warning   function
-                                                      stop                                                             stopped
-                                                      target
-     544      544.1    Alarm     SS1/SD   All axes                                                               
-              544.2    Alarm     SS1/SD   All axes                                                               
-              544.9    Alarm     SS1/SD   All axes                                                               
-              544.A    Alarm     SS1/SD   All axes                                                               
-     545      545.2    Alarm     STO/DB   All axes                                                               
-     546      546.1    Alarm     STO/DB   All axes                                                               
-              546.2    Alarm     STO/DB   All axes                                                               
-              546.9    Alarm     STO/DB   All axes                                                               
-              546.A    Alarm     STO/DB   All axes                                                               
-     547      547.1    Alarm     STO/DB   All axes                                                               
-              547.2    Alarm     STO/DB   All axes                                                               
-              547.9    Alarm     STO/DB   All axes                                                               
-              547.A    Alarm     STO/DB   All axes                                                               
-     549      549.1    Alarm     STO/DB   All axes                                                               
-              549.9    Alarm     STO/DB   All axes                                                               
-     54A      54A.1    Alarm     STO/DB   All axes                                                               
-              54A.2    Alarm     STO/DB   All axes                                                               
-              54A.3    Alarm     STO/DB   All axes                                                               
-              54A.9    Alarm     STO/DB   All axes                                                               
-              54A.A    Alarm     STO/DB   All axes                                                               
-              54A.B    Alarm     STO/DB   All axes                                                               
-     54D      54D.1    Alarm     STO/DB   All axes                                                               
-              54D.2    Alarm     STO/DB   All axes                                                               
-              54D.3    Alarm     STO/DB   All axes                                                               
-              54D.4    Alarm     STO/DB   All axes                                                               
-              54D.9    Alarm     STO/DB   All axes                                                               
-     54F      54F.1    Alarm     STO/DB   All axes                                                               
-     550      550.1    Alarm     STO/DB   Each axis                                                              
-              550.2    Alarm     STO/DB   Each axis                                                              
-              550.3    Alarm     STO/DB   Each axis                                                              
-              550.4    Alarm     STO/DB   Each axis                                                              
-              550.9    Alarm     STO/DB   Each axis                                                              
-              550.A    Alarm     STO/DB   Each axis                                                              
-              550.B    Alarm     STO/DB   Each axis                                                              
-              550.C    Alarm     STO/DB   Each axis                                                              
-     551      551.1    Alarm     STO/DB   Each axis                                                              
-              551.2    Alarm     STO/DB   Each axis                                                              
-              551.3    Alarm     STO/DB   Each axis                                                              
-              551.4    Alarm     STO/DB   Each axis                                                              
-              551.9    Alarm     STO/DB   Each axis                                                              
-              551.A    Alarm     STO/DB   Each axis                                                              
-              551.B    Alarm     STO/DB   Each axis                                                              
-              551.C    Alarm     STO/DB   Each axis                                                              
-     552      552.1    Alarm     STO/DB   Each axis                                                              
-              552.9    Alarm     STO/DB   Each axis                                                              
+   No.      Warning   stop     system      main        Safety   Alarm   Communication   Power     stop      sub-
+   method               circuit     reset    reset   reset           cycling   warning   function
+   stop                                                             stopped
+   target
+544      544.1    Alarm     SS1/SD   All axes                                                               
+   544.2    Alarm     SS1/SD   All axes                                                               
+   544.9    Alarm     SS1/SD   All axes                                                               
+   544.A    Alarm     SS1/SD   All axes                                                               
+545      545.2    Alarm     STO/DB   All axes                                                               
+546      546.1    Alarm     STO/DB   All axes                                                               
+   546.2    Alarm     STO/DB   All axes                                                               
+   546.9    Alarm     STO/DB   All axes                                                               
+   546.A    Alarm     STO/DB   All axes                                                               
+547      547.1    Alarm     STO/DB   All axes                                                               
+   547.2    Alarm     STO/DB   All axes                                                               
+   547.9    Alarm     STO/DB   All axes                                                               
+   547.A    Alarm     STO/DB   All axes                                                               
+549      549.1    Alarm     STO/DB   All axes                                                               
+   549.9    Alarm     STO/DB   All axes                                                               
+54A      54A.1    Alarm     STO/DB   All axes                                                               
+   54A.2    Alarm     STO/DB   All axes                                                               
+   54A.3    Alarm     STO/DB   All axes                                                               
+   54A.9    Alarm     STO/DB   All axes                                                               
+   54A.A    Alarm     STO/DB   All axes                                                               
+   54A.B    Alarm     STO/DB   All axes                                                               
+54D      54D.1    Alarm     STO/DB   All axes                                                               
+   54D.2    Alarm     STO/DB   All axes                                                               
+   54D.3    Alarm     STO/DB   All axes                                                               
+   54D.4    Alarm     STO/DB   All axes                                                               
+   54D.9    Alarm     STO/DB   All axes                                                               
+54F      54F.1    Alarm     STO/DB   All axes                                                               
+550      550.1    Alarm     STO/DB   Each axis                                                              
+   550.2    Alarm     STO/DB   Each axis                                                              
+   550.3    Alarm     STO/DB   Each axis                                                              
+   550.4    Alarm     STO/DB   Each axis                                                              
+   550.9    Alarm     STO/DB   Each axis                                                              
+   550.A    Alarm     STO/DB   Each axis                                                              
+   550.B    Alarm     STO/DB   Each axis                                                              
+   550.C    Alarm     STO/DB   Each axis                                                              
+551      551.1    Alarm     STO/DB   Each axis                                                              
+   551.2    Alarm     STO/DB   Each axis                                                              
+   551.3    Alarm     STO/DB   Each axis                                                              
+   551.4    Alarm     STO/DB   Each axis                                                              
+   551.9    Alarm     STO/DB   Each axis                                                              
+   551.A    Alarm     STO/DB   Each axis                                                              
+   551.B    Alarm     STO/DB   Each axis                                                              
+   551.C    Alarm     STO/DB   Each axis                                                              
+552      552.1    Alarm     STO/DB   Each axis                                                              
+   552.9    Alarm     STO/DB   Each axis                                                              
 
 
-           1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 26         1.2 List of alarm No./warning No.
 
 ---
@@ -1441,117 +1442,117 @@ No.      Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation 
 ## หน้า 29
 
 No.   Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation                            Motor     Safety
-      No.      Warning   stop     system      main        Safety   Alarm    Communication     Power     stop      sub-
-                         method               circuit                                                   warning   function
-                                              stop
-                                                          reset    reset    reset             cycling
-                                                                                                                  stopped         1
-                                              target
+No.      Warning   stop     system      main        Safety   Alarm    Communication     Power     stop      sub-
+   method               circuit                                                   warning   function
+   stop
+   reset    reset    reset             cycling
+   stopped         1
+   target
 553   553.1    Alarm     SS1/SD   All axes                                                                  
-      553.2    Alarm     SS1/SD   All axes                                                                  
-      553.3    Alarm     SS1/SD   All axes                                                                  
-      553.9    Alarm     SS1/SD   All axes                                                                  
-      553.A    Alarm     SS1/SD   All axes                                                                  
-      553.B    Alarm     SS1/SD   All axes                                                                  
+553.2    Alarm     SS1/SD   All axes                                                                  
+553.3    Alarm     SS1/SD   All axes                                                                  
+553.9    Alarm     SS1/SD   All axes                                                                  
+553.A    Alarm     SS1/SD   All axes                                                                  
+553.B    Alarm     SS1/SD   All axes                                                                  
 554   554.1    Alarm     SS1/SD   All axes                                                                  
-      554.2    Alarm     SS1/SD   All axes                                                                  
-      554.3    Alarm     SS1/SD   All axes                                                                  
-      554.9    Alarm     SS1/SD   All axes                                                                  
-      554.A    Alarm     SS1/SD   All axes                                                                  
-      554.B    Alarm     SS1/SD   All axes                                                                  
+554.2    Alarm     SS1/SD   All axes                                                                  
+554.3    Alarm     SS1/SD   All axes                                                                  
+554.9    Alarm     SS1/SD   All axes                                                                  
+554.A    Alarm     SS1/SD   All axes                                                                  
+554.B    Alarm     SS1/SD   All axes                                                                  
 555   555.1    Alarm     SS1/SD   All axes                                                                  
-      555.2    Alarm     SS1/SD   All axes                                                                  
-      555.3    Alarm     SS1/SD   All axes                                                                  
-      555.9    Alarm     SS1/SD   All axes                                                                  
-      555.A    Alarm     SS1/SD   All axes                                                                  
-      555.B    Alarm     SS1/SD   All axes                                                                  
+555.2    Alarm     SS1/SD   All axes                                                                  
+555.3    Alarm     SS1/SD   All axes                                                                  
+555.9    Alarm     SS1/SD   All axes                                                                  
+555.A    Alarm     SS1/SD   All axes                                                                  
+555.B    Alarm     SS1/SD   All axes                                                                  
 556   556.1    Alarm     SS1/SD   All axes                                                                  
-      556.2    Alarm     SS1/SD   All axes                                                                  
-      556.3    Alarm     SS1/SD   All axes                                                                  
-      556.9    Alarm     SS1/SD   All axes                                                                  
-      556.A    Alarm     SS1/SD   All axes                                                                  
-      556.B    Alarm     SS1/SD   All axes                                                                  
+556.2    Alarm     SS1/SD   All axes                                                                  
+556.3    Alarm     SS1/SD   All axes                                                                  
+556.9    Alarm     SS1/SD   All axes                                                                  
+556.A    Alarm     SS1/SD   All axes                                                                  
+556.B    Alarm     SS1/SD   All axes                                                                  
 557   557.1    Alarm     SS1/SD   All axes                                                                  
-      557.2    Alarm     SS1/SD   All axes                                                                  
-      557.3    Alarm     SS1/SD   All axes                                                                  
-      557.9    Alarm     SS1/SD   All axes                                                                  
-      557.A    Alarm     SS1/SD   All axes                                                                  
-      557.B    Alarm     SS1/SD   All axes                                                                  
+557.2    Alarm     SS1/SD   All axes                                                                  
+557.3    Alarm     SS1/SD   All axes                                                                  
+557.9    Alarm     SS1/SD   All axes                                                                  
+557.A    Alarm     SS1/SD   All axes                                                                  
+557.B    Alarm     SS1/SD   All axes                                                                  
 560   560.1    Alarm     STO/DB   Each axis                                                                 
-      560.2    Alarm     STO/DB   Each axis                                                                 
-      560.3    Alarm     STO/DB   Each axis                                                                 
-      560.9    Alarm     STO/DB   Each axis                                                                 
-      560.A    Alarm     STO/DB   Each axis                                                                 
-      560.B    Alarm     STO/DB   Each axis                                                                 
+560.2    Alarm     STO/DB   Each axis                                                                 
+560.3    Alarm     STO/DB   Each axis                                                                 
+560.9    Alarm     STO/DB   Each axis                                                                 
+560.A    Alarm     STO/DB   Each axis                                                                 
+560.B    Alarm     STO/DB   Each axis                                                                 
 561   561.1    Alarm     STO/DB   Each axis                                                                 
-      561.2    Alarm     STO/DB   Each axis                                                                 
-      561.3    Alarm     STO/DB   Each axis                                                                 
-      561.4    Alarm     STO/DB   Each axis                                                                 
-      561.9    Alarm     STO/DB   Each axis                                                                 
-      561.A    Alarm     STO/DB   Each axis                                                                 
-      561.B    Alarm     STO/DB   Each axis                                                                 
-      561.C    Alarm     STO/DB   Each axis                                                                 
+561.2    Alarm     STO/DB   Each axis                                                                 
+561.3    Alarm     STO/DB   Each axis                                                                 
+561.4    Alarm     STO/DB   Each axis                                                                 
+561.9    Alarm     STO/DB   Each axis                                                                 
+561.A    Alarm     STO/DB   Each axis                                                                 
+561.B    Alarm     STO/DB   Each axis                                                                 
+561.C    Alarm     STO/DB   Each axis                                                                 
 
 
-                                                                           1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                    1.2 List of alarm No./warning No.        27
+1 SERVO AMPLIFIER TROUBLESHOOTING
+   1.2 List of alarm No./warning No.        27
 
 ---
 
 ## หน้า 30
 
 No.      Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation                         Motor     Safety
-              No.      Warning   stop     system      main        Safety   Alarm   Communication   Power     stop      sub-
-                                 method               circuit     reset    reset   reset           cycling   warning   function
-                                                      stop                                                             stopped
-                                                      target
-     562      562.1    Alarm     STO/DB   Each axis                                                              
-              562.2    Alarm     STO/DB   Each axis                                                              
-              562.3    Alarm     STO/DB   Each axis                                                              
-              562.4    Alarm     STO/DB   Each axis                                                              
-              562.9    Alarm     STO/DB   Each axis                                                              
-              562.A    Alarm     STO/DB   Each axis                                                              
-              562.B    Alarm     STO/DB   Each axis                                                              
-              562.C    Alarm     STO/DB   Each axis                                                              
-     563      563.1    Alarm     STO/DB   Each axis                                                              
-              563.2    Alarm     STO/DB   Each axis                                                              
-              563.3    Alarm     STO/DB   Each axis                                                              
-              563.4    Alarm     STO/DB   Each axis                                                              
-              563.9    Alarm     STO/DB   Each axis                                                              
-              563.A    Alarm     STO/DB   Each axis                                                              
-              563.B    Alarm     STO/DB   Each axis                                                              
-              563.C    Alarm     STO/DB   Each axis                                                              
-     564      564.1    Alarm     STO/DB   Each axis                                                              
-              564.9    Alarm     STO/DB   Each axis                                                              
-     565      565.1    Alarm     STO/DB   Each axis                                                              
-              565.2    Alarm     STO/DB   Each axis                                                              
-              565.3    Alarm     STO/DB   Each axis                                                              
-              565.4    Alarm     STO/DB   Each axis                                                              
-              565.9    Alarm     STO/DB   Each axis                                                              
-              565.A    Alarm     STO/DB   Each axis                                                              
-              565.B    Alarm     STO/DB   Each axis                                                              
-              565.C    Alarm     STO/DB   Each axis                                                              
-     568      568.1    Alarm     STO/DB   Each axis                                                              
-              568.2    Alarm     STO/DB   Each axis                                                              
-              568.3    Alarm     STO/DB   Each axis                                                              
-              568.4    Alarm     STO/DB   Each axis                                                              
-              568.9    Alarm     STO/DB   Each axis                                                              
-              568.A    Alarm     STO/DB   Each axis                                                              
-              568.B    Alarm     STO/DB   Each axis                                                              
-              568.C    Alarm     STO/DB   Each axis                                                              
-     569      569.1    Alarm     STO/DB   Each axis                                                              
-              569.2    Alarm     STO/DB   Each axis                                                              
-              569.3    Alarm     STO/DB   Each axis                                                              
-              569.4    Alarm     STO/DB   Each axis                                                              
-              569.9    Alarm     STO/DB   Each axis                                                              
-              569.A    Alarm     STO/DB   Each axis                                                              
-              569.B    Alarm     STO/DB   Each axis                                                              
-              569.C    Alarm     STO/DB   Each axis                                                              
-     580      580.3    Alarm     SS1/SD   All axes                                                               
-              580.B    Alarm     SS1/SD   All axes                                                               
+   No.      Warning   stop     system      main        Safety   Alarm   Communication   Power     stop      sub-
+   method               circuit     reset    reset   reset           cycling   warning   function
+   stop                                                             stopped
+   target
+562      562.1    Alarm     STO/DB   Each axis                                                              
+   562.2    Alarm     STO/DB   Each axis                                                              
+   562.3    Alarm     STO/DB   Each axis                                                              
+   562.4    Alarm     STO/DB   Each axis                                                              
+   562.9    Alarm     STO/DB   Each axis                                                              
+   562.A    Alarm     STO/DB   Each axis                                                              
+   562.B    Alarm     STO/DB   Each axis                                                              
+   562.C    Alarm     STO/DB   Each axis                                                              
+563      563.1    Alarm     STO/DB   Each axis                                                              
+   563.2    Alarm     STO/DB   Each axis                                                              
+   563.3    Alarm     STO/DB   Each axis                                                              
+   563.4    Alarm     STO/DB   Each axis                                                              
+   563.9    Alarm     STO/DB   Each axis                                                              
+   563.A    Alarm     STO/DB   Each axis                                                              
+   563.B    Alarm     STO/DB   Each axis                                                              
+   563.C    Alarm     STO/DB   Each axis                                                              
+564      564.1    Alarm     STO/DB   Each axis                                                              
+   564.9    Alarm     STO/DB   Each axis                                                              
+565      565.1    Alarm     STO/DB   Each axis                                                              
+   565.2    Alarm     STO/DB   Each axis                                                              
+   565.3    Alarm     STO/DB   Each axis                                                              
+   565.4    Alarm     STO/DB   Each axis                                                              
+   565.9    Alarm     STO/DB   Each axis                                                              
+   565.A    Alarm     STO/DB   Each axis                                                              
+   565.B    Alarm     STO/DB   Each axis                                                              
+   565.C    Alarm     STO/DB   Each axis                                                              
+568      568.1    Alarm     STO/DB   Each axis                                                              
+   568.2    Alarm     STO/DB   Each axis                                                              
+   568.3    Alarm     STO/DB   Each axis                                                              
+   568.4    Alarm     STO/DB   Each axis                                                              
+   568.9    Alarm     STO/DB   Each axis                                                              
+   568.A    Alarm     STO/DB   Each axis                                                              
+   568.B    Alarm     STO/DB   Each axis                                                              
+   568.C    Alarm     STO/DB   Each axis                                                              
+569      569.1    Alarm     STO/DB   Each axis                                                              
+   569.2    Alarm     STO/DB   Each axis                                                              
+   569.3    Alarm     STO/DB   Each axis                                                              
+   569.4    Alarm     STO/DB   Each axis                                                              
+   569.9    Alarm     STO/DB   Each axis                                                              
+   569.A    Alarm     STO/DB   Each axis                                                              
+   569.B    Alarm     STO/DB   Each axis                                                              
+   569.C    Alarm     STO/DB   Each axis                                                              
+580      580.3    Alarm     SS1/SD   All axes                                                               
+   580.B    Alarm     SS1/SD   All axes                                                               
 
 
-           1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 28         1.2 List of alarm No./warning No.
 
 ---
@@ -1559,127 +1560,127 @@ No.      Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation 
 ## หน้า 31
 
 No.   Detail   Alarm/    Motor    Stop       Converter   Alarm deactivation                            Motor     Safety
-      No.      Warning   stop     system     main        Safety   Alarm    Communication     Power     stop      sub-
-                         method              circuit                                                   warning   function
-                                             stop
-                                                         reset    reset    reset             cycling
-                                                                                                                 stopped         1
-                                             target
+No.      Warning   stop     system     main        Safety   Alarm    Communication     Power     stop      sub-
+   method              circuit                                                   warning   function
+   stop
+   reset    reset    reset             cycling
+   stopped         1
+   target
 581   581.1    Alarm     SS1/SD   All axes                                                                 
-      581.2    Alarm     SS1/SD   All axes                                                                 
-      581.3    Alarm     SS1/SD   All axes                                                                 
-      581.4    Alarm     SS1/SD   All axes                                                                 
-      581.5    Alarm     SS1/SD   All axes                                                                 
-      581.6    Alarm     SS1/SD   All axes                                                                 
-      581.7    Alarm     SS1/SD   All axes                                                                 
-      581.9    Alarm     SS1/SD   All axes                                                                 
-      581.A    Alarm     SS1/SD   All axes                                                                 
-      581.B    Alarm     SS1/SD   All axes                                                                 
-      581.C    Alarm     SS1/SD   All axes                                                                 
-      581.D    Alarm     SS1/SD   All axes                                                                 
-      581.E    Alarm     SS1/SD   All axes                                                                 
-      581.F    Alarm     SS1/SD   All axes                                                                 
+581.2    Alarm     SS1/SD   All axes                                                                 
+581.3    Alarm     SS1/SD   All axes                                                                 
+581.4    Alarm     SS1/SD   All axes                                                                 
+581.5    Alarm     SS1/SD   All axes                                                                 
+581.6    Alarm     SS1/SD   All axes                                                                 
+581.7    Alarm     SS1/SD   All axes                                                                 
+581.9    Alarm     SS1/SD   All axes                                                                 
+581.A    Alarm     SS1/SD   All axes                                                                 
+581.B    Alarm     SS1/SD   All axes                                                                 
+581.C    Alarm     SS1/SD   All axes                                                                 
+581.D    Alarm     SS1/SD   All axes                                                                 
+581.E    Alarm     SS1/SD   All axes                                                                 
+581.F    Alarm     SS1/SD   All axes                                                                 
 582   582.1    Alarm     SS1/SD   All axes                                                                 
-      582.2    Alarm     SS1/SD   All axes                                                                 
-      582.3    Alarm     SS1/SD   All axes                                                                 
-      582.4    Alarm     SS1/SD   All axes                                                                 
-      582.5    Alarm     SS1/SD   All axes                                                                 
-      582.6    Alarm     SS1/SD   All axes                                                                 
-      582.7    Alarm     SS1/SD   All axes                                                                 
-      582.9    Alarm     SS1/SD   All axes                                                                 
-      582.A    Alarm     SS1/SD   All axes                                                                 
-      582.B    Alarm     SS1/SD   All axes                                                                 
-      582.C    Alarm     SS1/SD   All axes                                                                 
-      582.D    Alarm     SS1/SD   All axes                                                                 
-      582.E    Alarm     SS1/SD   All axes                                                                 
-      582.F    Alarm     SS1/SD   All axes                                                                 
+582.2    Alarm     SS1/SD   All axes                                                                 
+582.3    Alarm     SS1/SD   All axes                                                                 
+582.4    Alarm     SS1/SD   All axes                                                                 
+582.5    Alarm     SS1/SD   All axes                                                                 
+582.6    Alarm     SS1/SD   All axes                                                                 
+582.7    Alarm     SS1/SD   All axes                                                                 
+582.9    Alarm     SS1/SD   All axes                                                                 
+582.A    Alarm     SS1/SD   All axes                                                                 
+582.B    Alarm     SS1/SD   All axes                                                                 
+582.C    Alarm     SS1/SD   All axes                                                                 
+582.D    Alarm     SS1/SD   All axes                                                                 
+582.E    Alarm     SS1/SD   All axes                                                                 
+582.F    Alarm     SS1/SD   All axes                                                                 
 583   583.2    Alarm     SS1/SD   All axes                                                                 
-      583.3    Alarm     SS1/SD   All axes                                                                 
-      583.4    Alarm     SS1/SD   All axes                                                                 
-      583.5    Alarm     SS1/SD   All axes                                                                 
-      583.6    Alarm     SS1/SD   All axes                                                                 
-      583.A    Alarm     SS1/SD   All axes                                                                 
-      583.B    Alarm     SS1/SD   All axes                                                                 
-      583.C    Alarm     SS1/SD   All axes                                                                 
-      583.D    Alarm     SS1/SD   All axes                                                                 
-      583.E    Alarm     SS1/SD   All axes                                                                 
+583.3    Alarm     SS1/SD   All axes                                                                 
+583.4    Alarm     SS1/SD   All axes                                                                 
+583.5    Alarm     SS1/SD   All axes                                                                 
+583.6    Alarm     SS1/SD   All axes                                                                 
+583.A    Alarm     SS1/SD   All axes                                                                 
+583.B    Alarm     SS1/SD   All axes                                                                 
+583.C    Alarm     SS1/SD   All axes                                                                 
+583.D    Alarm     SS1/SD   All axes                                                                 
+583.E    Alarm     SS1/SD   All axes                                                                 
 584   584.1    Alarm     SS1/SD   All axes                                                                 
-      584.2    Alarm     SS1/SD   All axes                                                                 
-      584.3    Alarm     SS1/SD   All axes                                                                 
-      584.4    Alarm     SS1/SD   All axes                                                                 
-      584.5    Alarm     SS1/SD   All axes                                                                 
-      584.9    Alarm     SS1/SD   All axes                                                                 
-      584.A    Alarm     SS1/SD   All axes                                                                 
-      584.B    Alarm     SS1/SD   All axes                                                                 
-      584.C    Alarm     SS1/SD   All axes                                                                 
-      584.D    Alarm     SS1/SD   All axes                                                                 
+584.2    Alarm     SS1/SD   All axes                                                                 
+584.3    Alarm     SS1/SD   All axes                                                                 
+584.4    Alarm     SS1/SD   All axes                                                                 
+584.5    Alarm     SS1/SD   All axes                                                                 
+584.9    Alarm     SS1/SD   All axes                                                                 
+584.A    Alarm     SS1/SD   All axes                                                                 
+584.B    Alarm     SS1/SD   All axes                                                                 
+584.C    Alarm     SS1/SD   All axes                                                                 
+584.D    Alarm     SS1/SD   All axes                                                                 
 
 
-                                                                          1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                   1.2 List of alarm No./warning No.        29
+1 SERVO AMPLIFIER TROUBLESHOOTING
+   1.2 List of alarm No./warning No.        29
 
 ---
 
 ## หน้า 32
 
 No.      Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation                         Motor     Safety
-              No.      Warning   stop     system      main        Safety   Alarm   Communication   Power     stop      sub-
-                                 method               circuit     reset    reset   reset           cycling   warning   function
-                                                      stop                                                             stopped
-                                                      target
-     585      585.1    Alarm     SS1/SD   All axes                                                               
-              585.2    Alarm     SS1/SD   All axes                                                               
-              585.3    Alarm     SS1/SD   All axes                                                               
-              585.4    Alarm     SS1/SD   All axes                                                               
-              585.9    Alarm     SS1/SD   All axes                                                               
-              585.A    Alarm     SS1/SD   All axes                                                               
-              585.B    Alarm     SS1/SD   All axes                                                               
-              585.C    Alarm     SS1/SD   All axes                                                               
-     586      586.1    Alarm     SS1/SD   All axes                                                               
-              586.2    Alarm     SS1/SD   All axes                                                               
-              586.3    Alarm     SS1/SD   All axes                                                               
-              586.4    Alarm     SS1/SD   All axes                                                               
-              586.5    Alarm     SS1/SD   All axes                                                               
-              586.9    Alarm     SS1/SD   All axes                                                               
-              586.A    Alarm     SS1/SD   All axes                                                               
-              586.B    Alarm     SS1/SD   All axes                                                               
-              586.C    Alarm     SS1/SD   All axes                                                               
-              586.D    Alarm     SS1/SD   All axes                                                               
-     587      587.1    Alarm     SS1/SD   All axes                                                               
-              587.2    Alarm     SS1/SD   All axes                                                               
-              587.3    Alarm     SS1/SD   All axes                                                               
-              587.4    Alarm     SS1/SD   All axes                                                               
-              587.5    Alarm     SS1/SD   All axes                                                               
-              587.6    Alarm     SS1/SD   All axes                                                               
-              587.7    Alarm     SS1/SD   All axes                                                               
-              587.9    Alarm     SS1/SD   All axes                                                               
-              587.A    Alarm     SS1/SD   All axes                                                               
-              587.B    Alarm     SS1/SD   All axes                                                               
-              587.C    Alarm     SS1/SD   All axes                                                               
-              587.D    Alarm     SS1/SD   All axes                                                               
-              587.E    Alarm     SS1/SD   All axes                                                               
-              587.F    Alarm     SS1/SD   All axes                                                               
-     595      595.1    Warning   STO/DB   Each axis                                                              
-              595.9    Warning   STO/DB   Each axis                                                              
-     596      596.1    Warning   STO/DB   Each axis                                                              
-              596.9    Warning   STO/DB   Each axis                                                              
-     59D      59D.1    Warning   STO/DB   All axes                                                               
-              59D.3    Warning   STO/DB   All axes                                                               
-              59D.6    Warning   STO/DB   All axes                                                               
-              59D.9    Warning   STO/DB   All axes                                                               
-              59D.B    Warning   STO/DB   All axes                                                               
-              59D.E    Warning   STO/DB   All axes                                                               
-     5E0      5E0.1    Warning   STO/DB   All axes                                                               
-              5E0.2    Warning   STO/DB   All axes                                                               
-              5E0.3    Warning   STO/DB   All axes                                                               
-              5E0.7    Warning   STO/DB   All axes                                                               
-              5E0.9    Warning   STO/DB   All axes                                                               
-              5E0.A    Warning   STO/DB   All axes                                                               
-              5E0.B    Warning   STO/DB   All axes                                                               
-              5E0.F    Warning   STO/DB   All axes                                                               
+   No.      Warning   stop     system      main        Safety   Alarm   Communication   Power     stop      sub-
+   method               circuit     reset    reset   reset           cycling   warning   function
+   stop                                                             stopped
+   target
+585      585.1    Alarm     SS1/SD   All axes                                                               
+   585.2    Alarm     SS1/SD   All axes                                                               
+   585.3    Alarm     SS1/SD   All axes                                                               
+   585.4    Alarm     SS1/SD   All axes                                                               
+   585.9    Alarm     SS1/SD   All axes                                                               
+   585.A    Alarm     SS1/SD   All axes                                                               
+   585.B    Alarm     SS1/SD   All axes                                                               
+   585.C    Alarm     SS1/SD   All axes                                                               
+586      586.1    Alarm     SS1/SD   All axes                                                               
+   586.2    Alarm     SS1/SD   All axes                                                               
+   586.3    Alarm     SS1/SD   All axes                                                               
+   586.4    Alarm     SS1/SD   All axes                                                               
+   586.5    Alarm     SS1/SD   All axes                                                               
+   586.9    Alarm     SS1/SD   All axes                                                               
+   586.A    Alarm     SS1/SD   All axes                                                               
+   586.B    Alarm     SS1/SD   All axes                                                               
+   586.C    Alarm     SS1/SD   All axes                                                               
+   586.D    Alarm     SS1/SD   All axes                                                               
+587      587.1    Alarm     SS1/SD   All axes                                                               
+   587.2    Alarm     SS1/SD   All axes                                                               
+   587.3    Alarm     SS1/SD   All axes                                                               
+   587.4    Alarm     SS1/SD   All axes                                                               
+   587.5    Alarm     SS1/SD   All axes                                                               
+   587.6    Alarm     SS1/SD   All axes                                                               
+   587.7    Alarm     SS1/SD   All axes                                                               
+   587.9    Alarm     SS1/SD   All axes                                                               
+   587.A    Alarm     SS1/SD   All axes                                                               
+   587.B    Alarm     SS1/SD   All axes                                                               
+   587.C    Alarm     SS1/SD   All axes                                                               
+   587.D    Alarm     SS1/SD   All axes                                                               
+   587.E    Alarm     SS1/SD   All axes                                                               
+   587.F    Alarm     SS1/SD   All axes                                                               
+595      595.1    Warning   STO/DB   Each axis                                                              
+   595.9    Warning   STO/DB   Each axis                                                              
+596      596.1    Warning   STO/DB   Each axis                                                              
+   596.9    Warning   STO/DB   Each axis                                                              
+59D      59D.1    Warning   STO/DB   All axes                                                               
+   59D.3    Warning   STO/DB   All axes                                                               
+   59D.6    Warning   STO/DB   All axes                                                               
+   59D.9    Warning   STO/DB   All axes                                                               
+   59D.B    Warning   STO/DB   All axes                                                               
+   59D.E    Warning   STO/DB   All axes                                                               
+5E0      5E0.1    Warning   STO/DB   All axes                                                               
+   5E0.2    Warning   STO/DB   All axes                                                               
+   5E0.3    Warning   STO/DB   All axes                                                               
+   5E0.7    Warning   STO/DB   All axes                                                               
+   5E0.9    Warning   STO/DB   All axes                                                               
+   5E0.A    Warning   STO/DB   All axes                                                               
+   5E0.B    Warning   STO/DB   All axes                                                               
+   5E0.F    Warning   STO/DB   All axes                                                               
 
 
-           1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 30         1.2 List of alarm No./warning No.
 
 ---
@@ -1687,44 +1688,44 @@ No.      Detail   Alarm/    Motor    Stop        Converter   Alarm deactivation 
 ## หน้า 33
 
 No.         Detail     Alarm/      Motor       Stop        Converter    Alarm deactivation                                Motor     Safety
-            No.        Warning     stop        system      main         Safety    Alarm    Communication        Power     stop      sub-
-                                   method                  circuit                                                        warning   function
-                                                           stop
-                                                                        reset     reset    reset                cycling
-                                                                                                                                    stopped         1
-                                                           target
+No.        Warning     stop        system      main         Safety    Alarm    Communication        Power     stop      sub-
+   method                  circuit                                                        warning   function
+   stop
+   reset     reset    reset                cycling
+   stopped         1
+   target
 5E1         5E1.1      Warning     STO/DB      Each axis                                                                      
-            5E1.9      Warning     STO/DB      Each axis                                                                      
+5E1.9      Warning     STO/DB      Each axis                                                                      
 5E2         5E2.1      Warning     SS1/SD      All axes                                                                       
-            5E2.2      Warning     SS1/SD      All axes                                                                       
-            5E2.9      Warning     SS1/SD      All axes                                                                       
-            5E2.A      Warning     SS1/SD      All axes                                                                       
+5E2.2      Warning     SS1/SD      All axes                                                                       
+5E2.9      Warning     SS1/SD      All axes                                                                       
+5E2.A      Warning     SS1/SD      All axes                                                                       
 5E6         5E6.1      Warning     SS1/SD      Each axis                                                                      
-            5E6.9      Warning     SS1/SD      Each axis                                                                      
+5E6.9      Warning     SS1/SD      Each axis                                                                      
 
 *1    Because the servo motor is stopped when this alarm is detected, there is no "Motor stop method".
 *2    For details of "Motor stop method", refer to "Stop method at stroke limit detection" in the following manual.
-      MR-J5 User's Manual (Function)
+MR-J5 User's Manual (Function)
 
 
-                                                                                          1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                                   1.2 List of alarm No./warning No.           31
+1 SERVO AMPLIFIER TROUBLESHOOTING
+   1.2 List of alarm No./warning No.           31
 
 ---
 
 ## หน้า 34
 
 1.3                 Handling methods for alarms/warnings
-     Remove the cause of the alarm and warning in accordance with this section. MR Configurator2 can be referenced to find the
-     causes of alarms and warnings.
+Remove the cause of the alarm and warning in accordance with this section. MR Configurator2 can be referenced to find the
+causes of alarms and warnings.
 
-     [AL. 010_Undervoltage]
-     • The voltage of the control circuit power supply has dropped.
-     • The voltage of the main circuit power supply has dropped.
+[AL. 010_Undervoltage]
+• The voltage of the control circuit power supply has dropped.
+• The voltage of the main circuit power supply has dropped.
 
 
-     [AL. 010.1_Voltage drop in the control circuit power]
-     Cause                                                                  Check/action method                                                                  Model
+[AL. 010.1_Voltage drop in the control circuit power]
+Cause                                                                  Check/action method                                                                  Model
      1. Connection or wiring of the control circuit                         Check the connection and wiring of the control circuit power supply (screw           [G]
                                                                             tightening state on the power supply route, disconnected cables, and loose           [B]
            power supply is incorrect.
@@ -1833,12 +1834,12 @@ Cause                                                Check/action method        
 ## หน้า 36
 
 [AL. 011_Switch setting error]
-     • The settings of the DIP switch are incorrect.
-     • The settings of the rotary switch are incorrect.
+• The settings of the DIP switch are incorrect.
+• The settings of the rotary switch are incorrect.
 
 
-     [AL. 011.1_Rotary switch setting error]
-     Cause                                                Check/action method                                                                  Model
+[AL. 011.1_Rotary switch setting error]
+Cause                                                Check/action method                                                                  Model
      1. Each selected network has its settable range,     Check the settings of the rotary switches (SW1/SW2).                                 [G]
                                                           If the value set with the rotary switch does not match the actual value, the         [B]
           and the values set with the rotary switches
@@ -1849,8 +1850,8 @@ Cause                                                Check/action method        
                                                           and display of the drive unit" in the User's Manual (Introduction).
 
 
-     [AL. 011.2_Disabled axis setting error]
-     Cause                                                Check/action method                                                                  Model
+[AL. 011.2_Disabled axis setting error]
+Cause                                                Check/action method                                                                  Model
      1. The settings of the disabling control axis        Check the setting of the disabling control axis switch.                              [G]
                                                           Refer to "Switch setting and display of the servo amplifier" or "Switch setting
           switch are incorrect.
@@ -1930,20 +1931,20 @@ Cause                                                 Check/action method       
 Page 35 [AL. 012.1_RAM error 1]
 
 
-                                                                                    1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                      1.3 Handling methods for alarms/warnings               35
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings               35
 
 ---
 
 ## หน้า 38
 
 [AL. 013_CPU error]
-     • An internal part of the servo amplifier has malfunctioned.
-     • A clock transmitted from the controller has an error.
+• An internal part of the servo amplifier has malfunctioned.
+• A clock transmitted from the controller has an error.
 
 
-     [AL. 013.1_CPU error 1]
-     Cause                                                     Check/action method                                                            Model
+[AL. 013.1_CPU error 1]
+Cause                                                     Check/action method                                                            Model
      1. An internal part of the servo amplifier has            Noise from the power supply may have caused the failure. Disconnect all        [G]
                                                                cables except for those for the control circuit power supply, then check the   [B]
           malfunctioned.
@@ -1964,19 +1965,19 @@ Cause                                                 Check/action method       
                                                                MR-J5D User's Manual (Hardware)
 
 
-     [AL. 013.2_CPU error 2]
-     Page 36 [AL. 013.1_CPU error 1]
+[AL. 013.2_CPU error 2]
+Page 36 [AL. 013.1_CPU error 1]
 
 
-     [AL. 013.4_CPU error 4]
-     Page 36 [AL. 013.1_CPU error 1]
+[AL. 013.4_CPU error 4]
+Page 36 [AL. 013.1_CPU error 1]
 
 
-     [AL. 013.5_CPU error 5]
-     Page 36 [AL. 013.1_CPU error 1]
+[AL. 013.5_CPU error 5]
+Page 36 [AL. 013.1_CPU error 1]
 
 
-         1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 36       1.3 Handling methods for alarms/warnings
 
 ---
@@ -2049,19 +2050,19 @@ Cause                                                 Check/action method       
 Page 37 [AL. 014.1_Control process error 1]
 
 
-                                                                                     1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                       1.3 Handling methods for alarms/warnings              37
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings              37
 
 ---
 
 ## หน้า 40
 
 [AL. 016_Encoder initial communication error 1]
-     • There is a communication error between the encoder and servo amplifier.
+• There is a communication error between the encoder and servo amplifier.
 
 
-     [AL. 016.1_Encoder initial communication - Receive data error 1]
-     Cause                                                   Check/action method                                                                Model
+[AL. 016.1_Encoder initial communication - Receive data error 1]
+Cause                                                   Check/action method                                                                Model
      1. There is a problem with the encoder cable.           Check if the encoder cable has been disconnected, incorrectly wired, or has        [G]
                                                              shorted.                                                                           [B]
                                                              If there is a problem with the encoder cable, replace or repair the cable.         [A]
@@ -2094,11 +2095,11 @@ Cause                                                 Check/action method       
                                                              MR-J5D User's Manual (Hardware)
 
 
-     [AL. 016.2_Encoder initial communication - Receive data error 2]
-     Page 38 [AL. 016.1_Encoder initial communication - Receive data error 1]
+[AL. 016.2_Encoder initial communication - Receive data error 2]
+Page 38 [AL. 016.1_Encoder initial communication - Receive data error 1]
 
 
-         1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 38       1.3 Handling methods for alarms/warnings
 
 ---
@@ -2181,26 +2182,26 @@ Cause                                                Check/action method        
 ## หน้า 42
 
 [AL. 016.B_Encoder initial communication - Process error 2]
-     Page 39 [AL. 016.A_Encoder initial communication - Process error 1]
+Page 39 [AL. 016.A_Encoder initial communication - Process error 1]
 
 
-     [AL. 016.C_Encoder initial communication - Process error 3]
-     Page 39 [AL. 016.A_Encoder initial communication - Process error 1]
+[AL. 016.C_Encoder initial communication - Process error 3]
+Page 39 [AL. 016.A_Encoder initial communication - Process error 1]
 
 
-     [AL. 016.D_Encoder initial communication - Process error 4]
-     Page 39 [AL. 016.A_Encoder initial communication - Process error 1]
+[AL. 016.D_Encoder initial communication - Process error 4]
+Page 39 [AL. 016.A_Encoder initial communication - Process error 1]
 
 
-     [AL. 016.E_Encoder initial communication - Process error 5]
-     Page 39 [AL. 016.A_Encoder initial communication - Process error 1]
+[AL. 016.E_Encoder initial communication - Process error 5]
+Page 39 [AL. 016.A_Encoder initial communication - Process error 1]
 
 
-     [AL. 016.F_Encoder initial communication - Process error 6]
-     Page 39 [AL. 016.A_Encoder initial communication - Process error 1]
+[AL. 016.F_Encoder initial communication - Process error 6]
+Page 39 [AL. 016.A_Encoder initial communication - Process error 1]
 
 
-         1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 40       1.3 Handling methods for alarms/warnings
 
 ---
@@ -2287,7 +2288,7 @@ Cause                                                   Check/action method     
 ## หน้า 44
 
 [AL. 017.7_Board error 7]
-     Cause                                               Check/action method                                                                 Model
+Cause                                               Check/action method                                                                 Model
      1. The firmware version of the servo amplifier is   The firmware version is not supported. Perform a firmware update to revert to       [G]
                                                          the firmware version prior to the update.                                           [B]
          not supported.
@@ -2306,8 +2307,8 @@ Cause                                                   Check/action method     
                                                          MR-J5D User's Manual (Hardware)
 
 
-     [AL. 017.9_Board error 8]
-     Cause                                               Check/action method                                                                 Model
+[AL. 017.9_Board error 8]
+Cause                                               Check/action method                                                                 Model
      1. There is a problem with the surrounding          Check the noise, ambient temperature, and other conditions, and implement           [G]
                                                          appropriate countermeasures for the cause.                                          [B]
          environment.
@@ -2319,8 +2320,8 @@ Cause                                                   Check/action method     
      2. The servo amplifier has malfunctioned.           Replace the servo amplifier.
 
 
-     [AL. 017.A_Board error 9]
-     Cause                                               Check/action method                                                                 Model
+[AL. 017.A_Board error 9]
+Cause                                               Check/action method                                                                 Model
      1. A push button is faulty.                         After checking the conditions of the push buttons, cycle the power, then check      [A]
                                                          the repeatability. If the failure continues, the servo amplifier may have
                                                          malfunctioned. Replace the servo amplifier.
@@ -2371,20 +2372,20 @@ Cause                                                Check/action method        
 Page 43 [AL. 019.1_Flash-ROM error 1]
 
 
-                                                                                   1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                     1.3 Handling methods for alarms/warnings               43
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings               43
 
 ---
 
 ## หน้า 46
 
 [AL. 01A_Servo motor combination error]
-     • The combination of the servo amplifier and servo motor is incorrect.
-     • The combination of the servo amplifier and servo motor constant file is incorrect.
+• The combination of the servo amplifier and servo motor is incorrect.
+• The combination of the servo amplifier and servo motor constant file is incorrect.
 
 
-     [AL. 01A.1_Servo motor combination error 1]
-     Cause                                                  Check/action method                                                            Model
+[AL. 01A.1_Servo motor combination error 1]
+Cause                                                  Check/action method                                                            Model
      1. The servo amplifier and the servo motor have        Refer to "Servo amplifier/motor combinations" in the following manual.         [G]
                                                             MR-J5 User's Manual (Hardware)                                                [B]
           been connected incorrectly.
@@ -2414,8 +2415,8 @@ Cause                                                Check/action method        
      5. The encoder has malfunctioned.                      Replace the servo motor.
 
 
-     [AL. 01A.2_Servo motor control mode combination error]
-     Cause                                                  Check/action method                                                            Model
+[AL. 01A.2_Servo motor control mode combination error]
+Cause                                                  Check/action method                                                            Model
      1. The combination of the servo motor being            Check the [Pr. PA01.1] setting.                                                [G]
                                                                                                                                            [B]
           used and the setting of [Pr. PA01.1 Operation
@@ -2435,8 +2436,8 @@ Cause                                                Check/action method        
           amplifier.
 
 
-     [AL. 01A.3_Control mode/load-side encoder combination error]
-     Cause                                                  Check/action method                                                            Model
+[AL. 01A.3_Control mode/load-side encoder combination error]
+Cause                                                  Check/action method                                                            Model
      1. In the fully closed loop control mode, the servo    Refer to "USING A FULLY CLOSED LOOP SYSTEM" in the following                   [G]
                                                             manuals.                                                                       [B]
           motor-side encoder and the load-side encoder
@@ -2515,7 +2516,7 @@ Cause                                                                 Check/acti
 ## หน้า 48
 
 [AL. 01A.6_Servo motor combination error 4]
-     Cause                                                                 Check/action method                                                             Model
+Cause                                                                 Check/action method                                                             Model
      1. The scale measurement encoder that was                             Check if a scale measurement encoder other than the one that was connected      [G]
                                                                            at the startup of the absolute position detection system is connected. If a     [B]
            connected at the startup of the absolute
@@ -2613,11 +2614,11 @@ Cause                                                   Check/action method     
 ## หน้า 50
 
 [AL. 01E_Encoder initial communication error 2]
-     • The encoder has malfunctioned.
+• The encoder has malfunctioned.
 
 
-     [AL. 01E.1_Encoder malfunction]
-     Cause                                          Check/action method                                                         Model
+[AL. 01E.1_Encoder malfunction]
+Cause                                          Check/action method                                                         Model
      1. The encoder has malfunctioned.              Replace the servo motor.                                                    [G]
                                                                                                                                 [B]
      2. There is a problem with the surrounding     Check the noise, ambient temperature, and other conditions, and implement
@@ -2630,8 +2631,8 @@ Cause                                                   Check/action method     
                                                     MR-J5D User's Manual (Hardware)
 
 
-     [AL. 01E.2_Load-side encoder malfunction]
-     Cause                                          Check/action method                                                         Model
+[AL. 01E.2_Load-side encoder malfunction]
+Cause                                          Check/action method                                                         Model
      1. The load-side encoder has malfunctioned.    Replace the load-side encoder.                                              [G]
                                                                                                                                 [B]
      2. There is a problem with the surrounding     Check the noise, ambient temperature, and other conditions, and implement
@@ -2699,11 +2700,11 @@ Cause                                                Check/action method        
 ## หน้า 52
 
 [AL. 020_Encoder normal communication error 1]
-     • There is a communication error between the encoder and servo amplifier.
+• There is a communication error between the encoder and servo amplifier.
 
 
-     [AL. 020.1_Encoder normal communication - Receive data error 1]
-      Cause                                                  Check/action method                                                                Model
+[AL. 020.1_Encoder normal communication - Receive data error 1]
+ Cause                                                  Check/action method                                                                Model
       1. There is a problem with the encoder cable.          Check if the encoder cable has been disconnected or has shorted.                   [G]
                                                              If there is a problem with the cable, repair or replace the cable.                 [B]
                                                              If an A/B/Z-phase differential output type encoder is being used, check if the     [A]
@@ -2740,12 +2741,12 @@ Cause                                                Check/action method        
                                                              servo amplifier or servo motor.
 
 
-     [AL. 020.2_Encoder normal communication - Receive data error 2]
-     Page 50 [AL. 020.1_Encoder normal communication - Receive data error 1]
+[AL. 020.2_Encoder normal communication - Receive data error 2]
+Page 50 [AL. 020.1_Encoder normal communication - Receive data error 1]
 
 
-     [AL. 020.3_Encoder normal communication - Receive data error 3]
-      Cause                                                  Check/action method                                                                Model
+[AL. 020.3_Encoder normal communication - Receive data error 3]
+ Cause                                                  Check/action method                                                                Model
       1. The Z-phase signal cannot be detected               Check if the Z-phase pulse signals (PZ and PZR) of the encoder cable have          [G]
                                                              been disconnected or have shorted.                                                 [B]
            despite being on. This does not apply to multi-
@@ -2766,11 +2767,11 @@ Cause                                                Check/action method        
            environment.
 
 
-     [AL. 020.4_Manufacturer setting error]
-     This is for manufacturer setting.
+[AL. 020.4_Manufacturer setting error]
+This is for manufacturer setting.
 
 
-          1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 50        1.3 Handling methods for alarms/warnings
 
 ---
@@ -2835,19 +2836,19 @@ Cause                                               Check/action method         
 Page 50 [AL. 020.1_Encoder normal communication - Receive data error 1]
 
 
-                                                                                 1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                   1.3 Handling methods for alarms/warnings               51
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings               51
 
 ---
 
 ## หน้า 54
 
 [AL. 021_Encoder normal communication error 2]
-     • The encoder detected an error signal.
+• The encoder detected an error signal.
 
 
-     [AL. 021.1_Encoder data error 1]
-     Cause                                                   Check/action method                                                              Model
+[AL. 021.1_Encoder data error 1]
+Cause                                                   Check/action method                                                              Model
      1. An excessive speed or acceleration was               Decrease the control gain, then check the repeatability. If the error does not   [G]
                                                              repeat, use the encoder with a lower gain.                                       [B]
           detected due to an oscillation or other factors.
@@ -2879,8 +2880,8 @@ Cause                                               Check/action method         
                                                              MR-J5D User's Manual (Hardware)
 
 
-     [AL. 021.2_Encoder data update error]
-     Cause                                                   Check/action method                                                              Model
+[AL. 021.2_Encoder data update error]
+Cause                                                   Check/action method                                                              Model
      1. The encoder has malfunctioned.                       Replace the servo motor.                                                         [G]
                                                                                                                                               [B]
      2. The external conductor of the encoder cable is       Check if the external conductor of the encoder cable is connected to the
@@ -2900,11 +2901,11 @@ Cause                                               Check/action method         
                                                              MR-J5D User's Manual (Hardware)
 
 
-     [AL. 021.3_Encoder data waveform error]
-     Page 52 [AL. 021.2_Encoder data update error]
+[AL. 021.3_Encoder data waveform error]
+Page 52 [AL. 021.2_Encoder data update error]
 
 
-         1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 52       1.3 Handling methods for alarms/warnings
 
 ---
@@ -2940,20 +2941,20 @@ Cause                                               Check/action method         
 Page 52 [AL. 021.2_Encoder data update error]
 
 
-                                                                                  1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                    1.3 Handling methods for alarms/warnings            53
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings            53
 
 ---
 
 ## หน้า 56
 
 [AL. 024_Main circuit error]
-     • The servo motor power cable has a ground fault.
-     • The servo motor has a ground fault.
+• The servo motor power cable has a ground fault.
+• The servo motor has a ground fault.
 
 
-     [AL. 024.1_Ground fault detected via hardware detection circuit]
-     Cause                                                Check/action method                                                                   Model
+[AL. 024.1_Ground fault detected via hardware detection circuit]
+Cause                                                Check/action method                                                                   Model
      1. The servo motor power cable has a ground          Check if the servo motor power cable has a ground fault. If the servo motor           [G]
                                                           power cable has a ground fault, correct the wiring.                                   [B]
           fault or has shorted.
@@ -2994,8 +2995,8 @@ Cause                                               Check/action method         
                                                           MR-J5D User's Manual (Hardware)
 
 
-     [AL. 024.2_Ground fault detected via software detection processing]
-     Cause                                                Check/action method                                                                   Model
+[AL. 024.2_Ground fault detected via software detection processing]
+Cause                                                Check/action method                                                                   Model
      1. The servo motor power cable has a ground          Check if the servo motor power cable has a ground fault. If the servo motor           [G]
                                                           power cable has a ground fault, correct the wiring.                                   [B]
           fault or has shorted.
@@ -3040,15 +3041,15 @@ Cause                                               Check/action method         
 • The servo amplifier was powered on when the battery was degraded or disconnected.
 
 
-                                                                              1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                1.3 Handling methods for alarms/warnings     55
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings     55
 
 ---
 
 ## หน้า 58
 
 [AL. 025.1_Servo motor encoder absolute position erased]
-     Cause                                                               Check/action method                                                                Model
+Cause                                                               Check/action method                                                                Model
      1. Power was switched on for the first time in the                  If the power was switched on for the first time after the absolute position        [G]
                                                                          detection system is set, check that the battery is mounted correctly before        [B]
            absolute position detection system.
@@ -3219,11 +3220,11 @@ Cause                                                               Check/action
 ## หน้า 60
 
 [AL. 027_Initial magnetic pole detection error]
-     • The initial magnetic pole detection cannot be performed properly.
+• The initial magnetic pole detection cannot be performed properly.
 
 
-     [AL. 027.1_Initial magnetic pole detection - Abnormal termination]
-     Cause                                                 Check/action method                                                                   Model
+[AL. 027.1_Initial magnetic pole detection - Abnormal termination]
+Cause                                                 Check/action method                                                                   Model
      1. A moving part collided against the machine.        If the moving part collides, move the start position of the magnetic pole             [G]
                                                            detection.                                                                            [B]
 
@@ -3263,8 +3264,8 @@ Cause                                                               Check/action
                                                            MR-J5 User's Manual (Hardware)
 
 
-     [AL. 027.2_Initial magnetic pole detection - Time out error]
-     Cause                                                 Check/action method                                                                   Model
+[AL. 027.2_Initial magnetic pole detection - Time out error]
+Cause                                                 Check/action method                                                                   Model
      1. Servo-on was turned on while the primary side      Stop the linear servo motor or the direct drive motor, then turn on the servo-on      [G]
                                                            again.                                                                                [B]
           of the linear servo motor or the rotor of the
@@ -3325,19 +3326,19 @@ Cause                                                    Check/action method    
 Page 58 [AL. 027.1_Initial magnetic pole detection - Abnormal termination]
 
 
-                                                                                         1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                           1.3 Handling methods for alarms/warnings                 59
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings                 59
 
 ---
 
 ## หน้า 62
 
 [AL. 028_Linear encoder error 2]
-     • There is a problem with the operating environment of the linear encoder.
+• There is a problem with the operating environment of the linear encoder.
 
 
-     [AL. 028.1_Linear encoder environmental error]
-     Cause                                                Check/action method                                                           Model
+[AL. 028.1_Linear encoder environmental error]
+Cause                                                Check/action method                                                           Model
      1. The ambient temperature of the linear encoder     Check the ambient temperature and the specifications of the linear encoder.   [G]
                                                                                                                                         [B]
           is outside of specifications.
@@ -3348,11 +3349,11 @@ Cause                                                    Check/action method    
                                                           MR-J5 Partner's Encoder User's Manual
 
 
-     [AL. 028.2_Load-side linear encoder environmental error]
-     Page 60 [AL. 028.1_Linear encoder environmental error]
+[AL. 028.2_Load-side linear encoder environmental error]
+Page 60 [AL. 028.1_Linear encoder environmental error]
 
 
-         1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 60       1.3 Handling methods for alarms/warnings
 
 ---
@@ -3415,19 +3416,19 @@ Cause                                                Check/action method        
 Page 61 [AL. 02A.1_Linear encoder error 1-1]
 
 
-                                                                                   1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                     1.3 Handling methods for alarms/warnings            61
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings            61
 
 ---
 
 ## หน้า 64
 
 [AL. 02B_Encoder counter error]
-     • There is an error in the data created by the encoder.
+• There is an error in the data created by the encoder.
 
 
-     [AL. 02B.1_Encoder counter error 1]
-     Cause                                                 Check/action method                                                               Model
+[AL. 02B.1_Encoder counter error 1]
+Cause                                                 Check/action method                                                               Model
      1. There is a problem with the encoder cable.         Check if the encoder cable has been disconnected or has shorted.                  [G]
                                                            If there is a problem with the encoder cable, replace or repair the cable, then   [B]
                                                            execute homing.                                                                   [A]
@@ -3452,18 +3453,18 @@ Cause                                                Check/action method        
      4. The encoder has malfunctioned.                     Replace the direct drive motor.
 
 
-     [AL. 02B.2_Encoder counter error 2]
-     Cause                                                 Check/action method                                                               Model
+[AL. 02B.2_Encoder counter error 2]
+Cause                                                 Check/action method                                                               Model
      1. The connection of the servo motor is incorrect.    Check the U/V/W wiring. Refer to "Example power circuit connections" in the       [G]
                                                            following manuals.                                                                [B]
                                                            MR-J5 User's Manual (Hardware)                                                   [A]
                                                            MR-J5D User's Manual (Hardware)
 
      2. Take actions in accordance with the items shown below.
-     Page 62 [AL. 02B.1_Encoder counter error 1]
+Page 62 [AL. 02B.1_Encoder counter error 1]
 
 
-         1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 62       1.3 Handling methods for alarms/warnings
 
 ---
@@ -3544,7 +3545,7 @@ Cause                                                 Check/action method       
 ## หน้า 66
 
 [AL. 030.3_Regenerative feedback signal error]
-     Cause                                          Check/action method                                                             Model
+Cause                                          Check/action method                                                             Model
      1. The servo amplifier has malfunctioned.      Remove the wire of the regenerative option or built-in regenerative resistor,   [G]
                                                     then check if the alarm occurs at power on. If the alarm occurs, replace the    [B]
                                                     servo amplifier.                                                                [A]
@@ -3639,11 +3640,11 @@ Cause                                                   Check/action method     
 ## หน้า 68
 
 [AL. 032_Overcurrent]
-     • A current higher than the permissible current flowed in the servo amplifier.
+• A current higher than the permissible current flowed in the servo amplifier.
 
 
-     [AL. 032.1_Overcurrent detected via hardware detection circuit (during operation)]
-     Cause                                                  Check/action method                                                                 Model
+[AL. 032.1_Overcurrent detected via hardware detection circuit (during operation)]
+Cause                                                  Check/action method                                                                 Model
      1. The servo amplifier has malfunctioned.              Check if the servo motor power cable has a ground fault. If the servo motor         [G]
                                                             power cable has a ground fault, correct the wiring.                                 [B]
                                                             Check that this alarm occurs as the servo motor power cables (U/V/W) are            [A]
@@ -3745,21 +3746,21 @@ Cause                                                 Check/action method       
 Page 67 [AL. 032.2_Overcurrent detected via software detection processing (during operation)]
 
 
-                                                                                     1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                       1.3 Handling methods for alarms/warnings               67
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings               67
 
 ---
 
 ## หน้า 70
 
 [AL. 033_Overvoltage]
-     • The value of the bus voltage exceeded the specified value.
-     200 V class: 400 V DC
-     400 V class: 800 V DC (840 V for the MR-J5D_)
+• The value of the bus voltage exceeded the specified value.
+200 V class: 400 V DC
+400 V class: 800 V DC (840 V for the MR-J5D_)
 
 
-     [AL. 033.1_Main circuit voltage error]
-     Cause                                                Check/action method                                                             Model
+[AL. 033.1_Main circuit voltage error]
+Cause                                                Check/action method                                                             Model
      1. The settings of the regenerative resistor         Check the regenerative resistor (regenerative option) in use and the setting    [G]
                                                           value of [Pr. PA02.0-1 Regenerative option selection].                          [B]
           (regenerative option) are incorrect.
@@ -3880,19 +3881,19 @@ Cause                                                Check/action method        
 Page 69 [AL. 034.1_SSCNET receive data error]
 
 
-                                                                                    1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                      1.3 Handling methods for alarms/warnings                    69
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings                    69
 
 ---
 
 ## หน้า 72
 
 [AL. 035_Command frequency error]
-     • The input command pulse frequency is too high.
+• The input command pulse frequency is too high.
 
 
-     [AL. 035.1_Command frequency error]
-     Cause                                                    Check/action method                                                                  Model
+[AL. 035.1_Command frequency error]
+Cause                                                    Check/action method                                                                  Model
      1. The command pulse frequency is too high.              Check the command pulse frequency, and if the command pulse frequency                [A]
                                                               exceeds the maximum input pulse frequency, review the operation pattern.
 
@@ -3977,12 +3978,12 @@ Cause                                                Check/action method        
 ## หน้า 74
 
 [AL. 037_Parameter error]
-     • Servo parameter setting values are incorrect.
-     • Point table setting values are incorrect.
+• Servo parameter setting values are incorrect.
+• Point table setting values are incorrect.
 
 
-     [AL. 037.1_Parameter setting range error]
-     Cause                                                  Check/action method                                                                Model
+[AL. 037.1_Parameter setting range error]
+Cause                                                  Check/action method                                                                Model
      1. A parameter was set outside of the setting          [G] [B]: Check the parameter error No. on the alarm display screen of MR           [G]
                                                             Configurator2 or with another method, then review the setting value of the         [B]
           range.
@@ -4005,8 +4006,8 @@ Cause                                                Check/action method        
           malfunction.
 
 
-     [AL. 037.2_Parameter combination error]
-     Cause                                                  Check/action method                                                                Model
+[AL. 037.2_Parameter combination error]
+Cause                                                  Check/action method                                                                Model
      1. An inconsistent combination of parameters           [G] [B]: Check the parameter error No. on the alarm display screen of MR           [G]
                                                             Configurator2 or with another method, then review the setting value of the         [B]
           has been set.
@@ -4032,8 +4033,8 @@ Cause                                                Check/action method        
           deceleration function enabled).
 
 
-     [AL. 037.3_Point table setting error]
-     Cause                                                  Check/action method                                                                Model
+[AL. 037.3_Point table setting error]
+Cause                                                  Check/action method                                                                Model
      1. Point table setting values are incorrect.           Check if the setting value of the point table is within the setting range.         [G]
                                                             Check the error number of the point table with [Point table error No.(Obj.
                                                             2A43h: 01h)]. Or check the setting value in the point table screen of MR
@@ -4105,11 +4106,11 @@ Cause                                                 Check/action method       
 ## หน้า 76
 
 [AL. 03D_Driver communication parameter setting error]
-     • The setting values of control parameters for inter-driver communication are incorrect.
+• The setting values of control parameters for inter-driver communication are incorrect.
 
 
-     [AL. 03D.1_Slave-side driver communication parameter combination error]
-     Cause                                                 Check/action method                                                                Model
+[AL. 03D.1_Slave-side driver communication parameter combination error]
+Cause                                                 Check/action method                                                                Model
      1. The master-side transmission data selection        Review the settings of "Driver communication setting - Master - Transmit data      [B]
                                                            selection 1" and "Driver communication setting - Master - Transmit data
           for inter-driver communication has not been
@@ -4119,23 +4120,23 @@ Cause                                                 Check/action method       
                                                            selection 2]
 
 
-     [AL. 03D.2_Master-side driver communication parameter combination error]
-     Page 74 [AL. 03D.1_Slave-side driver communication parameter combination error]
+[AL. 03D.2_Master-side driver communication parameter combination error]
+Page 74 [AL. 03D.1_Slave-side driver communication parameter combination error]
 
-     [AL. 03E_Operation mode error]
-     • The operation mode settings have been changed.
+[AL. 03E_Operation mode error]
+• The operation mode settings have been changed.
 
 
-     [AL. 03E.4_Control command mismatch 1]
-     Cause                                                 Check/action method                                                                Model
+[AL. 03E.4_Control command mismatch 1]
+Cause                                                 Check/action method                                                                Model
      1. The control mode of the MR-J5-_B_-LL servo         Check if the control mode was switched to the torque control mode.                 [B]
                                                            If the control mode was switched, review the controller setting.
           amplifier was switched to the torque control
           mode.
 
 
-     [AL. 03E.5_Control command mismatch 2]
-     Cause                                                 Check/action method                                                                Model
+[AL. 03E.5_Control command mismatch 2]
+Cause                                                 Check/action method                                                                Model
      1. The control mode of the MR-J5-_B_-LL servo         Check if the control mode was switched to the continuous operation to torque       [B]
                                                            control mode.
           amplifier was switched to the continuous
@@ -4143,8 +4144,8 @@ Cause                                                 Check/action method       
           operation to torque control mode.
 
 
-     [AL. 03E.9_Connection mode error 1]
-     Cause                                                 Check/action method                                                                Model
+[AL. 03E.9_Connection mode error 1]
+Cause                                                 Check/action method                                                                Model
      1. When an SSCNET III/H controller is                 Restore the settings of the servo amplifier to the factory settings by using the   [B]
                                                            application "MR Mode Change" came with MR Configurator2, set the
           connected, the operation mode is not set to
@@ -4244,7 +4245,7 @@ Cause                                                  Check/action method      
 ## หน้า 78
 
 [AL. 042.3_Servo control error based on torque/thrust deviation]
-     Cause                                                 Check/action method                                                                  Model
+Cause                                                 Check/action method                                                                  Model
      1. [Pr. PA17 Servo motor series setting] and [Pr.     Check if [Pr. PA17] and [Pr. PA18] have been set correctly.                          [G]
                                                                                                                                                 [B]
           PA18 Servo motor type setting] were not set
@@ -4281,8 +4282,8 @@ Cause                                                  Check/action method      
                                                            as required.
 
 
-     [AL. 042.8_Fully closed loop control error based on position deviation]
-     Cause                                                 Check/action method                                                                  Model
+[AL. 042.8_Fully closed loop control error based on position deviation]
+Cause                                                 Check/action method                                                                  Model
      1. The settings of the load-side encoder              Check the settings of [Pr. PE04 Fully closed loop control - Feedback pulse           [G]
                                                            electronic gear 1 - Numerator] and [Pr. PE05 Fully closed loop control -             [B]
           resolution differ from the actual value.
@@ -4303,10 +4304,10 @@ Cause                                                  Check/action method      
           error detection level is too low.
                                                            operation status. Review the setting of [Pr. PE03 Fully closed loop control error
                                                            - Detection function selection] or [Pr. PE07 Fully closed loop control - Position
-                                                           deviation error detection level] as required.
+deviation error detection level] as required.
 
 
-         1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 76       1.3 Handling methods for alarms/warnings
 
 ---
@@ -4335,7 +4336,7 @@ Cause                                               Check/action method         
      detection level is too low.
                                                     operation status. Review the setting of [Pr. PE03 Fully closed loop control error
                                                     - Detection function selection] or [Pr. PE06 Fully closed loop control - Speed
-                                                    deviation error detection level] as required.
+deviation error detection level] as required.
 
 
 [AL. 042.A_Fully closed loop control error based on position deviation during
@@ -4343,19 +4344,19 @@ command stop]
 Page 76 [AL. 042.8_Fully closed loop control error based on position deviation]
 
 
-                                                                                   1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                     1.3 Handling methods for alarms/warnings                   77
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings                   77
 
 ---
 
 ## หน้า 80
 
 [AL. 045_Main circuit device overheat]
-     • The inside of the servo amplifier overheated.
+• The inside of the servo amplifier overheated.
 
 
-     [AL. 045.1_Main circuit device overheat error 1]
-     Cause                                                      Check/action method                                                           Model
+[AL. 045.1_Main circuit device overheat error 1]
+Cause                                                      Check/action method                                                           Model
      1. The ambient temperature exceeded the                    Check the ambient temperature, and if the temperature exceeds the specified   [G]
                                                                 value, lower the ambient temperature.                                         [B]
           specified value (60 °C).
@@ -4372,11 +4373,11 @@ command stop]
      5. The servo amplifier has malfunctioned.           Replace the servo amplifier.
 
 
-     [AL. 045.2_Main circuit device overheat error 2]
-     Page 78 [AL. 045.1_Main circuit device overheat error 1]
+[AL. 045.2_Main circuit device overheat error 2]
+Page 78 [AL. 045.1_Main circuit device overheat error 1]
 
 
-         1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 78       1.3 Handling methods for alarms/warnings
 
 ---
@@ -4447,15 +4448,15 @@ Cause                                                       Check/action method 
 Page 79 [AL. 046.1_Servo motor temperature error 1]
 
 
-                                                                                           1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                             1.3 Handling methods for alarms/warnings                  79
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings                  79
 
 ---
 
 ## หน้า 82
 
 [AL. 046.6_Servo motor temperature error 4]
-     Cause                                            Check/action method                                                                Model
+Cause                                            Check/action method                                                                Model
      1. A current larger than the continuous output   Check the effective load ratio.                                                    [G]
                                                       If the effective load ratio is too high, reduce the load or review the operation   [B]
          current of the servo motor flowed.
@@ -4463,8 +4464,8 @@ Cause                                                       Check/action method 
                                                       motor.
 
 
-     [AL. 046.7_Servo motor temperature error 5]
-     Cause                                            Check/action method                                                                Model
+[AL. 046.7_Servo motor temperature error 5]
+Cause                                            Check/action method                                                                Model
      1. Values of the servo parameters for            Set the servo parameters for manufacturer setting to the initial values.           [G]
                                                                                                                                          [B]
          manufacturer setting have been changed.
@@ -4524,11 +4525,11 @@ Cause                                                Check/action method        
 ## หน้า 84
 
 [AL. 050_Overload 1]
-     • The load exceeded the overload protection characteristics of the servo amplifier.
+• The load exceeded the overload protection characteristics of the servo amplifier.
 
 
-     [AL. 050.1_Thermal overload error 1 during operation]
-     Cause                                                 Check/action method                                                                   Model
+[AL. 050.1_Thermal overload error 1 during operation]
+Cause                                                 Check/action method                                                                   Model
      1. The servo motor power cable was                    Check the servo motor power cable, then repair or replace the cable.                  [G]
                                                                                                                                                  [B]
           disconnected.
@@ -4565,15 +4566,15 @@ Cause                                                Check/action method        
           environment of the servo motor.
 
 
-     [AL. 050.2_Thermal overload error 2 during operation]
-     Page 82 [AL. 050.1_Thermal overload error 1 during operation]
+[AL. 050.2_Thermal overload error 2 during operation]
+Page 82 [AL. 050.1_Thermal overload error 1 during operation]
 
 
-     [AL. 050.3_Thermal overload error 4 during operation]
-     Page 82 [AL. 050.1_Thermal overload error 1 during operation]
+[AL. 050.3_Thermal overload error 4 during operation]
+Page 82 [AL. 050.1_Thermal overload error 1 during operation]
 
 
-         1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 82       1.3 Handling methods for alarms/warnings
 
 ---
@@ -4625,19 +4626,19 @@ Cause                                                 Check/action method       
 Page 83 [AL. 050.4_Thermal overload error 1 during a stop]
 
 
-                                                                                     1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                       1.3 Handling methods for alarms/warnings                     83
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings                     83
 
 ---
 
 ## หน้า 86
 
 [AL. 051_Overload 2]
-     • Maximum output current continuously flowed due to machine collision or other causes.
+• Maximum output current continuously flowed due to machine collision or other causes.
 
 
-     [AL. 051.1_Thermal overload error 3 during operation]
-     Cause                                                 Check/action method                                                                Model
+[AL. 051.1_Thermal overload error 3 during operation]
+Cause                                                 Check/action method                                                                Model
      1. The servo motor power cable was                    Repair or replace the servo motor power cable.                                     [G]
                                                                                                                                               [B]
           disconnected.
@@ -4661,8 +4662,8 @@ Cause                                                 Check/action method       
           has malfunctioned.
 
 
-     [AL. 051.2_Thermal overload error 3 during a stop]
-     Cause                                                 Check/action method                                                                Model
+[AL. 051.2_Thermal overload error 3 during a stop]
+Cause                                                 Check/action method                                                                Model
      1. A moving part collided against the machine.        Review the operation pattern to avoid collision.                                   [G]
                                                            Check if the machine is interfering with the servo motor.                          [B]
 
@@ -4757,15 +4758,15 @@ Cause                                                      Check/action method  
 Page 85 [AL. 052.1_Excessive droop pulse 1]
 
 
-                                                                                          1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                            1.3 Handling methods for alarms/warnings                  85
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings                  85
 
 ---
 
 ## หน้า 88
 
 [AL. 052.6_Excessive droop pulse at servo-off]
-     Cause                                                 Check/action method                                                           Model
+Cause                                                 Check/action method                                                           Model
      1. The servo motor shaft was rotated by an            Make sure that the servo motor is not rotated (moved) by an external force.   [G]
                                                                                                                                          [B]
          external force or the moving part of the linear
@@ -4817,11 +4818,11 @@ Cause                                                Check/action method        
 ## หน้า 90
 
 [AL. 056_Forced stop error]
-     • The servo motor failed to decelerate normally during a forced stop deceleration.
+• The servo motor failed to decelerate normally during a forced stop deceleration.
 
 
-     [AL. 056.2_Speed exceeded during forced stop]
-     Cause                                                 Check/action method                                                                  Model
+[AL. 056.2_Speed exceeded during forced stop]
+Cause                                                 Check/action method                                                                  Model
      1. The forced stop deceleration time constant is      Set a larger value in "Deceleration time constant at forced stop", then check        [G]
                                                            the repeatability. If the error does not repeat, adjust the deceleration time        [B]
           short.
@@ -4840,8 +4841,8 @@ Cause                                                Check/action method        
           malfunctioned.
 
 
-     [AL. 056.3_Estimated excess distance during forced stop]
-     Cause                                                 Check/action method                                                                  Model
+[AL. 056.3_Estimated excess distance during forced stop]
+Cause                                                 Check/action method                                                                  Model
      1. The forced stop deceleration time constant is      Set a larger value in "Deceleration time constant at forced stop", then check        [G]
                                                            the repeatability. If the error does not repeat, adjust the deceleration time        [B]
           short.
@@ -4856,11 +4857,11 @@ Cause                                                Check/action method        
           malfunctioned.
 
 
-     [AL. 056.5_Travel distance exceeded during forced stop 2]
-     Page 88 [AL. 056.2_Speed exceeded during forced stop]
+[AL. 056.5_Travel distance exceeded during forced stop 2]
+Page 88 [AL. 056.2_Speed exceeded during forced stop]
 
 
-         1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 88       1.3 Handling methods for alarms/warnings
 
 ---
@@ -4884,11 +4885,11 @@ Cause                                                    Check/action method    
 ## หน้า 92
 
 [AL. 063_STO timing error]
-     • STO signal turned off when the servo motor is rotating.
+• STO signal turned off when the servo motor is rotating.
 
 
-     [AL. 063.1_STO1 off]
-     Cause                                                 Check/action method                                                      Model
+[AL. 063.1_STO1 off]
+Cause                                                 Check/action method                                                      Model
      1. While detection by [AL. 063 STO timing error]      After the servo motor stops, turn off (enable) STO1.                     [G]
                                                            Review the settings of "STO timing error selection" with the following   [B]
            has been enabled, STO1 was turned off
@@ -4901,8 +4902,8 @@ Cause                                                    Check/action method    
       • Direct drive motor speed: 5 r/min or higher
 
 
-     [AL. 063.2_STO2 off]
-     Cause                                                 Check/action method                                                      Model
+[AL. 063.2_STO2 off]
+Cause                                                 Check/action method                                                      Model
      1. While detection by [AL. 063 STO timing error]      After the servo motor stops, turn off (enable) STO2.                     [G]
                                                            Review the settings of "STO timing error selection" with the following   [B]
            has been enabled, STO2 was turned off
@@ -4967,40 +4968,40 @@ Cause                                                            Check/action me
 Page 91 [AL. 066.1_Encoder initial communication - Receive data error 1 (safety sub-function)]
 
 
-                                                                                                1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                                  1.3 Handling methods for alarms/warnings                91
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings                91
 
 ---
 
 ## หน้า 94
 
 [AL. 067_Encoder normal communication error 1 (safety sub-
-     function)]
-     • There is a communication error between the encoder and servo amplifier.
+function)]
+• There is a communication error between the encoder and servo amplifier.
 
 
-     [AL. 067.1_Encoder normal communication - Receive data error 1 (safety sub-function)]
-     Page 91 [AL. 066.1_Encoder initial communication - Receive data error 1 (safety sub-function)]
+[AL. 067.1_Encoder normal communication - Receive data error 1 (safety sub-function)]
+Page 91 [AL. 066.1_Encoder initial communication - Receive data error 1 (safety sub-function)]
 
 
-     [AL. 067.2_Encoder normal communication - Receive data error 2 (safety sub-function)]
-     Page 91 [AL. 066.1_Encoder initial communication - Receive data error 1 (safety sub-function)]
+[AL. 067.2_Encoder normal communication - Receive data error 2 (safety sub-function)]
+Page 91 [AL. 066.1_Encoder initial communication - Receive data error 1 (safety sub-function)]
 
 
-     [AL. 067.3_Encoder normal communication - Receive data error 3 (safety sub-function)]
-     Page 91 [AL. 066.1_Encoder initial communication - Receive data error 1 (safety sub-function)]
+[AL. 067.3_Encoder normal communication - Receive data error 3 (safety sub-function)]
+Page 91 [AL. 066.1_Encoder initial communication - Receive data error 1 (safety sub-function)]
 
 
-     [AL. 067.4_Encoder normal communication - Receive data error 4 (safety sub-function)]
-     Page 91 [AL. 066.1_Encoder initial communication - Receive data error 1 (safety sub-function)]
+[AL. 067.4_Encoder normal communication - Receive data error 4 (safety sub-function)]
+Page 91 [AL. 066.1_Encoder initial communication - Receive data error 1 (safety sub-function)]
 
 
-     [AL. 067.7_Encoder normal communication - Transmission data error 1 (safety sub-
-     function)]
-     Page 91 [AL. 066.1_Encoder initial communication - Receive data error 1 (safety sub-function)]
+[AL. 067.7_Encoder normal communication - Transmission data error 1 (safety sub-
+function)]
+Page 91 [AL. 066.1_Encoder initial communication - Receive data error 1 (safety sub-function)]
 
 
-          1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 92        1.3 Handling methods for alarms/warnings
 
 ---
@@ -5041,17 +5042,17 @@ Cause                                              Check/action method          
 ## หน้า 96
 
 [AL. 069_Command error]
-     • When the software limit was activated, the command position exceeded 32 bits (-2147483648 to 2147483647).
-     • When the software limit was activated, the command position exceeded 30 bits (-536870912 to 536870911) from the value
-       that was set.
-     • The command position exceeded 30 bits (-536870912 to 536870911) from the position which was detected after detecting
-       LSP (Forward rotation stroke end) or LSN (Reverse rotation stroke end).
-     • The command position exceeded 30 bits (-536870912 to 536870911) from the position that was detected after detecting
-       FLS (Upper stroke limit) or RLS (Lower stroke limit).
+• When the software limit was activated, the command position exceeded 32 bits (-2147483648 to 2147483647).
+• When the software limit was activated, the command position exceeded 30 bits (-536870912 to 536870911) from the value
+  that was set.
+• The command position exceeded 30 bits (-536870912 to 536870911) from the position which was detected after detecting
+  LSP (Forward rotation stroke end) or LSN (Reverse rotation stroke end).
+• The command position exceeded 30 bits (-536870912 to 536870911) from the position that was detected after detecting
+  FLS (Upper stroke limit) or RLS (Lower stroke limit).
 
 
-     [AL. 069.1_Forward rotation-side software limit detection - Command excess error]
-     Cause                                                     Check/action method                                                         Model
+[AL. 069.1_Forward rotation-side software limit detection - Command excess error]
+Cause                                                     Check/action method                                                         Model
      1. The command position exceeded 32 bits when             Check if the command is set for a position which exceeds 32 bits. Set the   [G]
                                                                command position correctly.
           the software limit was activated.
@@ -5071,12 +5072,12 @@ Cause                                              Check/action method          
                                                                MR-J5D User's Manual (Hardware)
 
 
-     [AL. 069.2_Reverse rotation-side software limit detection - Command excess error]
-     Page 94 [AL. 069.1_Forward rotation-side software limit detection - Command excess error]
+[AL. 069.2_Reverse rotation-side software limit detection - Command excess error]
+Page 94 [AL. 069.1_Forward rotation-side software limit detection - Command excess error]
 
 
-     [AL. 069.3_Forward rotation stroke end detection - Command excess error]
-     Cause                                                     Check/action method                                                         Model
+[AL. 069.3_Forward rotation stroke end detection - Command excess error]
+Cause                                                     Check/action method                                                         Model
      1. The command position exceeded 30 bits from             Review the operation pattern so that the command does not exceed 30 bits.   [G]
 
           the position that was detected after detecting
@@ -5172,11 +5173,11 @@ Cause                                                  Check/action method      
 ## หน้า 98
 
 [AL. 070_Load-side encoder initial communication error 1]
-     • There is a communication error between the load-side encoder and servo amplifier.
+• There is a communication error between the load-side encoder and servo amplifier.
 
 
-     [AL. 070.1_Load-side encoder initial communication - Receive data error 1]
-     Cause                                                 Check/action method                                                                Model
+[AL. 070.1_Load-side encoder initial communication - Receive data error 1]
+Cause                                                 Check/action method                                                                Model
      1. There is a problem with the load-side encoder      Check if the load-side encoder cable has been disconnected, incorrectly wired,     [G]
                                                            or has shorted.                                                                    [B]
           cable.
@@ -5207,11 +5208,11 @@ Cause                                                  Check/action method      
                                                            MR-J5D User's Manual (Hardware)
 
 
-     [AL. 070.2_Load-side encoder initial communication - Receive data error 2]
-     Page 96 [AL. 070.1_Load-side encoder initial communication - Receive data error 1]
+[AL. 070.2_Load-side encoder initial communication - Receive data error 2]
+Page 96 [AL. 070.1_Load-side encoder initial communication - Receive data error 1]
 
 
-          1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 96        1.3 Handling methods for alarms/warnings
 
 ---
@@ -5295,7 +5296,7 @@ Cause                                                Check/action method        
 ## หน้า 100
 
 [AL. 070.6_Load-side encoder initial communication - Transmission data error 2]
-     Cause                                              Check/action method                                                                Model
+Cause                                              Check/action method                                                                Model
      1. If an A/B/Z-phase differential output type      Check if the Z-phase pulse signals (PZ and PZR) of the encoder cable have          [G]
                                                         been disconnected or have shorted.                                                 [B]
           encoder is being used, the wiring of the
@@ -5311,12 +5312,12 @@ Cause                                                Check/action method        
           environment.
 
 
-     [AL. 070.7_Load-side encoder initial communication - Transmission data error 3]
-     Page 96 [AL. 070.1_Load-side encoder initial communication - Receive data error 1]
+[AL. 070.7_Load-side encoder initial communication - Transmission data error 3]
+Page 96 [AL. 070.1_Load-side encoder initial communication - Receive data error 1]
 
 
-     [AL. 070.A_Load-side encoder initial communication - Process error 1]
-     Cause                                              Check/action method                                                                Model
+[AL. 070.A_Load-side encoder initial communication - Process error 1]
+Cause                                              Check/action method                                                                Model
      1. The servo amplifier has malfunctioned.          Replace the servo amplifier.                                                       [G]
                                                                                                                                            [B]
      2. The load-side encoder has malfunctioned.        Replace the load-side encoder.
@@ -5330,27 +5331,27 @@ Cause                                                Check/action method        
                                                         MR-J5D User's Manual (Hardware)
 
 
-     [AL. 070.B_Load-side encoder initial communication - Process error 2]
-     Page 96 [AL. 070_Load-side encoder initial communication error 1]
+[AL. 070.B_Load-side encoder initial communication - Process error 2]
+Page 96 [AL. 070_Load-side encoder initial communication error 1]
 
 
-     [AL. 070.C_Load-side encoder initial communication - Process error 3]
-     Page 96 [AL. 070_Load-side encoder initial communication error 1]
+[AL. 070.C_Load-side encoder initial communication - Process error 3]
+Page 96 [AL. 070_Load-side encoder initial communication error 1]
 
 
-     [AL. 070.D_Load-side encoder initial communication - Process error 4]
-     Page 96 [AL. 070_Load-side encoder initial communication error 1]
+[AL. 070.D_Load-side encoder initial communication - Process error 4]
+Page 96 [AL. 070_Load-side encoder initial communication error 1]
 
 
-     [AL. 070.E_Load-side encoder initial communication - Process error 5]
-     Page 96 [AL. 070_Load-side encoder initial communication error 1]
+[AL. 070.E_Load-side encoder initial communication - Process error 5]
+Page 96 [AL. 070_Load-side encoder initial communication error 1]
 
 
-     [AL. 070.F_Load-side encoder initial communication - Process error 6]
-     Page 96 [AL. 070_Load-side encoder initial communication error 1]
+[AL. 070.F_Load-side encoder initial communication - Process error 6]
+Page 96 [AL. 070_Load-side encoder initial communication error 1]
 
 
-          1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 98        1.3 Handling methods for alarms/warnings
 
 ---
@@ -5463,7 +5464,7 @@ Cause                                                         Check/action metho
   Page 99 [AL. 071.1_Load-side encoder normal communication - Receive data error 1]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 100    1.3 Handling methods for alarms/warnings
 
 ---
@@ -5530,8 +5531,8 @@ Cause                                                   Check/action method     
 Page 101 [AL. 072.2_Load-side encoder data update error]
 
 
-                                                                                      1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                        1.3 Handling methods for alarms/warnings               101
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings               101
 
 ---
 
@@ -5568,8 +5569,8 @@ Cause                                                   Check/action method     
 Page 69 [AL. 034.1_SSCNET receive data error]
 
 
-                                                      1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                        1.3 Handling methods for alarms/warnings   103
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   103
 
 ---
 
@@ -5645,7 +5646,7 @@ Cause                                                   Check/action method     
   Page 104 [AL. 086.1_Network communication error 1]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 104   1.3 Handling methods for alarms/warnings
 
 ---
@@ -5683,8 +5684,8 @@ Cause                                             Check/action method           
 Page 105 [AL. 088.1_Watchdog 1-1]/[AL. 088_Watchdog 1-1]/[AL. 888_Watchdog 1-1]/[AL. 88888_Watchdog 1-1]
 
 
-                                                                                 1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                   1.3 Handling methods for alarms/warnings         105
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings         105
 
 ---
 
@@ -5692,7 +5693,7 @@ Cause                                             Check/action method           
 
 [AL. 08A_Serial communication time-out error]
   • The communication between the servo amplifier and the personal computer or the controller was lost for the specified time
-      or longer.
+or longer.
   • There is a problem with the serial communication (Mitsubishi Electric AC servo protocol).
 
 
@@ -6191,7 +6192,7 @@ Cause                                              Check/action method          
   Page 116 [AL. 098.1_Forward rotation-side software stroke limit reached]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 116    1.3 Handling methods for alarms/warnings
 
 ---
@@ -6283,7 +6284,7 @@ Cause                                                Check/action method        
   Page 117 [AL. 099.5_Lower stroke limit off]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 118   1.3 Handling methods for alarms/warnings
 
 ---
@@ -6733,7 +6734,7 @@ Cause                                                Check/action method        
   • When transferring the absolute position data, it took more than 5 s for the programmable controllers to respond.
   • During absolute position erased data transfer, ABSM (ABS transfer mode) turned off.
   • SON (Servo-on), RES (Reset), EM2 (Forced stop 2), or EM1 (Forced stop 1) turned off during absolute position erased
-      data transfer.
+data transfer.
 
 
   [AL. 0E5.1_Time-out during ABS data transfer]
@@ -6751,7 +6752,7 @@ Cause                                                Check/action method        
   Page 130 [AL. 0E5.1_Time-out during ABS data transfer]
 
 
-         1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 130      1.3 Handling methods for alarms/warnings
 
 ---
@@ -6811,8 +6812,8 @@ Cause                                                Check/action method        
 Page 133 [AL. 0E8.1_Decreased cooling fan speed]
 
 
-                                                                                    1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                      1.3 Handling methods for alarms/warnings                   133
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings                   133
 
 ---
 
@@ -6889,7 +6890,7 @@ Cause                                                Check/action method        
   Page 134 [AL. 0E9.1_Servo-on signal on during main circuit off]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 134    1.3 Handling methods for alarms/warnings
 
 ---
@@ -7077,7 +7078,7 @@ Cause                                                Check/action method        
   Page 142 [AL. 0F2.1_Drive recorder warning 1]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 142   1.3 Handling methods for alarms/warnings
 
 ---
@@ -7090,8 +7091,8 @@ Cause                                                Check/action method        
 Page 87 [AL. 054.1_Oscillation detection error]
 
 
-                                                     1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                       1.3 Handling methods for alarms/warnings   143
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   143
 
 ---
 
@@ -7434,7 +7435,7 @@ Cause                                                  Check/action method      
   2. Take actions in accordance with the items shown below.                                                                               [G]
                                                                                                                                           [B]
   Page 150 [AL. 119.1_Memory error 4-1]
-                                                                                                                                          [A]
+[A]
 
 
   [AL. 119.4_Memory error 4-4]
@@ -7449,7 +7450,7 @@ Cause                                                  Check/action method      
   2. Take actions in accordance with the items shown below.                                                                           [G]
                                                                                                                                       [B]
   Page 150 [AL. 119.1_Memory error 4-1]
-                                                                                                                                      [A]
+[A]
 
 
   [AL. 119.6_Memory error 4-6]
@@ -7580,7 +7581,7 @@ Cause                                                 Check/action method       
 
 [AL. 130_Regenerative error 2]
   • The regenerative power exceeds the permissible regenerative power of the built-in regenerative resistor or regenerative
-      option.
+option.
   • The regenerative transistor in the servo amplifier has malfunctioned.
 
 
@@ -7757,7 +7758,7 @@ Cause                                                 Check/action method       
   Page 104 [AL. 086.1_Network communication error 1]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 158   1.3 Handling methods for alarms/warnings
 
 ---
@@ -7823,8 +7824,8 @@ Cause                                                 Check/action method       
 Page 159 [AL. 17A.1_Load-side linear encoder error 1-1]
 
 
-                                                                                    1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                      1.3 Handling methods for alarms/warnings          159
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings          159
 
 ---
 
@@ -7842,7 +7843,7 @@ Cause                                                 Check/action method       
   Page 104 [AL. 086.1_Network communication error 1]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 160   1.3 Handling methods for alarms/warnings
 
 ---
@@ -8033,7 +8034,7 @@ Cause                                                 Check/action method       
 
 [AL. 1EA_Master-slave operation simultaneous stop warning]
   • When the master-slave operation simultaneous stop function was enabled, the servo motor of the master or slave axis
-      stopped.
+stopped.
 
 
   [AL. 1EA.1_Master-slave operation stop command detection warning]
@@ -8230,8 +8231,8 @@ Cause                                                  Check/action method      
 Page 171 [AL. 510.1_Power supply voltage diagnosis error A1 (safety sub-function)]
 
 
-                                                                                      1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                        1.3 Handling methods for alarms/warnings            171
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings            171
 
 ---
 
@@ -8269,7 +8270,7 @@ Cause                                                  Check/action method      
   Page 172 [AL. 512.2_RAM diagnosis error A2 (safety sub-function)]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 172   1.3 Handling methods for alarms/warnings
 
 ---
@@ -8298,8 +8299,8 @@ Cause                                                 Check/action method       
 Page 173 [AL. 514.9_Control process error B (safety sub-function)]
 
 
-                                                                                     1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                       1.3 Handling methods for alarms/warnings            173
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings            173
 
 ---
 
@@ -8339,7 +8340,7 @@ Cause                                                 Check/action method       
   Page 174 [AL. 515.9_ROM error B at power-on (safety sub-function)]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 174    1.3 Handling methods for alarms/warnings
 
 ---
@@ -8408,8 +8409,8 @@ function)]
 Page 175 [AL. 516.1_Encoder initial communication - Receive data error A1 (safety sub-function)]
 
 
-                                                                                   1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                     1.3 Handling methods for alarms/warnings              175
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings              175
 
 ---
 
@@ -8437,7 +8438,7 @@ function)]
   Page 176 [AL. 517.2_Board error A2 (safety sub-function)]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 176   1.3 Handling methods for alarms/warnings
 
 ---
@@ -8463,8 +8464,8 @@ Cause                                                   Check/action method     
 Page 177 [AL. 518.2_Synchronous control error A2 (safety sub-function)]
 
 
-                                                                                       1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                         1.3 Handling methods for alarms/warnings            177
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings            177
 
 ---
 
@@ -8493,7 +8494,7 @@ Cause                                                   Check/action method     
   Page 178 [AL. 519.2_Flash-ROM error A2 (safety sub-function)]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 178   1.3 Handling methods for alarms/warnings
 
 ---
@@ -8545,8 +8546,8 @@ function)]
 Page 175 [AL. 516.1_Encoder initial communication - Receive data error A1 (safety sub-function)]
 
 
-                                                                            1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                              1.3 Handling methods for alarms/warnings   179
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   179
 
 ---
 
@@ -8594,7 +8595,7 @@ function)]
   Page 180 [AL. 521.1_Encoder normal communication 2 - Diagnosis error A1 (safety sub-function)]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 180    1.3 Handling methods for alarms/warnings
 
 ---
@@ -8646,8 +8647,8 @@ function)]
 Page 175 [AL. 516.1_Encoder initial communication - Receive data error A1 (safety sub-function)]
 
 
-                                                                         1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                           1.3 Handling methods for alarms/warnings   181
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   181
 
 ---
 
@@ -8699,7 +8700,7 @@ function)]
   Page 181 [AL. 522.1_Encoder normal communication 3 - Diagnosis error A1 (safety sub-function)]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 182   1.3 Handling methods for alarms/warnings
 
 ---
@@ -8751,8 +8752,8 @@ function)]
 Page 181 [AL. 522.1_Encoder normal communication 3 - Diagnosis error A1 (safety sub-function)]
 
 
-                                                                        1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                          1.3 Handling methods for alarms/warnings   183
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   183
 
 ---
 
@@ -8803,7 +8804,7 @@ function)]
   Page 181 [AL. 522.1_Encoder normal communication 3 - Diagnosis error A1 (safety sub-function)]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 184   1.3 Handling methods for alarms/warnings
 
 ---
@@ -8855,8 +8856,8 @@ function)]
 Page 181 [AL. 522.1_Encoder normal communication 3 - Diagnosis error A1 (safety sub-function)]
 
 
-                                                                        1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                          1.3 Handling methods for alarms/warnings   185
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   185
 
 ---
 
@@ -8907,7 +8908,7 @@ function)]
   Page 181 [AL. 522.1_Encoder normal communication 3 - Diagnosis error A1 (safety sub-function)]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 186   1.3 Handling methods for alarms/warnings
 
 ---
@@ -8959,8 +8960,8 @@ function)]
 Page 181 [AL. 522.1_Encoder normal communication 3 - Diagnosis error A1 (safety sub-function)]
 
 
-                                                                        1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                          1.3 Handling methods for alarms/warnings   187
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   187
 
 ---
 
@@ -8978,7 +8979,7 @@ function)]
   Page 181 [AL. 522.1_Encoder normal communication 3 - Diagnosis error A1 (safety sub-function)]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 188   1.3 Handling methods for alarms/warnings
 
 ---
@@ -9003,8 +9004,8 @@ Cause                                              Check/action method          
 Page 189 [AL. 52A.1_Position feedback diagnosis error A (safety sub-function)]
 
 
-                                                                                  1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                    1.3 Handling methods for alarms/warnings               189
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings               189
 
 ---
 
@@ -9034,7 +9035,7 @@ Cause                                              Check/action method          
   Page 190 [AL. 52B.1_Encoder thermal error A (safety sub-function)]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 190   1.3 Handling methods for alarms/warnings
 
 ---
@@ -9078,8 +9079,8 @@ Cause                                                   Check/action method     
 Page 191 [AL. 537.2_Parameter combination error A (safety sub-function)]
 
 
-                                                                                     1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                       1.3 Handling methods for alarms/warnings            191
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings            191
 
 ---
 
@@ -9101,7 +9102,7 @@ Cause                                                   Check/action method     
   Page 192 [AL. 53A.2_Parameter verification error A2 (safety sub-function)]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 192    1.3 Handling methods for alarms/warnings
 
 ---
@@ -9142,8 +9143,8 @@ Cause                                                   Check/action method     
 Page 193 [AL. 540.1_Internal diagnosis error 1 - Data error A1 (safety sub-function)]
 
 
-                                                                                       1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                         1.3 Handling methods for alarms/warnings            193
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings            193
 
 ---
 
@@ -9193,7 +9194,7 @@ Cause                                                   Check/action method     
   Page 193 [AL. 540.1_Internal diagnosis error 1 - Data error A1 (safety sub-function)]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 194    1.3 Handling methods for alarms/warnings
 
 ---
@@ -9210,8 +9211,8 @@ Cause                                                   Check/action method     
 Page 193 [AL. 540.1_Internal diagnosis error 1 - Data error A1 (safety sub-function)]
 
 
-                                                                           1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                             1.3 Handling methods for alarms/warnings   195
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   195
 
 ---
 
@@ -9257,7 +9258,7 @@ Cause                                                   Check/action method     
   Page 193 [AL. 540.1_Internal diagnosis error 1 - Data error A1 (safety sub-function)]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 196    1.3 Handling methods for alarms/warnings
 
 ---
@@ -9295,8 +9296,8 @@ Cause                                                      Check/action method  
 Page 197 [AL. 544.1_Temperature diagnosis error A1 (safety sub-function)]
 
 
-                                                                                        1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                          1.3 Handling methods for alarms/warnings             197
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings             197
 
 ---
 
@@ -9310,7 +9311,7 @@ Cause                                                      Check/action method  
   Page 193 [AL. 540.1_Internal diagnosis error 1 - Data error A1 (safety sub-function)]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 198    1.3 Handling methods for alarms/warnings
 
 ---
@@ -9335,8 +9336,8 @@ Cause                                                      Check/action method  
 Page 193 [AL. 540.1_Internal diagnosis error 1 - Data error A1 (safety sub-function)]
 
 
-                                                                           1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                             1.3 Handling methods for alarms/warnings   199
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   199
 
 ---
 
@@ -9362,7 +9363,7 @@ Cause                                                      Check/action method  
   Page 193 [AL. 540.1_Internal diagnosis error 1 - Data error A1 (safety sub-function)]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 200    1.3 Handling methods for alarms/warnings
 
 ---
@@ -9379,8 +9380,8 @@ Cause                                                      Check/action method  
 Page 193 [AL. 540.1_Internal diagnosis error 1 - Data error A1 (safety sub-function)]
 
 
-                                                                           1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                             1.3 Handling methods for alarms/warnings   201
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   201
 
 ---
 
@@ -9414,7 +9415,7 @@ Cause                                                      Check/action method  
   Page 193 [AL. 540.1_Internal diagnosis error 1 - Data error A1 (safety sub-function)]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 202    1.3 Handling methods for alarms/warnings
 
 ---
@@ -9443,8 +9444,8 @@ Cause                                                      Check/action method  
 Page 193 [AL. 540.1_Internal diagnosis error 1 - Data error A1 (safety sub-function)]
 
 
-                                                                           1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                             1.3 Handling methods for alarms/warnings   203
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   203
 
 ---
 
@@ -9458,7 +9459,7 @@ Cause                                                      Check/action method  
   Page 193 [AL. 540.1_Internal diagnosis error 1 - Data error A1 (safety sub-function)]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 204    1.3 Handling methods for alarms/warnings
 
 ---
@@ -9499,8 +9500,8 @@ Cause                                                      Check/action method  
 Page 209 [AL. 554.1_SDI1A internal diagnosis error (safety sub-function)]
 
 
-                                                                           1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                             1.3 Handling methods for alarms/warnings   205
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   205
 
 ---
 
@@ -9542,7 +9543,7 @@ Cause                                                      Check/action method  
   Page 205 [AL. 550.1_Internal diagnosis error 11 - Internal signal error A1 (safety sub-function)]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 206    1.3 Handling methods for alarms/warnings
 
 ---
@@ -9559,8 +9560,8 @@ Cause                                                      Check/action method  
 Page 205 [AL. 550.1_Internal diagnosis error 11 - Internal signal error A1 (safety sub-function)]
 
 
-                                                                            1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                              1.3 Handling methods for alarms/warnings   207
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   207
 
 ---
 
@@ -9611,7 +9612,7 @@ Cause                                                      Check/action method  
   Page 208 [AL. 553.1_SDI1A test pulse diagnosis error (safety sub-function)]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 208    1.3 Handling methods for alarms/warnings
 
 ---
@@ -9656,8 +9657,8 @@ Cause                                              Check/action method          
 Page 209 [AL. 554.1_SDI1A internal diagnosis error (safety sub-function)]
 
 
-                                                                                  1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                    1.3 Handling methods for alarms/warnings         209
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings         209
 
 ---
 
@@ -9707,7 +9708,7 @@ Cause                                              Check/action method          
   Page 210 [AL. 555.1_SDO1A output mismatch error (safety sub-function)]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 210   1.3 Handling methods for alarms/warnings
 
 ---
@@ -9745,8 +9746,8 @@ Cause                                                         Check/action metho
 Page 211 [AL. 556.1_SDO1A test pulse diagnosis error (safety sub-function)]
 
 
-                                                                                           1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                             1.3 Handling methods for alarms/warnings    211
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings    211
 
 ---
 
@@ -9828,7 +9829,7 @@ Cause                                                         Check/action metho
 
 [AL. 557.9_SDI1 input mismatch error B (safety sub-function)]
 Page 212 [AL. 557.1_SDI1 input mismatch error A (safety sub-function)]
-                                                                                                                             1
+1
 [AL. 557.A_SDI2 input mismatch error B (safety sub-function)]
 Page 212 [AL. 557.2_SDI2 input mismatch error A (safety sub-function)]
 
@@ -9837,8 +9838,8 @@ Cause                                                         Check/action metho
 Page 212 [AL. 557.3_SDI3 input mismatch error A (safety sub-function)]
 
 
-                                                                          1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                            1.3 Handling methods for alarms/warnings   213
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   213
 
 ---
 
@@ -9904,7 +9905,7 @@ Cause                                                         Check/action metho
   Page 214 [AL. 560.1_SOS feedback speed exceeded A]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 214   1.3 Handling methods for alarms/warnings
 
 ---
@@ -9913,7 +9914,7 @@ Cause                                                         Check/action metho
 
 [AL. 560.9_SOS feedback speed exceeded B]
 Page 214 [AL. 560.1_SOS feedback speed exceeded A]
-                                                                                                            1
+1
 [AL. 560.A_SOS command speed exceeded B]
 Page 214 [AL. 560.2_SOS command speed exceeded A]
 
@@ -9922,8 +9923,8 @@ Cause                                                         Check/action metho
 Page 214 [AL. 560.3_SOS feedback position exceeded A]
 
 
-                                                         1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                           1.3 Handling methods for alarms/warnings   215
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   215
 
 ---
 
@@ -9989,7 +9990,7 @@ Cause                                                         Check/action metho
   Page 216 [AL. 561.1_SLS1 feedback speed exceeded A]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 216   1.3 Handling methods for alarms/warnings
 
 ---
@@ -10027,8 +10028,8 @@ Cause                                                  Check/action method      
 Page 217 [AL. 561.4_SLS2 command speed exceeded A]
 
 
-                                                                                     1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                       1.3 Handling methods for alarms/warnings                217
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings                217
 
 ---
 
@@ -10098,7 +10099,7 @@ Cause                                                  Check/action method      
   Page 216 [AL. 561.1_SLS1 feedback speed exceeded A]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 218   1.3 Handling methods for alarms/warnings
 
 ---
@@ -10107,7 +10108,7 @@ Cause                                                  Check/action method      
 
 [AL. 562.9_SLS3 feedback speed exceeded B]
 Page 218 [AL. 562.1_SLS3 feedback speed exceeded A]
-                                                                                                          1
+1
 [AL. 562.A_SLS3 command speed exceeded B]
 Page 218 [AL. 562.2_SLS3 command speed exceeded A]
 
@@ -10120,8 +10121,8 @@ Cause                                                  Check/action method      
 Page 218 [AL. 562.4_SLS4 command speed exceeded A]
 
 
-                                                       1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                         1.3 Handling methods for alarms/warnings   219
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   219
 
 ---
 
@@ -10191,7 +10192,7 @@ Cause                                                  Check/action method      
   Page 220 [AL. 563.1_SS1 feedback speed exceeded A]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 220   1.3 Handling methods for alarms/warnings
 
 ---
@@ -10229,8 +10230,8 @@ Cause                                                  Check/action method      
 Page 221 [AL. 563.4_SS2 command speed exceeded A]
 
 
-                                                                                    1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                      1.3 Handling methods for alarms/warnings             221
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings             221
 
 ---
 
@@ -10258,7 +10259,7 @@ Cause                                                  Check/action method      
   Page 222 [AL. 564.1_SLI feedback position exceeded A]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 222   1.3 Handling methods for alarms/warnings
 
 ---
@@ -10327,8 +10328,8 @@ Cause                                                  Check/action method      
 Page 220 [AL. 563.1_SS1 feedback speed exceeded A]
 
 
-                                                                                      1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                        1.3 Handling methods for alarms/warnings              223
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings              223
 
 ---
 
@@ -10362,7 +10363,7 @@ Cause                                                  Check/action method      
   Page 224 [AL. 565.4_SDIN command speed exceeded A]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 224   1.3 Handling methods for alarms/warnings
 
 ---
@@ -10423,8 +10424,8 @@ Cause                                                  Check/action method      
 Page 220 [AL. 563.1_SS1 feedback speed exceeded A]
 
 
-                                                                                      1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                        1.3 Handling methods for alarms/warnings                225
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings                225
 
 ---
 
@@ -10446,7 +10447,7 @@ Cause                                                  Check/action method      
   Page 225 [AL. 568.4_SLT2 command torque exceeded error A]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 226   1.3 Handling methods for alarms/warnings
 
 ---
@@ -10507,8 +10508,8 @@ Cause                                                  Check/action method      
 Page 220 [AL. 563.1_SS1 feedback speed exceeded A]
 
 
-                                                                                      1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                        1.3 Handling methods for alarms/warnings                227
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings                227
 
 ---
 
@@ -10530,7 +10531,7 @@ Cause                                                  Check/action method      
   Page 227 [AL. 569.4_SLT4 command torque exceeded error A]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 228   1.3 Handling methods for alarms/warnings
 
 ---
@@ -10560,8 +10561,8 @@ Cause                                                Check/action method        
 Page 229 [AL. 580.3_Safety verification code mismatch A]
 
 
-                                                                                  1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                    1.3 Handling methods for alarms/warnings                229
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings                229
 
 ---
 
@@ -10631,7 +10632,7 @@ Cause                                                Check/action method        
   Page 230 [AL. 581.1_Safety communication error 1 - Receive data error A1 (safety sub-function)]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 230    1.3 Handling methods for alarms/warnings
 
 ---
@@ -10640,13 +10641,13 @@ Cause                                                Check/action method        
 
 [AL. 581.E_Safety communication error 1 - Receive data error B6 (safety sub-function)]
 Page 230 [AL. 581.1_Safety communication error 1 - Receive data error A1 (safety sub-function)]
-                                                                                                                            1
+1
 [AL. 581.F_Safety communication error 1 - Receive data error B7 (safety sub-function)]
 Page 230 [AL. 581.1_Safety communication error 1 - Receive data error A1 (safety sub-function)]
 
 
-                                                                         1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                           1.3 Handling methods for alarms/warnings   231
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   231
 
 ---
 
@@ -10712,7 +10713,7 @@ Cause                                                Check/action method        
   Page 230 [AL. 581.1_Safety communication error 1 - Receive data error A1 (safety sub-function)]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 232    1.3 Handling methods for alarms/warnings
 
 ---
@@ -10761,8 +10762,8 @@ Cause                                                Check/action method        
 Page 230 [AL. 581.1_Safety communication error 1 - Receive data error A1 (safety sub-function)]
 
 
-                                                                         1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                           1.3 Handling methods for alarms/warnings   233
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings   233
 
 ---
 
@@ -10829,7 +10830,7 @@ Cause                                                Check/action method        
   Page 234 [AL. 584.5_FSoE SRA parameter length error A (safety sub-function)]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 234   1.3 Handling methods for alarms/warnings
 
 ---
@@ -10911,8 +10912,8 @@ function)]
 Page 235 [AL. 585.1_FSoE communication error 1 - Receive data error (Unexpected command) A (safety sub-function)]
 
 
-                                                                                      1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                        1.3 Handling methods for alarms/warnings                235
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings                235
 
 ---
 
@@ -10933,7 +10934,7 @@ function)]
   Page 235 [AL. 585.1_FSoE communication error 1 - Receive data error (Unexpected command) A (safety sub-function)]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 236   1.3 Handling methods for alarms/warnings
 
 ---
@@ -11010,8 +11011,8 @@ function)]
 Page 237 [AL. 586.1_FSoE communication error 2 - Receive data error (Unexpected command) A (safety sub-function)]
 
 
-                                                                                     1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                       1.3 Handling methods for alarms/warnings                237
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings                237
 
 ---
 
@@ -11051,7 +11052,7 @@ function)]
   Page 238 [AL. 586.5_FSoE communication error 2 - Receive time-out error A (safety sub-function)]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 238    1.3 Handling methods for alarms/warnings
 
 ---
@@ -11133,8 +11134,8 @@ function)]
 Page 239 [AL. 587.1_FSoE communication error 3 - Safety communication error 1A (safety sub-function)]
 
 
-                                                                                       1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                         1.3 Handling methods for alarms/warnings                239
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings                239
 
 ---
 
@@ -11185,7 +11186,7 @@ function)]
   Page 239 [AL. 587.1_FSoE communication error 3 - Safety communication error 1A (safety sub-function)]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 240   1.3 Handling methods for alarms/warnings
 
 ---
@@ -11205,8 +11206,8 @@ Cause                                         Check/action method               
 Page 241 [AL. 595.1_STO command off warning A]
 
 
-                                                                           1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                             1.3 Handling methods for alarms/warnings    241
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings    241
 
 ---
 
@@ -11236,7 +11237,7 @@ Cause                                         Check/action method               
   Page 242 [AL. 596.1_SS1 time-out warning A]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 242   1.3 Handling methods for alarms/warnings
 
 ---
@@ -11278,8 +11279,8 @@ Cause                                                   Check/action method     
 Page 243 [AL. 59D.1_Internal diagnosis error A1 (safety sub-function)]
 
 
-                                                                                       1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                         1.3 Handling methods for alarms/warnings         243
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings         243
 
 ---
 
@@ -11341,7 +11342,7 @@ Cause                                                   Check/action method     
   Page 244 [AL. 5E0.1_SDI1 fixing diagnosis at startup incomplete warning A (safety sub-function)]
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 244    1.3 Handling methods for alarms/warnings
 
 ---
@@ -11364,8 +11365,8 @@ Cause                                                Check/action method        
 Page 245 [AL. 5E1.1_Test mode setting mismatch warning A (safety sub-function)]
 
 
-                                                                                  1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                    1.3 Handling methods for alarms/warnings              245
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings              245
 
 ---
 
@@ -11409,7 +11410,7 @@ Cause                                                Check/action method        
   Page 246 [AL. 5E2.2_FSoE communication no connection warning A (safety sub-function)]
 
 
-      1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 246   1.3 Handling methods for alarms/warnings
 
 ---
@@ -11433,8 +11434,8 @@ Cause                                            Check/action method            
 Page 247 [AL. 5E6.1_SS1 command off warning A (safety sub-function)]
 
 
-                                                                                1 SERVO AMPLIFIER TROUBLESHOOTING
-                                                                                  1.3 Handling methods for alarms/warnings    247
+1 SERVO AMPLIFIER TROUBLESHOOTING
+  1.3 Handling methods for alarms/warnings    247
 
 ---
 
@@ -11444,7 +11445,7 @@ Cause                                            Check/action method            
   This section shows examples of trouble which will not trigger an alarm or warning as well as the possible causes of such
   trouble. Refer to this section and remove each cause of trouble.
 
-      Precautions
+Precautions
   • When the servo amplifier, servo motor, controller, or encoder malfunctions, the cases shown in this section may occur.
   • If the servo motor does not rotate, also check the "No Motor Rotation" area in MR Configurator2.
 
@@ -11703,7 +11704,7 @@ The increase in the servo motor speed is insufficient or excessive
 
        (Speed selection 2), or SP3 (Speed selection
        3) is incorrect in the speed control mode and
-       the torque control mode.
+the torque control mode.
   6. The analog signal was incorrectly input in the         Check the values of the analog speed command and the analog torque
                                                             command on the status display or on MR Configurator2.
        speed control mode and the torque control
@@ -12163,7 +12164,7 @@ Possible cause                                      Check/action method         
   number using an object that can read three-digit numbers, the servo amplifier display, or MR Configurator2.
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
+1 SERVO AMPLIFIER TROUBLESHOOTING
 260    1.5 Two-digit display of alarm/warning number
 
 ---
@@ -12171,11 +12172,11 @@ Possible cause                                      Check/action method         
 ## หน้า 263
 
 MEMO
-                                                             1
+1
 
 
-       1 SERVO AMPLIFIER TROUBLESHOOTING
-       1.5 Two-digit display of alarm/warning number   261
+1 SERVO AMPLIFIER TROUBLESHOOTING
+1.5 Two-digit display of alarm/warning number   261
 
 ---
 
@@ -12186,30 +12187,30 @@ REVISIONS
    Revision date             *Manual number                   Description
    June 2019                 SH(NA)-030312ENG-A               First edition
    January 2020              SH(NA)-030312ENG-B               ■Alarms and warnings related to the following functions are added:
-                                                              Profile mode, communication function, fully closed loop system, scale measurement function, super
-                                                              trace control, touch probe, functional safety
+Profile mode, communication function, fully closed loop system, scale measurement function, super
+trace control, touch probe, functional safety
    July 2020                 SH(NA)-030312ENG-C               ■Alarms and warnings related to the following function are added:
-                                                              Functional safety
+Functional safety
    October 2020              SH(NA)-030312ENG-D               ■Alarms and warnings related to the following functions are added:
-                                                              400 V class servo amplifier
-                                                              Communication function (Mitsubishi Electric AC servo protocol)
-                                                              Degree unit
+400 V class servo amplifier
+Communication function (Mitsubishi Electric AC servo protocol)
+Degree unit
    March 2021                SH(NA)-030312ENG-E               ■Alarms and warnings related to the following function are added:
-                                                              Positioning mode (point table method)
+Positioning mode (point table method)
    June 2021                 SH(NA)-030312ENG-F               ■Alarms and warnings related to the following functions are added:
-                                                              CC-Link IE Field Network Basic, MR-J5D_ drive unit
+CC-Link IE Field Network Basic, MR-J5D_ drive unit
    July 2022                 SH(NA)-030312ENG-G               ■The following model is added:
-                                                              MR-J5_-_B_
-                                                              ■Alarms and warnings related to the following functions are added/edited:
-                                                              CC-Link IE TSN Class A, master-slave operation function
+MR-J5_-_B_
+■Alarms and warnings related to the following functions are added/edited:
+CC-Link IE TSN Class A, master-slave operation function
    January 2023              SH(NA)-030312ENG-H               ■Alarms and warnings related to the following function are added/edited:
-                                                              Servo motor incorrect wiring detection function
+Servo motor incorrect wiring detection function
    July 2023                 SH(NA)-030312ENG-J               ■The following manufacturer setting alarms/ manufacturer setting warnings are added:
-                                                              [AL. 09E.B], [AL. 584], [AL. 585], [AL. 586], [AL. 587], [AL. 5E2.2], [AL. 5E2.A]
+[AL. 09E.B], [AL. 584], [AL. 585], [AL. 586], [AL. 587], [AL. 5E2.2], [AL. 5E2.A]
    January 2024              SH(NA)-030312ENG-K               ■Alarms and warnings related to the following functions are added:
-                                                              Functional safety, IP address setting function via the master station
+Functional safety, IP address setting function via the master station
    July 2024                 SH(NA)-030312ENG-L               ■Alarms and warnings related to the following function are added/edited:
-                                                              Pressure mode
+Pressure mode
 
    This manual confers no industrial property rights or any rights of any other kind, nor does it confer any patent licenses. Mitsubishi Electric Corporation cannot
    be held responsible for any problems involving industrial property rights which may occur as a result of using the contents noted in this manual.
@@ -12300,7 +12301,7 @@ TRADEMARKS
   All other product names and company names are trademarks or registered trademarks of their respective companies.
 
 
-                                                                                                         SH(NA)-030312ENG-L
+SH(NA)-030312ENG-L
 264
 
 ---

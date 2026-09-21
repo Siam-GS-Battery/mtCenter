@@ -19,6 +19,7 @@ import { LIVE_FLOOR_THEME } from "./liveFloorTheme";
 import FloorScene from "./scene/FloorScene";
 import {
   REFERENCE_SITE_SIZE,
+  isWideCameraPreset,
   type CameraFocusBox,
   type PlantCameraPreset,
 } from "./scene/sceneConfig";
@@ -457,12 +458,37 @@ export default function LiveFloorView({
     [focusZoneId, zoneSummaries]
   );
 
+  // ponytail: ตัวคูณ/ขั้นต่ำของกล่องโฟกัสเครื่องจักรที่เลือก — จูนได้ตรงนี้จุดเดียว
+  const SELECTED_MACHINE_FOCUS_PADDING = 2.2;
+  const SELECTED_MACHINE_FOCUS_MIN_SIZE = 10;
+
+  const selectedMachineFocusBox = useMemo<CameraFocusBox | null>(() => {
+    if (!selectedMachineId) return null;
+    const placed = plantLayout.machines.find((m) => m.id === selectedMachineId);
+    if (!placed) return null;
+    const size = Math.max(
+      placed.width,
+      placed.depth,
+      SELECTED_MACHINE_FOCUS_MIN_SIZE / SELECTED_MACHINE_FOCUS_PADDING
+    );
+    return {
+      x: placed.x,
+      z: placed.z,
+      width: size * SELECTED_MACHINE_FOCUS_PADDING,
+      depth: size * SELECTED_MACHINE_FOCUS_PADDING,
+    };
+  }, [selectedMachineId, plantLayout]);
+
+  // เครื่องจักรที่เลือกมาก่อน zone ที่นำทางไว้เสมอ — เลือกเครื่องแล้วต้องบิน
+  // เข้าไปหาเครื่องนั้น ไม่ใช่ค้างที่กรอบ zone เดิม กลับไปกรอบ zone (หรือ null)
+  // เมื่อเคลียร์การเลือก (Escape/handleClearSelection)
   const focusBox = useMemo<CameraFocusBox | null>(
     () =>
-      focusZone
+      selectedMachineFocusBox ??
+      (focusZone
         ? { x: focusZone.x, z: focusZone.z, width: focusZone.width, depth: focusZone.depth }
-        : null,
-    [focusZone]
+        : null),
+    [selectedMachineFocusBox, focusZone]
   );
 
   // ตัวกรองสถานะใน HUD ซ่อน/แสดงเฉพาะ "เครื่องจักร" — เปลือกอาคาร โซน และ
@@ -556,17 +582,26 @@ export default function LiveFloorView({
    *   • คลิกหนึ่งครั้ง = ไฮไลต์ในฉาก + ขึ้นการ์ดรายละเอียดใน HUD
    *   • ดับเบิลคลิก = เด้ง modal รายละเอียด/ประวัติของ dashboard
    */
-  const handleSelectMachine = useCallback((machineId: string) => {
-    setSelectedMachineId(machineId);
-  }, []);
+  const handleSelectMachine = useCallback(
+    (machineId: string) => {
+      setSelectedMachineId(machineId);
+      // ผู้ใช้กำลังดูมุมกว้าง (plant/top) แล้วกดเลือกเครื่อง — ต้องสลับมามุม
+      // "line" ก่อน ไม่งั้น computePlacement จะเมิน focusBox ทิ้ง (ดู
+      // isWideCameraPreset) กล้องเลยไม่ซูมเข้าอย่างที่ผู้ใช้เห็น ไม่แตะมุมที่
+      // ไม่ใช่มุมกว้างอยู่แล้ว (เช่น "eye" ที่ผู้ใช้ตั้งใจเลือกเอง)
+      if (isWideCameraPreset(cameraPreset)) setCameraPreset("line");
+    },
+    [cameraPreset]
+  );
 
   const handleOpenMachine = useCallback(
     (machineId: string) => {
       setSelectedMachineId(machineId);
+      if (isWideCameraPreset(cameraPreset)) setCameraPreset("line");
       const machine = machineById.get(machineId);
       if (machine) onOpenMachineDetail(machine);
     },
-    [machineById, onOpenMachineDetail]
+    [machineById, onOpenMachineDetail, cameraPreset]
   );
 
   const handleOpenDetail = useCallback(

@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-08-17T06:19:45.671Z",
-  "dryRun": true,
+  "generatedAt": "2026-09-08T04:08:23.632Z",
+  "dryRun": false,
   "only": null,
-  "uploadDate": "2026-08-17",
+  "uploadDate": "2026-09-08",
   "uploadedBy": "ระบบนำเข้าเอกสาร",
-  "totalCatalogued": 23,
-  "totalProcessed": 23,
+  "totalCatalogued": 25,
+  "totalProcessed": 25,
   "results": [
     {
       "file": "FANUC SERVO AMPLIFIER.md",
@@ -13,10 +13,10 @@
       "machineModel": "FANUC αi",
       "category": "คู่มือซ่อมบำรุงและแก้ไขปัญหา",
       "pagesCount": 276,
-      "fileSizeBytes": 846047,
-      "fileSize": "826 KB",
+      "fileSizeBytes": 686876,
+      "fileSize": "671 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "FR-E700.md",
@@ -24,10 +24,10 @@
       "machineModel": "FR-E700",
       "category": "General",
       "pagesCount": 59,
-      "fileSizeBytes": 342957,
-      "fileSize": "335 KB",
+      "fileSizeBytes": 240195,
+      "fileSize": "235 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "MR-C10A.md",
@@ -35,10 +35,10 @@
       "machineModel": "MR-C10A",
       "category": "General",
       "pagesCount": 208,
-      "fileSizeBytes": 328559,
+      "fileSizeBytes": 328729,
       "fileSize": "321 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "MR-J2S.md",
@@ -46,10 +46,10 @@
       "machineModel": "MR-J2S",
       "category": "General",
       "pagesCount": 402,
-      "fileSizeBytes": 1470347,
-      "fileSize": "1.4 MB",
+      "fileSizeBytes": 1017662,
+      "fileSize": "994 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "MR-J3 Manual.md",
@@ -57,10 +57,10 @@
       "machineModel": "MR-J3-A",
       "category": "General",
       "pagesCount": 670,
-      "fileSizeBytes": 2509172,
-      "fileSize": "2.4 MB",
+      "fileSizeBytes": 1735427,
+      "fileSize": "1.7 MB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "MR-J4_A.md",
@@ -68,10 +68,10 @@
       "machineModel": "MR-J4-A",
       "category": "General",
       "pagesCount": 396,
-      "fileSizeBytes": 1568917,
-      "fileSize": "1.5 MB",
+      "fileSizeBytes": 1011717,
+      "fileSize": "988 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "MR-J5 Function.md",
@@ -79,10 +79,10 @@
       "machineModel": "MR-J5",
       "category": "General",
       "pagesCount": 640,
-      "fileSizeBytes": 2257285,
-      "fileSize": "2.2 MB",
+      "fileSizeBytes": 1669183,
+      "fileSize": "1.6 MB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "MR-J5 Hardware.md",
@@ -90,10 +90,10 @@
       "machineModel": "MR-J5",
       "category": "ไดอะแกรมไฟฟ้าและไฮดรอลิก",
       "pagesCount": 722,
-      "fileSizeBytes": 2438589,
-      "fileSize": "2.3 MB",
+      "fileSizeBytes": 1483204,
+      "fileSize": "1.4 MB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "MR-J5 Troubleshooting.md",
@@ -101,10 +101,10 @@
       "machineModel": "MR-J5",
       "category": "คู่มือซ่อมบำรุงและแก้ไขปัญหา",
       "pagesCount": 268,
-      "fileSizeBytes": 815918,
-      "fileSize": "797 KB",
+      "fileSizeBytes": 786813,
+      "fileSize": "768 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "SGD7S.md",
@@ -112,10 +112,10 @@
       "machineModel": "SGD7S",
       "category": "General",
       "pagesCount": 632,
-      "fileSizeBytes": 2651292,
-      "fileSize": "2.5 MB",
+      "fileSizeBytes": 1689572,
+      "fileSize": "1.6 MB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "Laser_Mark/LP-RF200P_Alarm_List.md",
@@ -123,10 +123,10 @@
       "machineModel": "LP-RF200P",
       "category": "คู่มือซ่อมบำรุงและแก้ไขปัญหา",
       "pagesCount": 13,
-      "fileSizeBytes": 66498,
-      "fileSize": "65 KB",
+      "fileSizeBytes": 42328,
+      "fileSize": "41 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "Laser_Mark/LP-RF200P_Installation_Maintenance_TH.md",
@@ -134,10 +134,10 @@
       "machineModel": "LP-RF200P",
       "category": "คู่มือซ่อมบำรุงและแก้ไขปัญหา",
       "pagesCount": 218,
-      "fileSizeBytes": 586665,
-      "fileSize": "573 KB",
+      "fileSizeBytes": 459591,
+      "fileSize": "449 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "Laser_Mark/LP-RF200P_Laser_Safety_TH.md",
@@ -145,10 +145,10 @@
       "machineModel": "LP-RF200P",
       "category": "General",
       "pagesCount": 50,
-      "fileSizeBytes": 129307,
-      "fileSize": "126 KB",
+      "fileSizeBytes": 107401,
+      "fileSize": "105 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "Laser_Mark/LP-RF200P_NAVI_Smart_Basic_TH.md",
@@ -156,10 +156,10 @@
       "machineModel": "LP-RF200P",
       "category": "General",
       "pagesCount": 46,
-      "fileSizeBytes": 60464,
-      "fileSize": "59 KB",
+      "fileSizeBytes": 53674,
+      "fileSize": "52 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "Laser_Mark/LP-RF200P_NAVI_Smart_Detailed_TH.md",
@@ -167,10 +167,10 @@
       "machineModel": "LP-RF200P",
       "category": "General",
       "pagesCount": 428,
-      "fileSizeBytes": 1147837,
-      "fileSize": "1.1 MB",
+      "fileSizeBytes": 950783,
+      "fileSize": "928 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "Laser_Mark/MD-F3000_E.md",
@@ -178,10 +178,10 @@
       "machineModel": "MD-F3000",
       "category": "General",
       "pagesCount": 96,
-      "fileSizeBytes": 308940,
-      "fileSize": "302 KB",
+      "fileSizeBytes": 205100,
+      "fileSize": "200 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "Laser_Mark/MD-F3100_5100_S_222010_J.md",
@@ -189,10 +189,10 @@
       "machineModel": "MD-F3100/5100",
       "category": "General",
       "pagesCount": 58,
-      "fileSizeBytes": 143125,
-      "fileSize": "140 KB",
+      "fileSizeBytes": 115069,
+      "fileSize": "112 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "Laser_Mark/MD-F3200_TH.md",
@@ -200,10 +200,10 @@
       "machineModel": "MD-F3200/5200",
       "category": "คู่มือซ่อมบำรุงและแก้ไขปัญหา",
       "pagesCount": 46,
-      "fileSizeBytes": 446483,
+      "fileSizeBytes": 446326,
       "fileSize": "436 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "Laser_Mark/MD-V9900_TH.md",
@@ -211,10 +211,10 @@
       "machineModel": "MD-V9900A",
       "category": "General",
       "pagesCount": 96,
-      "fileSizeBytes": 564517,
-      "fileSize": "551 KB",
+      "fileSizeBytes": 461893,
+      "fileSize": "451 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "Laser_Mark/MD-X_EN.md",
@@ -222,10 +222,10 @@
       "machineModel": "MD-X1000/1500",
       "category": "General",
       "pagesCount": 40,
-      "fileSizeBytes": 360442,
-      "fileSize": "352 KB",
+      "fileSizeBytes": 223342,
+      "fileSize": "218 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "Laser_Mark/MD-X_TH.md",
@@ -233,10 +233,10 @@
       "machineModel": "MD-X2000/2500",
       "category": "General",
       "pagesCount": 62,
-      "fileSizeBytes": 655581,
-      "fileSize": "640 KB",
+      "fileSizeBytes": 542261,
+      "fileSize": "530 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "Robot/Maintenance IAI non.md",
@@ -244,10 +244,10 @@
       "machineModel": "IAI",
       "category": "คู่มือซ่อมบำรุงและแก้ไขปัญหา",
       "pagesCount": 89,
-      "fileSizeBytes": 43474,
-      "fileSize": "42 KB",
+      "fileSizeBytes": 40971,
+      "fileSize": "40 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
     },
     {
       "file": "Robot/OmniCore - Basic Programming.md",
@@ -255,10 +255,32 @@
       "machineModel": "ABB OmniCore",
       "category": "General",
       "pagesCount": 84,
-      "fileSizeBytes": 74470,
-      "fileSize": "73 KB",
+      "fileSizeBytes": 58510,
+      "fileSize": "57 KB",
       "metadataTableConverted": true,
-      "status": "skipped-existing"
+      "status": "updated"
+    },
+    {
+      "file": "all-000-machine-manual.md",
+      "title": "คู่มือบำรุงรักษาทั่วไป (All Machines) ALL-000",
+      "machineModel": "ALL-000",
+      "category": "คู่มือซ่อมบำรุงและแก้ไขปัญหา",
+      "pagesCount": 0,
+      "fileSizeBytes": 32160,
+      "fileSize": "31 KB",
+      "metadataTableConverted": true,
+      "status": "updated"
+    },
+    {
+      "file": "gr-1141-machine-manual.md",
+      "title": "คู่มือเครื่องจักร GR-1141",
+      "machineModel": "GR-1141",
+      "category": "คู่มือซ่อมบำรุงและแก้ไขปัญหา",
+      "pagesCount": 0,
+      "fileSizeBytes": 34655,
+      "fileSize": "34 KB",
+      "metadataTableConverted": false,
+      "status": "updated"
     }
   ]
 }

@@ -7,17 +7,18 @@
 | **วิธีสกัดข้อความ** | text layer (embedded) |
 
 ---
+
 ## หน้า 1
 
 Laser Marker
-                                            Setup /
-                                            Maintenance Guide
+Setup /
+Maintenance Guide
 
-                                                                        LP-RF series
+LP-RF series
 
 
-                                              Please read these instructions carefully before using this
-                                              product, and save this manual for future use.
+Please read these instructions carefully before using this
+product, and save this manual for future use.
 
 
 ME-LPRF-SM-11
@@ -30,16 +31,16 @@ ME-LPRF-SM-11
 ## หน้า 2
 
 Preface
-    Thank you for purchasing our product.
-    For full use of this product safely and properly, please read this document carefully.
-    This product has been strictly checked and tested prior to its delivery. However, please make sure that this product
-    operates properly before using it. In case that the product becomes damaged or does not operate as specified in this
-    document, contact the dealer you purchased from or our sales office.
+Thank you for purchasing our product.
+For full use of this product safely and properly, please read this document carefully.
+This product has been strictly checked and tested prior to its delivery. However, please make sure that this product
+operates properly before using it. In case that the product becomes damaged or does not operate as specified in this
+document, contact the dealer you purchased from or our sales office.
 
-    The English version of this document is the original version. All other languages are translations that are based on the
-    original documentation.
+The English version of this document is the original version. All other languages are translations that are based on the
+original documentation.
 
-    ⿎⿎General terms and conditions of this document
+⿎⿎General terms and conditions of this document
     1. Before using this product, or before every starting operation, please confirm the correct functioning and performance
        of this product.
     2. Contents of this document could be changed without notice.
@@ -48,20 +49,20 @@ Preface
        mistakes, or comments in this document, please notify us.
     5. Please remind that we assume no liability for any results arising out of operations regardless of the above clauses.
 
-    ⿎⿎Disclaimer
-    The applications described in this document are all intended for examples only. The purchase of our products described in
-    this document shall not be regarded as granting of a license to use our products in the described applications. We do NOT
-    warrant that we have obtained some intellectual properties, such as patent rights, with respect to such applications, or that
-    the described application may not infringe any intellectual property rights, such as patent rights, of a third party.
+⿎⿎Disclaimer
+The applications described in this document are all intended for examples only. The purchase of our products described in
+this document shall not be regarded as granting of a license to use our products in the described applications. We do NOT
+warrant that we have obtained some intellectual properties, such as patent rights, with respect to such applications, or that
+the described application may not infringe any intellectual property rights, such as patent rights, of a third party.
 
-    ⿎⿎Trademark
-    • Windows is a registered trademark or trademark of Microsoft Corporation in the United States and/or other countries.
-    • QR Code is a registered trademarks of DENSO WAVE INCORPORATED.
-    • Adobe, Adobe Logo, Adobe Reader, and Adobe Illustrator are either registered trademarks or trademarks of Adobe
-      Systems Incorporated in the United States and/or other countries.
-    • EtherNet/IP is a trademark of ODVA, Inc.
-    • All other product names and companies provided in this document are trademarks or registered trademarks of their
-      respective companies.
+⿎⿎Trademark
+• Windows is a registered trademark or trademark of Microsoft Corporation in the United States and/or other countries.
+• QR Code is a registered trademarks of DENSO WAVE INCORPORATED.
+• Adobe, Adobe Logo, Adobe Reader, and Adobe Illustrator are either registered trademarks or trademarks of Adobe
+  Systems Incorporated in the United States and/or other countries.
+• EtherNet/IP is a trademark of ODVA, Inc.
+• All other product names and companies provided in this document are trademarks or registered trademarks of their
+  respective companies.
 
 
 2                                                           ME-LPRF-SM-11
@@ -80,101 +81,101 @@ The following symbols are used to classify and describe the level of hazard, inj
 denotation is disregarded and improper use is performed.
 
 
-         DANGER                     Denotes a potential hazard that will result in serious injury or death.
+DANGER                     Denotes a potential hazard that will result in serious injury or death.
 
 
-        WARNING Denotes a potential hazard that could result in serious injury or death.
-         CAUTION Denotes a hazard that could result in minor injury.
+WARNING Denotes a potential hazard that could result in serious injury or death.
+ CAUTION Denotes a hazard that could result in minor injury.
 
 The following symbols are used to classify and describe the type of instructions to be observed.
 
 
-                   This symbol is used to alert users to a specific operating procedure that must not be performed.
+This symbol is used to alert users to a specific operating procedure that must not be performed.
 
 
-                   This symbols is used to alert users to a specific operating procedure that must be followed in order to
-                   operate the unit safely.
+This symbols is used to alert users to a specific operating procedure that must be followed in order to
+operate the unit safely.
 
 
-                   This symbols is used to alert users to a specific operating procedure that must be performed carefully.
+This symbols is used to alert users to a specific operating procedure that must be performed carefully.
 
 
-                                                        DANGER
-             • Never look at laser beam directly, through lens or
-               through any other optical components. Laser beam
-               radiation into the eye causes blindness or serious
-               damage to the eye.
-               Not only the direct beam of laser, but also diffused
-               reflected beam is harmful.
+   DANGER
+• Never look at laser beam directly, through lens or
+  through any other optical components. Laser beam
+  radiation into the eye causes blindness or serious
+  damage to the eye.
+  Not only the direct beam of laser, but also diffused
+  reflected beam is harmful.
 
 
-             • Never touch laser beam and avoid human skin, clothing and any other
-               flammable object from laser beam exposure directly.
-               Burning into deep skin might result and there is a risk of fire.
+• Never touch laser beam and avoid human skin, clothing and any other
+  flammable object from laser beam exposure directly.
+  Burning into deep skin might result and there is a risk of fire.
 
 
-                                                         ME-LPRF-SM-11                                                       3
+ME-LPRF-SM-11                                                       3
 
 ---
 
 ## หน้า 4
 
 WARNING
-    • Do not use this product anywhere where fire is strictly prohibited, near inflammable gas, objects or organic
-      solvents such as thinner or gasoline, or in dusty place. There is a risk of fire.
+• Do not use this product anywhere where fire is strictly prohibited, near inflammable gas, objects or organic
+  solvents such as thinner or gasoline, or in dusty place. There is a risk of fire.
 
-    • Do not use this product except for water-resistant part in wet place. In addition, never conduct wiring or
-      maintenance work with wet hands or when the product surface is wet. Otherwise, electric shock and/or
-      malfunction may result.
+• Do not use this product except for water-resistant part in wet place. In addition, never conduct wiring or
+  maintenance work with wet hands or when the product surface is wet. Otherwise, electric shock and/or
+  malfunction may result.
 
-    • Never disassemble the product.
-      Doing so may cause exposure to the laser beam or electric shock.
+• Never disassemble the product.
+  Doing so may cause exposure to the laser beam or electric shock.
 
-    • Do not insert hands or objects between the gaps of the exhaust port or intake port. There is a risk of
-      electrical shock or injury.
+• Do not insert hands or objects between the gaps of the exhaust port or intake port. There is a risk of
+  electrical shock or injury.
 
-    • Take laser protection measures required to use Class 4 laser products subject to the local laws and
-      regulations of the country or region in which this laser product is used.
+• Take laser protection measures required to use Class 4 laser products subject to the local laws and
+  regulations of the country or region in which this laser product is used.
 
-    • To protect the operators' eyes, make it mandatory to wear goggles against laser beam
-      within the laser controlled area. The protective goggles can momentarily protect the
-      eyes against the scattered beam. Never look at the direct beam or reflected beam
-      even when you are wearing the protective goggles.
+• To protect the operators' eyes, make it mandatory to wear goggles against laser beam
+  within the laser controlled area. The protective goggles can momentarily protect the
+  eyes against the scattered beam. Never look at the direct beam or reflected beam
+  even when you are wearing the protective goggles.
 
-    • Set protective enclosure including a workpiece stand or terminating object of the laser beam with proper
-      reflectance, durability and thermal resistance to enclose the laser radiation area without leakage.
+• Set protective enclosure including a workpiece stand or terminating object of the laser beam with proper
+  reflectance, durability and thermal resistance to enclose the laser radiation area without leakage.
 
-    • Construct an interlock systems such as a function to stop laser radiation for the maintenance door of the
-      protective enclosure.
-
-
-    • After power supply of laser marker is turned off, laser safety manager must remove the key and keep it.
+• Construct an interlock systems such as a function to stop laser radiation for the maintenance door of the
+  protective enclosure.
 
 
-    • Be sure to connect the head and controller of the laser marker which have the same model number or
-      allowed combination of the unit model number. Otherwise there is a risk of exposure to laser radiation or
-      failure.
+• After power supply of laser marker is turned off, laser safety manager must remove the key and keep it.
 
-    • Read all guides and manuals thoroughly, and do not operate, install and connect the laser marker with
-      any other methods except the instructions provided in the manuals. If the product is used in a manner not
-      specified by the instruction, the safety protection and functions provided by the device may be impaired
-      and may cause injury, electrical shock or exposure of laser beam.
 
-    • Prior to wiring, cable connecting, and/or maintenance work, ensure that all the power switches are turned
-      off. Otherwise, electrical shock may result.
+• Be sure to connect the head and controller of the laser marker which have the same model number or
+  allowed combination of the unit model number. Otherwise there is a risk of exposure to laser radiation or
+  failure.
 
-    • The wiring and maintenance must be conducted by the electrical engineers or under their supervision.
-      Incorrect work may cause electrical shock.
+• Read all guides and manuals thoroughly, and do not operate, install and connect the laser marker with
+  any other methods except the instructions provided in the manuals. If the product is used in a manner not
+  specified by the instruction, the safety protection and functions provided by the device may be impaired
+  and may cause injury, electrical shock or exposure of laser beam.
 
-    • Connect ground wire before using. A failure or electrical leakage that occurs when the unit is not properly
-      grounded may result in electric shock.
+• Prior to wiring, cable connecting, and/or maintenance work, ensure that all the power switches are turned
+  off. Otherwise, electrical shock may result.
 
-    • Perform regular maintenance (cleaning, parts replacement) on this product. Using the product with dust or
-      dirt may cause a fire or electric shock.
+• The wiring and maintenance must be conducted by the electrical engineers or under their supervision.
+  Incorrect work may cause electrical shock.
 
-    • For LP-RF/LP-RV series, be careful neither to give strong power to the fiber cable nor to nip it for
-      installation. Do not install the product to the systems that give excessive load acts on the fiber cable, such
-      as head movement unit. If the fiber cable is damaged, it may cause laser exposures.
+• Connect ground wire before using. A failure or electrical leakage that occurs when the unit is not properly
+  grounded may result in electric shock.
+
+• Perform regular maintenance (cleaning, parts replacement) on this product. Using the product with dust or
+  dirt may cause a fire or electric shock.
+
+• For LP-RF/LP-RV series, be careful neither to give strong power to the fiber cable nor to nip it for
+  installation. Do not install the product to the systems that give excessive load acts on the fiber cable, such
+  as head movement unit. If the fiber cable is damaged, it may cause laser exposures.
 
 
 4                                              ME-LPRF-SM-11
@@ -188,11 +189,11 @@ WARNING
   exhauster. Use an appropriate dust collector or exhauster for dust or gas generated.
   Depending on the material of the objects, harmful dust and/or gas to the human body and the laser marker
   may be generated.
-                                                                                      Dust collector
+Dust collector
 
 
-         Protective
-         enclosure
+Protective
+enclosure
 
 • When using the assist gas for laser processing, take safety precautions to protect operators from
   exposure, ignition, toxic effect, excess or lack of oxygen.
@@ -207,68 +208,68 @@ WARNING
 • In case it falls down, it may cause injury.
 
 
-                                        CAUTION
+CAUTION
 • Do not touch the head surface of LP-RF/LP-RV series during and right after the operation. It becomes hot
   and may cause burn injury.
 
 
-                                         ME-LPRF-SM-11                                                         5
+ME-LPRF-SM-11                                                         5
 
 ---
 
 ## หน้า 6
 
 For the Proper Use of Product
-                 • Be sure to observe the following matters to prevent a failure or a malfunction of this product and to
-                   maintain the product performance properly.
+• Be sure to observe the following matters to prevent a failure or a malfunction of this product and to
+  maintain the product performance properly.
 
 
-     Operating environment
-    • Do not use the product in a place with frequent vibrations or shocks. Moreover, please do not drop this product. It may
-      affect the precision component and optical component inside, which could impair the performance or result in a failure.
-    • Do not use the system outdoors.
-    • This product uses the air cooling system as the laser cooling method. Please install not to bar the flow of air cooling.
-      Avoid placing heat sources near the product.
-    • Be sure to use the product within the ambient temperature and humidity defined in the specifications.
-    • Be careful not to have water, oil, fingerprints, dust, or dirt attached to the laser emission port of the head. This could
-      degrade the marking performance and may result in a failure. If the laser emission port becomes dirty, use a dry soft
-      cloth to clean the port.
-    • Make sure to replace the air filter on a periodic basis. If the air filter becomes dirt and air flow is obstructed, resulting in
-      failure of this product.
-    • Ensure that the dust or gas is removed by placing the intake duct of the dust collector or exhauster near the source of
-      dust or gas. Any dust or gas contamination on the laser emission port may cause failure or decrease the laser marking
-      or processing quality. In addition, when the laser beam is blocked by dust or gas, it may cause decrease in laser marking
-      quality.
+ Operating environment
+• Do not use the product in a place with frequent vibrations or shocks. Moreover, please do not drop this product. It may
+  affect the precision component and optical component inside, which could impair the performance or result in a failure.
+• Do not use the system outdoors.
+• This product uses the air cooling system as the laser cooling method. Please install not to bar the flow of air cooling.
+  Avoid placing heat sources near the product.
+• Be sure to use the product within the ambient temperature and humidity defined in the specifications.
+• Be careful not to have water, oil, fingerprints, dust, or dirt attached to the laser emission port of the head. This could
+  degrade the marking performance and may result in a failure. If the laser emission port becomes dirty, use a dry soft
+  cloth to clean the port.
+• Make sure to replace the air filter on a periodic basis. If the air filter becomes dirt and air flow is obstructed, resulting in
+  failure of this product.
+• Ensure that the dust or gas is removed by placing the intake duct of the dust collector or exhauster near the source of
+  dust or gas. Any dust or gas contamination on the laser emission port may cause failure or decrease the laser marking
+  or processing quality. In addition, when the laser beam is blocked by dust or gas, it may cause decrease in laser marking
+  quality.
 
-     Installation
-    • To carry this product, wear the non-slip gloves and safety shoes. Hold the product with both hands. Do not hold the fiber
-      unit, cables or connectors at carrying.
-    • Do not touch the laser emission port on the bottom of the head. It may affect the marking quality badly.
-    • Carry the controller unit with two persons.
-    • Carry this product as shown in the figure below.
+ Installation
+• To carry this product, wear the non-slip gloves and safety shoes. Hold the product with both hands. Do not hold the fiber
+  unit, cables or connectors at carrying.
+• Do not touch the laser emission port on the bottom of the head. It may affect the marking quality badly.
+• Carry the controller unit with two persons.
+• Carry this product as shown in the figure below.
 
-                                           Head                                                         Controller
-
-
-                   Laser pointer
-                   emission port
-                                        Fiber unit
+Head                                                         Controller
 
 
-            Laser emission port
+Laser pointer
+emission port
+   Fiber unit
 
 
-    • Do not install the product to the systems that give excessive load acts on the head and cables, such as head movement
-      unit. Failure to do so may damage the head precision parts or disconnect the cables, resulting in a failure.
-    • Be careful not to apply excess force to the cable or not to nip the cable at the installation.
-    • Verify the minimum bend radius of each cable and install them without excess forces being applied.
-    • Do not hit the device with a tool such as a hammer at the installation. Do not use excessive force while tightening the
-      screws (nuts). It may cause a failure.
-    • Do not insert foreign objects to the exhaust port of each unit or the gaps between units.
-    • Use anti-reflection material (ex. black paint for metal) for an external shutter or a protective enclosure in a path of laser
-      beam. It may cause a failure of the components inside the laser marker head.
-    • If any other devices such as a sensor or a camera are installed near the laser marker, make sure that these devices are
-      installed in the place where laser beam and its reflected beam do not damage to them.
+Laser emission port
+
+
+• Do not install the product to the systems that give excessive load acts on the head and cables, such as head movement
+  unit. Failure to do so may damage the head precision parts or disconnect the cables, resulting in a failure.
+• Be careful not to apply excess force to the cable or not to nip the cable at the installation.
+• Verify the minimum bend radius of each cable and install them without excess forces being applied.
+• Do not hit the device with a tool such as a hammer at the installation. Do not use excessive force while tightening the
+  screws (nuts). It may cause a failure.
+• Do not insert foreign objects to the exhaust port of each unit or the gaps between units.
+• Use anti-reflection material (ex. black paint for metal) for an external shutter or a protective enclosure in a path of laser
+  beam. It may cause a failure of the components inside the laser marker head.
+• If any other devices such as a sensor or a camera are installed near the laser marker, make sure that these devices are
+  installed in the place where laser beam and its reflected beam do not damage to them.
 
 
 6                                                            ME-LPRF-SM-11
@@ -278,8 +279,8 @@ For the Proper Use of Product
 ## หน้า 7
 
 For the Proper Use of Product
-            • Be sure to observe the following matters to prevent a failure or a malfunction of this product and to
-              maintain the product performance properly.
+• Be sure to observe the following matters to prevent a failure or a malfunction of this product and to
+  maintain the product performance properly.
 
 
  Wiring
@@ -309,30 +310,30 @@ For the Proper Use of Product
   read out and leaking of information by a third-party with malicious intent.
 
 
-                                                        ME-LPRF-SM-11                                                         7
+ME-LPRF-SM-11                                                         7
 
 ---
 
 ## หน้า 8
 
 Network security
-    As you will use this product connected to a network, your attention is called to the following security risks.
-    (1) Leakage or theft of information through this product
-    (2) Use of this product for illegal operations by persons with malicious intent
-     (3) Interference with or stoppage of this unit by persons with malicious intent
-    It is your responsibility to take precautions such as those described below to protect yourself against the above network
-    security risks.
-     • Use this product in a secure network by using protection tools such as a firewall.
-     • If this product is connected to a network that includes PCs, make sure that the system is not infected by computer
-        viruses or other malicious entities (using a regularly updated antivirus program, anti-spyware program, etc.).
-     • Use this product in an environment that has LAN, VPN (Virtual Private Network) or leased line network.
-     • Use this product in an environment where only limited people concerned can enter.
-     • Use this product and connected devices such as a PC and tablet securing safety.
-     • Do not install this product in locations where the product or the cables can be destroyed or damaged by persons with
-        malicious intent.
+As you will use this product connected to a network, your attention is called to the following security risks.
+(1) Leakage or theft of information through this product
+(2) Use of this product for illegal operations by persons with malicious intent
+ (3) Interference with or stoppage of this unit by persons with malicious intent
+It is your responsibility to take precautions such as those described below to protect yourself against the above network
+security risks.
+ • Use this product in a secure network by using protection tools such as a firewall.
+ • If this product is connected to a network that includes PCs, make sure that the system is not infected by computer
+   viruses or other malicious entities (using a regularly updated antivirus program, anti-spyware program, etc.).
+ • Use this product in an environment that has LAN, VPN (Virtual Private Network) or leased line network.
+ • Use this product in an environment where only limited people concerned can enter.
+ • Use this product and connected devices such as a PC and tablet securing safety.
+ • Do not install this product in locations where the product or the cables can be destroyed or damaged by persons with
+   malicious intent.
 
-    Note that incorrect setting of the connection to the existing LAN might cause malfunction in the devices on the network.
-    Consult your network administrator before connecting.
+Note that incorrect setting of the connection to the existing LAN might cause malfunction in the devices on the network.
+Consult your network administrator before connecting.
 
 
 8                                                            ME-LPRF-SM-11
@@ -361,21 +362,21 @@ case the Products are incorporated to machinery, system, apparatus, and so forth
 conformity of the Products by yourself.
 
 Do not use the Products for the application which breakdown or malfunction of Products may cause damage to the body or property.
-    i) usage intended to protect the body and ensure security of life
-    ii) application which the performance degradation or quality problems, such as breakdown, of the Products may directly result in
-        damage to the body or property
+i) usage intended to protect the body and ensure security of life
+ii) application which the performance degradation or quality problems, such as breakdown, of the Products may directly result in
+   damage to the body or property
 It is not allowed the use of Products by incorporating into machinery and systems indicated below because the conformity, performance,
 and quality of Products are not guaranteed under such usage.
-    i) transport machinery (cars, trains, boats and ships, etc.)
-    ii) control equipment for transportation
-    iii) disaster-prevention equipment / security equipment
-    iv) control equipment for electric power generation
-    v) nuclear control system
-    vi) aircraft equipment, aerospace equipment, and submarine repeater
-    vii) burning appliances
-    viii) military devices
-    ix) medical devices (except for general controls)
-    x) machinery and systems which especially require the high level of reliability and safety
+i) transport machinery (cars, trains, boats and ships, etc.)
+ii) control equipment for transportation
+iii) disaster-prevention equipment / security equipment
+iv) control equipment for electric power generation
+v) nuclear control system
+vi) aircraft equipment, aerospace equipment, and submarine repeater
+vii) burning appliances
+viii) military devices
+ix) medical devices (except for general controls)
+x) machinery and systems which especially require the high level of reliability and safety
 
 ACCEPTANCE INSPECTION
 In connection with the Products you have purchased from us or with the Products delivered to your premises, please perform an
@@ -395,14 +396,14 @@ delivered to your premises as soon as possible.
 However, the following failures and defects are not covered by warranty and we are not responsible for such failures and defects.
   (1) When the failure or defect was caused by a specification, standard, handling method, etc. which was specified by you.
   (2) When the failure or defect was caused after purchase or delivery to your premises by an alteration in construction, performance,
-      specification, etc. which did not involve us.
+specification, etc. which did not involve us.
   (3) When the failure or defect was caused by a phenomenon that could not be predicted by the technology at purchasing or contracted
-      time.
+time.
   (4) When the use of our Products deviated from the scope of the conditions and environment set forth in the instruction manual and
-      specifications.
+specifications.
   (5) When, after our Products were incorporated into your products or equipment for use, damage resulted which could have been
-      avoided if your products or equipment had been equipped with the functions, construction, etc. the provision of which is accepted
-      practice in the industry.
+avoided if your products or equipment had been equipped with the functions, construction, etc. the provision of which is accepted
+practice in the industry.
   (6) When the failure or defect was caused by a natural disaster or other force majeure.
   (7) When the equipment is damaged due to corrosion caused by corrosive gases etc. in the surroundings.
 
@@ -415,7 +416,7 @@ The cost of delivered Products does not include the cost of dispatching an engin
 In case any such service is needed, contact our sales representative.
 
 
-                                                              ME-LPRF-SM-11                                                                    9
+ME-LPRF-SM-11                                                                    9
 
 ---
 
@@ -428,49 +429,49 @@ Related Regulations and Standards
  section. When exporting this product by itself or integrated into machine or device, confirm the regulations and standards of
  the exporting country or region.
 
-     Model            Applicable regulations and standards
-     LP-RF200P        JIS (Japanese Industrial Standards)
-                       • JIS C 6802
-                      FDA (Food and Drug Administration) Regulations
-                       • 21 CFR 1040.10 and 1040.11 (except for conformance with IEC 60825-1 Ed. 3, as described in
-                         Laser Notice No. 56 dated May 8, 2019)
-                      EN Standard (CE Marking)*1
-                      • 2014/30/EU “EMC Directive”
-                         • EN 55011
-                         • EN 61000-6-2
-                      • 2006/42/EC “Machinery Directive” (for partly completed machinery)*2
-                         • EN ISO 11553-1
-                         • EN 60204-1
+Model            Applicable regulations and standards
+LP-RF200P        JIS (Japanese Industrial Standards)
+   • JIS C 6802
+   FDA (Food and Drug Administration) Regulations
+   • 21 CFR 1040.10 and 1040.11 (except for conformance with IEC 60825-1 Ed. 3, as described in
+   Laser Notice No. 56 dated May 8, 2019)
+   EN Standard (CE Marking)*1
+   • 2014/30/EU “EMC Directive”
+   • EN 55011
+   • EN 61000-6-2
+   • 2006/42/EC “Machinery Directive” (for partly completed machinery)*2
+   • EN ISO 11553-1
+   • EN 60204-1
 
 
-                       • 2011/65/EU as amended by (EU)2015/863 “RoHS Directive”
-                          • EN IEC 63000
-                       • Technical specification
-                          • EN 55032
-                          • EN 60825-1
+• 2011/65/EU as amended by (EU)2015/863 “RoHS Directive”
+   • EN IEC 63000
+• Technical specification
+   • EN 55032
+   • EN 60825-1
 
 
-                      GB (Chinese National Standard)
-                      • GB 7247.1-2012 (idt IEC 60825-1: 2007)
-                      KC mark (Korea Certification)
-                      Class A Equipment (Industrial Broadcasting & Communication Equipment)
-                      This equipment is Industrial (Class A) electromagnetic wave suitability equipment and seller or user
-                      should take notice of it, and this equipment is to be used in the places except for home.
-                      A 급 기기 ( 업무용 방송통신기자재 )
-                      이 기기는 업무용 (A 급 ) 전자파적합기기로서 판매자 또는 사용자는 이 점을 주의하시기 바라며 ,
-                      가정외의 지역에서 사용하는 것을 목적으로 합니다 .
+GB (Chinese National Standard)
+• GB 7247.1-2012 (idt IEC 60825-1: 2007)
+KC mark (Korea Certification)
+Class A Equipment (Industrial Broadcasting & Communication Equipment)
+This equipment is Industrial (Class A) electromagnetic wave suitability equipment and seller or user
+should take notice of it, and this equipment is to be used in the places except for home.
+A 급 기기 ( 업무용 방송통신기자재 )
+이 기기는 업무용 (A 급 ) 전자파적합기기로서 판매자 또는 사용자는 이 점을 주의하시기 바라며 ,
+가정외의 지역에서 사용하는 것을 목적으로 합니다 .
 
  *1 : Contact for CE:
-       Panasonic Marketing Europe GmbH, Panasonic Testing Center
-       Winsbergring 15, 22525 Hamburg, Germany
+Panasonic Marketing Europe GmbH, Panasonic Testing Center
+Winsbergring 15, 22525 Hamburg, Germany
  *2 : The printed copy of “Declaration of Incorporation of Partly Completed Machinery” is included in the package of this
-      product.
+product.
 
 
-             • Construct a safety system before using this product as it is a class 4 laser product.
-             • While constructing the system, check ISO 13849-1 and ISO 11553-1, and take the required safety measures
-               accordingly.
-               Please see the “Laser Safety Guide” for details.
+• Construct a safety system before using this product as it is a class 4 laser product.
+• While constructing the system, check ISO 13849-1 and ISO 11553-1, and take the required safety measures
+  accordingly.
+  Please see the “Laser Safety Guide” for details.
 
 
 10                                                      ME-LPRF-SM-11
@@ -509,7 +510,7 @@ whole system conforms to the Machinery Directive.
  • Provide the power to the laser marker from the power supply terminals of the system.
 
 
-                                                        ME-LPRF-SM-11                                                       11
+ME-LPRF-SM-11                                                       11
 
 ---
 
@@ -518,11 +519,11 @@ whole system conforms to the Machinery Directive.
 How to Read this Document
   Symbol description
 
-                         “Notice” denotes any instructions or precautions for using this product. To prevent the damage or
-           ワㄐㄕㄊ㄄ㄆ
-                         malfunction of the product, observe these precautions fully.
+   “Notice” denotes any instructions or precautions for using this product. To prevent the damage or
+ワㄐㄕㄊ㄄ㄆ
+   malfunction of the product, observe these precautions fully.
 
-         ンㄆㄇㄆㄓㄆㄏ㄄ㄆ       “Reference” denotes any hints for operation, detail explanations, or references.
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ       “Reference” denotes any hints for operation, detail explanations, or references.
 
 
   Target model
@@ -531,8 +532,8 @@ How to Read this Document
  If the setting contents or specifications vary by models, the target models are specified in the text.
  In the text, multiple models may be described collectively, as shown in the table below.
  Please remind that the illustration and the screen image may vary with the model.
-     Target model            Description in the text
-     LP-RF200P               LP-RF Series
+Target model            Description in the text
+LP-RF200P               LP-RF Series
 
 
   Type of manuals
@@ -540,34 +541,34 @@ How to Read this Document
  Also, save the manuals for future use.
 
  Laser Safety Guide
-      This manual describes the items required for using this product correctly and safely. All users shall be required for
-      reading this manual.
+This manual describes the items required for using this product correctly and safely. All users shall be required for
+reading this manual.
 
  Setup/Maintenance Guide
-      This manual describes the items required for introduction and installation of this product as well as for the maintenance
-      work.
-       • Product specifications, external dimensions
-       • Installation and connection method
-       • Signal details, I/O rating, and timing chart when I/O is used for control
-       • Maintenance details
-      Mainly the machine builder and system integrator shall be required for reading this manual.
+This manual describes the items required for introduction and installation of this product as well as for the maintenance
+work.
+ • Product specifications, external dimensions
+ • Installation and connection method
+ • Signal details, I/O rating, and timing chart when I/O is used for control
+ • Maintenance details
+Mainly the machine builder and system integrator shall be required for reading this manual.
 
  Laser Marker NAVI smart Operation Manual
-      Instruction manual for the laser marker configuration software “Laser Marker NAVI smart”. This manual describes the
-      procedure and method to operate the laser marker, and the screen operations to set marking contents.
+Instruction manual for the laser marker configuration software “Laser Marker NAVI smart”. This manual describes the
+procedure and method to operate the laser marker, and the screen operations to set marking contents.
 
  Serial Communication Command Guide
-      This manual describes the communication commands to control this product externally using the serial communication
-      (RS-232C/Ethernet). It describes the communication settings, communication data formats, communication commands,
-      and the control samples.
-      Mainly the machine builder and system integrator shall be required for reading this manual.
+This manual describes the communication commands to control this product externally using the serial communication
+(RS-232C/Ethernet). It describes the communication settings, communication data formats, communication commands,
+and the control samples.
+Mainly the machine builder and system integrator shall be required for reading this manual.
 
  Serial Communication Command Guide: LP-400/V compatible mode
-      This manual describes the communication commands to control this product externally using the compatible command
-      format with the former models of LP-400/LP-V series.
-      Mainly the machine builder and system integrator shall be required for reading this manual.
+This manual describes the communication commands to control this product externally using the compatible command
+format with the former models of LP-400/LP-V series.
+Mainly the machine builder and system integrator shall be required for reading this manual.
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • The PDF data of each manual is included on an attached CD-ROM “Laser Marker Smart Utility”.
  • To read the PDF manual, Adobe Reader (Version X or later) of Adobe Systems Incorporated is required.
 
@@ -579,94 +580,94 @@ How to Read this Document
 ## หน้า 13
 
 Contents
-     Preface................................................................................................................ 2
-     Cautions in Handling............................................................................................ 3
-     Related Regulations and Standards................................................................... 10
-     How to Read this Document............................................................................... 12
+Preface................................................................................................................ 2
+Cautions in Handling............................................................................................ 3
+Related Regulations and Standards................................................................... 10
+How to Read this Document............................................................................... 12
 
 1 Product Overview……………………………………………………… 17
-     1-1 Product Model.............................................................................................. 18
-     1-2 Product Configuration.................................................................................. 19
-             1-2-1 Basic composition....................................................................................... 19
-             1-2-2 Optional items............................................................................................. 20
-             1-2-3 Package...................................................................................................... 21
-     1-3 Specification................................................................................................ 23
-     1-4 Outer Dimensional Drawing......................................................................... 25
-             1-4-1 Head........................................................................................................... 25
-             1-4-2 Fiber Unit.................................................................................................... 26
-             1-4-3 Controller.................................................................................................... 27
-             1-4-4 Cables........................................................................................................ 28
-     1-5 Name of Each Component.......................................................................... 29
-             1-5-1 Head........................................................................................................... 29
-             1-5-2 Controller.................................................................................................... 31
+1-1 Product Model.............................................................................................. 18
+1-2 Product Configuration.................................................................................. 19
+   1-2-1 Basic composition....................................................................................... 19
+   1-2-2 Optional items............................................................................................. 20
+   1-2-3 Package...................................................................................................... 21
+1-3 Specification................................................................................................ 23
+1-4 Outer Dimensional Drawing......................................................................... 25
+   1-4-1 Head........................................................................................................... 25
+   1-4-2 Fiber Unit.................................................................................................... 26
+   1-4-3 Controller.................................................................................................... 27
+   1-4-4 Cables........................................................................................................ 28
+1-5 Name of Each Component.......................................................................... 29
+   1-5-1 Head........................................................................................................... 29
+   1-5-2 Controller.................................................................................................... 31
 
 2 Laser Marker Installation……………………………………………… 34
-     2-1 Installation Environment............................................................................... 35
-     2-2 Installation Space......................................................................................... 36
-     2-3 Head Installation.......................................................................................... 37
-             2-3-1 Installation direction.................................................................................... 37
-             2-3-2 Installation method..................................................................................... 38
-             2-3-3 Marking field and marking center position.................................................. 40
-             2-3-4 Marking position check.............................................................................. 41
-             2-3-5 Detaching / attaching the fiber unit............................................................. 42
-     2-4 Controller Installation................................................................................... 46
-     2-5 Connecting Laser Marker............................................................................ 47
-             2-5-1 Connection of head and controller............................................................. 47
-             2-5-2 Power connection and earth (Grounding)................................................... 51
-             2-5-3 Restore of circuit protector......................................................................... 53
-             2-5-4 Connection of PC (Laser marker NAVI smart)........................................... 54
-     2-6 Construction of System............................................................................... 56
+2-1 Installation Environment............................................................................... 35
+2-2 Installation Space......................................................................................... 36
+2-3 Head Installation.......................................................................................... 37
+   2-3-1 Installation direction.................................................................................... 37
+   2-3-2 Installation method..................................................................................... 38
+   2-3-3 Marking field and marking center position.................................................. 40
+   2-3-4 Marking position check.............................................................................. 41
+   2-3-5 Detaching / attaching the fiber unit............................................................. 42
+2-4 Controller Installation................................................................................... 46
+2-5 Connecting Laser Marker............................................................................ 47
+   2-5-1 Connection of head and controller............................................................. 47
+   2-5-2 Power connection and earth (Grounding)................................................... 51
+   2-5-3 Restore of circuit protector......................................................................... 53
+   2-5-4 Connection of PC (Laser marker NAVI smart)........................................... 54
+2-6 Construction of System............................................................................... 56
 
 3 Operation Method…………………………………………………… 57
 
-                                                      ME-LPRF-SM-11                                                                     13
+ME-LPRF-SM-11                                                                     13
 
 ---
 
 ## หน้า 14
 
 3-1 Type of Operations....................................................................................... 58
-      3-2 Start-up & Termination................................................................................ 59
-             3-2-1 Start-up procedure..................................................................................... 59
-             3-2-2 Termination procedure................................................................................ 60
-             3-2-3 Operation of controller display panel.......................................................... 61
-      3-3 Operation by PC Configuration Software.................................................... 63
-             3-3-1 Operation procedure.................................................................................. 63
-             3-3-2 Screen types.............................................................................................. 65
-             3-3-3 How to establish online connection............................................................ 67
-             3-3-4 How to disconnect online connection......................................................... 69
-             3-3-5 User selection and password settings....................................................... 70
-             3-3-6 Test marking and RUN mode..................................................................... 73
-      3-4 Operation by External Devices.................................................................... 75
-             3-4-1 Operation method using external control device........................................ 75
-             3-4-2 Operation procedure with external control................................................. 76
-             3-4-3 General settings before external control.................................................... 77
-             3-4-4 Remote mode settings............................................................................... 80
+3-2 Start-up & Termination................................................................................ 59
+   3-2-1 Start-up procedure..................................................................................... 59
+   3-2-2 Termination procedure................................................................................ 60
+   3-2-3 Operation of controller display panel.......................................................... 61
+3-3 Operation by PC Configuration Software.................................................... 63
+   3-3-1 Operation procedure.................................................................................. 63
+   3-3-2 Screen types.............................................................................................. 65
+   3-3-3 How to establish online connection............................................................ 67
+   3-3-4 How to disconnect online connection......................................................... 69
+   3-3-5 User selection and password settings....................................................... 70
+   3-3-6 Test marking and RUN mode..................................................................... 73
+3-4 Operation by External Devices.................................................................... 75
+   3-4-1 Operation method using external control device........................................ 75
+   3-4-2 Operation procedure with external control................................................. 76
+   3-4-3 General settings before external control.................................................... 77
+   3-4-4 Remote mode settings............................................................................... 80
 
  4 External Control Using I/O…………………………………………… 81
-      4-1 I/O Interface Specification............................................................................ 82
-      4-2 Signals and Details of I/O Terminal Block.................................................... 83
-      4-3 Signals and Details of I/O Connector........................................................... 91
-      4-4 I/O Rating/Circuit......................................................................................... 98
-             4-4-1 Input rating and input circuit....................................................................... 98
-             4-4-2 Output rating and output circuit.................................................................. 99
-             4-4-3 Interlock terminal rating and I/O circuit...................................................... 100
-      4-5 Connecting I/O Terminal Block................................................................... 101
-             4-5-1 Factory default wiring................................................................................ 101
-             4-5-2 Connecting common terminals................................................................. 102
-             4-5-3 Sensor connection example...................................................................... 103
-             4-5-4 Connection example of interlock terminals and laser stop terminals........ 103
-             4-5-5 Checking the I/O terminal status............................................................... 104
-      4-6 Basic Control Timing Chart........................................................................ 106
-             4-6-1 Flow from startup to marking..................................................................... 106
-             4-6-2 Shutter open/close.................................................................................... 108
-             4-6-3 Marking trigger input (to static object): Single trigger................................ 109
-             4-6-4 Marking trigger input: Continuous trigger...................................................110
-             4-6-5 On-the-fly marking: Single trigger..............................................................112
-             4-6-6 On-the-fly marking: Marking at regular intervals........................................113
-             4-6-7 On-the-fly marking: Multiple triggers..........................................................114
-             4-6-8 On-the-fly marking: 2 sensors input...........................................................115
-             4-6-9 Target detection input.................................................................................116
+4-1 I/O Interface Specification............................................................................ 82
+4-2 Signals and Details of I/O Terminal Block.................................................... 83
+4-3 Signals and Details of I/O Connector........................................................... 91
+4-4 I/O Rating/Circuit......................................................................................... 98
+   4-4-1 Input rating and input circuit....................................................................... 98
+   4-4-2 Output rating and output circuit.................................................................. 99
+   4-4-3 Interlock terminal rating and I/O circuit...................................................... 100
+4-5 Connecting I/O Terminal Block................................................................... 101
+   4-5-1 Factory default wiring................................................................................ 101
+   4-5-2 Connecting common terminals................................................................. 102
+   4-5-3 Sensor connection example...................................................................... 103
+   4-5-4 Connection example of interlock terminals and laser stop terminals........ 103
+   4-5-5 Checking the I/O terminal status............................................................... 104
+4-6 Basic Control Timing Chart........................................................................ 106
+   4-6-1 Flow from startup to marking..................................................................... 106
+   4-6-2 Shutter open/close.................................................................................... 108
+   4-6-3 Marking trigger input (to static object): Single trigger................................ 109
+   4-6-4 Marking trigger input: Continuous trigger...................................................110
+   4-6-5 On-the-fly marking: Single trigger..............................................................112
+   4-6-6 On-the-fly marking: Marking at regular intervals........................................113
+   4-6-7 On-the-fly marking: Multiple triggers..........................................................114
+   4-6-8 On-the-fly marking: 2 sensors input...........................................................115
+   4-6-9 Target detection input.................................................................................116
 
 
 14                                                  ME-LPRF-SM-11
@@ -676,78 +677,78 @@ Contents
 ## หน้า 15
 
 4-6-10 Guide laser radiation input........................................................................117
-             4-6-11 Select file..................................................................................................118
-             4-6-12 Time/date hold input and date gap output................................................119
-             4-6-13 Counter end output...................................................................................119
-             4-6-14 Count-up/count-down value correction.................................................... 120
-             4-6-15 Counter reset input.................................................................................. 121
-             4-6-16 Registered characters/external offset marking........................................ 122
-             4-6-17 Laser stop input....................................................................................... 123
-             4-6-18 Remote interlock input............................................................................. 124
-             4-6-19 Interlock input.......................................................................................... 125
+4-6-11 Select file..................................................................................................118
+4-6-12 Time/date hold input and date gap output................................................119
+4-6-13 Counter end output...................................................................................119
+4-6-14 Count-up/count-down value correction.................................................... 120
+4-6-15 Counter reset input.................................................................................. 121
+4-6-16 Registered characters/external offset marking........................................ 122
+4-6-17 Laser stop input....................................................................................... 123
+4-6-18 Remote interlock input............................................................................. 124
+4-6-19 Interlock input.......................................................................................... 125
 
 5 External Control by Communication Commands……………… 126
-      5-1 Communication Interfaces.......................................................................... 127
-      5-2 RS-232C..................................................................................................... 128
-             5-2-1 Interface specifications and connection.................................................... 128
-             5-2-2 Communication settings (for command control)........................................ 130
-      5-3 Ethernet.......................................................................................................131
-             5-3-1 Port specifications and connection............................................................131
-             5-3-2 Communication settings............................................................................ 132
-             5-3-3 Connecting to external control devices and its setting sample................. 133
-      5-4 Checking the communication commands................................................... 134
+5-1 Communication Interfaces.......................................................................... 127
+5-2 RS-232C..................................................................................................... 128
+   5-2-1 Interface specifications and connection.................................................... 128
+   5-2-2 Communication settings (for command control)........................................ 130
+5-3 Ethernet.......................................................................................................131
+   5-3-1 Port specifications and connection............................................................131
+   5-3-2 Communication settings............................................................................ 132
+   5-3-3 Connecting to external control devices and its setting sample................. 133
+5-4 Checking the communication commands................................................... 134
 
 6 Link Control with External Devices……………………………… 135
-      6-1 Link Control with Image Checker................................................................ 136
-             6-1-1 Example of image checker linkage system................................................ 137
-             6-1-2 Operation flow........................................................................................... 138
-             6-1-3 Connection................................................................................................ 139
-             6-1-4 Set the laser marker communication settings............................................ 140
-             6-1-5 Set the laser marker overall file conditions.................................................141
-             6-1-6 Image checker setting............................................................................... 144
-             6-1-7 Code reader (LP-ABR) setting................................................................... 148
-             6-1-8 Code reader (DataMan) setting................................................................. 148
-             6-1-9 Timing chart............................................................................................... 149
-      6-2 Link Control with Code Reader................................................................... 153
-             6-2-1 Example of code reader linkage system.................................................... 153
-             6-2-2 Operation flow........................................................................................... 154
-             6-2-3 Connection................................................................................................ 156
-             6-2-4 Preparation of readout code...................................................................... 157
-             6-2-5 Setting of code reader linkage functions................................................... 158
+6-1 Link Control with Image Checker................................................................ 136
+   6-1-1 Example of image checker linkage system................................................ 137
+   6-1-2 Operation flow........................................................................................... 138
+   6-1-3 Connection................................................................................................ 139
+   6-1-4 Set the laser marker communication settings............................................ 140
+   6-1-5 Set the laser marker overall file conditions.................................................141
+   6-1-6 Image checker setting............................................................................... 144
+   6-1-7 Code reader (LP-ABR) setting................................................................... 148
+   6-1-8 Code reader (DataMan) setting................................................................. 148
+   6-1-9 Timing chart............................................................................................... 149
+6-2 Link Control with Code Reader................................................................... 153
+   6-2-1 Example of code reader linkage system.................................................... 153
+   6-2-2 Operation flow........................................................................................... 154
+   6-2-3 Connection................................................................................................ 156
+   6-2-4 Preparation of readout code...................................................................... 157
+   6-2-5 Setting of code reader linkage functions................................................... 158
 
 7 Maintenance………………………………………………………… 160
-      7-1 Maintenance Items.......................................................................................161
+7-1 Maintenance Items.......................................................................................161
 
 
-                                                     ME-LPRF-SM-11                                                                     15
+ME-LPRF-SM-11                                                                     15
 
 ---
 
 ## หน้า 16
 
 7-2 Maintenance Details of Parts...................................................................... 162
-            7-2-1 Protection glass of laser emission port...................................................... 162
-            7-2-2 Replacement of the protection glass.......................................................... 163
-            7-2-3 Cleaning of Head....................................................................................... 165
-            7-2-4 Intake/exhaust vent.................................................................................... 165
-            7-2-5 Air filter...................................................................................................... 166
-            7-2-6 Air-cooling fan............................................................................................ 168
-            7-2-7 Laser oscillator............................................................................................171
-            7-2-8 Galvano scanner.........................................................................................174
-            7-2-9 Internal shutter............................................................................................175
-            7-2-10 Replacement of contactor for interlock......................................................176
-            7-2-11 Replacement of battery inside the controller............................................ 180
-            7-2-12 Replacement of cable.............................................................................. 183
-     7-3 Obtaining Backup Data............................................................................... 183
-     7-4 Serial Number Checking Method................................................................ 184
-     7-5 Disposal of Laser Marker............................................................................ 185
-            7-5-1 Disposal of old equipment and batteries................................................... 185
+   7-2-1 Protection glass of laser emission port...................................................... 162
+   7-2-2 Replacement of the protection glass.......................................................... 163
+   7-2-3 Cleaning of Head....................................................................................... 165
+   7-2-4 Intake/exhaust vent.................................................................................... 165
+   7-2-5 Air filter...................................................................................................... 166
+   7-2-6 Air-cooling fan............................................................................................ 168
+   7-2-7 Laser oscillator............................................................................................171
+   7-2-8 Galvano scanner.........................................................................................174
+   7-2-9 Internal shutter............................................................................................175
+   7-2-10 Replacement of contactor for interlock......................................................176
+   7-2-11 Replacement of battery inside the controller............................................ 180
+   7-2-12 Replacement of cable.............................................................................. 183
+7-3 Obtaining Backup Data............................................................................... 183
+7-4 Serial Number Checking Method................................................................ 184
+7-5 Disposal of Laser Marker............................................................................ 185
+   7-5-1 Disposal of old equipment and batteries................................................... 185
 
  Troubleshooting………………………………………………………… 186
-     Troubleshooting................................................................................................. 187
-     Error Indication.................................................................................................. 201
-            Alarm: E001 - E599............................................................................................. 201
-            Warning: E600 - E799......................................................................................... 205
+Troubleshooting................................................................................................. 187
+Error Indication.................................................................................................. 201
+   Alarm: E001 - E599............................................................................................. 201
+   Warning: E600 - E799......................................................................................... 205
 
  Index…………………………………………………………………… 214
 
@@ -761,7 +762,7 @@ Contents
 1 Product Overview
 
 
-           ME-LPRF-SM-11
+ME-LPRF-SM-11
 
 ---
 
@@ -770,19 +771,19 @@ Contents
 1-1 Product Model
  FAYb Laser Marker LP-RF series have the following models.
 
-     Model           Marking field       Laser oscillator average output    Mode of laser operation
-     LP-RF200P       90mm x 90mm         20W                                Pulsed operation
+Model           Marking field       Laser oscillator average output    Mode of laser operation
+LP-RF200P       90mm x 90mm         20W                                Pulsed operation
 
 
   Model description
  LP-RF 200 P
-      q        w e
+q        w e
 
  q Represents the series name. “LP-RF series” refers to the fiber laser marker.
  w Represents the laser output class and the marking field size. The following types are applicable to this product.
-       200:   Laser oscillator average output 20W, Marking field 90mm x 90mm
+200:   Laser oscillator average output 20W, Marking field 90mm x 90mm
  e Represents the mode of laser operation.
-       P:     Pulsed operation
+P:     Pulsed operation
 
 
 18                                                      ME-LPRF-SM-11
@@ -798,50 +799,50 @@ This product is a laser marker designed to mark and process the object by radiat
 The laser marker LP-RF series consists of the following units mainly.
 
 
-                                                                         w
-                                                             e
-              q
+   w
+   e
+q
 
 
-                                                                                                                      r
+r
 
 
-                                     t
+t
 
-                                                                             u
+u
 
-                                          y
+y
 
  No.    Name                                          Description
 
   q     Head                                          It is the unit that radiates the laser beam. The optical parts and the
-                                                      scanner are loaded inside.
+scanner are loaded inside.
 
   w     Controller                                    It is the unit that generates the marking data. The laser oscillator,
-                                                      the main power supply and connection interface with external
-                                                      devices are loaded.
+the main power supply and connection interface with external
+devices are loaded.
 
   e     Unit power cable (Attached accessory)         Cables to connect the head and controller.
-        Signal cable (Attached accessory)             The fiber cable delivers the laser beam from controller to head.
-        Fiber cable
+Signal cable (Attached accessory)             The fiber cable delivers the laser beam from controller to head.
+Fiber cable
 
 
   r     AC power cable (Optional item)                Cable to supply AC power to the controller. Purchase the specified
-                                                      optional cable or a cable with the enough rating capacity to fulfil the
-                                                      power voltage specification of this product, which is compliant with
-                                                      the standards in the country or region where it is used.
+optional cable or a cable with the enough rating capacity to fulfil the
+power voltage specification of this product, which is compliant with
+the standards in the country or region where it is used.
 
   t     USB cable (Attached accessory)                Cable to connect the laser marker with a PC.
 
   y     Commercially available PC                     Install the attached software “Laser Marker Smart Utility” onto a PC
-        (Not included in this product.)               and set the marking data of the laser marker. You can use this PC
-                                                      as a monitor during the operation.
+(Not included in this product.)               and set the marking data of the laser marker. You can use this PC
+   as a monitor during the operation.
 
   u     Laser Marker Smart Utility software           This software contains the laser marker configuration software
-        (Attached CD-ROM)                             “Laser Marker NAVI smart” and PDF manual data.
+(Attached CD-ROM)                             “Laser Marker NAVI smart” and PDF manual data.
 
 
-                                                       ME-LPRF-SM-11                                                            19
+ME-LPRF-SM-11                                                            19
 
 ---
 
@@ -862,13 +863,13 @@ The laser marker LP-RF series consists of the following units mainly.
   Set of connector cover and gasket (for replacement)                                                              LP-ACC10
   Contactor unit for Interlock (for replacement)                                                                   LP-AEC10
   Battery inside the controller (for replacement)                                                                  AFPX-BATT
-                                                                                                                   (CR-2450)
+(CR-2450)
   Industrial network unit for EtherNet/IP                                                                          LP-ANW10
   Industrial network unit for PROFINET                                                                             LP-ANW11
 
-     ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  •• For the recommended AC power cable for China (rating 250V, CCC standards compatible cable), please contact our
-    sales office.
+sales office.
 
 
 20                                                          ME-LPRF-SM-11
@@ -882,38 +883,38 @@ Before using this product, be sure to check the packed objects as shown below.
 This product is delivered in a set of head unit and controller unit packed in one box.
 If you find any missing item in the package, please contact the dealer you purchased it or our sales office.
 
-      ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
 •• Be sure to store the packing material. Since this product is precision machinery, reuse the packing materials to prevent
    damages during transportation.
 
 
-            □□Laser marker (head and controller)
-                          1 unit
+□□Laser marker (head and controller)
+   1 unit
 
 
 □□System key             □□Unit power cable       □□Signal cable           □□I/O connector
 
 
-         qty.: 2                  qty.: 1                  qty.: 1                   qty.: 1
+qty.: 2                  qty.: 1                  qty.: 1                   qty.: 1
 
 
 □□I/O terminal block     □□Short bar              □□USB cable (2m)         □□Ferrite core              □□Laser Marker Smart
-                           (Attached to the I/O                                                          Utility (CD-ROM) *2
-                           terminal block partly)
-         qty.: 1                 qty.: 7                 qty.: 1                   qty.: 3 *1                  qty.: 1
+   (Attached to the I/O                                                          Utility (CD-ROM) *2
+   terminal block partly)
+qty.: 1                 qty.: 7                 qty.: 1                   qty.: 3 *1                  qty.: 1
 
 
 □□Laser Safety Guide     □□ Leaflet of carrying     □□General information □□Copy of Declaration □□Warning/explanation
-                            caution and information   for safety (For EU    of Incorporation      label
+caution and information   for safety (For EU    of Incorporation      label
 
 
-                            about PDF manuals         users)
+about PDF manuals         users)
 
 
-         qty.: 1                  qty.: 1                  qty.: 1                 qty.: 1 set                 qty.: 1
+qty.: 1                  qty.: 1                  qty.: 1                 qty.: 1 set                 qty.: 1
 
 
-                                                        ME-LPRF-SM-11                                                          21
+ME-LPRF-SM-11                                                          21
 
 ---
 
@@ -921,47 +922,47 @@ If you find any missing item in the package, please contact the dealer you purch
 
 □□Air filters for          □□Connector covers      □□Scanner unit cover          □□M5 screw (for         □□Protection cap of
    replacement                of unit power cable                                   scanner unit cover)     laser emission port
-                              and signal cable (for                                                         *3
-                              head)
+and signal cable (for                                                         *3
+head)
   2 filters for upper side,  1 set for each cable          qty.: 1                        qty.: 4                 qty.: 1
-    2 filters for bottom
+2 filters for bottom
 
 
  *1: Attach one ferrite core to the LAN cable (Ethernet), one to the I/O lines from the I/O terminal, and one to the I/O lines
-      from the I/O connector.
+from the I/O connector.
  *2: This CD-ROM contains the following data:
 
-          PC configuration software
-          Laser Marker NAVI smart
-          Logo Data Editing Software
-          ExportVec
-          Font Maker
+PC configuration software
+Laser Marker NAVI smart
+Logo Data Editing Software
+ExportVec
+Font Maker
 
-          PDF manuals                                               Language
-          Laser Safety Guide                                        English / Simplified Chinese / Japanese
-          Setup/Maintenance Guide
-          Serial Communication Command Guide
-          Serial Communication Command Guide: LP-400/V
-          compatible mode
-          Laser Marker NAVI smart Operation Manual
-          Logo Data Editing Software Operation Manual
-          ExportVec Operation Manual
-          Font Maker Operation Manual
+PDF manuals                                               Language
+Laser Safety Guide                                        English / Simplified Chinese / Japanese
+Setup/Maintenance Guide
+Serial Communication Command Guide
+Serial Communication Command Guide: LP-400/V
+compatible mode
+Laser Marker NAVI smart Operation Manual
+Logo Data Editing Software Operation Manual
+ExportVec Operation Manual
+Font Maker Operation Manual
 
-          Font files (.FON)
-          Fonts for alphanumeric characters and symbols: ORG1, ORG2, ORG3, ORG4, ORG5, ORG1S,
-          ORG2S, ORG3S, OCR1, ORG3-L1, DINLIKE1-L1
-          Fonts for Japanese characters: JIS1 (JIS level 1), JIS2 (JIS level 2)
-          Fonts for Simplified Chinese characters: GB2312-1 (GB 2312 level 1), GB2312-2 (GB 2312 level 2)
-          User-defined font: USER1
-          2D code pattern font: 2DCODE
+Font files (.FON)
+Fonts for alphanumeric characters and symbols: ORG1, ORG2, ORG3, ORG4, ORG5, ORG1S,
+ORG2S, ORG3S, OCR1, ORG3-L1, DINLIKE1-L1
+Fonts for Japanese characters: JIS1 (JIS level 1), JIS2 (JIS level 2)
+Fonts for Simplified Chinese characters: GB2312-1 (GB 2312 level 1), GB2312-2 (GB 2312 level 2)
+User-defined font: USER1
+2D code pattern font: 2DCODE
 
  *3: Attached to the head with shipment. Remove this cap before operation. Do not screw the lens when removing the cap.
 
-       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  •• The AC power cable is not included in this product. Purchase the specified optional cable or a cable with the enough
-    rating capacity to fulfil the power voltage specification of this product, which is compliant with the standards in the
-    country or region where it is used. For the optional cables, refer to “1-4-4 Cables” (P.28).
+rating capacity to fulfil the power voltage specification of this product, which is compliant with the standards in the
+country or region where it is used. For the optional cables, refer to “1-4-4 Cables” (P.28).
 
 
 22                                                         ME-LPRF-SM-11
@@ -971,129 +972,129 @@ If you find any missing item in the package, please contact the dealer you purch
 ## หน้า 23
 
 1-3 Specification
-                                                                             Model
-                 Item
-                                                                          LP-RF200P
-                        Laser type                   Yb: Fiber laser, Wavelength: 1064nm, Class 4 laser
-                   Oscillator average
-                                                                              20W
-                         output
+   Model
+Item
+   LP-RF200P
+   Laser type                   Yb: Fiber laser, Wavelength: 1064nm, Class 4 laser
+  Oscillator average
+   20W
+   output
 Marking laser      Average output for
-                                                                          17W ( ± 5%)
-                      marking *1
-                   Mode of operation                                   Pulsed oscillation
-                        Pulse cycle                                       5μs to 50μs
-                                                   Red semiconductor, Wavelength: 655nm, Class 2 laser
-     Guide laser, laser pointer
-                                                               Max. output: 1mW or less
-         Scanning system                                           Galvano scanning method
-            Beam stop                                       1 Shutter is equipped inside of head
-       Marking field (X, Y) *2                                          90mm × 90mm
-         Work distance *2                                                   190mm
-         Work piece status                                    Stationary object, Moving object
-         Scan speed *3, *4                                           Max 12000 mm/sec.
-      Applicable line speed *3                                         Max 240 m/min.
-      No. of registerable files                                           10,000 files
-     No. of marking data pieces
-                                                                       2000 objects/file
-    (No. of registerable objects)
-                                        West-European alphabet (A to Z, a to z, Latin-1 characters), numeric, symbol,
-                                                 user defined characters (up to 50 characters can be set)
-                        Character
-                                         Japanese characters: Katakana, Hiragana, Kanji (JIS level-1 and level-2)
-                                                Simplified Chinese characters: GB 2312 level-1 and level-2
-                           TrueType       TrueType fonts stored in the PC with Laser Marker NAVI smart installed *5
-                                            CODE39, CODE93, CODE128 (GS1-128), ITF, NW-7, EAN/UPC/JAN
+   17W ( ± 5%)
+   marking *1
+   Mode of operation                                   Pulsed oscillation
+   Pulse cycle                                       5μs to 50μs
+   Red semiconductor, Wavelength: 655nm, Class 2 laser
+ Guide laser, laser pointer
+   Max. output: 1mW or less
+   Scanning system                                           Galvano scanning method
+   Beam stop                                       1 Shutter is equipped inside of head
+   Marking field (X, Y) *2                                          90mm × 90mm
+   Work distance *2                                                   190mm
+   Work piece status                                    Stationary object, Moving object
+   Scan speed *3, *4                                           Max 12000 mm/sec.
+  Applicable line speed *3                                         Max 240 m/min.
+  No. of registerable files                                           10,000 files
+ No. of marking data pieces
+   2000 objects/file
+(No. of registerable objects)
+   West-European alphabet (A to Z, a to z, Latin-1 characters), numeric, symbol,
+   user defined characters (up to 50 characters can be set)
+   Character
+   Japanese characters: Katakana, Hiragana, Kanji (JIS level-1 and level-2)
+   Simplified Chinese characters: GB 2312 level-1 and level-2
+   TrueType       TrueType fonts stored in the PC with Laser Marker NAVI smart installed *5
+   CODE39, CODE93, CODE128 (GS1-128), ITF, NW-7, EAN/UPC/JAN
 Marking data               Bar code                  GS1 DataBar Limited, GS1 DataBar Stacked,
-                                               GS1 DataBar Limited CC-A, GS1 DataBar Stacked CC-A
-                                                            QR code, Micro QR code, iQR code,
-                           2D code
-                                                           Data Matrix, GS1 Data Matrix, PDF417
-                     Graphic file *6                       VEC, DXF, HPGL, BMP, JPEG, AI, EPS
-                   Point and shapes                             Point radiation, line, circle, arc
-     Character height/width *3
-                                                                       0.1mm to 90mm
-         (0.001mm unit)
-      Character arrangement                                Straight line, Arc, Proportional, Justify
-                I/O port                             I/O terminal block (40-pins), I/O connector (40-pins)
-     Communication interface                       EIA-RS-232C, Ethernet, EtherNet/IP *7, PROFINET *7
-         Attached software              Laser Marker NAVI smart, Logo Data Editing Software, ExportVec, Font Maker
-                                                               Windows® 10 Pro 32bit, 64bit /
-         Supported OS *8
-                                                               Windows® 8.1 Pro 32bit, 64bit
+   GS1 DataBar Limited CC-A, GS1 DataBar Stacked CC-A
+   QR code, Micro QR code, iQR code,
+   2D code
+   Data Matrix, GS1 Data Matrix, PDF417
+   Graphic file *6                       VEC, DXF, HPGL, BMP, JPEG, AI, EPS
+   Point and shapes                             Point radiation, line, circle, arc
+Character height/width *3
+   0.1mm to 90mm
+   (0.001mm unit)
+ Character arrangement                                Straight line, Arc, Proportional, Justify
+   I/O port                             I/O terminal block (40-pins), I/O connector (40-pins)
+Communication interface                       EIA-RS-232C, Ethernet, EtherNet/IP *7, PROFINET *7
+   Attached software              Laser Marker NAVI smart, Logo Data Editing Software, ExportVec, Font Maker
+   Windows® 10 Pro 32bit, 64bit /
+   Supported OS *8
+   Windows® 8.1 Pro 32bit, 64bit
 Laser marker NAVI smart connection
-                                                                        USB, Ethernet
-              method
+   USB, Ethernet
+method
  Laser marker NAVI smart display
-                                        English, German, Simplified Chinese, Traditional Chinese, Japanese, Korean
-           language
+   English, German, Simplified Chinese, Traditional Chinese, Japanese, Korean
+language
   Required time for system startup                                   Approx. 10 seconds
 
 
-                                                   ME-LPRF-SM-11                                                        23
+ME-LPRF-SM-11                                                        23
 
 ---
 
 ## หน้า 24
 
 Model
-                         Item
-                                                                              LP-RF200P
-         Required time for laser pumping                                  Approx. 7 seconds
-                                                        180V to 264V AC (including ±10% voltage fluctuations)
-                   Power voltage
-                                                                      Frequency: 50/60Hz *9
-              Power consumption
-                                                                      370VA or less (2.1A or less)
-           (Consumption current) *10
-               Grounding method                             Direct earth for both the head and the controller
+   Item
+   LP-RF200P
+Required time for laser pumping                                  Approx. 7 seconds
+   180V to 264V AC (including ±10% voltage fluctuations)
+   Power voltage
+   Frequency: 50/60Hz *9
+   Power consumption
+   370VA or less (2.1A or less)
+  (Consumption current) *10
+   Grounding method                             Direct earth for both the head and the controller
 
-         Cooling                  Head                                     Natural air-cooling
-         method                 Controller                                 Forced air-cooling
-       Operating ambient temperature *11,                With laser power setting 46 or more : 0°C to +36°C
-                      *12                                With laser power setting less than 46 : 0°C to +40°C
-       Ambient temperature for storage *11                                  -10°C to +60°C
-         Operating ambient humidity *11                                      35 to 85%RH
-          Protection degree of head *13                                           IP64
-              Overvoltage category                                                 Ⅱ
-                  Pollution degree                                                 2
-                      Use location                             Indoor; at an altitude of 1000 m or below
-               Fiber cable length                              3.0 ± 0.2 m, Minimum bent radius 80 mm
+  Cooling                  Head                                     Natural air-cooling
+  method                 Controller                                 Forced air-cooling
+Operating ambient temperature *11,                With laser power setting 46 or more : 0°C to +36°C
+   *12                                With laser power setting less than 46 : 0°C to +40°C
+Ambient temperature for storage *11                                  -10°C to +60°C
+  Operating ambient humidity *11                                      35 to 85%RH
+   Protection degree of head *13                                           IP64
+   Overvoltage category                                                 Ⅱ
+   Pollution degree                                                 2
+   Use location                             Indoor; at an altitude of 1000 m or below
+   Fiber cable length                              3.0 ± 0.2 m, Minimum bent radius 80 mm
 
-       Installation               Head                                      In all directions
-        direction               Controller                                     Vertically
-                                  Head                                       Approx. 8.0kg
-         Weight
-                                Controller                                   Approx. 37kg
-                                  Type                        Manganese dioxide lithium primary battery
-         Battery                 Model                                   AFPX-BATT (CR-2450)
-       (mounted in
-         product)               Quantity                                           1
-                                 Weight                                       Approx. 7.0g
+Installation               Head                                      In all directions
+ direction               Controller                                     Vertically
+   Head                                       Approx. 8.0kg
+  Weight
+   Controller                                   Approx. 37kg
+   Type                        Manganese dioxide lithium primary battery
+  Battery                 Model                                   AFPX-BATT (CR-2450)
+(mounted in
+  product)               Quantity                                           1
+   Weight                                       Approx. 7.0g
 
 
  *1: Average output power from the laser marker at delivery time with the maximum laser power setting.
  *2: There is approx. +/-0.5mm deviation per product.
  *3: The value shown here is the configuration range that can be input. The setting values that can keep the quality of
-      marking or processing vary depending on the setting details and the target materials.
+marking or processing vary depending on the setting details and the target materials.
  *4: Depending on the setting data, the available scan speed might be limited.
  *5: Some of the languages or character types are not supported by this laser marker. Characters written from right to left
-      such as Arabic or Hebrew, characters based on ligature such as Indian languages cannot be input.
+such as Arabic or Hebrew, characters based on ligature such as Indian languages cannot be input.
  *6: VEC is a graphic file format dedicated for the laser marker. To use AI or EPS files, convert them to VEC format with the
-      attached software “ExportVEC”.
+attached software “ExportVEC”.
  *7: Available when the optional network unit is installed to the controller.
  *8: OS versions of which Microsoft has ended support are excluded.
  *9: The frequency switches automatically.
  *10: The typical value of the inrush current at startup is as follows: (Duration time is 10ms or less.)
-       At 220V AC: 64A
+At 220V AC: 64A
  *11: Common to the controller and the head. No condensation or freezing shall be allowed. If there is a gap between the
-      stored temperature and operating temperature, make sure to have the product get used to the operating ambient
-      temperature gradually prior to use to prevent the dew condensation.
+stored temperature and operating temperature, make sure to have the product get used to the operating ambient
+temperature gradually prior to use to prevent the dew condensation.
  *12: If the laser power is corrected in system offset or other detailed settings, the allowed temperature is defined with the
-      corrected value.
+corrected value.
  *13: The controller is non-compliant with the ingress protection rating. The ingress protection characteristics of the head
-      are ensured only when the fiber unit, laser emission protection glass, cables and connector covers are installed
-      properly.
+are ensured only when the fiber unit, laser emission protection glass, cables and connector covers are installed
+properly.
 
 
 24                                                       ME-LPRF-SM-11
@@ -1106,45 +1107,45 @@ Model
 
 1-4-1 Head
 Unit: mm
-                                                     260                         (392)                        (45)
+260                         (392)                        (45)
 
-                            (1)
-
-
-                                                                                      0
-                                                                                   00
-                                                                                  R10
-                                                                                 R1
+(1)
 
 
-                                                                                                      (148)
-                            170
+   0
+  00
+ R10
+R1
 
 
-                                                                                                                            (50)
-                                                                                            0
-                                    r                                                     R8             1)
-                                                                                               (ȭ7)                  (19)
+   (148)
+170
 
 
-                                                                        y
-           t
-                            q
+   (50)
+   0
+r                                                     R8             1)
+   (ȭ7)                  (19)
 
 
-                                                           w
+   y
+t
+   q
+
+
+w
  (1)       135        (1)
 
-                                                  e
-                                                           152              20
-                                           40 40 40 40
-                                    62.2
-                       40 40
-                               37
+   e
+   152              20
+   40 40 40 40
+   62.2
+40 40
+   37
 
 
-                                  o                                     i
-                                   u         60       60
+o                                     i
+ u         60       60
 
 
  No.    Description
@@ -1160,13 +1161,13 @@ Unit: mm
   t     Laser emission port (Projecting part): φ100 mm
 
   y     Laser emission port height: (20) mm
-                                              +0.1
++0.1
   u     Head positioning pin hole: φ4 0 , depth 5
-                                                                 +0.1
++0.1
   i     Head positioning pin hole: Elongated hole φ4 0 x 5, depth 5
 
   o     Head fixing screw hole (10 holes*): M6 screw, depth 6
-        *: Fix the head with 6 or more screws at the installation.
+*: Fix the head with 6 or more screws at the installation.
 
   1)    Screw for frame ground: M4 screw, depth 5
 
@@ -1175,7 +1176,7 @@ Unit: mm
 •• For details on the head installation, refer to “2-3-2 Installation method” (P.38).
 
 
-                                                                 ME-LPRF-SM-11                                                     25
+ME-LPRF-SM-11                                                     25
 
 ---
 
@@ -1185,17 +1186,17 @@ Unit: mm
  When the fiber unit is detached from the head
  Unit: mm
 
-                                         31                                     (397)
+31                                     (397)
 
 
-                           83.5
+83.5
 
-                                  94
-                                                                                                           0
-                 69                                                                                      R8
+   94
+   0
+69                                                                                      R8
 
 
-     ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  •• For the detaching of the fiber unit, refer to “2-3-5 Detaching / attaching the fiber unit” (P.42).
 
 
@@ -1209,7 +1210,7 @@ Unit: mm
 Unit: mm
 
 
-                                        q
+q
 
 
  No.   Description
@@ -1217,7 +1218,7 @@ Unit: mm
   q    Controller fixing screw hole (4 holes): M5 screw, depth 10
 
 
-                                                      ME-LPRF-SM-11   27
+ME-LPRF-SM-11   27
 
 ---
 
@@ -1228,14 +1229,14 @@ Unit: mm
  Unit: mm
  Minimum bent radius 100mm
 
-                      ȭ
+ȭ
 
 
-                                           ȭ
+ȭ
   Signal cable
  Unit: mm
  Minimum bent radius 100mm
-                                            ȭ
+ȭ
 
 
   AC power cable: Optional item on request
@@ -1249,16 +1250,16 @@ Unit: mm
  LP-ACA12: Minimum bent radius 50mm
 
 
-                              q LP-ACA11                                     w LP-ACA12
-                              NEMA L6-15P                                   CEE Public 7-7
+q LP-ACA11                                     w LP-ACA12
+NEMA L6-15P                                   CEE Public 7-7
 
 
-         ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
   •• Be sure to connect the ground pin of the AC power cable to earth permanently.
 
-       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
   •• For the recommended AC power cable for China (rating 250V, CCC standards compatible cable), please contact our
-     sales office.
+sales office.
 
 
 28                                                      ME-LPRF-SM-11
@@ -1270,16 +1271,16 @@ Unit: mm
 1-5 Name of Each Component
 
 1-5-1 Head
-               1
+1
 
-                                                                                                                      2
-                                                                                               10                     3
+   2
+10                     3
 
 
-                                                                                                4
+4
 
-                                                                      8                 9
-                                  7 5, 6
+   8                 9
+7 5, 6
 
 
  1.   Laser radiation indicator
@@ -1366,17 +1367,17 @@ Unit: mm
  Front
 
 
-                                 4
+4
 
-                                 2
+2
 
-                                 4
+4
 
-                                                                                               6
-                                 1
+   6
+1
 
 
-                                           5                                 3
+5                                 3
 
  1.   Key switch: POWER
       The main power switch for the laser marker.
@@ -1398,30 +1399,30 @@ Unit: mm
                                                                     Warning generation: Pink
                                                                                        (5525                
 
-                                                                                     (
-                                                                              w      ,17(5/2&.LVRSHQ
+   (
+w      ,17(5/2&.LVRSHQ
 
 
-                                                                                                                     i
+i
 
 
-       No.    Description of the icons
+No.    Description of the icons
 
-        q     During the normal operation, the file number is displayed.
+q     During the normal operation, the file number is displayed.
 
-        w     When any alarm or warning has been occurred, the error information is displayed.
+w     When any alarm or warning has been occurred, the error information is displayed.
 
-        e     Indicates laser pumping is on.
+e     Indicates laser pumping is on.
 
-        r     Indicates laser marker is in remote control mode (operated by an external device).
+r     Indicates laser marker is in remote control mode (operated by an external device).
 
-        t     Tapping this icon moves to the model information (system clock information, model name, serial number,
-              and etc.) display.
+t     Tapping this icon moves to the model information (system clock information, model name, serial number,
+   and etc.) display.
 
-        y     Tapping this icon moves to the panel language selection.
+y     Tapping this icon moves to the panel language selection.
 
 
-                                                         ME-LPRF-SM-11                                                          31
+ME-LPRF-SM-11                                                          31
 
 ---
 
@@ -1448,20 +1449,20 @@ Unit: mm
 
   Rear
 
-                                                                                         10
+10
 
 
-                                       1
-                                                                                          9
-                                       2
-                                       3
+1
+   9
+2
+3
 
-                                       4
-                                       5
+4
+5
 
-                                       6
+6
 
-                                       7                                             8
+7                                             8
 
   1.   Power connector: POWER
        This is the connector for supplying the power to the head. Connect the attached unit power cable.
@@ -1534,7 +1535,7 @@ Unit: mm
 2 Laser Marker Installation
 
 
-             ME-LPRF-SM-11
+ME-LPRF-SM-11
 
 ---
 
@@ -1545,13 +1546,13 @@ Use this product in the following environments.
 
   Item                                        Installation environment conditions
   Operating ambient temperature *1            With laser power setting 46 or more: 0°C to +36°C
-                                              With laser power setting less than 46: 0°C to +40°C
+With laser power setting less than 46: 0°C to +40°C
   Operating ambient humidity *1               35 to 85%RH
   Ambient temperature for storage *1          -10°C to +60°C *2
   Protection degree                           Head: IP64 *3
 
 
-                                              Controller: non-compliant
+Controller: non-compliant
 
 
   Pollution degree                            2
@@ -1559,12 +1560,12 @@ Use this product in the following environments.
 
 *1 : No condensation or freezing shall be allowed.
 *2 : If there is a gap between the stored temperature and operating temperature, make sure to have the product get used
-     to the operating ambient temperature gradually prior to use to prevent the dew condensation.
+to the operating ambient temperature gradually prior to use to prevent the dew condensation.
 *3 : The controller is non-compliant with the ingress protection rating. The ingress protection characteristics of the head
-     are ensured only when the fiber unit, laser emission protection glass, cables and connector covers are installed properly.
+are ensured only when the fiber unit, laser emission protection glass, cables and connector covers are installed properly.
 
 
-         ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
  • Do not install this product at a place where vibrations and shocks can be directly transmitted to it.
  • Do not use this product at a place with oil mist.
  • In case this product is used in a dusty environment, take measures to prevent dust from entering into the controller, e.g.
@@ -1573,39 +1574,39 @@ Use this product in the following environments.
    maintain the air-cooling performance of the laser marker according to the ambient temperature.
 
 
-                                                                                  Panel cooler or
-                                                                                  heat exchanger
+Panel cooler or
+heat exchanger
 
 
-                                                     Storage housing image
+Storage housing image
 
  • Remove any dust and smoke from the laser emission port and laser beam path using a dust collector. For effective dust
    collection, put the suction port of the dust collector near the lasing position. In an environment where dust and smoke
    that tend to attach to the lens surface, it is recommended to create a compression air flow to ensure thorough dust collection.
-                                        Laser marker head
+Laser marker head
 
 
-                                                                                            Dust collector
-                                                           A
-                                                            B
+   Dust collector
+A
+ B
 
 
-                                                                          A
-                                                                          B
-                                                                           C
-                                                                              D
+A
+B
+ C
+   D
 
 
-                                              Compressed
-                                                                                       A
-                                                                                         B
-                                                                                           C
+Compressed
+   A
+   B
+   C
 
 
-                                              air
+air
 
 
-                                                          ME-LPRF-SM-11                                                           35
+ME-LPRF-SM-11                                                           35
 
 ---
 
@@ -1614,7 +1615,7 @@ Use this product in the following environments.
 2-2 Installation Space
  To keep the appropriate air cooling performance, provide space around the laser marker as shown in the following figure.
 
-       ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
  • To maintain the air-cooling performance of the laser marker, install both the head and controller in a well-ventilated
    place.
  • Installing near a heating element could cause the ambient temperature exceeding the specification range, which may
@@ -1622,34 +1623,34 @@ Use this product in the following environments.
 
   Head
 
-                                        50mm
-                                                                                        470mm
+50mm
+   470mm
 
 
-                             50mm
+50mm
 
-                                                         50mm
-                                  50mm
+   50mm
+50mm
 
 
   Controller
 
 
-                                                                                w
-                            50mm
+   w
+50mm
 
 
-                                    q                                                w
+q                                                w
 
-                                                                                300mm
+300mm
 
-                                  q
-                              50mm
+   q
+50mm
 
 
-                                                             50mm
-                                   150mm                                                    q Intake
-                                                                                            w Exhaust
+   50mm
+150mm                                                    q Intake
+   w Exhaust
 
 
 36                                                     ME-LPRF-SM-11
@@ -1659,11 +1660,11 @@ Use this product in the following environments.
 ## หน้า 37
 
 2-3 Head Installation
-                                           • Make sure that the power is turned OFF at installing. Failure to do so may
-                                             cause electrical shock.
-        WARNING                            • Install the product so that the laser beam path does not cross the eye height.
-                                           • The laser beam path shall be enclosed with protective enclosure and make
-                                             sure it is not exposed with direct light or reflected light.
+   • Make sure that the power is turned OFF at installing. Failure to do so may
+   cause electrical shock.
+WARNING                            • Install the product so that the laser beam path does not cross the eye height.
+   • The laser beam path shall be enclosed with protective enclosure and make
+   sure it is not exposed with direct light or reflected light.
 
 
  Carrying head part
@@ -1673,19 +1674,19 @@ Use this product in the following environments.
  • Carry this product as shown in the figure below.
 
 
-                                   Laser pointer
-                                   emission port
-                                                         Fiber unit
+Laser pointer
+emission port
+   Fiber unit
 
 
-                             Laser emission port
+Laser emission port
 
 
 2-3-1 Installation direction
 The head can be installed to up, down, left, and right directions.
 
 
-      ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
  • Do not move the head unit during the operation.
  • When the product is installed with the laser emission port facing upward, dust generated during marking may attach to
    the laser emission port, impairing marking quality and damage the product. Clean the laser emission port periodically
@@ -1693,7 +1694,7 @@ The head can be installed to up, down, left, and right directions.
  • Be sure to fix the bottom surface (the laser emission port side).
 
 
-                                                         ME-LPRF-SM-11                                                        37
+ME-LPRF-SM-11                                                        37
 
 ---
 
@@ -1701,25 +1702,25 @@ The head can be installed to up, down, left, and right directions.
 
 2-3-2 Installation method
   • Install the head on a plate with a thickness of 10 mm to 20 mm which is made of aluminum or other material with
-    radiation performance equivalent to that of aluminum.
+radiation performance equivalent to that of aluminum.
   • For details of installation, refer to “1-4-1 Head” (P.25).
   • Fix the head in the following conditions.
 
-       Fixing surface                      Fixing screw                              Screw insert length    Tightening torque
+Fixing surface                      Fixing screw                              Screw insert length    Tightening torque
 
-       Bottom (laser emission port side)   M6 screws at more than 6 positions        5 mm to 6 mm           3.0 N·m or below
-
-
-                                                                          Laser marker head                 A
-                                                                           Installation plate               B
+Bottom (laser emission port side)   M6 screws at more than 6 positions        5 mm to 6 mm           3.0 N·m or below
 
 
-                                                                                                           M6 screw
+Laser marker head                 A
+ Installation plate               B
 
-                                                                                 A : Screw insert length 5mm to 6mm
-                                                                                 B : Plate thickness + washer thickness
 
-                  M6 screw
+M6 screw
+
+A : Screw insert length 5mm to 6mm
+B : Plate thickness + washer thickness
+
+M6 screw
 
 
  Fix the bottom of head with M6 screw more than 6 positions as shown below.
@@ -1727,14 +1728,14 @@ The head can be installed to up, down, left, and right directions.
  Example of fixing positions
 
 
-                                Bottom of the head
+Bottom of the head
 
 
-         ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
   • Do not insert any screw of length exceeding the specification. Otherwise, the failure of
-    the product may be caused.
+the product may be caused.
   • A protection cap is installed on the laser emission port with shipment. Remove this
-    cap before operation. Do not screw the lens when removing the cap.
+cap before operation. Do not screw the lens when removing the cap.
 
 
 38                                                        ME-LPRF-SM-11
@@ -1747,22 +1748,22 @@ The head can be installed to up, down, left, and right directions.
   Example dimensions of plate for the head are indicated below.
   For plate thickness of 10 mm
   Unit: mm
-                             80         80
-                 䃥20         62.2                 q           10   4                  60      60
+   80         80
+䃥20         62.2                 q           10   4                  60      60
 
-                                                                                                            w
-            40
-            37
-            40
+   w
+40
+37
+40
 
 
-                                             䃥104
-                                                                       On the laser marker side
+䃥104
+   On the laser marker side
 
  No.    Description
 
  q      Head fixing hole (6 holes): φ6.6 through hole
-        You can change the position of the fixing holes depending on the intended screw holes to use.
+You can change the position of the fixing holes depending on the intended screw holes to use.
 
  w      Head positioning pin (2 pins): φ4 SUS pin, height 4
 
@@ -1773,7 +1774,7 @@ The head can be installed to up, down, left, and right directions.
   with the plate.
 
 
-                                                       ME-LPRF-SM-11                                                         39
+ME-LPRF-SM-11                                                         39
 
 ---
 
@@ -1793,19 +1794,19 @@ The head can be installed to up, down, left, and right directions.
    t Distance to center of marking field              152 mm
 
 
-                                                                    t
-                        q
-                        r                  w
+   t
+q
+r                  w
 
 
-                                e
+e
 
-        ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
   • Do not place anything in the area between the laser emission port and work pieces during the lasing operation.
   • Use anti-reflection material (ex. black paint for metal) for an external shutter or a protective enclosure in a path of laser
-    beam. It may cause a failure of the components inside the laser marker head.
+beam. It may cause a failure of the components inside the laser marker head.
   • If any other devices such as a sensor or a camera are installed near the laser marker, make sure that these devices are
-    installed in the place where laser beam and its reflected beam do not damage to them.
+installed in the place where laser beam and its reflected beam do not damage to them.
 
 
 40                                                        ME-LPRF-SM-11
@@ -1818,7 +1819,7 @@ The head can be installed to up, down, left, and right directions.
  Guide laser
 The marking position can be checked visually by using the guide function with the red laser beam.
 
-         ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
 • Use the guide display function only as the guideline. For the appropriate marking quality, fine adjust the work distance
   and setting position of the target object by checking the actual marking results.
 • When the fiber unit is removed and re-installed, the lasing position might be misaligned relative to the guide laser
@@ -1830,27 +1831,27 @@ With the guide laser the following data can be indicated.
   Display mode              Description
   Marking field             Displays the marking field frame and center lines with the guide laser.
   Marking image             Displays the setting data in the file.
-                            The object data with marking off setting is not displayed.
+The object data with marking off setting is not displayed.
   Masked objects            Displays only the data set to Marking off and enabled guide indication.
   Work distance             The guide laser shows the rough indication of the work distance (distance from the head base to
-                            the marking surface). The red point emitted in oblique and the red cross emitted perpendicularly
-                            from the head are displayed. The distance where the laser point is closest to the center of the
-                            cross represents the guide of the work distance.
+the marking surface). The red point emitted in oblique and the red cross emitted perpendicularly
+from the head are displayed. The distance where the laser point is closest to the center of the
+cross represents the guide of the work distance.
 
 
-          Marking field indication               Marking image indication                     Work distance indication
+Marking field indication               Marking image indication                     Work distance indication
 
 
-                                                                                         Where the red point is closest to
-                                                                                         the center of the cross is the rough
-                                                                                         indication of the work distance.
+Where the red point is closest to
+the center of the cross is the rough
+indication of the work distance.
 
 
-       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • For details of the guide display function, please refer to the “Laser Marker NAVI smart Operation Manual”.
 
 
-                                                         ME-LPRF-SM-11                                                           41
+ME-LPRF-SM-11                                                           41
 
 ---
 
@@ -1861,10 +1862,10 @@ With the guide laser the following data can be indicated.
  At the delivery state, the fiber unit is connected to the head.
 
 
-                                             Fiber unit
+Fiber unit
 
 
-       ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
  • The fiber cable cannot be removed from the controller side. Trying to disconnect the controller unit from the fiber cable
    forcibly may cause a failure.
  • It is recommended to connect the head and controller that have the identical serial numbers.
@@ -1877,9 +1878,9 @@ With the guide laser the following data can be indicated.
 
   Working conditions
 
-                                            • Before the detaching or attaching the fiber unit, turn off the power supply and
-         WARNING                              disconnect the AC power cable. There is a risk of exposure to the laser beam
-                                              or electrical shock.
+   • Before the detaching or attaching the fiber unit, turn off the power supply and
+WARNING                              disconnect the AC power cable. There is a risk of exposure to the laser beam
+   or electrical shock.
 
  • Avoid oil mist, dust and dirt when removing or installing the fiber unit.
 
@@ -1928,10 +1929,10 @@ With the guide laser the following data can be indicated.
 • The protection cover is a temporary item and shows no water resistance.
 
 
-                                                                                                Scanner unit protection cover
+Scanner unit protection cover
 
 
-                                                         ME-LPRF-SM-11                                                      43
+ME-LPRF-SM-11                                                      43
 
 ---
 
@@ -2007,12 +2008,12 @@ With the guide laser the following data can be indicated.
 ## หน้า 46
 
 2-4 Controller Installation
-                                               • Make sure that the power is turned OFF at installing. Failure to do so may
-                                                 cause electrical shock.
-                                               • Carry the controller unit with two persons. Lifting or carrying without
-          WARNING                                assistance may cause of injury.
-                                               • To carry this product, wear the non-slip gloves and safety shoes.
-                                               • In case it falls down, it may cause injury.
+   • Make sure that the power is turned OFF at installing. Failure to do so may
+   cause electrical shock.
+   • Carry the controller unit with two persons. Lifting or carrying without
+WARNING                                assistance may cause of injury.
+   • To carry this product, wear the non-slip gloves and safety shoes.
+   • In case it falls down, it may cause injury.
 
 
   Carrying the controller
@@ -2025,18 +2026,18 @@ With the guide laser the following data can be indicated.
   • For details of installation, refer to “1-4-3 Controller” (P.27).
   • Fix the controller in the following conditions.
 
-       Fixing surface               Fixing screw                       Screw insert length       Tightening torque
-       Bottom                       M5 screws at 4 positions           5 mm to 10 mm             2.0 N·m or below
+Fixing surface               Fixing screw                       Screw insert length       Tightening torque
+Bottom                       M5 screws at 4 positions           5 mm to 10 mm             2.0 N·m or below
 
 
-                                                                                M5 screw
+M5 screw
 
 
-         ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
   • Do not insert any screw of length exceeding the specification. Otherwise, the failure of the product may be caused.
   • Do not install the laser marker at a place where vibrations and shocks can be directly transmitted to it. In any
-    environment where effects of vibration are concerned, take measures against vibration on the product, e.g. fitting rubber
-    feet.
+environment where effects of vibration are concerned, take measures against vibration on the product, e.g. fitting rubber
+feet.
   • Do not install the controller laterally.
 
 
@@ -2047,17 +2048,17 @@ With the guide laser the following data can be indicated.
 ## หน้า 47
 
 2-5 Connecting Laser Marker
-                                             • Be sure to turn the power off before you conduct wiring or connection. Failure
-                                               to do so may cause electrical shock.
-           WARNING                           • Be sure to connect the head and controller of the laser marker which have the
-                                               same model number. Otherwise there is a risk of exposure to laser radiation
-                                               or failure.
+   • Be sure to turn the power off before you conduct wiring or connection. Failure
+   to do so may cause electrical shock.
+WARNING                           • Be sure to connect the head and controller of the laser marker which have the
+   same model number. Otherwise there is a risk of exposure to laser radiation
+   or failure.
 
 
 2-5-1 Connection of head and controller
 
 
-          ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
  • It is recommended to connect the head and controller that have the identical serial numbers.
  • For the connection of this product, use the dedicated cables attached to the product or the specified optional cables.
  • Insert the cable all the way in a straight line. Tilting and inserting the cable may cause a failure.
@@ -2066,45 +2067,45 @@ With the guide laser the following data can be indicated.
  • To ensure the ingress protection (IP64) of the head, install the attached connector covers to the cables.
 
 
-                                                      e
+e
 
-                                                                       w
-
-
-                                                                       q
-                                                      e
-                                                                      r
+w
 
 
-                          Rear of head                                                 Rear of controller
+   q
+e
+   r
+
+
+Rear of head                                                 Rear of controller
 
   No.      Cable and connector                            Connector
 
-      q    Signal cable                                   Signal connector: SIGNAL
+q    Signal cable                                   Signal connector: SIGNAL
 
-      w    Unit power cable                               Power connector: POWER
+w    Unit power cable                               Power connector: POWER
 
-      e    Connector cover                                Signal cable / Unit power cable (head side)
+e    Connector cover                                Signal cable / Unit power cable (head side)
 
-      r    I/O terminal block                             I/O terminal block connector: TERMINAL
+r    I/O terminal block                             I/O terminal block connector: TERMINAL
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • Connect the following terminals of the I/O terminal block. If any of them is not connected, the laser radiation is disabled.
    When shipped, some of these terminals are connected with a shot bar. Refer to “4-5-1 Factory default wiring” (P.101).
-      LASER STOP IN (X10)                ―     OUT COM. 1 (X12)
-      LASER STOP IN (X11)                ―     OUT COM. 1 (X12)
-      INTERLOCK 1(+) (X16)               ―     INTERLOCK 1(-) (X17)
-      INTERLOCK 2(+) (X18)               ―     INTERLOCK 2(-) (X19)
-      REMOTE INTERLOCK (X20)             ―     OUT COM. 1 (X12)
-      IN COM. 1 (X2)                     ―     Power supply *1
-      OUT COM. 1 (Y2)                    ―     Power supply *1
+LASER STOP IN (X10)                ―     OUT COM. 1 (X12)
+LASER STOP IN (X11)                ―     OUT COM. 1 (X12)
+INTERLOCK 1(+) (X16)               ―     INTERLOCK 1(-) (X17)
+INTERLOCK 2(+) (X18)               ―     INTERLOCK 2(-) (X19)
+REMOTE INTERLOCK (X20)             ―     OUT COM. 1 (X12)
+IN COM. 1 (X2)                     ―     Power supply *1
+OUT COM. 1 (Y2)                    ―     Power supply *1
 
 
 *1 : Connect IN COM. 1 (X2) and OUT COM. 1 (Y2) respectively to the power supply for input and output. Refer to “4-5-2
-     Connecting common terminals” (P.102).
+Connecting common terminals” (P.102).
 
 
-                                                          ME-LPRF-SM-11                                                         47
+ME-LPRF-SM-11                                                         47
 
 ---
 
@@ -2114,7 +2115,7 @@ With the guide laser the following data can be indicated.
  To ensure the ingress protection (IP64) of the head, install the attached connector cover to the unit power cable and signal
  cable.
 
-        ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
  • If there are signs of deterioration or damage in the gaskets of the connector covers, replace them. Replacement
    connector covers and gasket (LP-ACC10) are available on request. For purchasing them, contact our sales agency.
 
@@ -2145,10 +2146,10 @@ With the guide laser the following data can be indicated.
       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • First, connect the unit power cable and set the connector cover to it. Then, connect the signal cable.
 
-               Rear of head                                               Rear of head
+Rear of head                                               Rear of head
 
-                                                                                                Signal cable
-                                  Unit power cable
+   Signal cable
+Unit power cable
 
 
  3.    Tighten the fixing screw of the cable connector and then slide the bottom cover to the head.
@@ -2210,22 +2211,22 @@ When connecting the power supply, be sure to perform earth (grounding) properly.
 shock in case of a failure or electrical leakage. Further, it may cause malfunction of the device.
 The power supply terminal and frame ground terminal are located as indicated below.
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • The AC power cable is not included in this product. Purchase the specified optional cable or a cable with the enough
    rating capacity to fulfil the power voltage specification of this product, which is compliant with the standards in the
    country or region where it is used. For the optional cables, refer to “1-4-4 Cables” (P.28).
 
 
-                                                                           Rear of controller
-                                      Rear of head
+   Rear of controller
+Rear of head
 
 
-                                                                                                         Power terminal
-            Frame ground terminal
+   Power terminal
+Frame ground terminal
 
 
-                                           • Perform the connection of the Power Terminal with power-off state. Failure to
-          WARNING                            do so may cause electrical shock.
+   • Perform the connection of the Power Terminal with power-off state. Failure to
+WARNING                            do so may cause electrical shock.
 
 
 1.     Connect the frame ground terminal of the head to the grounding part.
@@ -2380,36 +2381,36 @@ To recover the power supply of the laser marker, turn ON the switch of the circu
   Installation of laser marker NAVI smart
   • Laser Marker NAVI smart is provided in the supplied CD-ROM “Laser Marker Smart Utility”.
   • Install the Laser Marker NAVI smart in the following environment. For details about installation, please refer to the “Laser
-    Marker NAVI smart Operation Manual”.
+Marker NAVI smart Operation Manual”.
 
-       Item                         Installation requirements
-       OS *1                        Microsoft ® Windows® 10 Pro 32bit, 64bit
-                                    Microsoft ® Windows® 8.1 Pro 32bit, 64bit
-       Free area on hard disk       512MB or more
-       CD-ROM drive *2              1 set or more
-       USB port                     USB 2.0
-       LAN *3                       10BASE-T or 100BASE-TX
-       Memory capacity              2GB or more
-       CPU                          Equivalent to or higher than Intel Core i3
-       Display resolution           1366 x 768 pixels or above
-       Display size                 10.6 inch or above
-       Others                       Pointing device such as a mouse, character input device such as a keyboard
+Item                         Installation requirements
+OS *1                        Microsoft ® Windows® 10 Pro 32bit, 64bit
+   Microsoft ® Windows® 8.1 Pro 32bit, 64bit
+Free area on hard disk       512MB or more
+CD-ROM drive *2              1 set or more
+USB port                     USB 2.0
+LAN *3                       10BASE-T or 100BASE-TX
+Memory capacity              2GB or more
+CPU                          Equivalent to or higher than Intel Core i3
+Display resolution           1366 x 768 pixels or above
+Display size                 10.6 inch or above
+Others                       Pointing device such as a mouse, character input device such as a keyboard
 
-       *1 : OS versions of which Microsoft has ended support are excluded. The CPU type, memory capacity, hard-
-            disk space, and display function required to operate each OS should be provided in accordance with the
-            recommendation of Microsoft. Laser Marker NAVI smart can be installed in English, German, Simplified Chinese
-            or Japanese. It is preferred that the OS language corresponds to the installation language. If the OS language is
-            other than these supported languages, install Laser Marker NAVI smart in English.
-       *2 : To install “Laser Marker Smart Utility” on a PC without a CD-ROM drive, copy all CD-ROM data to the PC using
-            external storage media such as a USB flash drive before installation.
-       *3 : Specifications to be observed for Ethernet connection.
+*1 : OS versions of which Microsoft has ended support are excluded. The CPU type, memory capacity, hard-
+   disk space, and display function required to operate each OS should be provided in accordance with the
+   recommendation of Microsoft. Laser Marker NAVI smart can be installed in English, German, Simplified Chinese
+   or Japanese. It is preferred that the OS language corresponds to the installation language. If the OS language is
+   other than these supported languages, install Laser Marker NAVI smart in English.
+*2 : To install “Laser Marker Smart Utility” on a PC without a CD-ROM drive, copy all CD-ROM data to the PC using
+   external storage media such as a USB flash drive before installation.
+*3 : Specifications to be observed for Ethernet connection.
 
 
-       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
   • If PC goes into “Sleep” when the laser marker and PC are connected online, the online connection between them is
-    disabled.
-    If PC goes into sleep state in the REMOTE mode or RUN mode, the PC is disconnected but the operation state of the
-    laser marker (REMOTE mode or RUN mode state) are maintained.
+disabled.
+If PC goes into sleep state in the REMOTE mode or RUN mode, the PC is disconnected but the operation state of the
+laser marker (REMOTE mode or RUN mode state) are maintained.
   • To maintain the online connection, release the sleep setting of the PC.
 
 
@@ -2437,12 +2438,12 @@ controller.
 Multiple laser markers can be connected via a USB hub,
 etc.
 
-      ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
 • Do not disconnect the USB cable when the laser marker
   is connected online.
 
 
-                                                                          PC                         Front of controller
+PC                         Front of controller
 
 
 w Ethernet connection
@@ -2459,13 +2460,13 @@ port, refer to “5-3 Ethernet” (P.131).
   devices simultaneously via a HUB or a router.
    • PC configuration software                                           PC                           Rear of controller
    • External device for communication command control
-     (PLC and PC for control)
+(PLC and PC for control)
    • Specific image checker
 • Connect the LAN cable to the port marked “LAN” on the rear of the controller. The other ports for the optional network
   unit (EtherNet/IP or PROFINET) cannot be used to operate Laser Marker NAVI smart.
 
 
-                                                       ME-LPRF-SM-11                                                       55
+ME-LPRF-SM-11                                                       55
 
 ---
 
@@ -2473,81 +2474,81 @@ port, refer to “5-3 Ethernet” (P.131).
 
 2-6 Construction of System
  The following figure shows the construction sample of the system.
-                                                                        q
-                                                                                     r          1!
+q
+   r          1!
 
-                                                                               a
+a
 
-                           w                                                                    t
-
-
-                                                                    B
-                                                                     C
-                                                                      D
+w                                                                    t
 
 
-                                                                               A
-                                                                               B
-                                                                               C
-                                                                                D
-                                               oi
+B
+ C
+  D
 
 
-                                                                                      A
-                                                                                       B
-                                                                                           C
-                                                                                            D
-                                                             uy
+   A
+   B
+   C
+   D
+oi
 
 
-                                                                                                     A
-                                                                                                     B
-                                                                                                     C
-                                                                                                      D
-                                                     e
+   A
+   B
+   C
+   D
+uy
+
+
+   A
+   B
+   C
+   D
+e
 
 
   No.      Description                                   Installation and control sample
 
-     q     Laser marker head                             -
+q     Laser marker head                             -
 
-     w     Laser marker controller                       -
+w     Laser marker controller                       -
 
-     e     PC for laser marker setting/monitoring        -
+e     PC for laser marker setting/monitoring        -
 
-     r     Protective enclosure                          -
+r     Protective enclosure                          -
 
-     t     Laser protection shutter for work piece       Construct a control system which will separate (cut off) the laser beams
-           gateway                                       or shut off the laser power when it is opened.
+t     Laser protection shutter for work piece       Construct a control system which will separate (cut off) the laser beams
+   gateway                                       or shut off the laser power when it is opened.
 
-     y     Emergency stop button                         Construct a control system for shutting off the laser power source when
-                                                         it is opened.
-     u     Safety switch
+y     Emergency stop button                         Construct a control system for shutting off the laser power source when
+   it is opened.
+u     Safety switch
 
-     i     Door for the maintenance
+i     Door for the maintenance
 
-     o     Safety relay unit or safety PLC, etc.         Connect both INTERLOCK 1 (X16, X17) and INTERLOCK 2 (X18,
-                                                         X19) of the laser marker to the devices t to i using the relay output
-                                                         terminal of the safety relay unit or the safety PLC.
-                                                         Besides INTERLOCK terminals, it can also be connected to other I/O signals
-                                                         such as LASER STOP terminals with the devices t to i depending on
-                                                         the control specifications.
+o     Safety relay unit or safety PLC, etc.         Connect both INTERLOCK 1 (X16, X17) and INTERLOCK 2 (X18,
+   X19) of the laser marker to the devices t to i using the relay output
+   terminal of the safety relay unit or the safety PLC.
+   Besides INTERLOCK terminals, it can also be connected to other I/O signals
+   such as LASER STOP terminals with the devices t to i depending on
+   the control specifications.
 
      1)    Laser radiation warning light                 To indicate the laser marker status, connect the output signals such
                                                          as ALARM OUT (Y15), LASER SUPPLY OUT (Y20) or LASING OUT
                                                          (No.40) to the light.
 
 
-     1!    Dust exhauster                                Place the intake vent of the exhauster as close as possible to the
-                                                         marking position of the work pieces.
+1!    Dust exhauster                                Place the intake vent of the exhauster as close as possible to the
+   marking position of the work pieces.
 
 
-          ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
  • INTERLOCK terminals (X16, X17 and X18, X19) are connected to the operating coil of the internal contactor in the
    controller. Connect INTERLOCK (+) and INTERLOCK (-) in the I/O terminal with the non-voltage contact (dry contact)
    such as a relay or a switch. Do not connect with the voltage contact such as a transistor.
 
-     ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • When constructing a system compatible to ISO11553-1/ISO13849-1, construct the redundant interlock system by using
    both INTERLOCK 1 (X16, X17) and INTERLOCK 2 (X18, X19) connected to safety PLC or safety relay unit to shut off the
    laser power supply in accordance with the standards.
@@ -2562,7 +2563,7 @@ port, refer to “5-3 Ethernet” (P.131).
 3 Operation Method
 
 
-           ME-LPRF-SM-11
+ME-LPRF-SM-11
 
 ---
 
@@ -2578,30 +2579,30 @@ port, refer to “5-3 Ethernet” (P.131).
  To irradiate the laser by the PC configuration software control, select the marking methods from the followings:
 
   • Test marking
-    The mode where you execute the laser radiation manually.
-    Please use this mode when you configure the marking
-    conditions at the laser marker installation or when you want
-    to irradiate the laser while editing the marking data by Laser
-    Marker NAVI smart, such as during the maintenance work.                                           PC with Laser Marker
-                                                                                                      NAVI smart installed
+The mode where you execute the laser radiation manually.
+Please use this mode when you configure the marking
+conditions at the laser marker installation or when you want
+to irradiate the laser while editing the marking data by Laser
+Marker NAVI smart, such as during the maintenance work.                                           PC with Laser Marker
+   NAVI smart installed
 
 
-                                                                                       Laser marker
+Laser marker
 
 
   • RUN mode
-    Run mode is an operation method to configure the settings of the
-    laser marker by Laser Marker NAVI smart and to control the marking
-    start signal from one of the following methods.
-     • External devices such as switches or sensors connected to I/O
-       terminal
-     • Clicking the marking start button of the Laser Marker NAVI smart
-       screen
-    Use this operation mode to configure the laser marker without using                                       Switch for
-    the external control devices as PLC.                                                                    marking trigger
+Run mode is an operation method to configure the settings of the
+laser marker by Laser Marker NAVI smart and to control the marking
+start signal from one of the following methods.
+ • External devices such as switches or sensors connected to I/O
+   terminal
+ • Clicking the marking start button of the Laser Marker NAVI smart
+   screen
+Use this operation mode to configure the laser marker without using                                       Switch for
+the external control devices as PLC.                                                                    marking trigger
 
 
-       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
   • Refer to “3-3-6 Test marking and RUN mode” (P.73).
   • You can edit marking data with Laser Marker NAVI smart even when it is not connected to the laser marker (offline).
   • For the operation method of Laser Marker NAVI smart, please refer to the “Laser Marker NAVI smart Operation Manual”.
@@ -2621,10 +2622,10 @@ port, refer to “5-3 Ethernet” (P.131).
   • Link control with image checker (Ethernet)
   • Link control with code reader (RS-232C)                                                                External control
   • Control by the optional industrial network (EtherNet/IP or                                           device such as PLC
-    PROFINET)
+PROFINET)
 
 
-       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
   • For details on the external control, refer to “3-4 Operation by External Devices” (P.75).
   • The link control with an image checker is not available at on-the-fly marking.
 
@@ -2636,13 +2637,13 @@ port, refer to “5-3 Ethernet” (P.131).
 ## หน้า 59
 
 3-2 Start-up & Termination
-                                           • It is obligated by IEC/FDA/JIS that laser products shall incorporate a key-
-                                             actuated master control. Actuation of this laser marker is basically controlled
-                                             by the key switch located on the front of the controller box. However, in
-         WARNING                             considering situations when the laser marker is operating as a part of a larger
-                                             system, the laser marker turns on if the key switch is already in ON position,
-                                             and power is supplied. In this case, be sure that the external system controls
-                                             the operation of the laser marker with a key-actuated master control.
+   • It is obligated by IEC/FDA/JIS that laser products shall incorporate a key-
+   actuated master control. Actuation of this laser marker is basically controlled
+   by the key switch located on the front of the controller box. However, in
+WARNING                             considering situations when the laser marker is operating as a part of a larger
+   system, the laser marker turns on if the key switch is already in ON position,
+   and power is supplied. In this case, be sure that the external system controls
+   the operation of the laser marker with a key-actuated master control.
 
 
 3-2-1 Start-up procedure
@@ -2744,12 +2745,12 @@ After turning on the power, the following screen is displayed until the system
 startup completes.
 
 Backlight color: White
-                                                                                        Display panel
+Display panel
 
 
-                                                                                                             Controller
+Controller
 
-       ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
 • In case the file No. is not displayed on the panel after 10 second passes or “**00FF” is displayed on the upper right side,
   contact our sales office or representatives.
 
@@ -2757,36 +2758,36 @@ Backlight color: White
 The file No. is displayed at the normal operation and error information is displayed when the alarm or the warning is
 generated.
 
-         Normal operation                            System clock display                  Model information display
+Normal operation                            System clock display                  Model information display
 
 
-         Alarm / Warning status                      Language selection
+Alarm / Warning status                      Language selection
 
 
  No.    Description
 
   q     Normal              Display contents: file No.
-        operation           Backlight color of default setting: White
+operation           Backlight color of default setting: White
 
   w     Alarm / Warning     Display contents:
-        status              • Date and time of occurrence of the error (Month/Day, Hour: minute)
-                            • Error code number
-                            • Error message
-                            Backlight color of default setting:
-                            • Alarm status: Red
-                            • Warning status: Pink
+status              • Date and time of occurrence of the error (Month/Day, Hour: minute)
+   • Error code number
+   • Error message
+   Backlight color of default setting:
+   • Alarm status: Red
+   • Warning status: Pink
 
   e     System clock        Year / Month / Day
-        display *1          Hour : Minute
+display *1          Hour : Minute
 
   r     Model               Display contents:
-        information         • Model
-        display             • Serial number (C: Controller / H: Head)
-                            • Version (C: Controller / H: Head)
-                            • Optional network *2
+information         • Model
+display             • Serial number (C: Controller / H: Head)
+   • Version (C: Controller / H: Head)
+   • Optional network *2
 
 
-                                                        ME-LPRF-SM-11                                                      61
+ME-LPRF-SM-11                                                      61
 
 ---
 
@@ -2794,27 +2795,27 @@ generated.
 
 No.         Description
 
-       t       Language             Touch the language to select. The error information is displayed in the selected language.
-               selection             • English
-                                     • Japanese
-                                     • Simplified Chinese
+t       Language             Touch the language to select. The error information is displayed in the selected language.
+   selection             • English
+   • Japanese
+   • Simplified Chinese
 
-       y                            Indicates laser pumping is on. (including the incomplete period)
+y                            Indicates laser pumping is on. (including the incomplete period)
 
-       u                            Indicates laser marker is in remote control mode (operated by an external device).
+u                            Indicates laser marker is in remote control mode (operated by an external device).
 
-       i                            Tapping this icon moves to the model information display.
+i                            Tapping this icon moves to the model information display.
 
-       o                            Tapping this icon returns to the previous display.
+o                            Tapping this icon returns to the previous display.
 
        1)                           Tapping this icon moves to the next display.
 
-       1!                           Tapping this icon moves to the panel language selection.
+1!                           Tapping this icon moves to the panel language selection.
 
  *1 : The system clock can be adjusted in system settings screen of Laser Marker NAVI smart.
  *2 : When the optional network unit is installed to the controller, the type of the network (EtherNet/IP or PROFINET), IP
-      address, and the version are displayed. If the network unit is not installed, the optional network is indicated as “None”
-      or “-----”.
+address, and the version are displayed. If the network unit is not installed, the optional network is indicated as “None”
+or “-----”.
 
 
   Settings of controller display panel
@@ -2885,35 +2886,35 @@ Marker NAVI smart.
 3-3-1 Operation procedure
  Offline editing: Operation example from offline editing to laser marker data registration
 
-                      Start up Laser Marker NAVI smart.
+Start up Laser Marker NAVI smart.
 
 
-                      Select “Offline”.
+Select “Offline”.
 
-                        • To create a new marking file: Select “New...” and select the model of the
-                          laser marking system.
-                        • To edit the existing marking file: Select “Open...” and select the file to edit.
-
-
-                      Edit the file in the “Marking settings” screen.
+• To create a new marking file: Select “New...” and select the model of the
+  laser marking system.
+• To edit the existing marking file: Select “Open...” and select the file to edit.
 
 
-                      Save the marking file to PC (local or network drive).
+Edit the file in the “Marking settings” screen.
 
 
-                      Connect online to the laser marking system.
+Save the marking file to PC (local or network drive).
 
 
-                      Add the marking file to the laser marking system.
-
-                        • In the “Marking settings” screen, select “Open” – “From PC”. Select the file
-                          to add, then select the file number as the importing destination.
-                        • In the “Data management” screen, open “Marking files” tab. In the file list,
-                          select the file number as the importing destination, then select “Add” in the
-                          ribbon and select the file to add.
+Connect online to the laser marking system.
 
 
-                                                          ME-LPRF-SM-11                                                 63
+Add the marking file to the laser marking system.
+
+• In the “Marking settings” screen, select “Open” – “From PC”. Select the file
+  to add, then select the file number as the importing destination.
+• In the “Data management” screen, open “Marking files” tab. In the file list,
+  select the file number as the importing destination, then select “Add” in the
+  ribbon and select the file to add.
+
+
+ME-LPRF-SM-11                                                 63
 
 ---
 
@@ -2921,57 +2922,57 @@ Marker NAVI smart.
 
  Online connection: Operation example from editing to marking
 
-                                         Turn on the key switch of the laser marking system.
-                                                 Start up Laser Marker NAVI smart.
+Turn on the key switch of the laser marking system.
+   Start up Laser Marker NAVI smart.
 
-          For test marking                                                                                    For RUN mode
-
-
-                                                               Select “Online”.
+For test marking                                                                                    For RUN mode
 
 
-     Select the laser marking system to connect.
+Select “Online”.
 
 
-     Select a file to edit in the “Marking settings” screen.
+Select the laser marking system to connect.
 
 
-     Edit a marking file.
+Select a file to edit in the “Marking settings” screen.
 
 
-                                                                            Save the marking file to the laser marking system.
+Edit a marking file.
 
 
-     Laser pumping ON
+Save the marking file to the laser marking system.
 
 
-     Start test marking                                                     Turn on the RUN mode.
+Laser pumping ON
 
 
-     Shutter open (automatic)
+Start test marking                                                     Turn on the RUN mode.
 
 
-                                                                            Input a marking trigger.
-
-                                                                            Turn on TRIGGER IN (X5) of the I/O terminal block
-                                                                            or click “Start marking” button of Laser Marker NAVI
-                                                                            smart.
+Shutter open (automatic)
 
 
-     Laser radiation
+Input a marking trigger.
+
+Turn on TRIGGER IN (X5) of the I/O terminal block
+or click “Start marking” button of Laser Marker NAVI
+smart.
 
 
-     Save the marking file to the laser marking system.                     Turn off the RUN mode.
+Laser radiation
 
 
-     Turn off the laser pumping.
+Save the marking file to the laser marking system.                     Turn off the RUN mode.
 
 
-     Disconnect the online connection.
+Turn off the laser pumping.
 
 
-     Turn off the key switch of the laser marking system.
-     Exit Laser Marker NAVI smart.
+Disconnect the online connection.
+
+
+Turn off the key switch of the laser marking system.
+Exit Laser Marker NAVI smart.
 
 
 64                                                              ME-LPRF-SM-11
@@ -3026,7 +3027,7 @@ Main usages:
 • Check the ON/OFF state of I/O.
 
 
-                                                            ME-LPRF-SM-11                                                      65
+ME-LPRF-SM-11                                                      65
 
 ---
 
@@ -3097,16 +3098,16 @@ Main usages:
 
       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
 ￼
-    • If PC goes into “Sleep” when the laser marker and PC are connected online, the online connection between them is
-      disabled.
-      If PC goes into sleep state in the REMOTE mode or RUN mode, the PC is disconnected but the operation state of the
-      laser marker (REMOTE mode or RUN mode state) are maintained.
-    • To maintain the online connection, release the sleep setting of the PC.
-    • If the version of using Laser Marker NAVI smart does not support the connecting laser marker model, some functions
-      and operations cannot be set or executed online.
+• If PC goes into “Sleep” when the laser marker and PC are connected online, the online connection between them is
+  disabled.
+  If PC goes into sleep state in the REMOTE mode or RUN mode, the PC is disconnected but the operation state of the
+  laser marker (REMOTE mode or RUN mode state) are maintained.
+• To maintain the online connection, release the sleep setting of the PC.
+• If the version of using Laser Marker NAVI smart does not support the connecting laser marker model, some functions
+  and operations cannot be set or executed online.
 
 
-                                                            ME-LPRF-SM-11                                                  67
+ME-LPRF-SM-11                                                  67
 
 ---
 
@@ -3166,7 +3167,7 @@ Main usages:
 ## หน้า 69
 
 3-3-4 How to disconnect online connection
-      ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
 • Disconnect the online connection before turning the laser marker power OFF.
 
 1.   Select the “Connection” tool in the ribbon or go to the “Startup” screen and select “Online”.   “Connection”
@@ -3189,7 +3190,7 @@ Main usages:
  As “Administrator” you have access to all screens and settings. As “Restricted user” the access to screens and settings is
  restricted. The parameters allowed to edit can be configured in the “System settings” screen in advance.
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • In offline mode, the user is fixed to “Administrator”.
  • The available screens of Laser Marker NAVI smart vary depending of the user role and operating mode. Refer to “3-3-2
    Screen types” (P.65).
@@ -3393,16 +3394,16 @@ Controls the laser marker from external devices such as PLC using I/O signals lo
 For details, refer to “4 External Control Using I/O” (P.81).
 
 
-                                                                        I/O terminal block
-                                                                        I/O connector
+I/O terminal block
+I/O connector
 
-                            Laser marker
-
-
-                                                                                      PLC, etc.
+Laser marker
 
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+PLC, etc.
+
+
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • To input marking trigger with I/O and configure other settings with a screen operation manually, use Run mode. For
    details, refer to “3-3-6 Test marking and RUN mode” (P.73).
  • When the optional network unit is installed to the controller, controlling the laser marker with EtherNet/IP or PROFINET
@@ -3417,15 +3418,15 @@ For details, refer to “5 External Control by Communication Commands” (P.126)
 Guide”.
 
 
-                                                                   RS-232C or
-                                                                   Ethernet
-                         Laser marker
+   RS-232C or
+   Ethernet
+Laser marker
 
-                                                                                    External control
-                                                                                        device
+External control
+   device
 
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • It is available to the external control combining I/O and communication commands.
  • For LP-RF/LP-RV series, if the optional network unit is installed to the controller, you can send the commands via
    EtherNet/IP or PROFINET.
@@ -3440,7 +3441,7 @@ For details, refer to “6 Link Control with External Devices” (P.135).
 *1 : The link control with an image checker is not available at on-the-fly marking.
 
 
-                                                       ME-LPRF-SM-11                                                          75
+ME-LPRF-SM-11                                                          75
 
 ---
 
@@ -3451,40 +3452,40 @@ For details, refer to “6 Link Control with External Devices” (P.135).
  ⿎⿎Operation example when controlling the laser marker from external control devices such as
    PLC
 
-                      Turn ON key switch of laser marker controller
+Turn ON key switch of laser marker controller
 
 
-     Remote mode ON
+Remote mode ON
 
-     Refer to “3-4-4 Remote mode settings” (P.80).
-
-
-                                                    Control by communication
-                   I/O control
-                                                           commands
+Refer to “3-4-4 Remote mode settings” (P.80).
 
 
-     Select file
+   Control by communication
+I/O control
+   commands
 
 
-     Laser pumping ON
+Select file
 
 
-     OPEN shutter                                                                     Control by using I/O or
-                                                                                      communication commands
-
-     Confirm READY OUT is ON.
-
-     The device is ready for receiving the marking starting signal (trigger).
+Laser pumping ON
 
 
-     Trigger Input ON
+OPEN shutter                                                                     Control by using I/O or
+   communication commands
+
+Confirm READY OUT is ON.
+
+The device is ready for receiving the marking starting signal (trigger).
 
 
-                                        Marking
+Trigger Input ON
 
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+Marking
+
+
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • It is available to the external control combining I/O, and communication commands.
  • You need to configure the system settings on the I/O communication in advance before using external control. Refer to
    “3-4-3 General settings before external control” (P.77).
@@ -3548,10 +3549,10 @@ settings of Laser Marker NAVI smart.
 
 8.     Select “Apply to laser marking system” on the left side of the ribbon.
                                                                                                 “Apply to laser marking
-                                                                                                system” tool
+system” tool
 
 
-                                                             ME-LPRF-SM-11                                                77
+ME-LPRF-SM-11                                                77
 
 ---
 
@@ -3664,50 +3665,50 @@ settings of Laser Marker NAVI smart.
  General settings before external control” (P.77).
 
 
-     Remote mode switching by Laser Marker NAVI smart
+Remote mode switching by Laser Marker NAVI smart
 
-       Select “Operation” in the ribbon.                                                        “Operation” tool
-       In the dialog, select “Remote ON” and select “Yes” to confirm.
-
-
-                                                                                  Remote mode ON            Remote mode OFF
+Select “Operation” in the ribbon.                                                        “Operation” tool
+In the dialog, select “Remote ON” and select “Yes” to confirm.
 
 
-     Startup the laser marker in the remote mode (Laser Marker NAVI smart can switch the remote mode)
+Remote mode ON            Remote mode OFF
 
-       When you turn ON the key switch of the laser marker, the system starts in the remote mode. Use the operation tool of
-       Laser Marker NAVI smart for releasing and resetting the remote mode.
-       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-     • If you want to start up the laser marker in the remote mode, you need to configure the settings on the system settings
-       screen of Laser Marker NAVI smart in advance.
-     • If you have configured the laser marker to start up in the remote mode, you cannot switch the remote mode from I/O.
+
+Startup the laser marker in the remote mode (Laser Marker NAVI smart can switch the remote mode)
+
+  When you turn ON the key switch of the laser marker, the system starts in the remote mode. Use the operation tool of
+  Laser Marker NAVI smart for releasing and resetting the remote mode.
+  ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• If you want to start up the laser marker in the remote mode, you need to configure the settings on the system settings
+  screen of Laser Marker NAVI smart in advance.
+• If you have configured the laser marker to start up in the remote mode, you cannot switch the remote mode from I/O.
  ￼
 
-     Remote mode switching using I/O
+Remote mode switching using I/O
 
-       Turn ON REMOTE IN (X4) of the I/O terminal block on the                                                  X1         Y1
-       controller.
-                                                                                                                X2         Y2
-                                                                           PLC, etc.
-                                                                                                                X3         Y3
-                                                                            OUTPUT
-                                                                                          REMOTE IN
-                                                                                                                X4         Y4
-                                                                                                                X5         Y5
-                                                                                                                X6         Y6
-                                                                                                                 X7        Y7
-                                                                                                              I/O terminal block
+Turn ON REMOTE IN (X4) of the I/O terminal block on the                                                  X1         Y1
+controller.
+   X2         Y2
+   PLC, etc.
+   X3         Y3
+   OUTPUT
+   REMOTE IN
+   X4         Y4
+   X5         Y5
+   X6         Y6
+   X7        Y7
+   I/O terminal block
 
-       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-     • To enable switching to the remote mode by REMOTE IN (X4) on the I/O terminal block, you need to configure the
-       settings on the system settings screen of Laser Marker NAVI smart in advance.
-     • If you have configured the remote mode switching method to the I/O terminal block, you cannot switch the remote mode
-       from the Laser Marker NAVI smart screen.
+  ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• To enable switching to the remote mode by REMOTE IN (X4) on the I/O terminal block, you need to configure the
+  settings on the system settings screen of Laser Marker NAVI smart in advance.
+• If you have configured the remote mode switching method to the I/O terminal block, you cannot switch the remote mode
+  from the Laser Marker NAVI smart screen.
 
 
-                                              • If the laser marker is set to enter the remote mode at startup or by I/O control,
-            WARNING                             construct a manual resetting system to re-pump the laser when the laser
-                                                pumping is turned to off due to an emergency stop or an interlock.
+   • If the laser marker is set to enter the remote mode at startup or by I/O control,
+WARNING                             construct a manual resetting system to re-pump the laser when the laser
+   pumping is turned to off due to an emergency stop or an interlock.
 
 
 80                                                         ME-LPRF-SM-11
@@ -3719,7 +3720,7 @@ settings of Laser Marker NAVI smart.
 4 External Control Using I/O
 
 
-            ME-LPRF-SM-11
+ME-LPRF-SM-11
 
 ---
 
@@ -3729,51 +3730,51 @@ settings of Laser Marker NAVI smart.
  The I/O terminal block and the I/O connector are available as the external control I/O interface of this product.
   • I/O terminal block: Loaded with the basic input/output to control the laser marker.
   • I/O connector: Loaded with the input/output for data configuration such as selecting a file number and the input/output
-    for the specific functions.
+for the specific functions.
 
-     ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • Before using I/O, configure the system settings. Refer to “3-4-3 General settings before external control” (P.77).
 
 
-                                               X1      Y1
-                                               X2      Y2
-                                               X3      Y3
-                                               X4      Y4
-                                                                                                           1                 2
-                                               X5      Y5
-                                               X6      Y6
-                                               X7      Y7
-                                               X8      Y8
-                                               X9      Y9
-                                               X10     Y10
-                                               X11     Y11
-                                               X12     Y12
-                                               X13     Y13
-           Hook                                X14     Y14
-     The I/O terminal block can be             X15     Y15
-                                               X16     Y16                                                39              40
-     removed by holding down the
-                                               X17     Y17
-     hooks.
-                                               X18     Y18
-                                               X19     Y19
-                                                                              Rear of controller
-                                               X20     Y20
+   X1      Y1
+   X2      Y2
+   X3      Y3
+   X4      Y4
+   1                 2
+   X5      Y5
+   X6      Y6
+   X7      Y7
+   X8      Y8
+   X9      Y9
+   X10     Y10
+   X11     Y11
+   X12     Y12
+   X13     Y13
+   Hook                                X14     Y14
+The I/O terminal block can be             X15     Y15
+   X16     Y16                                                39              40
+removed by holding down the
+   X17     Y17
+hooks.
+   X18     Y18
+   X19     Y19
+   Rear of controller
+   X20     Y20
 
-                                                                                                                I/O connector
-                                            I/O terminal block
-                                                                                                               (Laser marker)
+   I/O connector
+I/O terminal block
+   (Laser marker)
 
   Connector specifications and models
-      Connector position                  Connector specifications       Model                            Manufacturer name
-      I/O terminal      On the laser      Dedicated connector            15EDGRHCM-THR-3.5-40P-1          Degson Electronics
-      block             marker side                                                                       Co., Ltd
-                        User side                                        Accessories: 15EDGKNHG-
-                                                                         3.5-40P-14-00A
-      I/O Connector     On the laser      MIL connector                  XG4A-4034                        OMRON Corporation
-                        marker side       40-pin/male
-                        User side         MIL connector                  Accessories: XG4M-4030-T
-                                          40-pin/female
+Connector position                  Connector specifications       Model                            Manufacturer name
+I/O terminal      On the laser      Dedicated connector            15EDGRHCM-THR-3.5-40P-1          Degson Electronics
+block             marker side                                                                       Co., Ltd
+   User side                                        Accessories: 15EDGKNHG-
+   3.5-40P-14-00A
+I/O Connector     On the laser      MIL connector                  XG4A-4034                        OMRON Corporation
+   marker side       40-pin/male
+   User side         MIL connector                  Accessories: XG4M-4030-T
+   40-pin/female
 
 
   Wiring of input/output lines
@@ -3783,7 +3784,7 @@ settings of Laser Marker NAVI smart.
  core as shown in the figure.
 
 
-                                                                                                   Ferrite cores
+Ferrite cores
 
 
 82                                                           ME-LPRF-SM-11
@@ -3798,11 +3799,11 @@ The I/O terminal block is loaded with the basic input/output to control the lase
  List of signals
  No.             Name                                              No.             Name
  X1              24V OUT                                           Y1              0V OUT
-                 Internal power 24V                                                Internal power 0V
+Internal power 24V                                                Internal power 0V
  X2              IN COM. 1                                         Y2              OUT COM. 1
-                 Input common 1                                                    Output common 1
+Input common 1                                                    Output common 1
  X3              0V OUT                                            Y3              24V OUT
-                 Internal power 0V                                                 Internal power 24V
+Internal power 0V                                                 Internal power 24V
  X4              REMOTE IN                                         Y4              REMOTE OUT
  X5              TRIGGER IN                                        Y5              READY OUT
  X6              LASER SUPPLY IN                                   Y6              LASER STANDBY OUT
@@ -3812,8 +3813,8 @@ The I/O terminal block is loaded with the basic input/output to control the lase
  X10             LASER STOP IN                                     Y10             PROCESSING OUT
  X11             LASER STOP IN                                     Y11             PROCESSING END OUT
  X12             OUT COM. 1                                        Y12             PROCESSING FAIL OUT
-                 Output common 1
-                                                                   Y13             RESERVE
+Output common 1
+   Y13             RESERVE
  X13             ENCODER A IN                                                      System reservation
  X14             ENCODER B IN                                      Y14             WARNING OUT
  X15             ALARM RESET IN                                    Y15             ALARM OUT
@@ -3832,75 +3833,75 @@ The I/O terminal block is loaded with the basic input/output to control the lase
 • For details on the terminal block connection, refer to “4-5 Connecting I/O Terminal Block” (P.101).
 
 
-                                                        ME-LPRF-SM-11                                                      83
+ME-LPRF-SM-11                                                      83
 
 ---
 
 ## หน้า 84
 
  Input signal operation on the I/O terminal block
-     ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • The ON/OFF listed in this section refers to the ON/OFF operations. It does not refer to the voltage level (High/Low).
 
   No.       Name and description
 
   X1        24V OUT: Internal power (power for input/output) + 24V DC (max. output current 300mA)
-            Power to operate the laser marker independently.
-            X1 and Y3 are the common terminal connected internally.
+Power to operate the laser marker independently.
+X1 and Y3 are the common terminal connected internally.
 
-                   ワㄐㄕㄊ㄄ㄆ
-             • Make sure to use X3 or Y1 for the 0V of the internal power 24V OUT (X1 and Y3). Do not mix up with the
-               external and internal power supplies.
-             • Do not connect anything to this terminal when using the external power supply.
-             • When using the internal power supply (X1, X3, Y1, Y3), the total current of the power supply for the external
-               device and the consumption current for the I/O control should be less than 300mA.
+   ワㄐㄕㄊ㄄ㄆ
+• Make sure to use X3 or Y1 for the 0V of the internal power 24V OUT (X1 and Y3). Do not mix up with the
+  external and internal power supplies.
+• Do not connect anything to this terminal when using the external power supply.
+• When using the internal power supply (X1, X3, Y1, Y3), the total current of the power supply for the external
+  device and the consumption current for the I/O control should be less than 300mA.
 
   X2        IN COM. 1: Input common 1
-            The common terminal for each input of the I/O terminal block.
-            For NPN connection, this terminal is connected to the “+ (plus)” side of power which is used for control. For
-            PNP connection, this terminal is connected to the “- (minus)” side of power which is used for control.
-            For details, refer to “4-5-2 Connecting common terminals” (P.102).
+The common terminal for each input of the I/O terminal block.
+For NPN connection, this terminal is connected to the “+ (plus)” side of power which is used for control. For
+PNP connection, this terminal is connected to the “- (minus)” side of power which is used for control.
+For details, refer to “4-5-2 Connecting common terminals” (P.102).
 
   X3        0V OUT: Internal power (power supply for input/output) 0V
-            Power to operate the laser marker independently.
-            Y1 and X3 are the common terminal connected internally.
+Power to operate the laser marker independently.
+Y1 and X3 are the common terminal connected internally.
 
-                   ワㄐㄕㄊ㄄ㄆ
-             • Make sure to use X1 or Y3 for the internal power 0V OUT (X3 and Y1). Do not mix up with the external and
-               internal power supplies.
-             • Do not connect anything to this when using the external power supply.
+   ワㄐㄕㄊ㄄ㄆ
+• Make sure to use X1 or Y3 for the internal power 0V OUT (X3 and Y1). Do not mix up with the external and
+  internal power supplies.
+• Do not connect anything to this when using the external power supply.
 
   X4        REMOTE IN: Remote mode input
-            While the input is turned on, the laser marker operates in the remote mode which can be controlled externally
-            by I/O and communication commands.
-            To transit to the remote mode using this terminal, you will need to configure the communication setting of
-            Laser Marker NAVI smart in advance.
-            Refer to “3-4-4 Remote mode settings” (P.80).
+While the input is turned on, the laser marker operates in the remote mode which can be controlled externally
+by I/O and communication commands.
+To transit to the remote mode using this terminal, you will need to configure the communication setting of
+Laser Marker NAVI smart in advance.
+Refer to “3-4-4 Remote mode settings” (P.80).
 
   X5        TRIGGER IN: Marking trigger input
-            The signal to start marking (laser radiation). Starts marking by edge of input ON. This signal can be accepted
-            while READY OUT (Y5) is turned ON.
-            The operation behavior of TRIGGER IN signal varies depending on Trigger mode settings as follows.
-             • For marking to static object:
-                • Single trigger: One lasing operation is executed by the edge of turning on of TRIGGER IN signal.
-                • Continuous trigger: Lasing operation is repeated while TRIGGER IN signal is on.
-             • For on-the-fly marking:
-                • Single trigger: One lasing operation is executed by the edge of turning on of TRIGGER IN signal.
-                • Marking at regular intervals: Marking operation is executed at regular intervals while TRIGGER IN is ON.
-                • Multiple triggers: It allows to accept the multiple marking triggers in advance. Max. 16 triggers can be
-                  accepted while PROCESSING OUT (Y10) is ON.
+The signal to start marking (laser radiation). Starts marking by edge of input ON. This signal can be accepted
+while READY OUT (Y5) is turned ON.
+The operation behavior of TRIGGER IN signal varies depending on Trigger mode settings as follows.
+ • For marking to static object:
+   • Single trigger: One lasing operation is executed by the edge of turning on of TRIGGER IN signal.
+   • Continuous trigger: Lasing operation is repeated while TRIGGER IN signal is on.
+ • For on-the-fly marking:
+   • Single trigger: One lasing operation is executed by the edge of turning on of TRIGGER IN signal.
+   • Marking at regular intervals: Marking operation is executed at regular intervals while TRIGGER IN is ON.
+   • Multiple triggers: It allows to accept the multiple marking triggers in advance. Max. 16 triggers can be
+   accepted while PROCESSING OUT (Y10) is ON.
 
-                 ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-             • You can set the trigger mode with Laser Marker NAVI smart. For the marking to static object, it is specified
-               in “File settings” by each file. For on-the-fly marking, it is specified in “Motion settings to all files” and this
-               one setting is applied to all files.
-             • When the trigger delay time is set in the selected file, trigger processing (lasing) operation starts after the
-               delay time.
-             • When on-the-fly marking is set, lasing operation starts when the work piece comes to the preset marking
-               position after TRIGGER IN is accepted.
-             • If you are using the link control function with the image checker, the link control (a series of control
-               operations including external device operation, laser radiation, laser marker internal processing) starts by
-               the edge of input ON of TRIGGER IN. Refer to “6-1 Link Control with Image Checker” (P.136).
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• You can set the trigger mode with Laser Marker NAVI smart. For the marking to static object, it is specified
+  in “File settings” by each file. For on-the-fly marking, it is specified in “Motion settings to all files” and this
+  one setting is applied to all files.
+• When the trigger delay time is set in the selected file, trigger processing (lasing) operation starts after the
+  delay time.
+• When on-the-fly marking is set, lasing operation starts when the work piece comes to the preset marking
+  position after TRIGGER IN is accepted.
+• If you are using the link control function with the image checker, the link control (a series of control
+  operations including external device operation, laser radiation, laser marker internal processing) starts by
+  the edge of input ON of TRIGGER IN. Refer to “6-1 Link Control with Image Checker” (P.136).
 
 
 84                                                        ME-LPRF-SM-11
@@ -3912,69 +3913,69 @@ The I/O terminal block is loaded with the basic input/output to control the lase
 No.    Name and description
 
 X6     LASER SUPPLY IN: Laser pumping input
-       While this input is turned on, the laser is pumped to enable the radiation.
-       It takes approximately 7 seconds from turning on LASER SUPPLY IN to completion of laser pumping.
-       This terminal is available when the laser pumping control method is set to I/O at the system settings of Laser
-       Marker NAVI smart.
+While this input is turned on, the laser is pumped to enable the radiation.
+It takes approximately 7 seconds from turning on LASER SUPPLY IN to completion of laser pumping.
+This terminal is available when the laser pumping control method is set to I/O at the system settings of Laser
+Marker NAVI smart.
 
 X7     TARGET DETECTION IN
-       Connect a sensor which detect the work piece is in position for lasing.
-       According to the ON/OFF state of this terminal, CHECK OK OUT (No.34) or CHECK NG OUT (No.35) of I/O
-       connector turns on for one-shot pulse duration after the trigger processing (lasing) operation.
-        • When TARGET DETECTION IN (X7) turns ON for more than 1ms during lasing operation: CHECK OK
-          OUT (No.34) turns ON.
-        • When TARGET DETECTION IN (X7) did not turn ON during lasing operation: CHECK NG OUT (No.35)
-          turns ON.
-       This terminal is available when TARGET DETECTION IN (X7) is set to “Enabled” at the system settings of
-       Laser Marker NAVI smart.
+Connect a sensor which detect the work piece is in position for lasing.
+According to the ON/OFF state of this terminal, CHECK OK OUT (No.34) or CHECK NG OUT (No.35) of I/O
+connector turns on for one-shot pulse duration after the trigger processing (lasing) operation.
+ • When TARGET DETECTION IN (X7) turns ON for more than 1ms during lasing operation: CHECK OK
+   OUT (No.34) turns ON.
+ • When TARGET DETECTION IN (X7) did not turn ON during lasing operation: CHECK NG OUT (No.35)
+   turns ON.
+This terminal is available when TARGET DETECTION IN (X7) is set to “Enabled” at the system settings of
+Laser Marker NAVI smart.
 
-             ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-        • TARGET DETECTION IN is not available when you use the link control with an image checker.
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• TARGET DETECTION IN is not available when you use the link control with an image checker.
 
 
 X8     SHUTTER IN: Shutter open input
-       While this input is turned on, the internal shutter opens. The control of this terminal is enabled when
-       SHUTTER ENABLE IN (X9) is ON.
-       There is a delay time of around 200ms to max. 1 second from turning ON/OFF of SHUTTER IN for the actual
-       shutter open / close operation time.
-       This terminal is available when the shutter open/close control method is set to I/O at the system settings of
-       Laser Marker NAVI smart.
+While this input is turned on, the internal shutter opens. The control of this terminal is enabled when
+SHUTTER ENABLE IN (X9) is ON.
+There is a delay time of around 200ms to max. 1 second from turning ON/OFF of SHUTTER IN for the actual
+shutter open / close operation time.
+This terminal is available when the shutter open/close control method is set to I/O at the system settings of
+Laser Marker NAVI smart.
 
 
 X9     SHUTTER ENABLE IN: Shutter open enable input
-       Control by SHUTTER IN (X8) is available while SHUTTER ENABLE IN is turned ON. To control opening and
-       closing the shutter by SHUTTER IN (X8) only, short-circuit SHUTTER ENABLE IN (X9) and OUT COM.1 (Y2
-       or X12).
+Control by SHUTTER IN (X8) is available while SHUTTER ENABLE IN is turned ON. To control opening and
+closing the shutter by SHUTTER IN (X8) only, short-circuit SHUTTER ENABLE IN (X9) and OUT COM.1 (Y2
+or X12).
 
-                                     • Do not use SHUTTER IN (X8) and SHUTTER ENABLE IN (X9) as an
-      WARNING                          emergency stop or the interlock. Turning OFF these terminals during laser
-                                       radiation will not close the shutter until the marking completes.
+   • Do not use SHUTTER IN (X8) and SHUTTER ENABLE IN (X9) as an
+WARNING                          emergency stop or the interlock. Turning OFF these terminals during laser
+   radiation will not close the shutter until the marking completes.
 
 
 X10    LASER STOP IN
 X11    LASER STOP IN
-       Use these terminals when you want to stop the laser radiation or disable the laser radiation temporarily.
-       When between LASER STOP IN and OUT COM. 1 is disconnected, the laser radiation will be disabled.
-       The laser marker operation varies depending on its condition as shown below. For details, refer to “Laser
-       marker operation when functions for safety measures are input” (P.90).
-             Terminal connection   Status when the terminal is open           Shutter         Laser pumping
-             LASER STOP IN -             Laser is not radiating               Close              Hold ON
-               OUT COM.1                  Radiating the laser                 Close                OFF
+Use these terminals when you want to stop the laser radiation or disable the laser radiation temporarily.
+When between LASER STOP IN and OUT COM. 1 is disconnected, the laser radiation will be disabled.
+The laser marker operation varies depending on its condition as shown below. For details, refer to “Laser
+marker operation when functions for safety measures are input” (P.90).
+   Terminal connection   Status when the terminal is open           Shutter         Laser pumping
+   LASER STOP IN -             Laser is not radiating               Close              Hold ON
+   OUT COM.1                  Radiating the laser                 Close                OFF
 
-             ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-        • The function relating to safety must be shut off mechanically. Therefore, wire these terminal at no-voltage
-          contact (dry contact).
-        • If you need to shut off the laser pumping physically, user INTERLOCK 1 (X16, X17) and INTERLOCK 2 (X18,
-          X19) instead of these terminals.
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• The function relating to safety must be shut off mechanically. Therefore, wire these terminal at no-voltage
+  contact (dry contact).
+• If you need to shut off the laser pumping physically, user INTERLOCK 1 (X16, X17) and INTERLOCK 2 (X18,
+  X19) instead of these terminals.
 
 X12    OUT COM. 1: Output common 1
-       The common terminal for each output of the I/O terminal block. X12 and Y2 are the common terminal
-       connected internally.
-       For NPN connection, this terminal is connected to the “- (minus)” side of power which is used for control. For
-       PNP connection, this terminal is connected to the “+ (plus)” side of power which is used for control.
+The common terminal for each output of the I/O terminal block. X12 and Y2 are the common terminal
+connected internally.
+For NPN connection, this terminal is connected to the “- (minus)” side of power which is used for control. For
+PNP connection, this terminal is connected to the “+ (plus)” side of power which is used for control.
 
 
-                                                   ME-LPRF-SM-11                                                        85
+ME-LPRF-SM-11                                                        85
 
 ---
 
@@ -3984,61 +3985,61 @@ No.   Name and description
 
  X13   ENCODER A IN
  X14   ENCODER B IN
-       Input the signals from an encoder or two sensors which detect the line speed for on-the-fly marking.
-       When using an encoder, input A-phase to ENCODER A IN (X13) and B-phase to ENCODER B IN (X14). Up
-       to 100kHz can be input respectively. If only one phase is used, connect the encoder signal to ENCODER A IN
-       (X13) and connect ENCODER B IN (X14) to IN COM. 1 (X2).
-       When using two sensors for measuring the line speed, connect the upward sensor to ENCODER A IN (X13),
-       and connect the downward sensor to ENCODER B IN (X14).
+Input the signals from an encoder or two sensors which detect the line speed for on-the-fly marking.
+When using an encoder, input A-phase to ENCODER A IN (X13) and B-phase to ENCODER B IN (X14). Up
+to 100kHz can be input respectively. If only one phase is used, connect the encoder signal to ENCODER A IN
+(X13) and connect ENCODER B IN (X14) to IN COM. 1 (X2).
+When using two sensors for measuring the line speed, connect the upward sensor to ENCODER A IN (X13),
+and connect the downward sensor to ENCODER B IN (X14).
 
 
  X15   ALARM RESET IN
-       The reset input for restoring the system from the alarm status.
-       Make sure to verify the safety by eliminating the alarm causes before turning this input ON.
-       The errors you can restore by using this terminal are as follows:
-        • E400 to E499
-        • E500 to E599
-       For the alarms you are unable to reset such as the ones caused by hardware or system error, restart the laser
-       marker.
+The reset input for restoring the system from the alarm status.
+Make sure to verify the safety by eliminating the alarm causes before turning this input ON.
+The errors you can restore by using this terminal are as follows:
+ • E400 to E499
+ • E500 to E599
+For the alarms you are unable to reset such as the ones caused by hardware or system error, restart the laser
+marker.
 
  X16   INTERLOCK 1(+)
  X17   INTERLOCK 1(-)
  X18   INTERLOCK 2(+)
  X19   INTERLOCK 2(-)
-       The terminal used as the interlock, which is connected to the door or switches of the safety device.
-       When the connection between INTERLOCK (+) and INTERLOCK (-) is opened, the shutter is closed and the
-       laser pumping is turned OFF physically. For details, refer to “Laser marker operation when functions for safety
-       measures are input” (P.90).
-       To enable the laser radiation, connect INTERLOCK (+) and INTERLOCK (-) with the non-voltage contact (dry
-       contact) such as a relay or a switch.
-       Using both INTERLOCK 1 and INTERLOCK 2 with a safety relay unit, the safety designed system with the
-       double-circuit of the interlock can be constructed.
-              INTERLOCK connection                Shutter          Laser pumping
-                  X16 - X17: Open
-                                                  Close                  OFF
-                  X18 - X19: Open
+The terminal used as the interlock, which is connected to the door or switches of the safety device.
+When the connection between INTERLOCK (+) and INTERLOCK (-) is opened, the shutter is closed and the
+laser pumping is turned OFF physically. For details, refer to “Laser marker operation when functions for safety
+measures are input” (P.90).
+To enable the laser radiation, connect INTERLOCK (+) and INTERLOCK (-) with the non-voltage contact (dry
+contact) such as a relay or a switch.
+Using both INTERLOCK 1 and INTERLOCK 2 with a safety relay unit, the safety designed system with the
+double-circuit of the interlock can be constructed.
+   INTERLOCK connection                Shutter          Laser pumping
+   X16 - X17: Open
+   Close                  OFF
+   X18 - X19: Open
 
-               ワㄐㄕㄊ㄄ㄆ
-        • INTERLOCK terminals (X16, X17 and X18, X19) are connected to the operating coil of the internal contactor
-          in the controller. Connect INTERLOCK (+) and INTERLOCK (-) with the non-voltage contact (dry contact)
-          such as a relay or a switch. Do not connect with the voltage contact such as a transistor.
+   ワㄐㄕㄊ㄄ㄆ
+• INTERLOCK terminals (X16, X17 and X18, X19) are connected to the operating coil of the internal contactor
+  in the controller. Connect INTERLOCK (+) and INTERLOCK (-) with the non-voltage contact (dry contact)
+  such as a relay or a switch. Do not connect with the voltage contact such as a transistor.
 
 
-             ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-        • Between INTERLOCK(+) and INTERLOCK(-) are wired by a short bar for the shipment.
-        • For the connection of INTERLOCK terminals (X16, X17 and X18, X19), refer to “2-6 Construction of System”
-          (P.56) and “4-5-4 Connection example of interlock terminals and laser stop terminals” (P.103).
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• Between INTERLOCK(+) and INTERLOCK(-) are wired by a short bar for the shipment.
+• For the connection of INTERLOCK terminals (X16, X17 and X18, X19), refer to “2-6 Construction of System”
+  (P.56) and “4-5-4 Connection example of interlock terminals and laser stop terminals” (P.103).
 
  X20   REMOTE INTERLOCK IN
-       Use this terminal when you want to stop the laser radiation or disable the laser radiation temporarily.
-       When between REMOTE INTERLOCK IN (X20) and OUT COM. 1 is disconnected, the internal shutter is
-       closed and laser pumping is turned to off. For details, refer to “Laser marker operation when functions for
-       safety measures are input” (P.90).
-       This terminal can be used as the “Remote interlock connector” required by IEC 60825-1.
+Use this terminal when you want to stop the laser radiation or disable the laser radiation temporarily.
+When between REMOTE INTERLOCK IN (X20) and OUT COM. 1 is disconnected, the internal shutter is
+closed and laser pumping is turned to off. For details, refer to “Laser marker operation when functions for
+safety measures are input” (P.90).
+This terminal can be used as the “Remote interlock connector” required by IEC 60825-1.
 
-             ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-        • If you need to shut off the laser pumping physically, user INTERLOCK 1 (X16, X17) and INTERLOCK 2 (X18,
-          X19) instead of this terminal.
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• If you need to shut off the laser pumping physically, user INTERLOCK 1 (X16, X17) and INTERLOCK 2 (X18,
+  X19) instead of this terminal.
 
 
 86                                                ME-LPRF-SM-11
@@ -4053,58 +4054,58 @@ No.   Name and description
 
  No.       Name and description
  Y1        0V OUT: Internal power (power supply for input/output) 0V
-           Power to operate the laser marker independently.
-           Y1 and X3 are the common terminal connected internally.
+Power to operate the laser marker independently.
+Y1 and X3 are the common terminal connected internally.
 
-                  ワㄐㄕㄊ㄄ㄆ
-            • Make sure to use X1 or Y3 for the internal power 0V OUT (X3 and Y1). Do not mix up with the external and
-              internal power supplies.
-            • Do not connect anything to this when using the external power supply.
+   ワㄐㄕㄊ㄄ㄆ
+• Make sure to use X1 or Y3 for the internal power 0V OUT (X3 and Y1). Do not mix up with the external and
+  internal power supplies.
+• Do not connect anything to this when using the external power supply.
  Y2        OUT COM. 1: Output common 1
-           The common terminal for each output of the I/O terminal block. X12 and Y2 are the common terminal
-           connected internally.
-           For NPN connection, this terminal is connected to the “- (minus)” side of power which is used for control. For
-           PNP connection, this terminal is connected to the “+ (plus)” side of power which is used for control.
-           For details, refer to “4-5-2 Connecting common terminals” (P.102).
+The common terminal for each output of the I/O terminal block. X12 and Y2 are the common terminal
+connected internally.
+For NPN connection, this terminal is connected to the “- (minus)” side of power which is used for control. For
+PNP connection, this terminal is connected to the “+ (plus)” side of power which is used for control.
+For details, refer to “4-5-2 Connecting common terminals” (P.102).
  Y3        24V OUT: Internal power (power for input/output) + 24V DC (max. output current 300mA)
-           Power to operate the laser marker independently.
-           X1 and Y3 are the common terminal connected internally.
+Power to operate the laser marker independently.
+X1 and Y3 are the common terminal connected internally.
 
-                  ワㄐㄕㄊ㄄ㄆ
-            • Make sure to use X3 or Y1 for the 0V of the internal power 24V OUT (X1 and Y3). Do not mix up with the
-              external and internal power supplies.
-            • Do not connect anything to this when using the external power supply.
-            • When using the internal power supply (X1, X3, Y1, Y3), the total current of the power supply for the external
-              device and the consumption current for the I/O control should be less than 300mA.
+   ワㄐㄕㄊ㄄ㄆ
+• Make sure to use X3 or Y1 for the 0V of the internal power 24V OUT (X1 and Y3). Do not mix up with the
+  external and internal power supplies.
+• Do not connect anything to this when using the external power supply.
+• When using the internal power supply (X1, X3, Y1, Y3), the total current of the power supply for the external
+  device and the consumption current for the I/O control should be less than 300mA.
  Y4        REMOTE OUT: Remote mode output
-           The output is ON during the remote mode.
-           Make sure that this terminal is turned ON and start the external control by I/O or communication commands.
+The output is ON during the remote mode.
+Make sure that this terminal is turned ON and start the external control by I/O or communication commands.
  Y5        READY OUT: Marking trigger ready output
-           When TRIGGER IN (X5) becomes acceptable (the laser radiation becomes ready), this output turns ON.
-           To turn on READY OUT, the following conditions are required:
-            • No error has occurred (Except E700 to E799)
-            • Not in trigger processing operation (Except the multiple triggers of on-the-fly marking)
-            • Laser pumping has completed
-            • Internal shutter is open
-            • The file number switching process has completed
-            • With the file using “registered characters via I/O” or “external offset function”, the data number and SET IN
-              (No.2) of I/O signals have been input.
-            • With the file using “characters specified by SIN command” or external offset function with “Using SEO
-              command”, SIN or SEO command has been sent.
-            • When the command reception permission (MKM command) is used, the reception permission state is
-              turned OFF.
+When TRIGGER IN (X5) becomes acceptable (the laser radiation becomes ready), this output turns ON.
+To turn on READY OUT, the following conditions are required:
+ • No error has occurred (Except E700 to E799)
+ • Not in trigger processing operation (Except the multiple triggers of on-the-fly marking)
+ • Laser pumping has completed
+ • Internal shutter is open
+ • The file number switching process has completed
+ • With the file using “registered characters via I/O” or “external offset function”, the data number and SET IN
+   (No.2) of I/O signals have been input.
+ • With the file using “characters specified by SIN command” or external offset function with “Using SEO
+   command”, SIN or SEO command has been sent.
+ • When the command reception permission (MKM command) is used, the reception permission state is
+   turned OFF.
  Y6        LASER STANDBY OUT: Laser pumping completion output
-           The output is ON after the laser pumping completes and until the laser pumping turns OFF.
-           The output turns ON approximately 7 seconds after the laser pumping started.
+The output is ON after the laser pumping completes and until the laser pumping turns OFF.
+The output turns ON approximately 7 seconds after the laser pumping started.
 
 
  Y7        SYSTEM STANDBY OUT: System startup completed output
-           After the laser marker is turned ON, the output remains turned ON during the time since the system startup
-           has completed until the power is turned OFF.
-           Output ON in approximately 10 seconds after key switch is turned ON.
+After the laser marker is turned ON, the output remains turned ON during the time since the system startup
+has completed until the power is turned OFF.
+Output ON in approximately 10 seconds after key switch is turned ON.
 
 
-                                                       ME-LPRF-SM-11                                                          87
+ME-LPRF-SM-11                                                          87
 
 ---
 
@@ -4113,53 +4114,53 @@ No.   Name and description
 No.   Name and description
  Y8    SHUTTER CLOSE 1 OUT
  Y9    SHUTTER CLOSE 2 OUT
-       Output ON during internal shutter of the head is closed.
-       Two sensors mounted inside of the head detect the shutter status and output them as SHUTTER CLOSE 1
-       OUT and SHUTTER CLOSE 2 OUT respectively.
-       Connect these signals to the external safety control unit to ensure the shutter status of the laser system.
-       SHUTTER CLOSE 1 OUT and SHUTTER CLOSE 2 OUT will be output by the same operation, but their
-       output timing has a margin of error.
-       There is a delay time of around 200ms to max. 1 second from turning ON/OFF of SHUTTER IN (X8) to turning
-       ON/OFF of SHUTTER CLOSE 1 OUT (Y8) and SHUTTER CLOSE 2 OUT (Y9).
+Output ON during internal shutter of the head is closed.
+Two sensors mounted inside of the head detect the shutter status and output them as SHUTTER CLOSE 1
+OUT and SHUTTER CLOSE 2 OUT respectively.
+Connect these signals to the external safety control unit to ensure the shutter status of the laser system.
+SHUTTER CLOSE 1 OUT and SHUTTER CLOSE 2 OUT will be output by the same operation, but their
+output timing has a margin of error.
+There is a delay time of around 200ms to max. 1 second from turning ON/OFF of SHUTTER IN (X8) to turning
+ON/OFF of SHUTTER CLOSE 1 OUT (Y8) and SHUTTER CLOSE 2 OUT (Y9).
 
-             ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-        • To confirm the shutter open status, use SHUTTER OPEN OUT (No.39) on the I/O connector.
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• To confirm the shutter open status, use SHUTTER OPEN OUT (No.39) on the I/O connector.
 
 
  Y10   PROCESSING OUT: Trigger processing output
-       When TRIGGER IN (X5) is accepted, this terminal turns ON. The output time of PROCESSING OUT (Y10)
-       includes the trigger delay time, marking preparation time, laser radiation time, and processing time after
-       marking has completed.
-       In case the trigger processing time is shorter than the set one-shot pulse duration, the trigger processing
-       output remains ON until the one-shot output time ends. *1
+When TRIGGER IN (X5) is accepted, this terminal turns ON. The output time of PROCESSING OUT (Y10)
+includes the trigger delay time, marking preparation time, laser radiation time, and processing time after
+marking has completed.
+In case the trigger processing time is shorter than the set one-shot pulse duration, the trigger processing
+output remains ON until the one-shot output time ends. *1
 
-             ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-        • If you are not using the link control function with the image checker, output time of PROCESSING OUT (Y10)
-          is almost the same as the total duration of the trigger delay time and LASING OUT (No.40).
-        • When on-the-fly marking with multiple triggers is set, PROCESSING OUT (Y10) remains ON until the all
-          trigger processing operation has been completed.
-        • If you are using the link function with external devices, output time of PROCESSING OUT (Y10) includes
-          operation time of the external device, laser radiation time, and internal processing time of the laser marker.
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• If you are not using the link control function with the image checker, output time of PROCESSING OUT (Y10)
+  is almost the same as the total duration of the trigger delay time and LASING OUT (No.40).
+• When on-the-fly marking with multiple triggers is set, PROCESSING OUT (Y10) remains ON until the all
+  trigger processing operation has been completed.
+• If you are using the link function with external devices, output time of PROCESSING OUT (Y10) includes
+  operation time of the external device, laser radiation time, and internal processing time of the laser marker.
  Y11   PROCESSING END OUT: Trigger processing completed output
-       Output ON when the input marking trigger processing (such as laser radiation) is completed. You can use this
-       output for confirmation of the marking completion.
-       This is One-shot output. *1
+Output ON when the input marking trigger processing (such as laser radiation) is completed. You can use this
+output for confirmation of the marking completion.
+This is One-shot output. *1
  Y12   PROCESSING FAIL OUT: Trigger processing abnormal end output
-       Output ON when the input marking trigger processing (such as laser radiation) did not end normally.
-       This will be output when the trigger processing operation including marking was stopped by an alarm or a
-       warning during the trigger processing. This is One-shot output. *1
+Output ON when the input marking trigger processing (such as laser radiation) did not end normally.
+This will be output when the trigger processing operation including marking was stopped by an alarm or a
+warning during the trigger processing. This is One-shot output. *1
 
-               ワㄐㄕㄊ㄄ㄆ
-        • PROCESSING END OUT (Y11) and PROCESSING FAIL OUT (Y12) indicate that the marking processing
-          has ended. They do not mean whether the marking quality is normal or abnormal.
+   ワㄐㄕㄊ㄄ㄆ
+• PROCESSING END OUT (Y11) and PROCESSING FAIL OUT (Y12) indicate that the marking processing
+  has ended. They do not mean whether the marking quality is normal or abnormal.
  Y13   RESERVE: System reservation
-       Do not connect externally.
+Do not connect externally.
  Y14   WARNING OUT
-       Output OFF at warning occurrence.
-       Refer to “Error Indication” (P.201) for contents of warning.
+Output OFF at warning occurrence.
+Refer to “Error Indication” (P.201) for contents of warning.
  Y15   ALARM OUT
-       Output OFF at alarm occurrence. When an alarm occurs, laser pumping turns OFF.
-       Refer to “Error Indication” (P.201) for contents of alarm.
+Output OFF at alarm occurrence. When an alarm occurs, laser pumping turns OFF.
+Refer to “Error Indication” (P.201) for contents of alarm.
 
 
 88                                                  ME-LPRF-SM-11
@@ -4173,42 +4174,42 @@ No.        Name and description
  Y17        INTERLOCK 1 MONITOR COM.: Interlock 1 monitoring common
  Y18        INTERLOCK 2 MONITOR: Interlock 2 monitoring
  Y19        INTERLOCK 2 MONITOR COM.: Interlock 2 monitoring common
-            INTERLOCK 1 MONITOR (Y16 - Y17) monitors the contact status of INTERLOCK 1 (X16 - X17). INTERLOCK
-            2 MONITOR (Y18 - Y19) monitors the contact status of INTERLOCK 2 (X18 - X19). For details, refer to “4-4-3
-            Interlock terminal rating and I/O circuit” (P.100).
-                    State of INTERLOCK terminals            Operation of INTERLOCK MONITOR terminals
-                          X16 - X17: OPEN                                  Y16 - Y17: CLOSE
-                  X16 - X17: CLOSE (Short-circuited)                        Y16 - Y17: OPEN
-                          X18 - X19: OPEN                                  Y18 - Y19: CLOSE
-                  X18 - X19: CLOSE (Short-circuited)                        Y18 - Y19: OPEN
-            Interlock monitor is switched open and closed with a delay of approx. 50ms with reference to each interlock
-            input as shown below.
-                                                                         CLOSE
-                                      INTERLOCK(+) - INTERLOCK(-)
-                                             (X16 - X17, X18 - X19)
-                                                                         OPEN
-                                                                                              50ms                    50ms
-                                                                         CLOSE
-             INTERLOCK MONITOR - INTERLOCK MONITOR COM.
-                                       (Y16 - Y17, Y18 - Y19)
-                                                                         OPEN
+INTERLOCK 1 MONITOR (Y16 - Y17) monitors the contact status of INTERLOCK 1 (X16 - X17). INTERLOCK
+2 MONITOR (Y18 - Y19) monitors the contact status of INTERLOCK 2 (X18 - X19). For details, refer to “4-4-3
+Interlock terminal rating and I/O circuit” (P.100).
+   State of INTERLOCK terminals            Operation of INTERLOCK MONITOR terminals
+   X16 - X17: OPEN                                  Y16 - Y17: CLOSE
+   X16 - X17: CLOSE (Short-circuited)                        Y16 - Y17: OPEN
+   X18 - X19: OPEN                                  Y18 - Y19: CLOSE
+   X18 - X19: CLOSE (Short-circuited)                        Y18 - Y19: OPEN
+Interlock monitor is switched open and closed with a delay of approx. 50ms with reference to each interlock
+input as shown below.
+   CLOSE
+   INTERLOCK(+) - INTERLOCK(-)
+   (X16 - X17, X18 - X19)
+   OPEN
+   50ms                    50ms
+   CLOSE
+ INTERLOCK MONITOR - INTERLOCK MONITOR COM.
+   (Y16 - Y17, Y18 - Y19)
+   OPEN
 
 
  Y20        LASER SUPPLY OUT
-            Output ON during LASER SUPPLY IN (X6) is ON including the preparing time of the laser pumping.
-            To show the on/off state of the laser supply by using the external warning light or other indicator, connect this
-            terminal to them.
+Output ON during LASER SUPPLY IN (X6) is ON including the preparing time of the laser pumping.
+To show the on/off state of the laser supply by using the external warning light or other indicator, connect this
+terminal to them.
 
-                  ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-             • Use LASER STANDBY OUT (Y6) for the confirmation of laser pumping completion.
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• Use LASER STANDBY OUT (Y6) for the confirmation of laser pumping completion.
 
 
 *1 : Set the output time of the one-shot output on the system settings screen of Laser Marker NAVI smart. The setting
-     range is 2 to 510ms. The initial setting value is 40ms. One-shot output time has a small margin of error for the setting
-     value.
+range is 2 to 510ms. The initial setting value is 40ms. One-shot output time has a small margin of error for the setting
+value.
 
 
-                                                        ME-LPRF-SM-11                                                           89
+ME-LPRF-SM-11                                                           89
 
 ---
 
@@ -4222,32 +4223,32 @@ No.        Name and description
   Safety function                      Laser marker operation                Release method              Remarks
   INTERLOCK 1 (X16, X17)                • Laser Pumping: OFF                 Close both                  The power supply of
   INTERLOCK 2 (X18, X19)                • Internal Shutter: CLOSE            INTERLOCK 1 and             laser source is shut
-                                        • Status: Alarm E400, E401 *1        INTERLOCK 2                 down by the contactor
-                                                                             connections                 operation (hardware
-                                                                             respectively and input      control).
-                                                                             alarm reset.
+• Status: Alarm E400, E401 *1        INTERLOCK 2                 down by the contactor
+   connections                 operation (hardware
+   respectively and input      control).
+   alarm reset.
 
 
   LASER STOP IN (X10, X11)             Opened during laser emission          Close LASER STOP IN         The power supply of
-                                       • Laser Pumping: OFF                  connection and input        laser source is shut
-                                       • Internal Shutter: CLOSE             alarm reset.                down through the
-                                       • Status: Alarm E402                                              internal circuit by the
-                                                                                                         software control.
-                                       Opened at non-emitting with           Close LASER STOP IN
-                                       opened shutter                        connection.
-                                        • Laser Pumping: Hold ON
-                                        • Internal Shutter: CLOSE
-                                        • Status: Warning E600
+• Laser Pumping: OFF                  connection and input        laser source is shut
+• Internal Shutter: CLOSE             alarm reset.                down through the
+• Status: Alarm E402                                              internal circuit by the
+   software control.
+Opened at non-emitting with           Close LASER STOP IN
+opened shutter                        connection.
+ • Laser Pumping: Hold ON
+ • Internal Shutter: CLOSE
+ • Status: Warning E600
   REMOTE INTERLOCK IN (X20)             • Laser Pumping: OFF                 Close REMOTE
-                                        • Internal Shutter: CLOSE            INTERLOCK IN
-                                        • Status: Alarm E405, E503 *1        connection and input
-                                                                             alarm reset.
+• Internal Shutter: CLOSE            INTERLOCK IN
+• Status: Alarm E405, E503 *1        connection and input
+   alarm reset.
 
 
  *1 : The error will not occur if the shutter is closed (laser is not radiating) with the PC configuration software control
-      enabled.
+enabled.
 
-     ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • For the alarm of the interlock functions controlled by I/O signals REMOTE INTERLOCK IN, INTERLOCK 1 and
    INTERLOCK 2, you can select when an alarm should be detected from “Activate always under remote mode” or
    “Deactivate while shutter closed”. Configure it in “System settings” > “Operation/information” > “INTERLOCK alarm
@@ -4267,7 +4268,7 @@ specific functions.
  List of signals
  No.        Name                                                 No.        Name
  1          IN COM. 2                                            27         OUT COM. 2
-            Input common 2                                                  Output common 2
+Input common 2                                                  Output common 2
  2          SET IN                                               28         SET OK OUT
  3          D0 IN                                                29         DATE GAP OUT
  4          D1 IN                                                30         COUNT END A OUT
@@ -4280,9 +4281,9 @@ specific functions.
  11         D8 IN                                                37         SCRIPTING OUT
  12         D9 IN                                                38         DATA WAIT OUT
  13         D10 IN
-                                                                 39         SHUTTER OPEN OUT
+39         SHUTTER OPEN OUT
  14         D11 IN
-                                                                 40         LASING OUT
+40         LASING OUT
  15         D12 IN
  16         D13 IN
  17         D14 IN
@@ -4292,14 +4293,14 @@ specific functions.
  21         SELECT 2 IN
  22         TIME HOLD IN
  23         GUIDE IN
-            Guide laser radiation input
+Guide laser radiation input
 
  24         TIMING IN
  25         RESERVE
  26         System reservation
 
 
-     ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
 • IN COM. 1, OUT COM. 1 of the I/O terminal block and IN COM. 2, OUT COM. 2 of the I/O connector are independent.
   If you use the I/O connector terminal, connect input common/output common of the I/O terminal block and the I/O
   connector to power supply respectively.
@@ -4307,65 +4308,65 @@ specific functions.
 • For the pin arrangement of the I/O connector, refer to “4-1 I/O Interface Specification” (P.82).
 
 
-                                                       ME-LPRF-SM-11                                                         91
+ME-LPRF-SM-11                                                         91
 
 ---
 
 ## หน้า 92
 
  Input signal operation on the I/O connector
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • The ON/OFF listed in this section refers to the ON/OFF operations. It does not refer to the voltage level (High/Low).
 
   No.        Name and description
   1          IN COM. 2: Input common 2
-             The common terminal for each input of the I/O connector.
-             For NPN connection, this terminal is connected to the “+ (plus)” side of power which is used for control. For
-             PNP connection, this terminal is connected to the “- (minus)” side of power which is used for control.
+The common terminal for each input of the I/O connector.
+For NPN connection, this terminal is connected to the “+ (plus)” side of power which is used for control. For
+PNP connection, this terminal is connected to the “- (minus)” side of power which is used for control.
 
-                  ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-              • IN COM. 1, OUT COM. 1 of the I/O terminal block and IN COM. 2, OUT COM. 2 of the I/O connector are
-                independent.
-                If you use the I/O connector terminal, connect input common/output common of the I/O terminal block and
-                the I/O connector to power supply respectively.
-              • For details on the connection, refer to “4-5-2 Connecting common terminals” (P.102).
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• IN COM. 1, OUT COM. 1 of the I/O terminal block and IN COM. 2, OUT COM. 2 of the I/O connector are
+  independent.
+  If you use the I/O connector terminal, connect input common/output common of the I/O terminal block and
+  the I/O connector to power supply respectively.
+• For details on the connection, refer to “4-5-2 Connecting common terminals” (P.102).
 
   2          SET IN
-             Turn ON this signal when executing the input of D0 IN to D15 IN (No.3 to 18) and SELECT 0 IN to SELECT 2
-             IN (No.19 to 21).
-             Turn ON SET IN with maintaining the input status of D0 IN to D15 IN and SELECT 0 IN to SELECT 2 IN. The
-             input operation is executed at the timing of the edge of turning ON.
-             SET IN is required to control the following operations by I/O.
-              • Select file number
-              • Correct the count-up/count-down value of the counter function
-              • Reset the count value of the counter function
-              • Switch marking characters of the registered characters via I/O
-              • Switch marking position of the external offset function
+Turn ON this signal when executing the input of D0 IN to D15 IN (No.3 to 18) and SELECT 0 IN to SELECT 2
+IN (No.19 to 21).
+Turn ON SET IN with maintaining the input status of D0 IN to D15 IN and SELECT 0 IN to SELECT 2 IN. The
+input operation is executed at the timing of the edge of turning ON.
+SET IN is required to control the following operations by I/O.
+ • Select file number
+ • Correct the count-up/count-down value of the counter function
+ • Reset the count value of the counter function
+ • Switch marking characters of the registered characters via I/O
+ • Switch marking position of the external offset function
   3 to 18    D0 IN to D15 IN : Number input
-             Set the number for one of the following targets selected at SELECT 0 IN to SELECT 2 IN (No.19 to 21).
-             q File No.
-             w Count-up value correction
-             e Count-down value correction
-             r Counter number to reset
-             t Data number for the registered characters/external offset function
-             q File No. (SELECT 0 IN to SELECT 2 IN: All OFF)
-                  Input when changing the file number of 0 to 9999.
-                  Specify the file number in the binary system as D0 to D15 and turn ON SET IN (No.2).
-                  Indicate values in the binary system as ON/OFF of D0 to D15 with D0 being the lowest digit value.
+Set the number for one of the following targets selected at SELECT 0 IN to SELECT 2 IN (No.19 to 21).
+q File No.
+w Count-up value correction
+e Count-down value correction
+r Counter number to reset
+t Data number for the registered characters/external offset function
+q File No. (SELECT 0 IN to SELECT 2 IN: All OFF)
+   Input when changing the file number of 0 to 9999.
+   Specify the file number in the binary system as D0 to D15 and turn ON SET IN (No.2).
+   Indicate values in the binary system as ON/OFF of D0 to D15 with D0 being the lowest digit value.
 
-                  Example: When selecting the file No. 618
-                  Select “0000 0010 0110 1010”, which represents 618 in a 16-bit binary system, by specifying ON/OFF of
-                  D0 to D15 as shown in the below table.
-                      Terminal   File No. (binary)       Input           Terminal    File No. (binary)        Input
-                         D0             0                OFF                D8              0                 OFF
-                         D1             1                 ON                D9              1                  ON
-                         D2             0                OFF               D10              0                 OFF
-                         D3             1                 ON               D11              0                 OFF
-                         D4             0                OFF               D12              0                 OFF
-                         D5             1                 ON               D13              0                 OFF
-                         D6             1                 ON               D14              0                 OFF
-                         D7             0                OFF               D15              0                 OFF
-                  ￼
+Example: When selecting the file No. 618
+Select “0000 0010 0110 1010”, which represents 618 in a 16-bit binary system, by specifying ON/OFF of
+D0 to D15 as shown in the below table.
+   Terminal   File No. (binary)       Input           Terminal    File No. (binary)        Input
+   D0             0                OFF                D8              0                 OFF
+   D1             1                 ON                D9              1                  ON
+   D2             0                OFF               D10              0                 OFF
+   D3             1                 ON               D11              0                 OFF
+   D4             0                OFF               D12              0                 OFF
+   D5             1                 ON               D13              0                 OFF
+   D6             1                 ON               D14              0                 OFF
+   D7             0                OFF               D15              0                 OFF
+￼
 
 
 92                                                       ME-LPRF-SM-11
@@ -4376,68 +4377,68 @@ specific functions.
 
 No.   Name and description
 
-      w Count-up value correction (SELECT 1 IN: ON)
-      e Count-down value correction (SELECT 0 IN, SELECT 1 IN: ON)
-        Input this number when you change the next marking value of the counter function. The counter value
-        is specified by the step times of count-up or count-down. The step value indicates a value to increase or
-        decrease per one counting-up or counting-down.
-        Specify the count-up/count-down with SELECT 0 IN to SELECT 2 IN.
-        Specify the target counter number and step times as D0 to D15 and turn ON SET IN (No.2).
-         • How to select the counter number:
-           Select a value from D0 to D7 for the counter number to correct the count-up/count-down value.
-           The counter No. 0 to 3 is assigned at D0 to D3 and the common counter No. 16 to 19 is assigned at D4
-           to D7 respectively.
-           In case two or more counter numbers are specified, counter values of all the specified counter numbers
-           are changed.
-         • How to specify the step times:
-           Specify a value in D8 to D15 for the step times of count-up or count-down in the binary system. Indicate
-           values in the binary system as ON/OFF of D8 to D15 with D8 being the lowest digit value.
+w Count-up value correction (SELECT 1 IN: ON)
+e Count-down value correction (SELECT 0 IN, SELECT 1 IN: ON)
+  Input this number when you change the next marking value of the counter function. The counter value
+  is specified by the step times of count-up or count-down. The step value indicates a value to increase or
+  decrease per one counting-up or counting-down.
+  Specify the count-up/count-down with SELECT 0 IN to SELECT 2 IN.
+  Specify the target counter number and step times as D0 to D15 and turn ON SET IN (No.2).
+   • How to select the counter number:
+   Select a value from D0 to D7 for the counter number to correct the count-up/count-down value.
+   The counter No. 0 to 3 is assigned at D0 to D3 and the common counter No. 16 to 19 is assigned at D4
+   to D7 respectively.
+   In case two or more counter numbers are specified, counter values of all the specified counter numbers
+   are changed.
+   • How to specify the step times:
+   Specify a value in D8 to D15 for the step times of count-up or count-down in the binary system. Indicate
+   values in the binary system as ON/OFF of D8 to D15 with D8 being the lowest digit value.
 
-        Example: Count up or count down the counter of the counter number 3 by two steps
-        • Turn ON D3 which represents the counter number 3.
-        • Select “0000 0010”, which represents the step times 2 in a 8-bit binary system, by specifying ON/OFF
-          of D8 to D15 as shown in the below table.
-           D0 to D7: Counter No. 0 to 3, 16 to 19                   D8 to D15: Step times
-           Terminal     Counter No.        Input                    Terminal     Step times (binary)       Input
-              D0            0              OFF                         D8                0                 OFF
-              D1             1             OFF                         D9                1                  ON
-              D2             2             OFF                        D10                0                 OFF
-              D3             3              ON                        D11                0                 OFF
-              D4            16             OFF                        D12                0                 OFF
-              D5            17             OFF                        D13                0                 OFF
-              D6            18             OFF                        D14                0                 OFF
-              D7            19             OFF                        D15                0                 OFF
-           Counter No. 16 to 19 are the common counters you can use with all the files.
+Example: Count up or count down the counter of the counter number 3 by two steps
+• Turn ON D3 which represents the counter number 3.
+• Select “0000 0010”, which represents the step times 2 in a 8-bit binary system, by specifying ON/OFF
+  of D8 to D15 as shown in the below table.
+   D0 to D7: Counter No. 0 to 3, 16 to 19                   D8 to D15: Step times
+   Terminal     Counter No.        Input                    Terminal     Step times (binary)       Input
+   D0            0              OFF                         D8                0                 OFF
+   D1             1             OFF                         D9                1                  ON
+   D2             2             OFF                        D10                0                 OFF
+   D3             3              ON                        D11                0                 OFF
+   D4            16             OFF                        D12                0                 OFF
+   D5            17             OFF                        D13                0                 OFF
+   D6            18             OFF                        D14                0                 OFF
+   D7            19             OFF                        D15                0                 OFF
+   Counter No. 16 to 19 are the common counters you can use with all the files.
 
-      r Counter No. to reset (SELECT 2 IN: ON)
-        Input this number when you restore the present counter value to the initial value for files with the counter
-        function applied.
-        Specify the target counter number as D0 to D15 and turn ON SET IN (No.2).
-         • How to select the counter number:
-           Select the counter number to reset from D0 to D15.
-           The following counter numbers are assigned to D0 to D15 respectively.
-           D0 to D3: Counter No. 0 to 3
-           D4 to D7: Common Counter No. 16 to 19
-           D8 to D11: Counter No. 4 to 7
-           D12 to D15: Common Counter No. 20 to 23
-           In case two or more counter numbers are specified, all counters specified are reset.
+r Counter No. to reset (SELECT 2 IN: ON)
+  Input this number when you restore the present counter value to the initial value for files with the counter
+  function applied.
+  Specify the target counter number as D0 to D15 and turn ON SET IN (No.2).
+   • How to select the counter number:
+   Select the counter number to reset from D0 to D15.
+   The following counter numbers are assigned to D0 to D15 respectively.
+   D0 to D3: Counter No. 0 to 3
+   D4 to D7: Common Counter No. 16 to 19
+   D8 to D11: Counter No. 4 to 7
+   D12 to D15: Common Counter No. 20 to 23
+   In case two or more counter numbers are specified, all counters specified are reset.
 
-        Example: When the counter No. 0 to 3 are reset.
-        Turn ON D0, D1, D2, and D3 which represent the counter No. 0, 1, 2, and 3.
-        D0 to D7: Counter No. 0 to 3, 16 to 19               D8 to D15: Counter No. 4 to 7, 20 to 23
-           Terminal      Counter No.         Input                 Terminal     Counter No.        Input
-              D0             0                ON                      D8             4             OFF
-              D1             1                ON                      D9             5             OFF
-              D2             2                ON                     D10             6             OFF
-              D3             3                ON                     D11             7             OFF
-              D4             16              OFF                     D12            20             OFF
-              D5             17              OFF                     D13            21             OFF
-              D6             18              OFF                     D14            22             OFF
-              D7             19              OFF                     D15            23             OFF
-        Counter Nos. 16 to 23 are the common counters you can use with all the files.
+Example: When the counter No. 0 to 3 are reset.
+Turn ON D0, D1, D2, and D3 which represent the counter No. 0, 1, 2, and 3.
+D0 to D7: Counter No. 0 to 3, 16 to 19               D8 to D15: Counter No. 4 to 7, 20 to 23
+   Terminal      Counter No.         Input                 Terminal     Counter No.        Input
+   D0             0                ON                      D8             4             OFF
+   D1             1                ON                      D9             5             OFF
+   D2             2                ON                     D10             6             OFF
+   D3             3                ON                     D11             7             OFF
+   D4             16              OFF                     D12            20             OFF
+   D5             17              OFF                     D13            21             OFF
+   D6             18              OFF                     D14            22             OFF
+   D7             19              OFF                     D15            23             OFF
+Counter Nos. 16 to 23 are the common counters you can use with all the files.
 
 
-                                                   ME-LPRF-SM-11                                                       93
+ME-LPRF-SM-11                                                       93
 
 ---
 
@@ -4445,40 +4446,40 @@ No.   Name and description
 
 No.   Name and description
 
-       t Data number to switch when using the registered characters/external offset function (SELECT 0 IN: ON)
-         The registered characters/external offset function is a function that switches marking characters (registered
-         characters) or the position (external offset) using the input terminal D0 to D15. Configure the character or
-         coordinate patterns to the data number corresponding to D0 to D15 in advance. Specify which pattern you
-         will mark from D0 to D15.
-         Specify the data number in the binary system as D0 to D15 and turn ON SET IN (No.2).
-         The data numbers corresponding to D0 to D15 are defined as follows according to the settings.
-             I/O input condition settings *       Terminal                Data number target           Data number
-           Registered characters: 4-bit × 4       D0 to D3            Registered character table 0         0 to 15
-                                                  D4 to D7            Registered character table 1         0 to 15
-                                                  D8 to D11           Registered character table 2         0 to 15
-                                                 D12 to D15           Registered character table 3         0 to 15
-           Registered characters: 8-bit × 2       D0 to D7            Registered character table 0        0 to 255
-                                                  D8 to D15           Registered character table 1        0 to 255
-           External offset: Lower 4 bits          D0 to D3                  External offset                0 to 15
-           External offset: Lower 8 bits          D0 to D7                  External offset               0 to 255
-           External offset: Lower 10 bits         D0 to D9                  External offset              0 to 1023
+t Data number to switch when using the registered characters/external offset function (SELECT 0 IN: ON)
+  The registered characters/external offset function is a function that switches marking characters (registered
+  characters) or the position (external offset) using the input terminal D0 to D15. Configure the character or
+  coordinate patterns to the data number corresponding to D0 to D15 in advance. Specify which pattern you
+  will mark from D0 to D15.
+  Specify the data number in the binary system as D0 to D15 and turn ON SET IN (No.2).
+  The data numbers corresponding to D0 to D15 are defined as follows according to the settings.
+   I/O input condition settings *       Terminal                Data number target           Data number
+   Registered characters: 4-bit × 4       D0 to D3            Registered character table 0         0 to 15
+   D4 to D7            Registered character table 1         0 to 15
+   D8 to D11           Registered character table 2         0 to 15
+   D12 to D15           Registered character table 3         0 to 15
+   Registered characters: 8-bit × 2       D0 to D7            Registered character table 0        0 to 255
+   D8 to D15           Registered character table 1        0 to 255
+   External offset: Lower 4 bits          D0 to D3                  External offset                0 to 15
+   External offset: Lower 8 bits          D0 to D7                  External offset               0 to 255
+   External offset: Lower 10 bits         D0 to D9                  External offset              0 to 1023
           * You can also use the registered characters via I/O together with the external offset function. If you use
             the same terminal for both the registered characters and external offset at this time, the input status will
             be reflected to the data number of both functions.
 
-         Example: Specify data number 15 when using lower 8 bits
-         Select “0000 1111”, which represents 15 in a 8-bit binary system, by specifying ON/OFF of D0 to D7 as
-         shown in the below table. (D0 is the lowest digit number.)
-         D0 to D7: Data number of registered characters/external offset (the lower 8 bits are used)
-            Terminal          Data number (binary)            Input
-               D0                     1                        ON
-               D1                     1                        ON
-               D2                     1                        ON
-               D3                     1                        ON
-               D4                     0                       OFF
-               D5                     0                       OFF
-               D6                     0                       OFF
-               D7                     0                       OFF
+Example: Specify data number 15 when using lower 8 bits
+Select “0000 1111”, which represents 15 in a 8-bit binary system, by specifying ON/OFF of D0 to D7 as
+shown in the below table. (D0 is the lowest digit number.)
+D0 to D7: Data number of registered characters/external offset (the lower 8 bits are used)
+   Terminal          Data number (binary)            Input
+   D0                     1                        ON
+   D1                     1                        ON
+   D2                     1                        ON
+   D3                     1                        ON
+   D4                     0                       OFF
+   D5                     0                       OFF
+   D6                     0                       OFF
+   D7                     0                       OFF
 
 
 94                                                ME-LPRF-SM-11
@@ -4489,114 +4490,114 @@ No.   Name and description
 
 No.        Name and description
 19 to 21   SELECT 0 IN to SELECT 2 IN
-           With SELECT 0 IN to SELECT 2 IN, the setting target of D0 IN to D15 IN and Guide laser indication target
-           are specified.
-            • Select the setting target of D0 IN to D15 IN
-              Specify SELECT 0 IN to SELECT 2 IN corresponding to the setting target shown below. Keeping the input
-              of SELECT 0 IN to SELECT 2 IN and D0 IN to D15 IN (No.3 to 18), turn ON SET IN (No.2).
-                      Setting target of D0 IN to D15 IN       SELECT 0 IN       SELECT 1 IN       SELECT 2 IN
-                  File No.                                         OFF               OFF               OFF
-                  Count up value correction                        OFF               ON                OFF
-                  Count down value correction                      ON                ON                OFF
-                  Counter number to reset                          OFF               OFF                ON
-                  Data number of registered characters/
-                                                                   ON                OFF               OFF
-                  external offset
+With SELECT 0 IN to SELECT 2 IN, the setting target of D0 IN to D15 IN and Guide laser indication target
+are specified.
+ • Select the setting target of D0 IN to D15 IN
+   Specify SELECT 0 IN to SELECT 2 IN corresponding to the setting target shown below. Keeping the input
+   of SELECT 0 IN to SELECT 2 IN and D0 IN to D15 IN (No.3 to 18), turn ON SET IN (No.2).
+   Setting target of D0 IN to D15 IN       SELECT 0 IN       SELECT 1 IN       SELECT 2 IN
+   File No.                                         OFF               OFF               OFF
+   Count up value correction                        OFF               ON                OFF
+   Count down value correction                      ON                ON                OFF
+   Counter number to reset                          OFF               OFF                ON
+   Data number of registered characters/
+   ON                OFF               OFF
+   external offset
 
 
-            • Select guide laser indication target
-              Specify SELECT 0 IN to SELECT 2 IN corresponding to the indication target of guide laser as shown
-              below. Keeping the input of SELECT 0 IN to SELECT 2 IN, turn ON GUIDE IN (No.23).
-                      Indication by guide laser        SELECT 0 IN        SELECT 1 IN      SELECT 2 IN
-                  Work distance                             OFF               OFF               OFF
-                  Marking image                             ON                OFF               OFF
-                  Marking field                             OFF               ON                OFF
-                  Masked objects                            ON                ON                OFF
+• Select guide laser indication target
+  Specify SELECT 0 IN to SELECT 2 IN corresponding to the indication target of guide laser as shown
+  below. Keeping the input of SELECT 0 IN to SELECT 2 IN, turn ON GUIDE IN (No.23).
+   Indication by guide laser        SELECT 0 IN        SELECT 1 IN      SELECT 2 IN
+   Work distance                             OFF               OFF               OFF
+   Marking image                             ON                OFF               OFF
+   Marking field                             OFF               ON                OFF
+   Masked objects                            ON                ON                OFF
 
 22         TIME HOLD IN: Time/date hold input
-           Performs marking of date and lot, reflecting the time when the input is turned ON.
-           While this input is turned on, the laser marker retains the time and date of the system clock at the point when
-           the input was turned ON, then it marks the functional characters for current date, expiry date, and lot.
-           TIME HOLD IN is available even when the remote mode is turned off.
-           If TIME HOLD IN is turned ON when powering on the laser marker, it retains the system startup time.
+Performs marking of date and lot, reflecting the time when the input is turned ON.
+While this input is turned on, the laser marker retains the time and date of the system clock at the point when
+the input was turned ON, then it marks the functional characters for current date, expiry date, and lot.
+TIME HOLD IN is available even when the remote mode is turned off.
+If TIME HOLD IN is turned ON when powering on the laser marker, it retains the system startup time.
 23
 
 
-                 GUIDE IN: Guide laser radiation input
-                 The guide laser irradiates while the input is turned ON. (Up to one minute)
-                 Determine the guide laser radiation details by the combination of SELECT 0 IN to SELECT 2 IN (No.19 to
-                 No.21). Keep the input state of SELECT 0 IN to SELECT 2 IN while GUIDE IN is turned ON.
-                 This terminal is available when the guide laser control method is set to I/O at the system settings of Laser
-                 Marker NAVI smart.
-                 Input this terminal with the shutter closed.
+GUIDE IN: Guide laser radiation input
+The guide laser irradiates while the input is turned ON. (Up to one minute)
+Determine the guide laser radiation details by the combination of SELECT 0 IN to SELECT 2 IN (No.19 to
+No.21). Keep the input state of SELECT 0 IN to SELECT 2 IN while GUIDE IN is turned ON.
+This terminal is available when the guide laser control method is set to I/O at the system settings of Laser
+Marker NAVI smart.
+Input this terminal with the shutter closed.
 
 
 24         TIMING IN
-           This is the terminal you will use when the link control function with the image checker is configured.
-           Turn this terminal ON when you instruct the operation timing to the laser marker or to the target device
-           controlled by the link function. Starts the link control processing by edge of input ON.
-           Input this terminal within 60 seconds from turning ON of TIMING WAIT OUT (No.36).
-           For details, refer to “6-1 Link Control with Image Checker” (P.136).
+This is the terminal you will use when the link control function with the image checker is configured.
+Turn this terminal ON when you instruct the operation timing to the laser marker or to the target device
+controlled by the link function. Starts the link control processing by edge of input ON.
+Input this terminal within 60 seconds from turning ON of TIMING WAIT OUT (No.36).
+For details, refer to “6-1 Link Control with Image Checker” (P.136).
 25, 26     RESERVE: System reservation
-           Do not connect externally.
+Do not connect externally.
 
 
-                                                          ME-LPRF-SM-11                                                         95
+ME-LPRF-SM-11                                                         95
 
 ---
 
 ## หน้า 96
 
  I/O connector output signal operation
-     ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • The ON/OFF listed in this section refers to the ON/OFF operations. It does not refer to the voltage level (High/Low).
 
   No.        Name and description
 
   27         OUT COM. 2: Output common 2
-             The common terminal for each output of the I/O connector.
-             For NPN connection, this terminal is connected to the “- (minus)” side of power which is used for control. For
-             PNP connection, this terminal is connected to the “+ (plus)” side of power which is used for control.
+The common terminal for each output of the I/O connector.
+For NPN connection, this terminal is connected to the “- (minus)” side of power which is used for control. For
+PNP connection, this terminal is connected to the “+ (plus)” side of power which is used for control.
 
-                 ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-             • IN COM. 1, OUT COM. 1 of the I/O terminal block and IN COM. 2, OUT COM. 2 of the I/O connector are
-               independent.
-               If you use the I/O connector terminal, connect input common/output common of the I/O terminal block and
-               the I/O connector to power supply respectively.
-             • For details on the connection, refer to “4-5-2 Connecting common terminals” (P.102).
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• IN COM. 1, OUT COM. 1 of the I/O terminal block and IN COM. 2, OUT COM. 2 of the I/O connector are
+  independent.
+  If you use the I/O connector terminal, connect input common/output common of the I/O terminal block and
+  the I/O connector to power supply respectively.
+• For details on the connection, refer to “4-5-2 Connecting common terminals” (P.102).
 
   28         SET OK OUT: Setting completion output
-             The output turns ON when the setting has completed for SET IN (No.2).
-             Output ON when number inputs such as file No. and counter reset are set. This is one-shot output. *1
+The output turns ON when the setting has completed for SET IN (No.2).
+Output ON when number inputs such as file No. and counter reset are set. This is one-shot output. *1
 
-                 ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-             • SET OK OUT is a response to SET IN (No.2). To verify if the laser marker has entered into the marking
-               ready state (trigger input acceptance state), check by READY OUT (Y5).
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• SET OK OUT is a response to SET IN (No.2). To verify if the laser marker has entered into the marking
+  ready state (trigger input acceptance state), check by READY OUT (Y5).
 
   29         DATE GAP OUT: Date gap output
-             This terminal turns ON when the date of the system clock has changed (passed the midnight) while TIME
-             HOLD IN (No.22) is ON.
-             This is the output to notify you that the laser marker is marking the different date from that of the system clock
-             while TIME HOLD IN is turned ON.
+This terminal turns ON when the date of the system clock has changed (passed the midnight) while TIME
+HOLD IN (No.22) is ON.
+This is the output to notify you that the laser marker is marking the different date from that of the system clock
+while TIME HOLD IN is turned ON.
 
   30         COUNT END A OUT: Counter end A output
   31         COUNT END B OUT: Counter end B output
   32         COUNT END C OUT: Counter end C output
   33         COUNT END D OUT: Counter end D output
-             Each output turns ON when the count value of the specified counter numbers has marked the end value.
-             Assign the counter No. to COUNT END A OUT to COUNT END D OUT in system settings of Laser Marker
-             NAVI smart.
-             The counter end output remains turned ON with the shutter open until the next marking trigger is input. When
-             you close the shutter, the counter end output turns OFF.
+Each output turns ON when the count value of the specified counter numbers has marked the end value.
+Assign the counter No. to COUNT END A OUT to COUNT END D OUT in system settings of Laser Marker
+NAVI smart.
+The counter end output remains turned ON with the shutter open until the next marking trigger is input. When
+you close the shutter, the counter end output turns OFF.
 
-                 ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-             • As the default setting, counter No. 0 to 3 are assigned to COUNT END A OUT to COUNT END D OUT
-               respectively.
-             • The counter value will not be updated at test marking.
-             • It starts counting from the initial value again once the counter reaches to the end value.
-             • The counter end output is disabled when “counter update per step” is configured at Step & repeat.
-             • The counter end output is available when you set the functional character of the counter in a string of the
-               objects such as character or barcode.
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• As the default setting, counter No. 0 to 3 are assigned to COUNT END A OUT to COUNT END D OUT
+  respectively.
+• The counter value will not be updated at test marking.
+• It starts counting from the initial value again once the counter reaches to the end value.
+• The counter end output is disabled when “counter update per step” is configured at Step & repeat.
+• The counter end output is available when you set the functional character of the counter in a string of the
+  objects such as character or barcode.
 
 
 96                                                       ME-LPRF-SM-11
@@ -4611,71 +4612,71 @@ No.        Name and description
  35         CHECK NG OUT: Check NG output
 
 
-            These outputs are available when the following functions are configured. This is One-shot output. *1
-             • When the link control function with the image checker is configured:
-               Check results by the linked image checker, such as a camera or a code reader are output.
-               • CHECK OK OUT: Output when the check result is positive
-               • CHECK NG OUT: Output when the check result is negative
+These outputs are available when the following functions are configured. This is One-shot output. *1
+ • When the link control function with the image checker is configured:
+   Check results by the linked image checker, such as a camera or a code reader are output.
+   • CHECK OK OUT: Output when the check result is positive
+   • CHECK NG OUT: Output when the check result is negative
 
-             • When TARGET DETECTION IN (X7) is used:
-               According to the ON/OFF state of TARGET DETECTION IN (X7), CHECK OK OUT (No.34) or CHECK NG
-               OUT (No.35) turns on for one-shot time after the trigger processing (lasing) operation.
-               • CHECK OK OUT: Output when TARGET DETECTION IN (X7) turns ON for more than 1ms during
-                 lasing operation.
-               • CHECK NG OUT: Output when TARGET DETECTION IN (X7) did not turn ON during lasing operation.
+• When TARGET DETECTION IN (X7) is used:
+  According to the ON/OFF state of TARGET DETECTION IN (X7), CHECK OK OUT (No.34) or CHECK NG
+  OUT (No.35) turns on for one-shot time after the trigger processing (lasing) operation.
+  • CHECK OK OUT: Output when TARGET DETECTION IN (X7) turns ON for more than 1ms during
+   lasing operation.
+  • CHECK NG OUT: Output when TARGET DETECTION IN (X7) did not turn ON during lasing operation.
 
 
  36         TIMING WAIT OUT: Timing wait output
-            This is the terminal you will use when the link control function with the image checker is configured.
-            This terminal turns ON when the laser marker enters into the link function operation trigger (TIMING IN)
-            standby state.
-            Input TIMING IN (No.24) after making sure that this terminal is turned ON.
+This is the terminal you will use when the link control function with the image checker is configured.
+This terminal turns ON when the laser marker enters into the link function operation trigger (TIMING IN)
+standby state.
+Input TIMING IN (No.24) after making sure that this terminal is turned ON.
 
  37         SCRIPTING OUT: Scripting output
-            This is the terminal you will use when the link control function with the image checker is configured.
-            This terminal turns ON while executing scripting (laser marker's internal processing to perform the link control
-            of the external devices) upon receiving TRIGGER IN (X5). The output time of SCRIPTING OUT does not
-            include the laser radiation time.
+This is the terminal you will use when the link control function with the image checker is configured.
+This terminal turns ON while executing scripting (laser marker's internal processing to perform the link control
+of the external devices) upon receiving TRIGGER IN (X5). The output time of SCRIPTING OUT does not
+include the laser radiation time.
 
  38         DATA WAIT OUT
-            When using either of the following functions, this terminal turns ON to notify the waiting status of the data
-            input. Confirm this output is ON and then input the corresponding data.
-             • Characters specified by SIN command: Waiting for character input by SIN command
-             • External offset function with “Using SEO command” : Waiting for marking position input by SEO command
-             • Registered characters via I/O: Waiting for registered characters input and SET IN (No.2) by I/O
-             • External offset function: Waiting for marking position input and SET IN (No.2) by I/O
+When using either of the following functions, this terminal turns ON to notify the waiting status of the data
+input. Confirm this output is ON and then input the corresponding data.
+ • Characters specified by SIN command: Waiting for character input by SIN command
+ • External offset function with “Using SEO command” : Waiting for marking position input by SEO command
+ • Registered characters via I/O: Waiting for registered characters input and SET IN (No.2) by I/O
+ • External offset function: Waiting for marking position input and SET IN (No.2) by I/O
 
-                  ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-             • After inputting the required data, this output turns OFF and then READY OUT (Y5) turns ON.
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• After inputting the required data, this output turns OFF and then READY OUT (Y5) turns ON.
 
 
  39         SHUTTER OPEN OUT
-            Output ON during internal shutter of the head is open.
-            There is a delay time of around 200ms to max. 1 second from turning ON/OFF of SHUTTER IN (X8) to
-            turning ON/OFF of SHUTTER OPEN OUT.
+Output ON during internal shutter of the head is open.
+There is a delay time of around 200ms to max. 1 second from turning ON/OFF of SHUTTER IN (X8) to
+turning ON/OFF of SHUTTER OPEN OUT.
 
-                  ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-             • To monitor the shutter operation for the safety control system, use SHUTTER CLOSE 1 OUT (Y8) and
-               SHUTTER CLOSE 2 OUT (Y9).
-             • The output timing of SHUTTER OPEN OUT (No.39), SHUTTER CLOSE 1 OUT (Y8) and SHUTTER
-               CLOSE 2 OUT (Y9) has a margin of error.
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• To monitor the shutter operation for the safety control system, use SHUTTER CLOSE 1 OUT (Y8) and
+  SHUTTER CLOSE 2 OUT (Y9).
+• The output timing of SHUTTER OPEN OUT (No.39), SHUTTER CLOSE 1 OUT (Y8) and SHUTTER
+  CLOSE 2 OUT (Y9) has a margin of error.
 
 
  40         LASING OUT: Laser radiation output
-            Output ON during laser radiation.
-            In case the lasing time is shorter than the set one-shot output time, the lasing output remains ON until the
-            one-shot output time ends. *1
+Output ON during laser radiation.
+In case the lasing time is shorter than the set one-shot output time, the lasing output remains ON until the
+one-shot output time ends. *1
 
-                  ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-             • Use PROCESSING END OUT (Y11) and PROCESSING FAIL OUT (Y12) for the confirmation of marking
-               completion.
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• Use PROCESSING END OUT (Y11) and PROCESSING FAIL OUT (Y12) for the confirmation of marking
+  completion.
 
 
 *1 : Set the output time of the one-shot output on the system settings screen of Laser Marker NAVI smart. The setting range is
-     2 to 510ms. The initial setting value is 40ms. One-shot output time has a small margin of error for the setting value.
+2 to 510ms. The initial setting value is 40ms. One-shot output time has a small margin of error for the setting value.
 
 
-                                                        ME-LPRF-SM-11                                                       97
+ME-LPRF-SM-11                                                       97
 
 ---
 
@@ -4689,57 +4690,57 @@ No.        Name and description
  “4-4-3 Interlock terminal rating and I/O circuit” (P.100).
 
   Input rating
-                            Item                             I/O terminal block input, I/O connector input
-                          Input form                         Bidirectional photo coupler insulation input
-               Input ON voltage              Difference of voltages between input and input common: 19V or more
-            Input OFF voltage          Difference of voltages between input and input common: No more than 3V or open
-        Rated input voltage                                                 +24V DC+/-10%
+   Item                             I/O terminal block input, I/O connector input
+   Input form                         Bidirectional photo coupler insulation input
+   Input ON voltage              Difference of voltages between input and input common: 19V or more
+   Input OFF voltage          Difference of voltages between input and input common: No more than 3V or open
+Rated input voltage                                                 +24V DC+/-10%
 
 
   Input circuit
-       Internal circuit
+Internal circuit
 
 
-                                                                     INPUT
+INPUT
 
 
-                                                                     Input common
-                                                                     (IN COM.)
+Input common
+(IN COM.)
 
  ￼
   NPN sample                                                          PNP sample
-                                                                                                             External power
-                                                                                                             supply
-                     Input common                                                                            (+24V DC)
-                                         External power
-                     (IN COM.)           supply                                                              PNP open
-     INPUT
+   External power
+   supply
+   Input common                                                                            (+24V DC)
+   External power
+   (IN COM.)           supply                                                              PNP open
+INPUT
 
 
-                                         (+24V DC)                              Each input                   collector output
-                                                                        INPUT
+(+24V DC)                              Each input                   collector output
+   INPUT
 
 
-                      Each input
-                                          NPN open                              Input
-                                          collector output                      common
-                                                                                (IN COM.)
+Each input
+   NPN open                              Input
+   collector output                      common
+   (IN COM.)
 
 
-                          ワㄐㄕㄊ㄄ㄆ
-     • This product supports both the NPN transistor output and the PNP transistor output. However, the wiring from I/O
-       terminal block and the I/O connector respectively cannot be used as NPN/PNP mixed. Operate the product after
-       selecting either NPN or PNP.
-     • Do not short-circuit 24V OUT (X1, Y3) and 0V OUT (Y1, X3). Also, do not short-circuit IN COM. 1 (X2) and OUT COM.1
-       (Y2, X12). Starting the laser marker with these terminals short-circuited will cause the laser marker to malfunction.
+   ワㄐㄕㄊ㄄ㄆ
+• This product supports both the NPN transistor output and the PNP transistor output. However, the wiring from I/O
+  terminal block and the I/O connector respectively cannot be used as NPN/PNP mixed. Operate the product after
+  selecting either NPN or PNP.
+• Do not short-circuit 24V OUT (X1, Y3) and 0V OUT (Y1, X3). Also, do not short-circuit IN COM. 1 (X2) and OUT COM.1
+  (Y2, X12). Starting the laser marker with these terminals short-circuited will cause the laser marker to malfunction.
 
-          ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-     • Respective inputs are bidirectional photo-coupler inputs. The regulation for input ON is based on the ON status of photo-
-       coupler.
-     • IN COM. 1, OUT COM. 1 of the I/O terminal block and IN COM. 2, OUT COM. 2 of the I/O connector are independent.
-       If you use the I/O connector terminal, connect input common/output common of the I/O terminal block and the I/O
-       connector to power supply respectively.
-     • DC 2-wire sensor cannot be connected to any input.
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• Respective inputs are bidirectional photo-coupler inputs. The regulation for input ON is based on the ON status of photo-
+  coupler.
+• IN COM. 1, OUT COM. 1 of the I/O terminal block and IN COM. 2, OUT COM. 2 of the I/O connector are independent.
+  If you use the I/O connector terminal, connect input common/output common of the I/O terminal block and the I/O
+  connector to power supply respectively.
+• DC 2-wire sensor cannot be connected to any input.
 
 
 98                                                             ME-LPRF-SM-11
@@ -4754,44 +4755,44 @@ Note that the output rating and circuit of INTERLOCK MONITOR terminals (Y16, Y17
 shown here. Refer to“4-4-3 Interlock terminal rating and I/O circuit” (P.100).
 
  Output rating
-                                 Item                            I/O terminal block output                      I/O connector output
-                            Output form                                     NPN/PNP Photo-coupler (insulated output)
-              Protection function for short-circuit                                                None
-                        Max. output current                                50mA                                        20mA
-                       Max. applied voltage                                                      +30V DC
-                         Residual voltage                                                    +2.0V DC or less
+   Item                            I/O terminal block output                      I/O connector output
+   Output form                                     NPN/PNP Photo-coupler (insulated output)
+Protection function for short-circuit                                                None
+   Max. output current                                50mA                                        20mA
+   Max. applied voltage                                                      +30V DC
+   Residual voltage                                                    +2.0V DC or less
 
 
  Output Circuit
 
 
-                                                                   OUTPUT
+OUTPUT
 Internal circuit
 
 
-                                                                   Output common
-                                                                   (OUT COM.)
+Output common
+(OUT COM.)
 
 
  NPN Sample                                                                    PNP Sample
 
-                                                        External power                                                      External power
-                                                        supply                            Output common                     supply
-                                              Load
-                   Each output                          +30V DC MAX                       (OUT COM.)                        +30V DC MAX
-                                                                                 OUTPUT
+   External power                                                      External power
+   supply                            Output common                     supply
+   Load
+Each output                          +30V DC MAX                       (OUT COM.)                        +30V DC MAX
+   OUTPUT
  OUTPUT
 
 
-                                                                                          Each output
-                   Output common
-                   (OUT COM.)                                                                                        Load
+   Each output
+Output common
+(OUT COM.)                                                                                        Load
 
 
-                                                      I: I/O terminal block output        MAX 50mA
-                                                        I/O connector output              MAX 20mA
+I: I/O terminal block output        MAX 50mA
+  I/O connector output              MAX 20mA
 
-                   ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
 • This product supports both the NPN transistor output and the PNP transistor output. However, the wiring from I/O terminal
   block and the I/O connector respectively cannot be used as NPN/PNP mixed. Operate the product after selecting either
   NPN or PNP.
@@ -4800,14 +4801,14 @@ Internal circuit
 • The applied voltage and input/output current to each terminal must not exceed each maximum value shown above.
   Exceeding the maximum applied voltage and the maximum output current will cause the laser marker to malfunction.
 
-           ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
 • Respective outputs are photo-coupler outputs. The regulation for output ON is based on the ON status of photo-coupler.
 • IN COM. 1, OUT COM. 1 of the I/O terminal block and IN COM. 2, OUT COM. 2 of the I/O connector are independent.
   If you use the I/O connector terminal, connect input common/output common of the I/O terminal block and the I/O
   connector to power supply respectively.
 
 
-                                                                      ME-LPRF-SM-11                                                          99
+ME-LPRF-SM-11                                                          99
 
 ---
 
@@ -4822,40 +4823,40 @@ Internal circuit
   INTERLOCK 2(-) (X19)                INTERLOCK 2 MONITOR COM. (Y19)
 
 
-        ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
  • INTERLOCK terminals (X16, X17 and X18, X19) are connected to the operating coil of the internal contactor in the
    controller. Connect INTERLOCK (+) and INTERLOCK (-) with the non-voltage contact (dry contact) such as a relay or a
    switch. Do not connect with the voltage contact such as a transistor.
 
 
-                                 Laser marker internal circuit
+Laser marker internal circuit
 
-                                                         ヌビフヷチュヤ
+ヌビフヷチュヤ
 
-                                                                        Pin X16 INTERLOCK 1 (+)
-           Laser oscillator                  Contactor
-           power                                                        Pin X17 INTERLOCK 1 (-)
-                                                           ヒブㄎモチ
-
-
-                                                                                                               Contact
-                                                                        Pin Y16 INTERLOCK 1 MONITOR            capacity:
-                                                                        Pin Y17 INTERLOCK 1 MONITOR COM.       +24V DC
-                                                                                                               1A
-                                                         ヌビフヷチュヤ
-
-                                                                        Pin X18 INTERLOCK 2 (+)
-                                             Contactor
-                                                                        Pin X19 INTERLOCK 2 (-)
-                                                           ヒブㄎモチ
+   Pin X16 INTERLOCK 1 (+)
+Laser oscillator                  Contactor
+power                                                        Pin X17 INTERLOCK 1 (-)
+   ヒブㄎモチ
 
 
-                                                                                                               Contact
-                                                                        Pin Y18 INTERLOCK 2 MONITOR            capacity:
-                                                                        Pin Y19 INTERLOCK 2 MONITOR COM.       +24V DC
-                                                                                                               1A
+   Contact
+   Pin Y16 INTERLOCK 1 MONITOR            capacity:
+   Pin Y17 INTERLOCK 1 MONITOR COM.       +24V DC
+   1A
+ヌビフヷチュヤ
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+   Pin X18 INTERLOCK 2 (+)
+Contactor
+   Pin X19 INTERLOCK 2 (-)
+   ヒブㄎモチ
+
+
+   Contact
+Pin Y18 INTERLOCK 2 MONITOR            capacity:
+Pin Y19 INTERLOCK 2 MONITOR COM.       +24V DC
+   1A
+
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • For the connection examples of the interlock terminals, refer to “4-5-4 Connection example of interlock terminals and
    laser stop terminals” (P.103).
  • INTERLOCK 1(+) (X16) and INTERLOCK 2(+) (X18) are connected to the interlock dedicated power supply +24DVC
@@ -4870,7 +4871,7 @@ Internal circuit
 
 4-5 Connecting I/O Terminal Block
 
-          WARNING                         • Make sure that the power is turned OFF at wiring.
+WARNING                         • Make sure that the power is turned OFF at wiring.
 
 
 4-5-1 Factory default wiring
@@ -4878,52 +4879,52 @@ The following terminals are connected by short bars at the factory default. Remo
 them to an external device.
 
 
-                                                     X1        Y1
-                                                     X2        Y2
-                                                     X3        Y3
-                                                     X4        Y4
-                                                     X5        Y5
-                                                     X6        Y6
-                                                     X7        Y7
-                                                     X8        Y8
-                                                     X9        Y9
-                         LASER STOP IN
-                                                    X10       Y10
-       Short-circuited   LASER STOP IN
-                                                    X11       Y11
-       Short-circuited   OUT COM. 1
-                                                    X12       Y12
-                                                    X13       Y13
-                                                    X14       Y14
-                                Short-circuited
-                                                    X15       Y15
-                         INTERLOCK 1(+)
-                                                    X16       Y16
-       Short-circuited   INTERLOCK 1(-)
-                                                    X17       Y17
-                         INTERLOCK 2(+)
-                                                    X18       Y18
-       Short-circuited   INTERLOCK 2(-)
-                                                    X19       Y19
-                                                    X20       Y20
-                         REMOTE INTERLOCK IN
-                                                   I/O terminal block
+   X1        Y1
+   X2        Y2
+   X3        Y3
+   X4        Y4
+   X5        Y5
+   X6        Y6
+   X7        Y7
+   X8        Y8
+   X9        Y9
+   LASER STOP IN
+   X10       Y10
+Short-circuited   LASER STOP IN
+   X11       Y11
+Short-circuited   OUT COM. 1
+   X12       Y12
+   X13       Y13
+   X14       Y14
+   Short-circuited
+   X15       Y15
+   INTERLOCK 1(+)
+   X16       Y16
+Short-circuited   INTERLOCK 1(-)
+   X17       Y17
+   INTERLOCK 2(+)
+   X18       Y18
+Short-circuited   INTERLOCK 2(-)
+   X19       Y19
+   X20       Y20
+   REMOTE INTERLOCK IN
+   I/O terminal block
 
 
-        ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
  • Do not short-circuit 24V OUT (X1, Y3) and 0V OUT (X3, Y1). Also, do not short-circuit IN COM. 1 (X2) and OUT COM.1
    (Y2, X12). Starting the laser marker with these terminals short-circuited will cause the laser marker to malfunction.
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • To enable the laser radiation, connect IN COM. 1 (X2) and OUT COM. 1 (Y2) respectively to the internal of external
    power supply. Refer to “4-5-2 Connecting common terminals” (P.102).
  • The following terminals of the I/O terminal block are the common terminals connected internally.
-    • X1 and Y3: 24V OUT
-    • X3 and Y1: 0V OUT
-    • Y2 and X12: OUT COM. 1
+• X1 and Y3: 24V OUT
+• X3 and Y1: 0V OUT
+• Y2 and X12: OUT COM. 1
 
 
-                                                       ME-LPRF-SM-11                                                    101
+ME-LPRF-SM-11                                                    101
 
 ---
 
@@ -4934,64 +4935,64 @@ them to an external device.
  For the I/O connector terminals, connect IN COM. 2 and OUT COM. 2 respectively to the power supply in the same
  manner.
 
-                         Use the internal power                       Use the external power
-                         IN COM. 1 (X2)        -    24V OUT (X1)      IN COM. 1 (X2)        -    24V
+Use the internal power                       Use the external power
+IN COM. 1 (X2)        -    24V OUT (X1)      IN COM. 1 (X2)        -    24V
    NPN connection
-                         OUT COM. 1 (Y2)       -    0V OUT (Y1)       OUT COM. 1 (Y2)       -    0V
-                         IN COM. 1 (X2)        -    0V OUT (X3)       IN COM. 1 (X2)        -    0V
+OUT COM. 1 (Y2)       -    0V OUT (Y1)       OUT COM. 1 (Y2)       -    0V
+IN COM. 1 (X2)        -    0V OUT (X3)       IN COM. 1 (X2)        -    0V
    PNP connection
-                         OUT COM. 1 (Y2)       -    24V OUT (Y3)      OUT COM. 1 (Y2)       -    24V
+OUT COM. 1 (Y2)       -    24V OUT (Y3)      OUT COM. 1 (Y2)       -    24V
 
-         ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
   • Do not short-circuit 24V OUT (X1, Y3) and 0V OUT (Y1, X3). Also, do not short-circuit IN COM. 1 (X2) and OUT COM. 1
-    (Y2, X12). Starting the laser marker with these terminals short-circuited will cause the laser marker to malfunction.
+(Y2, X12). Starting the laser marker with these terminals short-circuited will cause the laser marker to malfunction.
   • Do not mix up with the external and internal power supplies.
   • Do not mix the NPN and PNP connecting patterns.
   • When using the internal power supply (X1, X3, Y1, Y3), the total current of the power supply for the external device and
-    the consumption current for the I/O control should be less than 300mA.
+the consumption current for the I/O control should be less than 300mA.
   • If you control the laser marker by the external power such as PLC, do not connect anything to the internal power 24V
-    OUT (X1, Y3) or 0V OUT (X3, Y1) of the I/O terminal block. If a short bar is installed, remove it.
+OUT (X1, Y3) or 0V OUT (X3, Y1) of the I/O terminal block. If a short bar is installed, remove it.
 
-       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
   • IN COM. 1 and OUT COM. 1 of the I/O terminal block are independent from IN COM. 2 and OUT COM. 2 of the I/O
-    connector. If you use the I/O connector terminal, connect input common/output common of the I/O terminal block and the
-    I/O connector to power supply respectively.
+connector. If you use the I/O connector terminal, connect input common/output common of the I/O terminal block and the
+I/O connector to power supply respectively.
 
   To use the internal power (the I/O terminal block is not connected to an external control device)
  NPN connection                                                    PNP connection
 
-           24V OUT         X1           Y1    0V OUT                                   X1         Y1
+24V OUT         X1           Y1    0V OUT                                   X1         Y1
  Short-                                                  Short-
  circuited IN COM. 1                          OUT COM. 1 circuited IN COM. 1                             OUT COM. 1
-                           X2           Y2                                             X2         Y2
-                                                          Short-    0V OUT                               24V OUT      Short-
-                           X3           Y3                circuited                    X3         Y3                  circuited
-                           X4           Y4                                             X4         Y4
-                           X5           Y5                                             X5         Y5
-                         I/OX6        Y6
-                             terminal block                                         I/OX6        Y6
-                                                                                        terminal block
+  X2           Y2                                             X2         Y2
+   Short-    0V OUT                               24V OUT      Short-
+  X3           Y3                circuited                    X3         Y3                  circuited
+  X4           Y4                                             X4         Y4
+  X5           Y5                                             X5         Y5
+I/OX6        Y6
+   terminal block                                         I/OX6        Y6
+   terminal block
 
-       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
   • The dotted line indicates that the terminals are connected inside of the laser marker.
   • When connecting the internal power supply to IN COM. 1 and OUT COM. 1, use the attached short bars.
 
 
   To use the external power (connected to an external control device such as PLC)
  NPN connection                                                    PNP connection
-                                 OUT COM. 1                                    IN COM. 1
-            0V                                                                                                 0V
+   OUT COM. 1                                    IN COM. 1
+0V                                                                                                 0V
 
-                                   X1         Y1                              X1        Y1
-                   IN COM. 1                                                                     OUT COM. 1
-            24V                    X2         Y2                              X2        Y2                    24V
+   X1         Y1                              X1        Y1
+   IN COM. 1                                                                     OUT COM. 1
+24V                    X2         Y2                              X2        Y2                    24V
 
-        External power             X3         Y3                              X3        Y3                 External
-        supply                     X4         Y4                              X4        Y4                 power supply
-                                I/OX5        Y5
-                                   terminal block                           I/OX5
-                                                                                terminal Y5
-                                                                                         block
+External power             X3         Y3                              X3        Y3                 External
+supply                     X4         Y4                              X4        Y4                 power supply
+   I/OX5        Y5
+   terminal block                           I/OX5
+   terminal Y5
+   block
 
 
 102                                                       ME-LPRF-SM-11
@@ -5005,22 +5006,22 @@ them to an external device.
 NPN connection                                                   PNP connection
 
 Sensor                                                           Sensor
-              24V OUT        X1          Y1     0V OUT                        24V OUT          X1         Y1
+24V OUT        X1          Y1     0V OUT                        24V OUT          X1         Y1
  VDD                                                              VDD
-              IN COM. 1                         OUT COM. 1                    IN COM. 1                            OUT COM. 1
+IN COM. 1                         OUT COM. 1                    IN COM. 1                            OUT COM. 1
  OUT                         X2          Y2                       OUT                          X2         Y2
-              0V OUT                                                          0V OUT                               24V OUT
+0V OUT                                                          0V OUT                               24V OUT
   0V                         X3          Y3                        0V                          X3         Y3
-                             X4          Y4                                                    X4         Y4
-          TRIGGER IN                                                        TRIGGER IN
-                             X5          Y5                                                    X5         Y5
-                             X6          Y6                                                    X6         Y6
-                             X7          Y7                                                    X7         Y7
-                           I/OX8
-                               terminal block
-                                        Y8                                                   I/OX8
-                                                                                                 terminal block
-                                                                                                          Y8
+   X4          Y4                                                    X4         Y4
+TRIGGER IN                                                        TRIGGER IN
+   X5          Y5                                                    X5         Y5
+   X6          Y6                                                    X6         Y6
+   X7          Y7                                                    X7         Y7
+   I/OX8
+   terminal block
+   Y8                                                   I/OX8
+   terminal block
+   Y8
    ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
 • The dotted line indicates that the terminals are connected inside of the laser marker.
 
@@ -5035,36 +5036,36 @@ warning status.
  INTERLOCK 2(+) (X18)              ―     INTERLOCK 2(-) (X19)
  REMOTE INTERLOCK (X20)            ―     OUT COM. 1 (X12)
 
-                                                      X7         Y7
-                                                      X8         Y8
-                                                      X9         Y9
-         *1             LASER STOP IN
-                                                      X10       Y10
-         *1             LASER STOP IN
-                                                      X11       Y11
-                                                      X12       Y12
-                        OUT COM. 1
-                                                      X13       Y13
-                                                      X14       Y14
-         *2             INTERLOCK 1(+)
-                                                      X15       Y15                                            Input to PLC
-              N.O.                                                        INTERLOCK 1 MONITOR
-                                                      X16       Y16
-                        INTERLOCK 1(-)                                    INTERLOCK 1 MONITOR COM.                Monitor 1
-                                                      X17       Y17
-         *2             INTERLOCK 2(+)                                    INTERLOCK 2 MONITOR
-                                                      X18       Y18
-              N.O.      INTERLOCK 2(-)                                    INTERLOCK 2 MONITOR COM.                Monitor 2
-                                                      X19       Y19
-                                                      X20       Y20
-         *1          REMOTE INTERLOCK IN
-                                                    I/O terminal block
+   X7         Y7
+   X8         Y8
+   X9         Y9
+*1             LASER STOP IN
+   X10       Y10
+*1             LASER STOP IN
+   X11       Y11
+   X12       Y12
+   OUT COM. 1
+   X13       Y13
+   X14       Y14
+*2             INTERLOCK 1(+)
+   X15       Y15                                            Input to PLC
+   N.O.                                                        INTERLOCK 1 MONITOR
+   X16       Y16
+   INTERLOCK 1(-)                                    INTERLOCK 1 MONITOR COM.                Monitor 1
+   X17       Y17
+*2             INTERLOCK 2(+)                                    INTERLOCK 2 MONITOR
+   X18       Y18
+   N.O.      INTERLOCK 2(-)                                    INTERLOCK 2 MONITOR COM.                Monitor 2
+   X19       Y19
+   X20       Y20
+*1          REMOTE INTERLOCK IN
+   I/O terminal block
 
 *1 : Connect stop terminals such as a laser stop switch between LASER STOP IN and OUT COM. 1 as well as REMOTE
-     INTERLOCK IN and OUT COM. 1 respectively.
+INTERLOCK IN and OUT COM. 1 respectively.
 *2 : Connect non-voltage contact such as a relay output terminal including a safety device door, switches, safety relay
-     units between INTERLOCK 1(+) (X16) and INTERLOCK 1(-) (X17) as well as between INTERLOCK 2(+) (X16) and
-     INTERLOCK 2(-) (X19) respectively.
+units between INTERLOCK 1(+) (X16) and INTERLOCK 1(-) (X17) as well as between INTERLOCK 2(+) (X16) and
+INTERLOCK 2(-) (X19) respectively.
 
    ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
 • For details on the I/O circuit of the interlock terminals, refer to “4-4-3 Interlock terminal rating and I/O circuit” (P.100).
@@ -5072,7 +5073,7 @@ warning status.
   for safety measures are input” (P.90).
 
 
-                                                         ME-LPRF-SM-11                                                        103
+ME-LPRF-SM-11                                                        103
 
 ---
 
@@ -5148,68 +5149,68 @@ Output simulation starts with the following procedure.
 ## หน้า 106
 
 4-6 Basic Control Timing Chart
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • ON/OFF on the timing chart refers to ON/OFF operations. It does not refer to the voltage level (High/Low).
  • In the following timing charts, the timing of output operation corresponding to the each input has a small delay of 0ms or
    more.
 
 
  4-6-1 Flow from startup to marking
-                               ON                                                                                        *1
-                  Key Switch
-                               OFF
-                               ON
-             REMOTE IN (X4)
-                               OFF
-                               ON
-        LASER SUPPLY IN (X6)
-                               OFF
-                               ON
-    SHUTTER ENABLE IN (X9)
-                               OFF
-                               ON (Open)
-             SHUTTER IN (X8)
-                               OFF (Close)
-                               ON
-                                                                                                 T5
-             TRIGGER IN (X5)
-                               OFF
+   ON                                                                                        *1
+   Key Switch
+   OFF
+   ON
+   REMOTE IN (X4)
+   OFF
+   ON
+   LASER SUPPLY IN (X6)
+   OFF
+   ON
+SHUTTER ENABLE IN (X9)
+   OFF
+   ON (Open)
+   SHUTTER IN (X8)
+   OFF (Close)
+   ON
+   T5
+   TRIGGER IN (X5)
+   OFF
 
-     SYSTEM STANDBY OUT ON                          T1
-                     (Y7)
-                          OFF
-                          ON
-         REMOTE OUT (Y4)
-                          OFF
-                          ON
+SYSTEM STANDBY OUT ON                          T1
+   (Y7)
+   OFF
+   ON
+   REMOTE OUT (Y4)
+   OFF
+   ON
    LASER SUPPLY OUT (Y20)
-                          OFF
-                          ON
+OFF
+ON
   LASER STANDBY OUT (Y6)                            T2
-                          OFF                                       T3               T3                        T3
-                          ON (Close)
+OFF                                       T3               T3                        T3
+ON (Close)
  SHUTTER CLOSE 1 OUT (Y8)                                                T3
  SHUTTER CLOSE 2 OUT (Y9)
-                          OFF (Open)
-                               ON (Normal)
-         WARNING OUT (Y14)
-                               OFF (Error)
-                               ON (Normal)
-            ALARM OUT (Y15)
-                               OFF (Error)
-                               ON
-             READY OUT (Y5)                                 T4                          T4
-                               OFF
-                               ON
-      PROCESSING OUT (Y10)                                                                       T6
-                               OFF
-                               ON
-          LASING OUT (No.40)
-                               OFF
-                               ON
-       PROCESSING END OUT                                                                          T7
-                     (Y11)
-                               OFF
+   OFF (Open)
+   ON (Normal)
+   WARNING OUT (Y14)
+   OFF (Error)
+   ON (Normal)
+   ALARM OUT (Y15)
+   OFF (Error)
+   ON
+   READY OUT (Y5)                                 T4                          T4
+   OFF
+   ON
+PROCESSING OUT (Y10)                                                                       T6
+   OFF
+   ON
+   LASING OUT (No.40)
+   OFF
+   ON
+ PROCESSING END OUT                                                                          T7
+   (Y11)
+   OFF
 
  *1 : Turn off the key switch with the laser pumping turned off or with the shutter closed.
 
@@ -5222,34 +5223,34 @@ Output simulation starts with the following procedure.
 
 Item   Time              Remarks
 T1     Approx. 10 sec.   Time for system startup. Turn ON the remote mode upon verifying SYSTEM STANDBY
-                         OUT (Y7).
+OUT (Y7).
 T2     Approx. 7 sec.    Time for completion of laser pumping.
 
 
 T3     Max. 1 sec.       There is a delay time of around 200ms to max. 1 second from turning ON/OFF of
-                         SHUTTER IN (X8) to turning ON/OFF of SHUTTER CLOSE 1 OUT (Y8) and SHUTTER
-                         CLOSE 2 OUT (Y9).
-                         SHUTTER CLOSE 1 OUT and SHUTTER CLOSE 2 OUT will be output by the same
-                         operation, but their output timing has a margin of error.
+SHUTTER IN (X8) to turning ON/OFF of SHUTTER CLOSE 1 OUT (Y8) and SHUTTER
+CLOSE 2 OUT (Y9).
+SHUTTER CLOSE 1 OUT and SHUTTER CLOSE 2 OUT will be output by the same
+operation, but their output timing has a margin of error.
 
 T4     ―                 Setup time of the laser marker to start the marking trigger processing.
-                         • In the laser pumping completed state: Total time for shutter opening (T3) and marking
-                           data creation. It varies depending on the quantity of the setting data.
-                         • When the laser pumping is not completed: Total time for shutter opening (T3) and
-                           marking data creation, or time for laser pumping, whichever is longer.
+• In the laser pumping completed state: Total time for shutter opening (T3) and marking
+  data creation. It varies depending on the quantity of the setting data.
+• When the laser pumping is not completed: Total time for shutter opening (T3) and
+  marking data creation, or time for laser pumping, whichever is longer.
 T5     2ms or more       Keep the ON status for 2ms or more.
 T6     ―                 When TRIGGER IN (X5) is accepted, PROCESSING OUT (Y10) turns ON. The output time
-                         of PROCESSING OUT (Y10) includes the trigger delay time, marking preparation time,
-                         laser radiation time, and processing time after marking has completed.
-                         If you are not using the link function with external devices, output time of PROCESSING
-                         OUT (Y10) is almost the same as the total duration of the trigger delay time and LASING
-                         OUT (No.40).
+of PROCESSING OUT (Y10) includes the trigger delay time, marking preparation time,
+laser radiation time, and processing time after marking has completed.
+If you are not using the link function with external devices, output time of PROCESSING
+OUT (Y10) is almost the same as the total duration of the trigger delay time and LASING
+OUT (No.40).
 
 T7     2 to 510ms        One-shot output. Set the output time on the environment setting screen.
-                         There is a small margin of error for the setting value.
+There is a small margin of error for the setting value.
 
 
-                                                ME-LPRF-SM-11                                                      107
+ME-LPRF-SM-11                                                      107
 
 ---
 
@@ -5257,69 +5258,69 @@ T7     2 to 510ms        One-shot output. Set the output time on the environment
 
 4-6-2 Shutter open/close
 
-                                 ON
-       LASER STANDBY OUT (Y6)
-                                 OFF
-                                 ON
-               TRIGGER IN (X5)                                                                     T3
-                                 OFF
-                                 ON
-       SHUTTER ENABLE IN (X9)
-                                 OFF                        T1            T1                                      T1
-                                 ON (Open)       *1                                                 *2
-               SHUTTER IN (X8)
-                                 OFF (Close)
+   ON
+LASER STANDBY OUT (Y6)
+   OFF
+   ON
+   TRIGGER IN (X5)                                                                     T3
+   OFF
+   ON
+SHUTTER ENABLE IN (X9)
+   OFF                        T1            T1                                      T1
+   ON (Open)       *1                                                 *2
+   SHUTTER IN (X8)
+   OFF (Close)
 
-                                                         T1         T1             T1
-                                                                                                             T1
-                                 ON (Close)
-         SHUTTER CLOSE 1 OUT
-                         (Y8) OFF (Open)
+   T1         T1             T1
+   T1
+   ON (Close)
+SHUTTER CLOSE 1 OUT
+   (Y8) OFF (Open)
 
-                              ON (Close)
-         SHUTTER CLOSE 2 OUT
-                         (Y9) OFF (Open)
+   ON (Close)
+SHUTTER CLOSE 2 OUT
+   (Y9) OFF (Open)
 
-                              ON (Open)
-           SHUTTER OPEN OUT
-                      (No.39) OFF (Close)
+   ON (Open)
+SHUTTER OPEN OUT
+   (No.39) OFF (Close)
 
-                                 ON
-               READY OUT (Y5)                             T2         T2            T2                                  T2
-                                 OFF
-                                 ON
-        PROCESSING OUT (Y10)                                                                      T4
-                                 OFF
-                             ON
-         PROCESSING END OUT                                                                                   T5
-                       (Y11) OFF
+   ON
+   READY OUT (Y5)                             T2         T2            T2                                  T2
+   OFF
+   ON
+PROCESSING OUT (Y10)                                                                      T4
+   OFF
+   ON
+ PROCESSING END OUT                                                                                   T5
+   (Y11) OFF
 
 
  *1 : SHUTTER IN (X8) is accepted and the shutter opens only when SHUTTER ENABLE IN (X9) is turned on.
  *2 : If SHUTTER IN (X8) was turned off during the trigger processing, the shutter closes after the trigger processing has
-      completed.
+completed.
 
 
    Item       Time                 Remarks
    T1         Max. 1 sec.          There is a delay time of around 200ms to max. 1 second from turning ON/OFF of
-                                   SHUTTER IN (X8) to turning ON/OFF of SHUTTER CLOSE 1 OUT (Y8) and SHUTTER
-                                   CLOSE 2 OUT (Y9).
-                                   The output timing of SHUTTER OPEN OUT, SHUTTER CLOSE 1 OUT and SHUTTER
-                                   CLOSE 2 OUT has a margin of error.
+SHUTTER IN (X8) to turning ON/OFF of SHUTTER CLOSE 1 OUT (Y8) and SHUTTER
+CLOSE 2 OUT (Y9).
+The output timing of SHUTTER OPEN OUT, SHUTTER CLOSE 1 OUT and SHUTTER
+CLOSE 2 OUT has a margin of error.
 
 
    T2         ―                    Total time for shutter opening (T1) and marking data creation. It varies depending on the
-                                   quantity of the setting data.
+quantity of the setting data.
    T3         2ms or more          Keep the ON status for 2ms or more.
    T4         ―                    When TRIGGER IN (X5) is accepted, PROCESSING OUT (Y10) turns ON. The output time
-                                   of PROCESSING OUT (Y10) includes the trigger delay time, marking preparation time,
-                                   laser radiation time, and processing time after marking has completed.
-                                   If you are not using the link function with external devices, output time of PROCESSING
-                                   OUT (Y10) is almost the same as the total duration of the trigger delay time and LASING
-                                   OUT (No.40).
+of PROCESSING OUT (Y10) includes the trigger delay time, marking preparation time,
+laser radiation time, and processing time after marking has completed.
+If you are not using the link function with external devices, output time of PROCESSING
+OUT (Y10) is almost the same as the total duration of the trigger delay time and LASING
+OUT (No.40).
 
    T5         2 to 510ms           One-shot output. Set the output time on the environment setting screen.
-                                   There is a small margin of error for the setting value.
+There is a small margin of error for the setting value.
 
 
 108                                                        ME-LPRF-SM-11
@@ -5332,66 +5333,66 @@ T7     2 to 510ms        One-shot output. Set the output time on the environment
 When the trigger mode is set to “single trigger” in the file settings, one lasing operation is executed by the edge of turning
 on of TRIGGER IN (X5).
 
-                        ON
-      READY OUT (Y5)
-                        OFF
-                                                                T1
-                        ON
-      TRIGGER IN (X5)                     T1                                                     T1
-                        OFF
-                                                                                                                 Marking
-                        ON
+   ON
+READY OUT (Y5)
+   OFF
+   T1
+   ON
+TRIGGER IN (X5)                     T1                                                     T1
+   OFF
+   Marking
+   ON
    PROCESSING OUT                                                                                                interruption
-                                                  T2                       T2
-             (Y10)
-                        OFF
-                                                                                                                 Marking
-                        ON
-                                                                                                                 interruption
+   T2                       T2
+(Y10)
+   OFF
+   Marking
+   ON
+   interruption
  LASING OUT (No.40)                       T3                     T3                             T3
-                        OFF
-                        ON                        T4                       T4
+OFF
+ON                        T4                       T4
    PROCESSING END
-         OUT (Y11)
-                        OFF
+OUT (Y11)
+   OFF
 
-                        ON                                                                            T6
+ON                                                                            T6
    PROCESSING FAIL
-         OUT (Y12)
-                        OFF
+OUT (Y12)
+   OFF
 
-                        ON (Normal)
+ON (Normal)
  WARNING OUT (Y14)                                                    T5
-                        OFF (Error)
+OFF (Error)
 
-                        ON (Normal)
+ON (Normal)
    ALARM OUT (Y15)
-                        OFF (Error)
+OFF (Error)
 
 
  Item     Time                  Remarks
  T1       2ms or more           Keep the ON status for 2ms or more.
  T2       ―                     When TRIGGER IN (X5) is accepted, PROCESSING OUT (Y10) turns ON. The output time
-                                of PROCESSING OUT (Y10) includes the trigger delay time, marking preparation time,
-                                laser radiation time, and processing time after marking has completed.
-                                If you are not using the link function with external devices, output time of PROCESSING
-                                OUT (Y10) is almost the same as the total duration of the trigger delay time and LASING
-                                OUT (No.40).
+of PROCESSING OUT (Y10) includes the trigger delay time, marking preparation time,
+laser radiation time, and processing time after marking has completed.
+If you are not using the link function with external devices, output time of PROCESSING
+OUT (Y10) is almost the same as the total duration of the trigger delay time and LASING
+OUT (No.40).
 
  T3       0 to 9999ms           When the trigger delay time is set in the selected file, trigger processing (lasing) operation
-                                starts after the delay time.
+starts after the delay time.
  T4       2 to 510ms            This is the output to notify that the marking trigger processing completed normally. This
-                                is One-shot output. Set the output time on the system settings screen. There is a small
-                                margin of error for the setting value.
+is One-shot output. Set the output time on the system settings screen. There is a small
+margin of error for the setting value.
  T5       Approx. 3 sec.        It outputs a warning to notify that an invalid trigger was input when TRIGGER IN (X5) was
-                                input during trigger processing. This is One-shot output. You can turn this warning off by
-                                the settings.
+input during trigger processing. This is One-shot output. You can turn this warning off by
+the settings.
  T6       2 to 510ms            If the trigger processing was stopped by an alarm or a warning, PROCESSING FAIL OUT
-                                (Y12) turns on during the one-shot output period. PROCESSING END OUT (Y11) will not
-                                be output at this time.
+(Y12) turns on during the one-shot output period. PROCESSING END OUT (Y11) will not
+be output at this time.
 
 
-                                                         ME-LPRF-SM-11                                                          109
+ME-LPRF-SM-11                                                          109
 
 ---
 
@@ -5403,61 +5404,61 @@ on of TRIGGER IN (X5).
  (X5) is on. Without “allow to stop halfway” setting if TRIGGER IN turns OFF when the lasing operation is running, the lasing
  operation is terminated after finishing the running operation.
 
-                              ON                                                            T6
-         READY OUT (Y5)
-                              OFF
-                                                                  T1
-                              ON
-         TRIGGER IN (X5)                                     *1             *1   *2
-                              OFF
-                                                                                                                          Marking
-                                                                                                                          interruption
-                              ON
-       PROCESSING OUT
-                 (Y10)
-                              OFF                          T3            T3
-                                             T2                                                            T2
-                              ON
-            LASING OUT
-                 (No.40)
-                              OFF
+   ON                                                            T6
+  READY OUT (Y5)
+   OFF
+   T1
+   ON
+  TRIGGER IN (X5)                                     *1             *1   *2
+   OFF
+   Marking
+   interruption
+   ON
+PROCESSING OUT
+   (Y10)
+   OFF                          T3            T3
+   T2                                                            T2
+   ON
+   LASING OUT
+   (No.40)
+   OFF
 
-       PROCESSING END ON                                                                         T4
-             OUT (Y11)
-                              OFF
+PROCESSING END ON                                                                         T4
+   OUT (Y11)
+   OFF
 
-       PROCESSING FAIL ON                                                                                                T7
-             OUT (Y12)
-                              OFF
-                              ON (Normal)
+PROCESSING FAIL ON                                                                                                T7
+   OUT (Y12)
+   OFF
+   ON (Normal)
    WARNING OUT (Y14)                                                                       T5
-                              OFF (Error)
-                              ON (Normal)
-       ALARM OUT (Y15)
-                              OFF (Error)
+   OFF (Error)
+   ON (Normal)
+ALARM OUT (Y15)
+   OFF (Error)
 
 
  *1 : If TRIGGER IN (X5) is still ON at the completion of the lasing operation, the lasing operation starts again.
  *2 : If TRIGGER IN (X5) turns OFF when the lasing operation is running, the lasing operation is terminated after finishing
-      the running operation.
+the running operation.
 
   Item       Time                   Remarks
   T1         2 ms or more           Keep the ON status for the duration of repeating the lasing operation.
   T2         0 to 9999 ms           When the trigger delay time is set in the selected file, trigger processing (lasing) operation
-                                    starts after the delay time.
+starts after the delay time.
   T3         0.0 to 60.0 sec.       When the scanning interval is set, the next lasing operation starts after a lapse of the
-                                    setting period.
+setting period.
   T4         2 to 510 ms            This is the output to notify that the marking trigger processing completed normally. This
-                                    is One-shot output. Set the output time on the system settings screen. There is a small
-                                    margin of error for the setting value.
+is One-shot output. Set the output time on the system settings screen. There is a small
+margin of error for the setting value.
   T5         Approx. 3 sec.         It outputs a warning to notify that an invalid trigger was input when TRIGGER IN (X5) was
-                                    input during trigger processing. This is One-shot output. You can turn this warning off by
-                                    the settings.
+input during trigger processing. This is One-shot output. You can turn this warning off by
+the settings.
   T6         ―                      Time for marking data creation. It varies depending on the quantity of the setting data. This
-                                    time is required at every marking.
+time is required at every marking.
   T7         2 to 510ms             If the trigger processing was stopped by an alarm or a warning, PROCESSING FAIL OUT
-                                    (Y12) turns on during the one-shot output period. PROCESSING END OUT (Y11) will not
-                                    be output at this time.
+(Y12) turns on during the one-shot output period. PROCESSING END OUT (Y11) will not
+be output at this time.
 
 
 110                                                         ME-LPRF-SM-11
@@ -5470,53 +5471,53 @@ on of TRIGGER IN (X5).
 When the trigger mode is set to “continuous trigger” in the file settings, lasing operation is repeated while TRIGGER IN (X5)
 is on. With “allow to stop halfway” setting, the lasing operation is terminated immediately when TRIGGER IN turns OFF.
 
-                           ON                                                      T5
-        READY OUT (Y5)
-                           OFF
-                                                               T1
-                           ON
-        TRIGGER IN (X5)
-                           OFF
-                                                                                                                       Marking
-                                                                                                                       interruption
-                           ON
-      PROCESSING OUT
-                (Y10)
-                           OFF                          T3            T3
-                                         T2                                                             T2
-                           ON
-           LASING OUT
-                (No.40)
-                           OFF
+   ON                                                      T5
+  READY OUT (Y5)
+   OFF
+   T1
+   ON
+  TRIGGER IN (X5)
+   OFF
+   Marking
+   interruption
+   ON
+PROCESSING OUT
+   (Y10)
+   OFF                          T3            T3
+   T2                                                             T2
+   ON
+   LASING OUT
+   (No.40)
+   OFF
 
-      PROCESSING END ON                                                                 T4
-            OUT (Y11)
-                           OFF
+PROCESSING END ON                                                                 T4
+   OUT (Y11)
+   OFF
 
-      PROCESSING FAIL ON                                                                                              T6
-            OUT (Y12)
-                           OFF
-                           ON (Normal)
-      ALARM OUT (Y15)
-                           OFF (Error)
+PROCESSING FAIL ON                                                                                              T6
+   OUT (Y12)
+   OFF
+   ON (Normal)
+ALARM OUT (Y15)
+   OFF (Error)
 
 
  Item       Time                 Remarks
  T1         2 ms or more         Keep the ON status for the duration of repeating the lasing operation.
  T2         0 to 9999 ms         When the trigger delay time is set in the selected file, trigger processing (lasing) operation
-                                 starts after the delay time.
+starts after the delay time.
  T3         0.0 to 60.0 sec.     When the scanning interval is set, the next lasing operation starts after a lapse of the
-                                 setting period.
+setting period.
  T4         2 to 510 ms          This is the output to notify that the marking trigger processing completed normally. This
-                                 is One-shot output. Set the output time on the system settings screen. There is a small
-                                 margin of error for the setting value.
-                                 When the marking operation stops halfway because TRIGGER IN turns OFF, it is treated
-                                 as normal operation end.
+is One-shot output. Set the output time on the system settings screen. There is a small
+margin of error for the setting value.
+When the marking operation stops halfway because TRIGGER IN turns OFF, it is treated
+as normal operation end.
  T5         ―                    Time for marking data creation. It varies depending on the quantity of the setting data. This
-                                 time is required at every marking.
+time is required at every marking.
  T6         2 to 510 ms          If the trigger processing was stopped by an alarm or a warning, PROCESSING FAIL OUT
-                                 (Y12) turns on during the one-shot output period. PROCESSING END OUT (Y11) will not
-                                 be output at this time.
+(Y12) turns on during the one-shot output period. PROCESSING END OUT (Y11) will not
+be output at this time.
 
 
    ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
@@ -5526,50 +5527,50 @@ is on. With “allow to stop halfway” setting, the lasing operation is termina
   number, warning E631 occurs and the subsequent lasing is canceled.
 
 
-                                                         ME-LPRF-SM-11                                                         111
+ME-LPRF-SM-11                                                         111
 
 ---
 
 ## หน้า 112
 
 4-6-5 On-the-fly marking: Single trigger
-                            ON (Open)
-         SHUTTER OPEN OUT
-                    (No.39) OFF (Close)           T1
-                            ON
-            READY OUT (Y5)                                                   T5                                     T5
-                            OFF
-                               ON
-             TRIGGER IN (X5)                               T2                                    T2
-                               OFF
-                               ON
-      PROCESSING OUT (Y10)
-                               OFF                              T3                                    T3
-                               ON
-          LASING OUT (No.40)
-                               OFF
-                               ON
-      PROCESSING END OUT
-                    (Y11)                                                          T4                                    T4
-                               OFF
+   ON (Open)
+   SHUTTER OPEN OUT
+   (No.39) OFF (Close)           T1
+   ON
+   READY OUT (Y5)                                                   T5                                     T5
+   OFF
+   ON
+   TRIGGER IN (X5)                               T2                                    T2
+   OFF
+   ON
+PROCESSING OUT (Y10)
+   OFF                              T3                                    T3
+   ON
+   LASING OUT (No.40)
+   OFF
+   ON
+PROCESSING END OUT
+   (Y11)                                                          T4                                    T4
+   OFF
 
 
   Item      Time                    Remarks
   T1        ―                       Time for marking data creation. It varies depending on the quantity of the setting data.
   T2        2ms or more             Keep the ON status for 2ms or more.
   T3        ―                       Time from when TRIGGER IN (X5) is turned on till when the work piece comes to the
-                                    preset marking position.
+preset marking position.
   T4        2 to 510ms              This is the output to notify that the marking trigger processing completed normally. This is
-                                    One-shot output. Set the output time on System settings screen. There is a small margin of
-                                    error for the setting value.
+One-shot output. Set the output time on System settings screen. There is a small margin of
+error for the setting value.
   T5        ―                       Time for marking data creation.
-                                    When the next marking data is not ready during the marking operation, this is the rest time
-                                    for data creation.
-                                    When the next marking data is ready during the marking operation, this takes less than
-                                    1ms.
+When the next marking data is not ready during the marking operation, this is the rest time
+for data creation.
+When the next marking data is ready during the marking operation, this takes less than
+1ms.
 
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • If the counter is reset during on-the-fly marking operation, READY OUT (Y5) turns off momentary and there is a case
    that the next marking could not be executed due to Warning E751.
 
@@ -5581,44 +5582,44 @@ is on. With “allow to stop halfway” setting, the lasing operation is termina
 ## หน้า 113
 
 4-6-6 On-the-fly marking: Marking at regular intervals
-                           ON (Open)
-        SHUTTER OPEN OUT
-                   (No.39) OFF (Close)        T1
-                           ON
-           READY OUT (Y5)                                                                                          T5
-                           OFF
-                              ON
-            TRIGGER IN (X5)                                                                                   *1
-                              OFF
-                              ON
-      PROCESSING OUT (Y10)
-                              OFF
-                                                          T2              T3                 T3
-                              ON
-         LASING OUT (No.40)
-                              OFF
-                              ON
-      PROCESSING END OUT
-                    (Y11)                                                      T4                   T4                  T4
-                              OFF
+   ON (Open)
+  SHUTTER OPEN OUT
+   (No.39) OFF (Close)        T1
+   ON
+   READY OUT (Y5)                                                                                          T5
+   OFF
+   ON
+   TRIGGER IN (X5)                                                                                   *1
+   OFF
+   ON
+PROCESSING OUT (Y10)
+   OFF
+   T2              T3                 T3
+   ON
+   LASING OUT (No.40)
+   OFF
+   ON
+PROCESSING END OUT
+   (Y11)                                                      T4                   T4                  T4
+   OFF
 
 
 *1 : If TRIGGER IN (X5) turns off when the trigger processing operation is running, on-the-fly marking at regular intervals
-     is terminated after finishing the running operation.
+is terminated after finishing the running operation.
 
  Item     Time                 Remarks
  T1       ―                    Time for marking data creation. It varies depending on the quantity of the setting data.
  T2       ―                    Time from when TRIGGER IN (X5) is turned on till when the work piece comes to the
-                               preset marking position.
+preset marking position.
  T3       ―                    Time it takes the workpiece to move to the setting intervals [mm].
  T4       2 to 510ms           This is the output to notify that the marking trigger processing completed normally. This is
-                               One-shot output. Set the output time on System settings screen. There is a small margin of
-                               error for the setting value.
+One-shot output. Set the output time on System settings screen. There is a small margin of
+error for the setting value.
  T5       ―                    Time for marking data creation.
-                               When the next marking data is not ready during the marking operation, this is the rest time
-                               for data creation.
-                               When the next marking data is ready during the marking operation, this takes less than
-                               1ms.
+When the next marking data is not ready during the marking operation, this is the rest time
+for data creation.
+When the next marking data is ready during the marking operation, this takes less than
+1ms.
 
 
    ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
@@ -5626,63 +5627,63 @@ is on. With “allow to stop halfway” setting, the lasing operation is termina
   due to Warning E751.
 
 
-                                                       ME-LPRF-SM-11                                                         113
+ME-LPRF-SM-11                                                         113
 
 ---
 
 ## หน้า 114
 
 4-6-7 On-the-fly marking: Multiple triggers
-                            ON (Open)
-         SHUTTER OPEN OUT
-                    (No.39) OFF (Close)        T1
-                            ON
-            READY OUT (Y5)
-                            OFF                              T4
-                               ON                                                    *1
-             TRIGGER IN (X5)                            T2          T2          T2
-                               OFF
-                               ON
-       PROCESSING OUT (Y10)
-                               OFF
-                                                                         T3
-                                                                                     T3
-                                                                                                 T3
+   ON (Open)
+  SHUTTER OPEN OUT
+   (No.39) OFF (Close)        T1
+   ON
+   READY OUT (Y5)
+   OFF                              T4
+   ON                                                    *1
+   TRIGGER IN (X5)                            T2          T2          T2
+   OFF
+   ON
+PROCESSING OUT (Y10)
+   OFF
+   T3
+   T3
+   T3
 
-                                                                                          T4
-                               ON
-          LASING OUT (No.40)
-                               OFF
-                               ON
-       PROCESSING END OUT
-                     (Y11)                                                                T5       T5          T5
-                               OFF
+   T4
+   ON
+   LASING OUT (No.40)
+   OFF
+   ON
+PROCESSING END OUT
+   (Y11)                                                                T5       T5          T5
+   OFF
 
  *1 : When trigger mode is set to Multiple triggers at on-the-fly marking, max. 16 triggers can be accepted while
-      PROCESSING OUT (Y10) is ON.
+PROCESSING OUT (Y10) is ON.
 
   Item     Time                 Remarks
   T1       ―                    Time for marking data creation. It varies depending on the quantity of the setting data.
   T2       2ms or more          Keep the ON status for 2ms or more.
   T3       ―                    Time from when TRIGGER IN (X5) is turned on till when the work piece comes to the
-                                preset marking position
+preset marking position
   T4       ―                    The total time of lasing time and preparing time for next marking is needed for the input
-                                interval of TRIGGER IN.
-                                If this interval is too short, warning E618 occurs and subsequent marking will be canceled.
+interval of TRIGGER IN.
+If this interval is too short, warning E618 occurs and subsequent marking will be canceled.
   T5       2 to 510ms           This is the output to notify that the marking trigger processing completed normally. This is
-                                One-shot output. Set the output time on System settings screen. There is a small margin of
-                                error for the setting value.
+One-shot output. Set the output time on System settings screen. There is a small margin of
+error for the setting value.
 
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • If the counter is reset during on-the-fly marking operation, READY OUT (Y5) turns off momentary and there is a case
    that the next marking could not be executed due to Warning E751.
  • If any of the following operations are executed while the trigger processing operations of multiple triggers are running,
    on-the-fly marking is terminated after finishing the running marking, and subsequent triggers will be canceled.
-    • Closing the shutter
-    • Sending MKM command with “command reception permission ON”
-    • Changing the file
-    • Changing the marking characters by code reader linkage function
+• Closing the shutter
+• Sending MKM command with “command reception permission ON”
+• Changing the file
+• Changing the marking characters by code reader linkage function
 
 
 114                                                     ME-LPRF-SM-11
@@ -5694,51 +5695,51 @@ is on. With “allow to stop halfway” setting, the lasing operation is termina
 4-6-8 On-the-fly marking: 2 sensors input
 When trigger mode is set to Single trigger
 
-                                                    Speed A              Speed B        Speed C
+Speed A              Speed B        Speed C
 
-                                    ON
-           ENCODER A IN (X13)                  T1                              T6
-                                    OFF
-                                    ON               T3
-           ENCODER B IN (X14)
-                                    OFF
-                                    ON
-               TRIGGER IN (X5)                            T4                       T4
+   ON
+ENCODER A IN (X13)                  T1                              T6
+   OFF
+   ON               T3
+ENCODER B IN (X14)
+   OFF
+   ON
+   TRIGGER IN (X5)                            T4                       T4
 
-                                    OFF
-                                    ON
+OFF
+ON
   SHUTTER OPEN OUT (No.39)
-                                    OFF
-                                    ON    T2
-               READY OUT (Y5)
-                                    OFF
-                                    ON
-        PROCESSING OUT (Y10)
-                                    OFF
-                                    ON                           T5                       T5                T5
-           LASING OUT (No.40)
-                                    OFF
+   OFF
+   ON    T2
+   READY OUT (Y5)
+   OFF
+   ON
+PROCESSING OUT (Y10)
+   OFF
+   ON                           T5                       T5                T5
+   LASING OUT (No.40)
+   OFF
 
-              Applied line speed          Undefined *1         Speed A              Speed B *2             Speed C
+Applied line speed          Undefined *1         Speed A              Speed B *2             Speed C
 
 
 *1 : If TRIGGER IN (X5) is turned ON without proper detection of the line speed, warning E607 occurs.
 *2 : When ENCODER B IN (X14) is input during the trigger processing operation, the line speed is updated after the
-     running trigger processing.
+running trigger processing.
 
  Item     Time                     Remarks
  T1       0ms or more              Turn on ENCODER A IN (X13) with the shutter opened.
  T2       ―                        Time for marking data creation. It varies depending on the quantity of the setting data.
  T3       Max. 10 sec.             If ENCODER B IN (X14) does not turn on within 10 seconds from turnig on of ENCODER A
-                                   IN (X13), time-out error (E607) occurs when TRIGGER IN (X5) is input.
+IN (X13), time-out error (E607) occurs when TRIGGER IN (X5) is input.
  T4       1 to 10 sec.             If TRIGGER IN (X5) is not turned on within the setting time-out period from turning on
-          or                       ENCODER B IN (X14), time-out error (warning E607) occurs.
-          Not specified            This time-out can be disabled by setting.
-          (No time-out)
+or                       ENCODER B IN (X14), time-out error (warning E607) occurs.
+Not specified            This time-out can be disabled by setting.
+(No time-out)
  T5       ―                        Time from when TRIGGER IN (X5) is turned on till when the work piece comes to the
-                                   preset marking position.
+preset marking position.
  T6       0ms or more              ENCODER A IN (X13) for the next marking can be accepted after inputting ENCODER B
-                                   IN (X14).
+IN (X14).
 
 
    ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
@@ -5746,69 +5747,69 @@ When trigger mode is set to Single trigger
   reduce the difference between the detected line speed and the actual line speed at the marking.
 
 
-                                                              ME-LPRF-SM-11                                                   115
+ME-LPRF-SM-11                                                   115
 
 ---
 
 ## หน้า 116
 
 4-6-9 Target detection input
-                                     ON
-                  READY OUT (Y5)
-                                     OFF
-                                     ON        T1                                         T1
-                  TRIGGER IN (X5)
-                                     OFF
-                                     ON
-      TARGET DETECTION IN (X7)                          T3                   T3
-                                     OFF
-                                     ON
-         PROCESSING OUT (Y10)
-                                     OFF
-                                     ON        T2                    T2                   T2
-            LASING OUT (No.40)
-                                     OFF
-                                     ON                       T4                   T4                    T4
+   ON
+   READY OUT (Y5)
+   OFF
+   ON        T1                                         T1
+   TRIGGER IN (X5)
+   OFF
+   ON
+TARGET DETECTION IN (X7)                          T3                   T3
+   OFF
+   ON
+   PROCESSING OUT (Y10)
+   OFF
+   ON        T2                    T2                   T2
+   LASING OUT (No.40)
+   OFF
+   ON                       T4                   T4                    T4
   PROCESSING END OUT (Y11)
-                                     OFF
-                                     ON
+OFF
+ON
   PROCESSING FAIL OUT (Y12)
-                                     OFF
-                                     ON
-                                                              T5                   T5
-          CHECK OK OUT (No.34)
-                                     OFF
-                                     ON                                                                  T5
-          CHECK NG OUT (No.35)
-                                     OFF
-                                     ON (Normal)                                                                  T6
-            WARNING OUT (Y14)
-                                     OFF (Error)
+   OFF
+   ON
+   T5                   T5
+CHECK OK OUT (No.34)
+   OFF
+   ON                                                                  T5
+CHECK NG OUT (No.35)
+   OFF
+   ON (Normal)                                                                  T6
+  WARNING OUT (Y14)
+   OFF (Error)
 
 
   Item     Time                     Remarks
   T1       2ms or more              Keep the ON status for 2ms or more.
   T2       0 to 9999 ms             When the trigger delay time is set in the selected file, trigger processing (lasing) operation
-                                    starts after the delay time.
+starts after the delay time.
   T3       1 ms or more             When TARGET DETECTION IN (X7) turns ON for more than 1ms while LASING OUT
-                                    (No.40) is ON, it is judged as success of the target detection.
+(No.40) is ON, it is judged as success of the target detection.
   T4       2 to 510 ms              This is the output to notify that the marking trigger processing completed normally. Even
-                                    when the workpiece could not be detected, PROCESSING END OUT (Y11) turns on unless
-                                    the trigger processing operation is interrupted. This is One-shot output. Set the output time
-                                    on System settings screen. There is a small margin of error for the setting value.
+when the workpiece could not be detected, PROCESSING END OUT (Y11) turns on unless
+the trigger processing operation is interrupted. This is One-shot output. Set the output time
+on System settings screen. There is a small margin of error for the setting value.
   T5       2 to 510 ms              According to the ON/OFF state of TARGET DETECTION IN (X7), CHECK OK OUT (No.34)
-                                    or CHECK NG OUT (No.35) turns on for one-shot time after the trigger processing (lasing)
-                                    operation. The one-shot output time is set on the system settings screen. There is a small
-                                    margin of error for the setting value.
-                                     • When TARGET DETECTION IN (X7) turns ON for more than 1ms during lasing
-                                       operation: CHECK OK OUT (No.34) turns ON.
-                                     • When TARGET DETECTION IN (X7) did not turn ON during lasing operation: CHECK
-                                       NG OUT (No.35) turns ON.
+or CHECK NG OUT (No.35) turns on for one-shot time after the trigger processing (lasing)
+operation. The one-shot output time is set on the system settings screen. There is a small
+margin of error for the setting value.
+ • When TARGET DETECTION IN (X7) turns ON for more than 1ms during lasing
+   operation: CHECK OK OUT (No.34) turns ON.
+ • When TARGET DETECTION IN (X7) did not turn ON during lasing operation: CHECK
+   NG OUT (No.35) turns ON.
   T6       Approx. 3 sec.           When TARGET DETECTION IN (X7) did not turn ON during lasing operation, the warning
-                                    E752 is output for 3 seconds.
+E752 is output for 3 seconds.
 
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • Before using TARGET DETECTION IN (X7), set X7: TARGET DETECTION IN to “Enabled” at the system settings of
    Laser Marker NAVI smart.
 
@@ -5820,46 +5821,46 @@ When trigger mode is set to Single trigger
 ## หน้า 117
 
 4-6-10 Guide laser radiation input
-                                     ON
-        SHUTTER ENABLE IN (X9)
-                                     OFF
+   ON
+SHUTTER ENABLE IN (X9)
+   OFF
 
-                                     ON
-                 SHUTTER IN (X8)
-                                     OFF
-                                                                                                                 *2
-                                     ON
-        SELECT 0 - 2 IN (No.19-21)                                       *1
+   ON
+   SHUTTER IN (X8)
+   OFF
+   *2
+   ON
+SELECT 0 - 2 IN (No.19-21)                                       *1
 
-                                     OFF
-                                     ON                                  T3
-                 GUIDE IN (No.23)                                                             T4
-                                                                    T2
-                                     OFF
+   OFF
+   ON                                  T3
+GUIDE IN (No.23)                                                             T4
+   T2
+   OFF
 
-                                     ON
-                 READY OUT (Y5)
-                                     OFF
-                                     ON (Close)
-      SHUTTER CLOSE 1 OUT (Y8)                                 T1
-      SHUTTER CLOSE 2 OUT (Y9)
-                                     OFF (Open)
+   ON
+   READY OUT (Y5)
+   OFF
+   ON (Close)
+SHUTTER CLOSE 1 OUT (Y8)                                 T1
+SHUTTER CLOSE 2 OUT (Y9)
+   OFF (Open)
 
 
   Item       Time                    Remarks
   T1         Max. 1 sec.             There is a delay time of around 200ms to max. 1 second from turning ON/OFF of
-                                     SHUTTER IN (X8) to turning ON/OFF of SHUTTER CLOSE 1 OUT (Y8) and SHUTTER
-                                     CLOSE 2 OUT (Y9).
-                                     SHUTTER CLOSE 1 OUT and SHUTTER CLOSE 2 OUT will be output by the same
-                                     operation, but their output timing has a margin of error.
+SHUTTER IN (X8) to turning ON/OFF of SHUTTER CLOSE 1 OUT (Y8) and SHUTTER
+CLOSE 2 OUT (Y9).
+SHUTTER CLOSE 1 OUT and SHUTTER CLOSE 2 OUT will be output by the same
+operation, but their output timing has a margin of error.
 
   T2         0ms or more             Turn on GUIDE IN (No.23) with the shutter closed.
   T3         0.5ms or more           After a lapse of 0.5ms or more from specifying SELECT 0 IN to SELECT 2 IN, turn on
-                                     GUIDE IN.
+GUIDE IN.
   T4         Max. 60 sec.            The guide laser is stopped automatically after passing 1 minute from start-up.
 
 *1 : Select the indication contents of the guide laser with SELECT 0 IN to SELECT 2 IN as follows.
-       Radiation details         SELECT 0 IN (No. 19)            SELECT 1 IN (No. 20)          SELECT 2 IN (No. 21)
+Radiation details         SELECT 0 IN (No. 19)            SELECT 1 IN (No. 20)          SELECT 2 IN (No. 21)
   Work distance                            OFF                                OFF                       OFF
   Marking image                             ON                                OFF                       OFF
   Marking field                            OFF                                ON                        OFF
@@ -5867,7 +5868,7 @@ When trigger mode is set to Single trigger
 
 *2 : Keep the input state of SELECT 0 IN to SELECT 2 IN (No.19-21) while GUIDE IN (No.23) is turned ON.
 
-       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • To use a guide laser in remote mode while any of the INTERLOCK inputs (REMOTE INTERLOCK IN, INTERLOCK
    1, INTERLOCK 2) is open, set “Deactivate while shutter closed” in “System settings” > “Operation/information” >
    “INTERLOCK alarm detection”.
@@ -5878,64 +5879,64 @@ When trigger mode is set to Single trigger
  • Do not execute any other operation while the guide laser is emitted.
 
 
-                                                             ME-LPRF-SM-11                                                117
+ME-LPRF-SM-11                                                117
 
 ---
 
 ## หน้า 118
 
 4-6-11 Select file
-                               ON
-            SELECT 0 - 2 IN                    *1
-                (No.19-21)
-                               OFF
-                               ON
-                                               File                                     File
-       D0 - D15 IN (No.3-18)
-                                               number A                                 number B
-                               OFF
-                                                                                                    T6
-                               ON                                                        T1
-                                               T1                                              *2
-               SET IN (No.2)
-                               OFF
-                                                    T2                                                   T2
-                               ON                                                      T5
-          TRIGGER IN (X5)
-                               OFF
-                               ON
-       SET OK OUT (No.28)                           T3                                         T3
+   ON
+   SELECT 0 - 2 IN                    *1
+   (No.19-21)
+   OFF
+   ON
+   File                                     File
+D0 - D15 IN (No.3-18)
+   number A                                 number B
+   OFF
+   T6
+   ON                                                        T1
+   T1                                              *2
+   SET IN (No.2)
+   OFF
+   T2                                                   T2
+   ON                                                      T5
+   TRIGGER IN (X5)
+   OFF
+   ON
+SET OK OUT (No.28)                           T3                                         T3
 
-                               OFF
+OFF
 
-                               ON
-          READY OUT (Y5)                                   T4      File number A                           T4     File number B
-                                                                   ready                                          ready
-                               OFF
+   ON
+READY OUT (Y5)                                   T4      File number A                           T4     File number B
+   ready                                          ready
+   OFF
 
-                               ON
+ON
   PROCESSING OUT (Y10)                                                                        File
-                                                                                              number A
-                               OFF
+   number A
+OFF
 
 
   Item     Time                      Remarks
   T1       0.5ms or more             After a lapse of 0.5ms or more from specifying SELECT 0 IN to SELECT 2 IN and D0 IN to
-                                     D15 IN, turn on SET IN (No.2).
+D15 IN, turn on SET IN (No.2).
   T2       0ms or more               Keep the input until SET OK OUT (No.28) turns on.
   T3       2 to 510ms                One-shot output. Set the output time on the system settings screen. There is a small
-                                     margin of error for the setting value.
+margin of error for the setting value.
   T4       ―                         • In the laser pumping completed and shutter opened state: Time for marking data
-                                       creation. It varies depending on the quantity of the setting data.
-                                     • When the laser pumping is not completed and shutter is closed: Total time for shutter
-                                       opening and marking data creation, or time for laser pumping, whichever is longer.
+  creation. It varies depending on the quantity of the setting data.
+• When the laser pumping is not completed and shutter is closed: Total time for shutter
+  opening and marking data creation, or time for laser pumping, whichever is longer.
   T5       2ms or more               Keep the ON status for 2ms or more.
   T6       0ms or more               To input the next file number right after TRIGGER IN (X5), input SET IN (No.2) after
-                                     PROCESSING OUT (Y10) turns ON.
+PROCESSING OUT (Y10) turns ON.
 
  *1 : Turn off SELECT 0 IN to SELECT 2 IN when you specify a file number.
  *2 : You can input the next file number during the trigger processing. If the trigger processing was being executed when
-      you turned on SET IN (No.2), the file number changes after the trigger processing completes.
+you turned on SET IN (No.2), the file number changes after the trigger processing completes.
 
 
 118                                                          ME-LPRF-SM-11
@@ -5945,35 +5946,35 @@ When trigger mode is set to Single trigger
 ## หน้า 119
 
 4-6-12 Time/date hold input and date gap output
-                   Actual date                   Day 1                                                   Day 2
+Actual date                   Day 1                                                   Day 2
 
-                                                                                                      8 o’clock of day 2
-                        Example: at 15 o’clock of day 1
+   8 o’clock of day 2
+Example: at 15 o’clock of day 1
 
-                              ON
-       TIME HOLD IN (No.22)
-                              OFF
+   ON
+TIME HOLD IN (No.22)
+   OFF
 
-                              ON
-           TRIGGER IN (X5)
-                              OFF
+   ON
+TRIGGER IN (X5)
+   OFF
 
-                              ON
-                                                      Mark                          Mark
+ON
+   Mark                          Mark
   PROCESSING OUT (Y10)
-                                                      retained time                 retained time
-                              OFF
-                                                  (15 o’clock of day 1)       (15 o’clock of day 1)            (Mark 8 o’clock of day 2)
-                              ON
-           READY OUT (Y5)
-                              OFF
+   retained time                 retained time
+   OFF
+   (15 o’clock of day 1)       (15 o’clock of day 1)            (Mark 8 o’clock of day 2)
+   ON
+READY OUT (Y5)
+   OFF
 
-                              ON
-     DATE GAP OUT (No.29)
-                              OFF
+   ON
+DATE GAP OUT (No.29)
+   OFF
 
 
-                                                                      Date change
+Date change
 
 
   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
@@ -5985,23 +5986,23 @@ When trigger mode is set to Single trigger
 
 
 4-6-13 Counter end output
-                              ON
-          READY OUT (Y5)
+   ON
+READY OUT (Y5)
 
-                              OFF
-                              ON
-                                                     T1                 T1              T1               T1
-          TRIGGER IN (X5)
-                              OFF
-                              ON
+   OFF
+   ON
+   T1                 T1              T1               T1
+TRIGGER IN (X5)
+   OFF
+   ON
   PROCESSING OUT (Y10)
 
-                              OFF
-                                                          Mark the counter end value
-                              ON
+OFF
+   Mark the counter end value
+ON
  COUNT END A/B/C/D OUT
-        (No.30/31/32/33)
-                              OFF
+(No.30/31/32/33)
+   OFF
 
 
 Item      Time                   Remarks
@@ -6016,67 +6017,67 @@ T1        2ms or more            Keep the ON status for 2ms or more.
 • COUNT END A/B/C/D OUT is disabled when “counter update per step” is configured at Step & repeat.
 
 
-                                                          ME-LPRF-SM-11                                                                    119
+ME-LPRF-SM-11                                                                    119
 
 ---
 
 ## หน้า 120
 
 4-6-14 Count-up/count-down value correction
-                                    ON
-       SELECT 0 - 2 IN (No.19-21)                      *1
-                                    OFF
+   ON
+SELECT 0 - 2 IN (No.19-21)                      *1
+   OFF
 
-                                    ON
-             D0 - D7 IN (No.3-10)                      *2
-                                    OFF
+   ON
+D0 - D7 IN (No.3-10)                      *2
+   OFF
 
-                                    ON
-           D8 - D15 IN (No.10-18)                      *3
-                                    OFF
+   ON
+D8 - D15 IN (No.10-18)                      *3
+   OFF
 
-                                    ON
-                                                       T1
-                   SET IN (No.2)
-                                    OFF
-                                                            T2
-                                    ON
-            SET OK OUT (No.28)                              T3
-                                    OFF
-                                                                    T4
-                                    ON
-                TRIGGER IN (X5)                                              T5
+   ON
+   T1
+   SET IN (No.2)
+   OFF
+   T2
+   ON
+SET OK OUT (No.28)                              T3
+   OFF
+   T4
+   ON
+   TRIGGER IN (X5)                                              T5
 
-                                    OFF
+OFF
 
-                                    ON
-                READY OUT (Y5)
-                                    OFF
+   ON
+READY OUT (Y5)
+   OFF
 
-                                    ON
-         PROCESSING OUT (Y10)
-                                    OFF
+   ON
+PROCESSING OUT (Y10)
+   OFF
 
 
   Item      Time                    Remarks
   T1        0.5ms or more           After a lapse of 0.5ms or more from specifying SELECT 0 IN to SELECT 2 IN and D0 IN to
-                                    D15 IN, turn on SET IN (No.2).
+D15 IN, turn on SET IN (No.2).
   T2        0ms or more             Keep the input until SET OK OUT (No.28) turns on.
   T3        2 to 510ms              One-shot output. Set the output time on the system settings screen.
-                                    There is a small margin of error for the setting value.
+There is a small margin of error for the setting value.
   T4        0ms or more             Turn on TRIGGER IN (X5) after SET OK OUT (No.28) turns on.
   T5        2ms or more             Keep the ON status for 2ms or more.
 
  *1 : Select the number input target with SELECT 0 IN to SELECT 2 IN as follows.
-         Number input target             SELECT 0 IN (No. 19)      SELECT 1 IN (No. 20)        SELECT 2 IN (No. 21)
+Number input target             SELECT 0 IN (No. 19)      SELECT 1 IN (No. 20)        SELECT 2 IN (No. 21)
   Count-up value correction                      OFF                        ON                            OFF
   Count-down value correction                    ON                         ON                            OFF
 
  *2 : Select a value from D0 to D7 for the counter number to correct the count-up/count-down value. The counter No. 0 to 3
-      is assigned at D0 to D3 and the common counter No. 16 to 19 is assigned at D4 to D7 respectively.
+is assigned at D0 to D3 and the common counter No. 16 to 19 is assigned at D4 to D7 respectively.
  *3 : Specify a value in D8 to D15 for the step times of count-up or count-down in the binary system.
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • To specify the next counter value during the trigger processing, input SET IN (No.2) after PROCESSING OUT (Y10)
    turns ON.
  • If the count-up/count-down correction is input during on-the-fly marking operation, READY OUT (Y5) turns off
@@ -6090,54 +6091,54 @@ T1        2ms or more            Keep the ON status for 2ms or more.
 ## หน้า 121
 
 4-6-15 Counter reset input
-                                ON
+ON
    SELECT 0 - 2 IN (No.19-21)                                           *1
-                                OFF
+OFF
 
-                                ON
-        D0 - D15 IN (No.3-18)                                           *2
-                                OFF
-                                ON
-                                                                             T5
-                SET IN (No.2)
-                                OFF
-                                                                                  T2
-                                ON                     T1                                         T1
-            TRIGGER IN (X5)
-                                OFF
+   ON
+D0 - D15 IN (No.3-18)                                           *2
+   OFF
+   ON
+   T5
+   SET IN (No.2)
+   OFF
+   T2
+   ON                     T1                                         T1
+   TRIGGER IN (X5)
+   OFF
 
-                                ON
-         SET OK OUT (No.28)                                                       T3
-                                OFF
+   ON
+SET OK OUT (No.28)                                                       T3
+   OFF
 
 
-                                ON
-            READY OUT (Y5)
-                                                                                         T4
-                                OFF
+   ON
+READY OUT (Y5)
+   T4
+   OFF
 
-                                ON
-      PROCESSING OUT (Y10)
-                                OFF
+   ON
+PROCESSING OUT (Y10)
+   OFF
 
 
  Item    Time                   Remarks
  T1      2ms or more            Keep the ON status for 2ms or more.
  T2      0ms or more            Keep the input until SET OK OUT (No.28) turns on.
  T3      2 to 510ms             One-shot output. Set the output time on the system settings screen. There is a small
-                                margin of error for the setting value.
+margin of error for the setting value.
  T4      0ms or more            Turn on TRIGGER IN (X5) after SET OK OUT (No.28) turns on.
  T5      0.5ms or more          After a lapse of 0.5ms or more from specifying SELECT 0 IN to SELECT 2 IN and D0 IN to
-                                D15 IN, turn on SET IN (No.2).
+D15 IN, turn on SET IN (No.2).
 
 *1 : To reset the counter, set SELECT 0 IN to SELECT 2 IN as follows.
-      SELECT 0 IN (No.19): OFF, SELECT 1 IN (No.20): OFF, SELECT 2 IN (No.21): ON
+SELECT 0 IN (No.19): OFF, SELECT 1 IN (No.20): OFF, SELECT 2 IN (No.21): ON
 *2 : Specify the counter number to reset by using D0 IN to D15 IN (No.3 to 18). The following counter numbers are
-     assigned to D0 IN to D15 IN respectively.
-    • D0 to D3: Counter No. 0 to 3
-    • D4 to D7: Common Counter No. 16 to 19
-    • D8 to D11: Counter No. 4 to 7
-    • D12 to D15: Common Counter No. 20 to 23
+ assigned to D0 IN to D15 IN respectively.
+• D0 to D3: Counter No. 0 to 3
+• D4 to D7: Common Counter No. 16 to 19
+• D8 to D11: Counter No. 4 to 7
+• D12 to D15: Common Counter No. 20 to 23
 
 
    ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
@@ -6145,73 +6146,73 @@ T1        2ms or more            Keep the ON status for 2ms or more.
   that the next marking could not be executed due to Warning E751.
 
 
-                                                       ME-LPRF-SM-11                                                    121
+ME-LPRF-SM-11                                                    121
 
 ---
 
 ## หน้า 122
 
 4-6-16 Registered characters/external offset marking
-                               ON
-            SELECT 0 - 2 IN
-                                                     *1
-                (No.19-21)
-                               OFF
+   ON
+SELECT 0 - 2 IN
+   *1
+   (No.19-21)
+   OFF
 
-                               ON
-       D0 - D15 IN (No.3-18)                         *2
-                                                                                        Data B              Data C
-                                                     Data A
-                               OFF
-                                           T1                                     T1                  T1
-                               ON
-                                                T6            T2                 T6               T2        T6        T2
-              SET IN (No.2)
-                               OFF
+   ON
+D0 - D15 IN (No.3-18)                         *2
+   Data B              Data C
+   Data A
+   OFF
+   T1                                     T1                  T1
+   ON
+   T6            T2                 T6               T2        T6        T2
+   SET IN (No.2)
+   OFF
 
-                               ON
-          TRIGGER IN (X5)                                                  T5                                    T5                    T5
-                               OFF
+   ON
+TRIGGER IN (X5)                                                  T5                                    T5                    T5
+   OFF
 
-                               ON
+ON
  DATA WAIT OUT (No.38)
-                               OFF
+OFF
 
-                               ON
-                                                                   T3                                  T3                  T3
-       SET OK OUT (No.28)
-                               OFF
-                               ON
-          READY OUT (Y5)                                      T4                                 T4
-                               OFF
+   ON
+   T3                                  T3                  T3
+SET OK OUT (No.28)
+   OFF
+   ON
+   READY OUT (Y5)                                      T4                                 T4
+   OFF
 
-                               ON
+ON
  PROCESSING OUT (Y10)                                                   Data A                              Data B              T7   Data C
-                               OFF
+OFF
 
 
   Item       Time                    Remarks
   T1         0.5ms or more           After a lapse of 0.5ms or more from specifying SELECT 0 IN to SELECT 2 IN and D0 IN to
-                                     D15 IN, turn on SET IN (No.2).
+D15 IN, turn on SET IN (No.2).
   T2         0ms or more             Keep the input until SET OK OUT (No.28) turns on.
   T3         2 to 510ms              One-shot output. Set the output time on the system settings screen. There is a small
-                                     margin of error for the setting value.
+margin of error for the setting value.
   T4         ―                       Time for data creation. It varies depending on the quantity of the setting data.
   T5         2ms or more             Keep the ON status for 2ms or more.
   T6         0ms or more             Input SET IN (No.2) after DATA WAIT OUT (No.38) turns ON.
 
 
   T7         ―                        • When the next marking data compiling has finished within the trigger processing time:
-                                        1ms or less
-                                      • When the next marking data compiling did not finish within the trigger processing time:
-                                        The remaining time of the marking data compiling (T4)
+  1ms or less
+• When the next marking data compiling did not finish within the trigger processing time:
+  The remaining time of the marking data compiling (T4)
 
  *1 : To specify the registered characters/external offset data number, set SELECT 0 IN to SELECT 2 IN as follows.
-       SELECT 0 IN (No.19): ON, SELECT 1 IN (No.20): OFF, SELECT 2 IN (No.21): OFF
+SELECT 0 IN (No.19): ON, SELECT 1 IN (No.20): OFF, SELECT 2 IN (No.21): OFF
  *2 : Specify the data number of registered characters/external offset by using D0 IN to D15 IN. Refer to “4-3 Signals and
-      Details of I/O Connector” (P.91).
+Details of I/O Connector” (P.91).
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • SET IN (No.2) for the registered characters/external offset is acceptable when the laser pumping is completed, and the
    internal shutter opens.
  • If you have configured the registered characters/external offset function, READY OUT (Y5) will not be output until the
@@ -6235,69 +6236,69 @@ If LASER STOP IN is released when laser is not radiating, the shutter is closed 
 If LASER STOP IN is released when laser is radiating, the laser pumping is turned off, and the shutter is closed.
 Refer to “Laser marker operation when functions for safety measures are input” (P.90).
 
-                                    ON
-           LASER SUPPLY IN (X6)
-                                    OFF
-                                    ON
-         SHUTTER ENABLE IN (X9)
-               SHUTTER IN (X8)
-                                    OFF
-                                    ON                                 T3
-                  TRIGGER IN (X5)
-                                    OFF
-                                    ON (Close)
-        LASER STOP IN (X10, X11)
-                                    OFF (Open)
-                                    ON                                                                      T5
-           ALARM RESET IN (X15)
-                                    OFF
+   ON
+   LASER SUPPLY IN (X6)
+   OFF
+   ON
+ SHUTTER ENABLE IN (X9)
+   SHUTTER IN (X8)
+   OFF
+   ON                                 T3
+   TRIGGER IN (X5)
+   OFF
+   ON (Close)
+LASER STOP IN (X10, X11)
+   OFF (Open)
+   ON                                                                      T5
+   ALARM RESET IN (X15)
+   OFF
 
-                                    ON                                                                           T6
-        LASER STANDBY OUT (Y6)
-                               OFF                   T1
-      SHUTTER CLOSE 1 OUT (Y8) ON (Close)                         T1                    T1                       T1
-      SHUTTER CLOSE 2 OUT (Y9)
-                               OFF (Open)
-                               ON
-                                                                                                                 T7
-               READY OUT (Y5)                                     T2
-                               OFF
-                                                                                             Marking
-                                    ON                                                       interruption
-          PROCESSING OUT (Y10)
-                                    OFF
-                                    ON                                          T4
-      PROCESSING FAIL OUT (Y12)
-                                    OFF
-                                    ON (Normal)
-             WARNING OUT (Y14)
-                                    OFF (Error)
-                                    ON (Normal)
-                  ALARM OUT (Y15)
-                                    OFF (Error)
+   ON                                                                           T6
+  LASER STANDBY OUT (Y6)
+   OFF                   T1
+SHUTTER CLOSE 1 OUT (Y8) ON (Close)                         T1                    T1                       T1
+SHUTTER CLOSE 2 OUT (Y9)
+   OFF (Open)
+   ON
+   T7
+   READY OUT (Y5)                                     T2
+   OFF
+   Marking
+   ON                                                       interruption
+   PROCESSING OUT (Y10)
+   OFF
+   ON                                          T4
+PROCESSING FAIL OUT (Y12)
+   OFF
+   ON (Normal)
+   WARNING OUT (Y14)
+   OFF (Error)
+   ON (Normal)
+   ALARM OUT (Y15)
+   OFF (Error)
 
 
   Item      Time                     Remarks
   T1        Max. 1 sec.              There is a delay time of around 200ms to max. 1 second from turning ON/OFF of
-                                     SHUTTER IN (X8) to turning ON/OFF of SHUTTER CLOSE 1 OUT (Y8) and SHUTTER
-                                     CLOSE 2 OUT (Y9).
-                                     SHUTTER CLOSE 1 OUT and SHUTTER CLOSE 2 OUT will be output by the same
-                                     operation, but their output timing has a margin of error.
+SHUTTER IN (X8) to turning ON/OFF of SHUTTER CLOSE 1 OUT (Y8) and SHUTTER
+CLOSE 2 OUT (Y9).
+SHUTTER CLOSE 1 OUT and SHUTTER CLOSE 2 OUT will be output by the same
+operation, but their output timing has a margin of error.
 
   T2        ―                        Total time for shutter opening and marking data creation. It varies depending on the
-                                     quantity of the setting data.
+quantity of the setting data.
   T3        2ms or more              Keep the ON status for 2ms or more.
   T4        2 to 510ms               This is One-shot output. Set the output time on the environment setting screen. There is
-                                     a small margin of error for the setting value.
+a small margin of error for the setting value.
   T5        100ms or more            Keep the ON status for 100ms or more.
   T6        Approx. 7 sec.           Time for completion of laser pumping.
 
 
   T7        ―                        Total time for shutter opening and marking data creation, or time for laser pumping,
-                                     whichever is longer.
+whichever is longer.
 
 
-                                                           ME-LPRF-SM-11                                                        123
+ME-LPRF-SM-11                                                        123
 
 ---
 
@@ -6309,65 +6310,65 @@ Refer to “Laser marker operation when functions for safety measures are input�
  If REMOTE INTERLOCK IN is released, the laser pumping is turned off and the shutter is closed, regardless of whether or
  not the laser is radiating. Refer to “Laser marker operation when functions for safety measures are input” (P.90).
 
-                                     ON
-            LASER SUPPLY IN (X6)
-                                     OFF
-                                     ON
-          SHUTTER ENABLE IN (X9)
-                SHUTTER IN (X8)
-                                     OFF
-                                     ON                                                    T5
-                   TRIGGER IN (X5)
-                                     OFF
-                                     ON (Close)
-       REMOTE INTERLOCK IN (X20)
-                                     OFF (Open)
-                                     ON                     T2                                               T2
-            ALARM RESET IN (X15)
-                                     OFF
+   ON
+   LASER SUPPLY IN (X6)
+   OFF
+   ON
+   SHUTTER ENABLE IN (X9)
+   SHUTTER IN (X8)
+   OFF
+   ON                                                    T5
+   TRIGGER IN (X5)
+   OFF
+   ON (Close)
+REMOTE INTERLOCK IN (X20)
+   OFF (Open)
+   ON                     T2                                               T2
+   ALARM RESET IN (X15)
+   OFF
 
-                                     ON                          T3                                               T3
-         LASER STANDBY OUT (Y6)
-                                OFF
-       SHUTTER CLOSE 1 OUT (Y8) ON (Close)
-                                                   T1                 T1                             T1                T1
-       SHUTTER CLOSE 2 OUT (Y9)
-                                OFF (Open)
-                                ON
-                READY OUT (Y5)                                   T4                                               T4
-                                     OFF
-                                                                                                                   Marking
-                                     ON
-                                                                                                                   interruption
-           PROCESSING OUT (Y10)
-                                     OFF
-                                     ON
-       PROCESSING END OUT (Y11)
-                                     OFF
-                                     ON                                                             T6
-       PROCESSING FAIL OUT (Y12)
-                                     OFF
-                                     ON (Normal)
-                   ALARM OUT (Y15)
-                                     OFF (Error)
+   ON                          T3                                               T3
+  LASER STANDBY OUT (Y6)
+   OFF
+SHUTTER CLOSE 1 OUT (Y8) ON (Close)
+   T1                 T1                             T1                T1
+SHUTTER CLOSE 2 OUT (Y9)
+   OFF (Open)
+   ON
+   READY OUT (Y5)                                   T4                                               T4
+   OFF
+   Marking
+   ON
+   interruption
+   PROCESSING OUT (Y10)
+   OFF
+   ON
+PROCESSING END OUT (Y11)
+   OFF
+   ON                                                             T6
+PROCESSING FAIL OUT (Y12)
+   OFF
+   ON (Normal)
+   ALARM OUT (Y15)
+   OFF (Error)
 
 
    Item      Time                     Remarks
    T1        Max. 1 sec.              There is a delay time of around 200ms to max. 1 second from turning ON/OFF of
-                                      SHUTTER IN (X8) to turning ON/OFF of SHUTTER CLOSE 1 OUT (Y8) and SHUTTER
-                                      CLOSE 2 OUT (Y9).
-                                      SHUTTER CLOSE 1 OUT and SHUTTER CLOSE 2 OUT will be output by the same
-                                      operation, but their output timing has a margin of error.
+SHUTTER IN (X8) to turning ON/OFF of SHUTTER CLOSE 1 OUT (Y8) and SHUTTER
+CLOSE 2 OUT (Y9).
+SHUTTER CLOSE 1 OUT and SHUTTER CLOSE 2 OUT will be output by the same
+operation, but their output timing has a margin of error.
 
    T2        100ms or more            Keep the ON status for 100ms or more.
    T3        Approx. 7 sec.           Time for completion of laser pumping.
 
 
    T4        ―                        Total time for shutter opening and marking data creation, or time for laser pumping,
-                                      whichever is longer.
+whichever is longer.
    T5        2ms or more              Keep the ON status for 2ms or more.
    T6        2 to 510ms               This is One-shot output. Set the output time on the environment setting screen. There is
-                                      a small margin of error for the setting value.
+a small margin of error for the setting value.
 
 
 124                                                        ME-LPRF-SM-11
@@ -6380,73 +6381,73 @@ Refer to “Laser marker operation when functions for safety measures are input�
 If INTERLOCK (X16 - X17 and X18 - X19) is opened, the laser pumping is turned off and the shutter is closed, regardless of
 whether or not the laser is radiating. Refer to “Laser marker operation when functions for safety measures are input” (P.90).
 
-                                   ON
-         LASER SUPPLY IN (X6)
-                             OFF
-      SHUTTER ENABLE IN (X9) ON
-            SHUTTER IN (X8)
-                             OFF
-                                   ON                                                        T6
-                 TRIGGER IN (X5)
-                                   OFF
-                                   CLOSE
-        INTERLOCK 1 (X16-X17)
-                                   OPEN
-                                   CLOSE
-        INTERLOCK 2 (X18-X19)                                T1                                                 T1
-                                   OPEN          T1                                                 T1
-                              CLOSE
-        INTERLOCK 1 MONITOR
-                    (Y16-Y17) OPEN
-                                                                        T1              T1
-                                   CLOSE
-        INTERLOCK 2 MONITOR
-                    (Y18-Y19) OPEN
-                                   ON                      T3                     T3                           T3
-         ALARM RESET IN (X15)
-                                   OFF
-                                   ON                             T4                   T4                            T4
+   ON
+   LASER SUPPLY IN (X6)
+   OFF
+SHUTTER ENABLE IN (X9) ON
+   SHUTTER IN (X8)
+   OFF
+   ON                                                        T6
+   TRIGGER IN (X5)
+   OFF
+   CLOSE
+  INTERLOCK 1 (X16-X17)
+   OPEN
+   CLOSE
+  INTERLOCK 2 (X18-X19)                                T1                                                 T1
+   OPEN          T1                                                 T1
+   CLOSE
+  INTERLOCK 1 MONITOR
+   (Y16-Y17) OPEN
+   T1              T1
+   CLOSE
+  INTERLOCK 2 MONITOR
+   (Y18-Y19) OPEN
+   ON                      T3                     T3                           T3
+   ALARM RESET IN (X15)
+   OFF
+   ON                             T4                   T4                            T4
    LASER STANDBY OUT (Y6)
-                                   OFF
-                                   ON (Close)
+OFF
+ON (Close)
  SHUTTER CLOSE 1 OUT (Y8)                          T2             T2     T2            T2             T2             T2
  SHUTTER CLOSE 2 OUT (Y9)
-                                   OFF (Open)
-                                   ON
-                 READY OUT (Y5)                                    T5                   T5                            T5
-                                   OFF
-                                                                                                                     Marking
-                                   ON                                                                                interruption
-        PROCESSING OUT (Y10)
-                                   OFF
-                                   ON                                                                T7
+   OFF (Open)
+   ON
+   READY OUT (Y5)                                    T5                   T5                            T5
+   OFF
+   Marking
+   ON                                                                                interruption
+PROCESSING OUT (Y10)
+   OFF
+   ON                                                                T7
  PROCESSING FAIL OUT (Y12)
-                                   OFF
-                                   ON (Normal)
-                 ALARM OUT (Y15)
-                                   OFF (Error)
+   OFF
+   ON (Normal)
+ALARM OUT (Y15)
+   OFF (Error)
 
 
  Item      Time                      Remarks
  T1        Approx. 50ms              INTERLOCK MONITOR is switched open and closed with a delay of approx. 50ms with
-                                     reference to each INTERLOCK input.
+reference to each INTERLOCK input.
  T2        Max. 1 sec.               There is a delay time of around 200ms to max. 1 second from turning ON/OFF of
-                                     SHUTTER IN (X8) to turning ON/OFF of SHUTTER CLOSE 1 OUT (Y8) and SHUTTER
-                                     CLOSE 2 OUT (Y9). SHUTTER CLOSE 1 OUT and SHUTTER CLOSE 2 OUT will be
-                                     output by the same operation, but their output timing has a margin of error.
+SHUTTER IN (X8) to turning ON/OFF of SHUTTER CLOSE 1 OUT (Y8) and SHUTTER
+CLOSE 2 OUT (Y9). SHUTTER CLOSE 1 OUT and SHUTTER CLOSE 2 OUT will be
+output by the same operation, but their output timing has a margin of error.
 
  T3        100ms or more             Keep the ON status for 100ms or more.
  T4        Approx. 7 sec.            Time for completion of laser pumping.
 
 
  T5        ―                         Total time for shutter opening and marking data creation, or time for laser pumping,
-                                     whichever is longer.
+whichever is longer.
  T6        2ms or more               Keep the ON status for 2ms or more.
  T7        2 to 510ms                This is One-shot output. Set the output time on the environment setting screen. There is
-                                     a small margin of error for the setting value.
+a small margin of error for the setting value.
 
 
-                                                           ME-LPRF-SM-11                                                       125
+ME-LPRF-SM-11                                                       125
 
 ---
 
@@ -6456,7 +6457,7 @@ whether or not the laser is radiating. Refer to “Laser marker operation when f
   Communication Commands
 
 
-          ME-LPRF-SM-11
+ME-LPRF-SM-11
 
 ---
 
@@ -6466,40 +6467,40 @@ whether or not the laser is radiating. Refer to “Laser marker operation when f
 This product has the following communication interfaces on the controller.
 
 
-                                    w
+w
 
-                                   q
-                                    e
+q
+ e
 
 
-                                                      Rear of Controller
+Rear of Controller
 
 
  No.    Name                            Description
 
   q     RS-232C port                    For the connection details, refer to “5-2 RS-232C” (P.128).
-                                        To use the RS-232C port, select the RS-232C usage from communication
-                                        command control or code reader linkage function in the system settings screen in
-                                        advance.
+To use the RS-232C port, select the RS-232C usage from communication
+command control or code reader linkage function in the system settings screen in
+advance.
 
   w     Ethernet port                   For the connection details, refer to “5-3 Ethernet” (P.131).
-                                        The Ethernet port can be connected with the following devices simultaneously via
-                                        a HUB or a router.
-                                         • Laser Marker NAVI smart (PC configuration software)
-                                         • External device for communication command control (PLC and PC for control)
-                                         • Specific image checker
+The Ethernet port can be connected with the following devices simultaneously via
+a HUB or a router.
+ • Laser Marker NAVI smart (PC configuration software)
+ • External device for communication command control (PLC and PC for control)
+ • Specific image checker
 
   e     Ports for industrial network:   Available when the optional network unit (EtherNet/IP unit or PROFINET unit) is
-        EtherNet/IP or PROFINET         installed to the controller.
-                                        Communication port (2-port switch) to control the laser marker by the industrial
-                                        network with the control device such as a PLC.
-                                        Connect a LAN cable.
-                                        For details, refer to “EtherNet/IP Communication Guide” or “PROFINET
-                                        Communication Guide”.
-                                        If you do not install the network unit, there is no port here.
+EtherNet/IP or PROFINET         installed to the controller.
+   Communication port (2-port switch) to control the laser marker by the industrial
+   network with the control device such as a PLC.
+   Connect a LAN cable.
+   For details, refer to “EtherNet/IP Communication Guide” or “PROFINET
+   Communication Guide”.
+   If you do not install the network unit, there is no port here.
 
 
-                                                        ME-LPRF-SM-11                                                      127
+ME-LPRF-SM-11                                                      127
 
 ---
 
@@ -6510,7 +6511,7 @@ This product has the following communication interfaces on the controller.
  For the control by communication commands, configure the communication settings in advance at the system settings of
  Laser Marker NAVI smart. Refer to “3-4-3 General settings before external control” (P.77).
 
-       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
   • The laser marker can be controlled by I/O and communication commands combined.
   • For communication commands, refer to “Serial Communication Command Guide”.
 
@@ -6520,25 +6521,25 @@ This product has the following communication interfaces on the controller.
  control device.
 
 
-                                      1              6
+1              6
 
 
-                                      5              9
+5              9
 
-                                      RS-232C port
-                                        (female)
+RS-232C port
+  (female)
 
-                                   On the laser marker
-                                     controller side
-                                                                              Rear of controller
+On the laser marker
+  controller side
+   Rear of controller
 
    Connector position     Connector specifications                        Model                             Manufacturer name
    On the laser marker    D-sub 9-pin, female                             -                                 -
    side                   Screw type: No.4-40UNC inch screw, female
    User side              D-sub 9-pin, male                               Recommended connector             OMRON
-                          Screw type: No.4-40UNC inch screw, male         XM3A-0921                         Corporation
-                                                                          Recommended connector cover
-                                                                          XM2S-0913
+Screw type: No.4-40UNC inch screw, male         XM3A-0921                         Corporation
+   Recommended connector cover
+   XM2S-0913
 
 
  ⿎⿎Signals and Details of RS-232C connector
@@ -6556,9 +6557,9 @@ This product has the following communication interfaces on the controller.
    9               N.C.
 
 
-       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
   • On the system settings screen, select communication command control or code reader linkage function that you use
-    with the RS-232C port.
+with the RS-232C port.
   • The GND pin of the RS-232C connector is common to the body of the laser marker.
 
 
@@ -6580,20 +6581,20 @@ This product has the following communication interfaces on the controller.
   control device and connect it to the laser marker appropriately.
 
   Connection example
-                            RS-232C port
-                           (Laser marker)                                   External control devise
+ RS-232C port
+(Laser marker)                                   External control devise
 
-                         Terminal No. Signal                                Signal Terminal No.
-                                                     Straight cable
-                              2        TxD                                  RxD           2
-                              3        RxD                                  TxD           3
-                              5        GND                                  GND           5
-                                                                            DCD           1
-                                                                            DTR           4
-                                                                            DSR           6
-                                                                   *
-                                                                            RTS           7
-                                                                            CTS           8
+Terminal No. Signal                                Signal Terminal No.
+   Straight cable
+   2        TxD                                  RxD           2
+   3        RxD                                  TxD           3
+   5        GND                                  GND           5
+   DCD           1
+   DTR           4
+   DSR           6
+   *
+   RTS           7
+   CTS           8
 
 * The loop back wiring on the external control device side shown in the above figure is just an example. The wiring method
   varies depending on the specifications of each external control device. Read the instruction manual of the external
@@ -6623,8 +6624,8 @@ This product has the following communication interfaces on the controller.
    Response data command *        ON / OFF (initial setting: ON)
    Response data sub              Any single byte character of ASCII code from 01 (HEX) to 7F (HEX) can be specified.
    command *                      • Initial setting of positive response code: A
-                                  • Initial setting of negative response code: E
-                                  • Initial setting of read request response code: A
+• Initial setting of negative response code: E
+• Initial setting of read request response code: A
 
 
    Character code                 ASCII code
@@ -6642,7 +6643,7 @@ This product has the following communication interfaces on the controller.
        ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
   • For the details of the communication settings, refer to “3-4-3 General settings before external control” (P.77).
   • When using RS-232C, specify the “Flow control” to “None” at the communication port settings of the external control
-    device.
+device.
 
 
 130                                                           ME-LPRF-SM-11
@@ -6667,15 +6668,15 @@ To control the laser marker by Ethernet communication, use an Ethernet port on t
    • Specific image checker
 
 
-                                 Orange LED
+Orange LED
 
 
-                                 Green LED
-                                  RJ-45 8-pole connector
-                                  AUTO-MDIX compatible
+Green LED
+ RJ-45 8-pole connector
+ AUTO-MDIX compatible
 
-                           On the laser marker controller side
-                                                                             Rear of controller
+On the laser marker controller side
+   Rear of controller
 
 
  Light up color    Description
@@ -6689,14 +6690,14 @@ When you connect a LAN cable to the Ethernet port, attach the ferrite core inclu
 the Ethernet port on the LAN cable controller side.
 Turn the LAN cable 3 times around the ferrite core as shown below figure.
 
-                                 Laser marker controller
+Laser marker controller
 
 
-                                                           Ferrite core
-                                                                               LAN cable
+Ferrite core
+   LAN cable
 
 
-                                                           ME-LPRF-SM-11                                                    131
+ME-LPRF-SM-11                                                    131
 
 ---
 
@@ -6719,7 +6720,7 @@ Turn the LAN cable 3 times around the ferrite core as shown below figure.
        ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
   • The communication control of the laser marker through the Ethernet should be performed in a secure network settings.
   • Even the IP Address and Subnet Mask values are within the configurable range, they may not be available depending
-    on the combination.
+on the combination.
   • For the details of the communication settings, refer to “3-4-3 General settings before external control” (P.77).
 
  ⿎⿎Ethernet communication settings for communication command control
@@ -6730,8 +6731,8 @@ Turn the LAN cable 3 times around the ferrite core as shown below figure.
    Response data command *         ON / OFF (initial setting: ON)
    Response data sub               Any single byte character of ASCII code from 01 (HEX) to 7F (HEX) can be specified.
    command *                       • Initial setting of positive response code: A
-                                   • Initial setting of negative response code: E
-                                   • Initial setting of read request response code: A
+• Initial setting of negative response code: E
+• Initial setting of read request response code: A
 
 
    Character code                  ASCII code
@@ -6759,16 +6760,16 @@ Connect the two or more laser markers and an external device via a HUB or a rout
 Use a HUB (or a rooter) that supports 100BASE-TX/10BASE-T and a cable of Category 5 or higher for the connection.
 
 
-                   External controller (PC, etc.)                          HUB (or rooter)
+External controller (PC, etc.)                          HUB (or rooter)
 
 
-                                                     Laser marker controller
-                                                    (Several units connected)
+ Laser marker controller
+(Several units connected)
 
 Example of communication system settings:
 Set a separate IP address not to overlap between the laser marker and PC on the network.
 
-                                      PC            Laser marker A      Laser marker B       Laser marker C
+PC            Laser marker A      Laser marker B       Laser marker C
  IP address                       192.168.1.10       192.168.1.5          192.168.1.6         192.168.1.7
  Subnet mask                                                 255.255.255.0
  Default gateway                                                   None
@@ -6778,7 +6779,7 @@ Set a separate IP address not to overlap between the laser marker and PC on the 
 • When the laser marker is connected the external control device one to one, no HUB is necessary.
 
 
-                                                        ME-LPRF-SM-11                                               133
+ME-LPRF-SM-11                                               133
 
 ---
 
@@ -6817,7 +6818,7 @@ Set a separate IP address not to overlap between the laser marker and PC on the 
   Devices
 
 
-             ME-LPRF-SM-11
+ME-LPRF-SM-11
 
 ---
 
@@ -6844,7 +6845,7 @@ Set a separate IP address not to overlap between the laser marker and PC on the 
  The image checking operation before marking (postion correction) and after marking (code/character checking or image
  capturing) can be combined.
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • When you use the link control with an image checker, the following functions are not available.
    • “Continuous trigger” of trigger mode
    • On-the-fly marking
@@ -6858,43 +6859,43 @@ Set a separate IP address not to overlap between the laser marker and PC on the 
 ## หน้า 137
 
 6-1-1 Example of image checker linkage system
-                              Image checker camera
-                                                            Illumination
-                                                                  Laser marker head
+Image checker camera
+   Illumination
+   Laser marker head
 
 
-                                                                              Code reader
+Code reader
 
 
-    Laser marker controller
+Laser marker controller
 
 
-                                                                           Checkup result display
-                       Image checker controller
-                                                         HUB (for Ethernet connection)
+   Checkup result display
+Image checker controller
+   HUB (for Ethernet connection)
 
 
-                              • Detect the work position
-       Image checker
-                              • Transmit the detected position information to the laser marker
+   • Detect the work position
+Image checker
+   • Transmit the detected position information to the laser marker
 
 
-                              • Correct the marking position
-        Laser marker          • Perform marking on the corrected position
-                              • Transmit the marked code string to the code reader
+   • Correct the marking position
+Laser marker          • Perform marking on the corrected position
+   • Transmit the marked code string to the code reader
 
 
-                              • Readout the marked code and check the read contents against the string
-        Code reader             transmitted by the laser marker
-                              • Transmit the checkup results to the laser marker
+   • Readout the marked code and check the read contents against the string
+Code reader             transmitted by the laser marker
+   • Transmit the checkup results to the laser marker
 
 
-                              • Output the consistent (OK)/inconsistent (NG) results transmitted by the code
-        Laser marker
-                                reader (I/O connector)
+   • Output the consistent (OK)/inconsistent (NG) results transmitted by the code
+Laser marker
+   reader (I/O connector)
 
 
-                                                  ME-LPRF-SM-11                                                137
+ME-LPRF-SM-11                                                137
 
 ---
 
@@ -6903,52 +6904,52 @@ Set a separate IP address not to overlap between the laser marker and PC on the 
 6-1-2 Operation flow
   Example of operations for Position correction → Marking → Code checking
 
-                           Start the image checker and laser marker
+Start the image checker and laser marker
 
 
-                  Start up and online connect the Laser Marker NAVI smart
+Start up and online connect the Laser Marker NAVI smart
 
 
-                                       Remote mode ON
+Remote mode ON
 
 
-                                           Select File
+Select File
 
 
-                                      Laser pumping ON
+Laser pumping ON
 
 
-                                          Shutter open
+Shutter open
 
 
-                              Check the marking ready output ON
+Check the marking ready output ON
 
 
-                              Laser marker marking trigger input
+Laser marker marking trigger input
 
 
-                  Image checker: Operation start
-                    • Execution of shooting and checker
-                    • Output of inspection results
+Image checker: Operation start
+  • Execution of shooting and checker
+  • Output of inspection results
 
 
-                  Laser marker: Change of coordinates                                    Repeat this procedure
+Laser marker: Change of coordinates                                    Repeat this procedure
 
-                                                     TIMING IN signal input *
+TIMING IN signal input *
 
-                  Laser marker: Laser radiation
+Laser marker: Laser radiation
 
-                                                     TIMING IN signal input *
+TIMING IN signal input *
 
-                  Code reader: Operation start
-                    • Reading and checkup of the marked code
-                    • Output of checkup results
+Code reader: Operation start
+  • Reading and checkup of the marked code
+  • Output of checkup results
 
 
-                  Laser marker: Output of checkup results
+Laser marker: Output of checkup results
 
       * If it is set to use the TIMING IN signal, enter TIMING IN as a next operation trigger.
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • Confirm the laser marker and image checker communication settings in advance.
  • Set the conditions of files to use the image checker linkage function.
  • The image checker linkage function can be used while the laser marker is under the remote control mode.
@@ -6961,7 +6962,7 @@ Set a separate IP address not to overlap between the laser marker and PC on the 
 ## หน้า 139
 
 6-1-3 Connection
-        ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
 • To prevent damage of the image checker, do not install the camera in the laser emission area. Besides, take measures
   to protect the camera against the reflected laser beam, such as installing a shutter in front of the camera lens.
 
@@ -6970,8 +6971,8 @@ Image checkers compatible with this product are listed below.
  Usage                               Model                                                Manufacturer name
  Position correction                 PV230 / PV200                                        Panasonic Devices SUNX Co, Ltd.
  Code checking                       PV230
-                                     LP-ABR11 / LP-ABR12
-                                     DataMan series (Ethernet supported model)            Cognex Corporation
+LP-ABR11 / LP-ABR12
+DataMan series (Ethernet supported model)            Cognex Corporation
  Character checking                  PV230                                                Panasonic Devices SUNX Co, Ltd.
  Image capturing and inspection      PV230 / PV200
 
@@ -6987,23 +6988,23 @@ This product can be connected with one device each for position correction and c
 
 To connect a position correction device (PV230), code reader (DataMan) and control PLC with the laser marker
 
-                                                                                 HUB
+HUB
 
 
-               PLC                                                    PV230                              DataMan
-        (For I/O control)             Laser marker            (For position correction)             (For code reading)
+   PLC                                                    PV230                              DataMan
+(For I/O control)             Laser marker            (For position correction)             (For code reading)
 
 Example of communication system settings
 To prevent duplication of IP addresses of network devices, set individual addresses.
-                                                                   PV230                            DataMan
-                               Laser marker
-                                                           (For position correction)           (For code reading)
+   PV230                            DataMan
+Laser marker
+   (For position correction)           (For code reading)
  IP address                     192.168.1.4                      192.168.1.5                      192.168.1.10
  Subnet mask                                                    255.255.255.0
  Default gateway                                                 192.168.1.1
  Port                                                          Fixed value
-                                     ―                     (Result output: 8601)                   23 (Telnet)
-                                                       (Command transmission: 8604)
+―                     (Result output: 8601)                   23 (Telnet)
+   (Command transmission: 8604)
 
    ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
 • Port on the laser marker side is a fixed value when PV230/PV200 is used.
@@ -7013,7 +7014,7 @@ To prevent duplication of IP addresses of network devices, set individual addres
 • The Ethernet port of this product is compatible with both straight cable and cross cable.
 
 
-                                                        ME-LPRF-SM-11                                                    139
+ME-LPRF-SM-11                                                    139
 
 ---
 
@@ -7160,17 +7161,17 @@ TIMING IN signal: Use
 TIMING IN signal is used when the laser marker operation trigger and image checker/code reader operation trigger is input
 separately, e.g. when the camera (code reader) field of view is away from the laser marker marking position.
 
-               For image checking before marking                         For image checking after marking
+For image checking before marking                         For image checking after marking
 
-       Camera etc.                           Laser marker         Laser marker                           Camera etc.
-
-
-                       q              w                                              q              w
-                TRIGGER IN       TIMING IN                                       TRIGGER IN    TIMING IN
+Camera etc.                           Laser marker         Laser marker                           Camera etc.
 
 
-         q Start work location detection (initial operation)      q Start marking (initial operation)
-         w Start marking                                          w Start image checking
+   q              w                                              q              w
+TRIGGER IN       TIMING IN                                       TRIGGER IN    TIMING IN
+
+
+q Start work location detection (initial operation)      q Start marking (initial operation)
+w Start marking                                          w Start image checking
 
    ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
 • To control the linkage operation by TIMING IN signal, input TIMING IN signal within 60 seconds after completion of the
@@ -7183,21 +7184,21 @@ TIMING IN signal: Not use
 TIMING IN signal is not necessary when the series of operations of the laser marker and the image checker/code reader by
 one trigger, e.g. when the camera (code reader) field of view and the laser marker marking position are the same.
 
-               For image checking before marking                         For image checking after marking
+For image checking before marking                         For image checking after marking
 
-                                           Laser marker            Laser marker
-         Camera etc.                                                                                    Camera etc.
-
-
-                                  q                                                      q
-                            TRIGGER IN                                             TRIGGER IN
+   Laser marker            Laser marker
+Camera etc.                                                                                    Camera etc.
 
 
-        q Start work location detection and start marking        q Start marking and after completion of marking,
-           after completion of location detection                   start image checking
+   q                                                      q
+TRIGGER IN                                             TRIGGER IN
 
 
-                                                        ME-LPRF-SM-11                                                  143
+q Start work location detection and start marking        q Start marking and after completion of marking,
+   after completion of location detection                   start image checking
+
+
+ME-LPRF-SM-11                                                  143
 
 ---
 
@@ -7206,20 +7207,20 @@ one trigger, e.g. when the camera (code reader) field of view and the laser mark
 6-1-6 Image checker setting
  Settings to use the image checker PV230/PV200 for link control with the laser marker are described below.
 
-       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-     • For specifications and setting of image checker PV230/PV200, refer to the instruction manual for PV230/PV200.
+  ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• For specifications and setting of image checker PV230/PV200, refer to the instruction manual for PV230/PV200.
 
   Communication settings of image checker PV230/PV200
  To connect the laser marker with PV230/PV200, configure the PV230/PV200's communication settings as follows.
 
-     Item                         Ethernet communication specifications
-     Communication protocol       Multipurpose communication (TCP/IP)
-     Port No.                     Result output                   8601
-     (Fixed)
-                                  Command transmission            8604
-     IP address                   Initial value: 192.168.1.5
-                                  Make sure that the IP address for the laser marker on the network is not overlapping the IP
-                                  address for the other external devices.
+Item                         Ethernet communication specifications
+Communication protocol       Multipurpose communication (TCP/IP)
+Port No.                     Result output                   8601
+(Fixed)
+   Command transmission            8604
+IP address                   Initial value: 192.168.1.5
+   Make sure that the IP address for the laser marker on the network is not overlapping the IP
+   address for the other external devices.
 
 
   Input/output setting
@@ -7284,7 +7285,7 @@ When PV230/PV200 is used for position correction, set the following items:
   PV230/PV200 to the X-/Y-coordinates (mm) of the laser marker.               +Y
 • After the calibration, confirm that in PV230/PV200 the CCW                                                         -Y
   direction of the θ-correction is on the positive (+) side.                    Coordinates of                 Coordinates of
-                                                                                PV230/PV200                     laser marker
+PV230/PV200                     laser marker
 
 3.    Set one of the followings to detect the correction value of the position for the laser marking.
       • “Inspection” - “Position Adjustment”
@@ -7455,7 +7456,7 @@ When PV230 or PV200 is used for image capturing and inspection, set the followin
   the result of the total judgement is output always with “1”.
 
 
-                                                         ME-LPRF-SM-11                                                       147
+ME-LPRF-SM-11                                                       147
 
 ---
 
@@ -7465,21 +7466,21 @@ When PV230 or PV200 is used for image capturing and inspection, set the followin
  To use the code reader LP-ABR series (LP-ABR11 / LP-ABR12) for the code checking of image checking after marking, set
  the followings by using Configurator LP-ABR software.
   • Set the code reading parameters of LP-ABR such as the code type and inversion to read the marked code symbols
-    without errors.
+without errors.
   • Set the following communication and LAN settings for LP-ABR series:
 
   Category                           Item                     Settings
   Common - Communication             Select Port              Set “LAN” or “RS-232C/LAN”.
   Common - LAN                       IP Address               Specify the same settings with “Image checking after
-                                                              marking” parameters in the system settings of the laser
-                                     Data Port No             marker.
+   marking” parameters in the system settings of the laser
+Data Port No             marker.
 
-                                     Subnet Mask              Configure the communication settings according to the
-                                                              network settings. Usually the code reader and the laser
-                                     Default Gateway          marker are used on the same network.
+Subnet Mask              Configure the communication settings according to the
+   network settings. Usually the code reader and the laser
+Default Gateway          marker are used on the same network.
 
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • For specifications and setting of the code reader LP-ABR series, refer to the instruction manuals for LP-ABR and
    Configurator LP-ABR.
  • While the laser marker and LP-ABR series are connected for the linkage control, do not start-up Configurator LP-ABR
@@ -7491,13 +7492,13 @@ When PV230 or PV200 is used for image capturing and inspection, set the followin
   • DataMan IP address and Telnet Port number: Set them according to the network settings.
   • Code reading setting: Set the code type, etc. to read the code to be marked by the laser marker.
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • For specifications and setting of code reader DataMan, refer to the instruction manual for DataMan.
  • Ensure that any code other than the readout target is in the DataMan shooting range. Code reading is not performed
    properly.
  • If the code type is UPC-E (6-digits UPC code), set DataMan’s “UPC/EAN Properties” as follows:
-    • Check off “Expanded”
-    • Check on “Delete Leading Zero”
+• Check off “Expanded”
+• Check on “Delete Leading Zero”
 
   DataMan communication settings specification for connection with laser marker
   Item                         Ethernet communication specifications
@@ -7512,94 +7513,94 @@ When PV230 or PV200 is used for image capturing and inspection, set the followin
 
 6-1-9 Timing chart
  Position correction - Marking (when TIMING IN signal is used)
-                                    ON              T1
-                 TRIGGER IN (X5)
-                                    OFF
-                                    ON           Starting location detection signal
-                                                                                              T1
-                TIMING IN (No.24)
-                                    OFF
-                                                                                           Marking trigger
+   ON              T1
+ TRIGGER IN (X5)
+   OFF
+   ON           Starting location detection signal
+   T1
+TIMING IN (No.24)
+   OFF
+   Marking trigger
 
-                                    ON
-                 READY OUT (Y5)
-                                    OFF
-                                    ON
-                                                               T2                     T4
-         TIMING WAIT OUT (No.36)
-                                    OFF
+   ON
+   READY OUT (Y5)
+   OFF
+   ON
+   T2                     T4
+TIMING WAIT OUT (No.36)
+   OFF
 
-                                    ON
-          PROCESSING OUT (Y10)                                            T3
-                                    OFF
-                                    ON
-             LASING OUT (No.40)                                                               T5
-                                    OFF
-                                    ON
-          SCRIPTING OUT (No.37)
-                                    OFF
-                                    ON
-      PROCESSING END OUT (Y11)                                                                               T6
-                                    OFF
+   ON
+   PROCESSING OUT (Y10)                                            T3
+   OFF
+   ON
+   LASING OUT (No.40)                                                               T5
+   OFF
+   ON
+   SCRIPTING OUT (No.37)
+   OFF
+   ON
+PROCESSING END OUT (Y11)                                                                               T6
+   OFF
 
 
  Item    Time                 Remarks
 
  T1      2ms or more          Keep the ON status for 2ms or more.
  T2      ―                    Processing time of linkage operations with the image checker.
-                              In this case, it is the following time.
-                               • Time for location detection by image checker
-                               • Time for marking position correction by the laser marker
+In this case, it is the following time.
+ • Time for location detection by image checker
+ • Time for marking position correction by the laser marker
  T3      ―                    When TRIGGER IN (X5) is accepted, PROCESSING OUT (Y10) turns ON.
-                              The output time of PROCESSING OUT includes the trigger delay time, operation time,
-                              laser radiation time and laser marker internal processing time of the linkage devices.
+The output time of PROCESSING OUT includes the trigger delay time, operation time,
+laser radiation time and laser marker internal processing time of the linkage devices.
  T4      Max. 60 sec          Turn on TIMING IN within 60 seconds after TIMING WAIT OUT is turned ON.
-                              If there is no input of TIMING IN within 60 seconds, an error occurs and trigger processing
-                              is terminated due to the abnormality.
+If there is no input of TIMING IN within 60 seconds, an error occurs and trigger processing
+is terminated due to the abnormality.
  T5      ―                    Laser radiation time. This varies depending on marking contents.
  T6      2 to 510 ms          One-shot output. Set the output time on the system settings screen.
-                              There is a small margin of error for the setting value.
+There is a small margin of error for the setting value.
 
 
-                                                      ME-LPRF-SM-11                                                     149
+ME-LPRF-SM-11                                                     149
 
 ---
 
 ## หน้า 150
 
  Marking - Image checking (when TIMING IN signal is used)
-                                      ON
-                                                           T1
-                  TRIGGER IN (X5)
-                                      OFF
-                                      ON               Starting marking signal
-                                                                                               T1
-                  TIMING IN (No.24)
-                                      OFF
-                                                                                          Starting image checking signal
-                                      ON
-                  READY OUT (Y5)
-                                      OFF
-                                      ON
-          TIMING WAIT OUT (No.36)                                     T4          T5
-                                      OFF
+   ON
+   T1
+   TRIGGER IN (X5)
+   OFF
+   ON               Starting marking signal
+   T1
+   TIMING IN (No.24)
+   OFF
+   Starting image checking signal
+   ON
+   READY OUT (Y5)
+   OFF
+   ON
+TIMING WAIT OUT (No.36)                                     T4          T5
+   OFF
 
-           CHECK OK OUT (No.34)       ON                                                      T6
-                      or                                                                               *1   T7
-           CHECK NG OUT (No.35)       OFF
+CHECK OK OUT (No.34)       ON                                                      T6
+   or                                                                               *1   T7
+CHECK NG OUT (No.35)       OFF
 
-                                      ON
-           PROCESSING OUT (Y10)                                                  T2
-                                      OFF
-                                      ON
-               LASING OUT (No.40)                           T3
-                                      OFF
-                                      ON
-           SCRIPTING OUT (No.37)
-                                      OFF
-                                      ON
-       PROCESSING END OUT (Y11)                                                                               T7
-                                      OFF
+   ON
+   PROCESSING OUT (Y10)                                                  T2
+   OFF
+   ON
+   LASING OUT (No.40)                           T3
+   OFF
+   ON
+   SCRIPTING OUT (No.37)
+   OFF
+   ON
+PROCESSING END OUT (Y11)                                                                               T7
+   OFF
 
  *1: CHECK OK OUT (No.34) / CHECK NG OUT (No.35) outputs before PROCESSING OUT (Y10) is turned OFF.
 
@@ -7607,21 +7608,21 @@ When PV230 or PV200 is used for image capturing and inspection, set the followin
 
   T1       2ms or more           Keep the ON status for 2ms or more.
   T2       ―                     When TRIGGER IN (X5) is accepted, PROCESSING OUT (Y10) turns ON.
-                                 The output time of PROCESSING OUT includes the trigger delay time, operation time,
-                                 laser radiation time and laser marker internal processing time of the linkage devices.
+The output time of PROCESSING OUT includes the trigger delay time, operation time,
+laser radiation time and laser marker internal processing time of the linkage devices.
   T3       ―                     Laser radiation time. This varies depending on marking contents.
   T4       ―                     Processing time of communication and linkage operations with the image checker.
-                                 For code checking or character checking, time for transferring the marking data to the
-                                 image checker by the laser marker is included.
+For code checking or character checking, time for transferring the marking data to the
+image checker by the laser marker is included.
   T5       Max. 60 sec.          Turn on TIMING IN within 60 seconds after TIMING WAIT OUT is turned ON.
-                                 If there is no input of TIMING IN within 60 seconds, an error occurs and trigger processing
-                                 is terminated due to the abnormality.
+If there is no input of TIMING IN within 60 seconds, an error occurs and trigger processing
+is terminated due to the abnormality.
   T6       ―                     Processing time of linkage operations with the image checker.
-                                 In this case, it is the following time.
-                                  • Time for reading by the image checker
-                                  • Time for transferring the checkup results from the image checker to the laser marker
+In this case, it is the following time.
+ • Time for reading by the image checker
+ • Time for transferring the checkup results from the image checker to the laser marker
   T7       2 to 510 ms           One-shot output. Set the output time on the system settings screen.
-                                 There is a small margin of error for the setting value.
+There is a small margin of error for the setting value.
 
 
 150                                                      ME-LPRF-SM-11
@@ -7631,35 +7632,35 @@ When PV230 or PV200 is used for image capturing and inspection, set the followin
 ## หน้า 151
 
  Position correction - Marking - Image checking (when TIMING IN signal is used)
-                                     ON            T1
-                 TRIGGER IN (X5)
-                                     OFF
-                                              Starting location
-                                     ON                               T1                             T1
-                 TIMING IN (No.24)            detection signal
-                                     OFF
-                                                                  Starting marking signal        Starting image checking signal
-                                     ON
-                 READY OUT (Y5)
-                                     OFF
-                                     ON
-        TIMING WAIT OUT (No.36)                   T2       T4                       T6      T4        T7
-                                     OFF
-         CHECK OK OUT (No.34) ON                                                                                  T8
-                     or                                                                                      *1
-         CHECK NG OUT (No.35) OFF
-                                     ON
-        PROCESSING OUT (Y10)                                                   T3
-                                     OFF
-                                     ON
-              LASING OUT (No.40)                                         T5
-                                     OFF
-                                     ON
-         SCRIPTING OUT (No.37)
-                                     OFF
-                                     ON                                                                             T8
+   ON            T1
+   TRIGGER IN (X5)
+   OFF
+   Starting location
+   ON                               T1                             T1
+   TIMING IN (No.24)            detection signal
+   OFF
+   Starting marking signal        Starting image checking signal
+   ON
+   READY OUT (Y5)
+   OFF
+   ON
+TIMING WAIT OUT (No.36)                   T2       T4                       T6      T4        T7
+   OFF
+ CHECK OK OUT (No.34) ON                                                                                  T8
+   or                                                                                      *1
+ CHECK NG OUT (No.35) OFF
+   ON
+PROCESSING OUT (Y10)                                                   T3
+   OFF
+   ON
+   LASING OUT (No.40)                                         T5
+   OFF
+   ON
+ SCRIPTING OUT (No.37)
+   OFF
+   ON                                                                             T8
    PROCESSING END OUT (Y11)
-                                     OFF
+OFF
 
 *1: CHECK OK OUT (No.34) / CHECK NG OUT (No.35) outputs is output before PROCESSING OUT (Y10) is turned OFF.
 
@@ -7667,57 +7668,57 @@ When PV230 or PV200 is used for image capturing and inspection, set the followin
 
  T1       2ms or more           Keep the ON status for 2ms or more.
  T2       ―                     Processing time of linkage operations with the image checker.
-                                In this case, it is the following time.
-                                 • Time for location detection by image checker
-                                 • Time for marking position correction by the laser marker
+In this case, it is the following time.
+ • Time for location detection by image checker
+ • Time for marking position correction by the laser marker
  T3       ―                     When TRIGGER IN (X5) is accepted, PROCESSING OUT (Y10) turns ON.
-                                The output time of PROCESSING OUT includes the trigger delay time, operation time,
-                                laser radiation time and laser marker internal processing time of the linkage devices.
+The output time of PROCESSING OUT includes the trigger delay time, operation time,
+laser radiation time and laser marker internal processing time of the linkage devices.
  T4       Max. 60 sec.          Turn on TIMING IN within 60 seconds after TIMING WAIT OUT is turned ON.
-                                If there is no input of TIMING IN within 60 seconds, an error occurs and trigger processing
-                                is terminated due to the abnormality.
+If there is no input of TIMING IN within 60 seconds, an error occurs and trigger processing
+is terminated due to the abnormality.
  T5       ―                     Laser radiation time. The time varies depending on marking contents.
  T6       ―                     Processing time of communication and linkage operations with the image checker.
-                                For code checking or character checking, time for transferring the marking data to the
-                                image checker by the laser marker is included.
+For code checking or character checking, time for transferring the marking data to the
+image checker by the laser marker is included.
  T7       ―                     Processing time of linkage operations with the image checker.
-                                In this case, it is the following time.
-                                 • Time for reading by the image checker
-                                 • Time for transferring the checkup results from the image checker to the laser marker
+In this case, it is the following time.
+ • Time for reading by the image checker
+ • Time for transferring the checkup results from the image checker to the laser marker
  T8       2 to 510 ms           One-shot output. Set the output time on the system settings screen.
-                                There is a small margin of error for the setting value.
+There is a small margin of error for the setting value.
 
 
-                                                         ME-LPRF-SM-11                                                       151
+ME-LPRF-SM-11                                                       151
 
 ---
 
 ## หน้า 152
 
  Position correction - Marking - Image checking (when TIMING IN signal is not used)
-                                   ON                T1
-                 TRIGGER IN (X5)
-                                   OFF
-                                                 Starting a series of interfaced operations signal
-                                   ON
-                 READY OUT (Y5)
-                                   OFF
-           CHECK OK OUT (No.34) ON
-                                                                                                          T6
-                    or                                                                               *1
-           CHECK NG OUT (No.35) OFF
-                                   ON
-           PROCESSING OUT (Y10)                                           T2
-                                   OFF
-                                   ON
-              LASING OUT (No.40)                                          T4
-                                   OFF
-                                   ON
-           SCRIPTING OUT (No.37)                       T3                                   T5
-                                   OFF
-                                   ON                                                                      T6
-       PROCESSING END OUT (Y11)
-                                   OFF
+   ON                T1
+   TRIGGER IN (X5)
+   OFF
+   Starting a series of interfaced operations signal
+   ON
+   READY OUT (Y5)
+   OFF
+   CHECK OK OUT (No.34) ON
+   T6
+   or                                                                               *1
+   CHECK NG OUT (No.35) OFF
+   ON
+   PROCESSING OUT (Y10)                                           T2
+   OFF
+   ON
+   LASING OUT (No.40)                                          T4
+   OFF
+   ON
+   SCRIPTING OUT (No.37)                       T3                                   T5
+   OFF
+   ON                                                                      T6
+PROCESSING END OUT (Y11)
+   OFF
 
  *1: CHECK OK OUT (No.34) / CHECK NG OUT (No.35) outputs before PROCESSING OUT (Y10) is turned OFF.
 
@@ -7725,19 +7726,19 @@ When PV230 or PV200 is used for image capturing and inspection, set the followin
 
   T1      2ms or more        Keep the ON status for 2ms or more.
   T2      ―                  When TRIGGER IN (X5) is accepted, PROCESSING OUT (Y10) turns ON.
-                             The output time of PROCESSING OUT includes the trigger delay time, operation time,
-                             laser radiation time and laser marker internal processing time of the linkage devices.
+The output time of PROCESSING OUT includes the trigger delay time, operation time,
+laser radiation time and laser marker internal processing time of the linkage devices.
   T3      ―                  Processing time of linkage operations with the image checker.
-                             In this case, it is the following time.
-                              • Time for location detection by image checker
-                              • Time for marking position correction by the laser marker
+In this case, it is the following time.
+ • Time for location detection by image checker
+ • Time for marking position correction by the laser marker
   T4      ―                  Laser radiation time. The time varies depending on marking contents.
   T5      ―                  Processing time of linkage operations with the image checker.
-                             In this case, it is the following time.
-                              • Time for reading by the image checker
-                              • Time for transferring the checkup results from the image checker to the laser marker
+In this case, it is the following time.
+ • Time for reading by the image checker
+ • Time for transferring the checkup results from the image checker to the laser marker
   T6      2 to 510 ms        One-shot output. Set the output time on the system settings screen.
-                             There is a small margin of error for the setting value.
+There is a small margin of error for the setting value.
 
 
 152                                                  ME-LPRF-SM-11
@@ -7765,20 +7766,20 @@ If the bar code/2D code is set for the specified object number, change the input
 6-2-1 Example of code reader linkage system
 
 
-                                                                           w
-                                         e                                             ABCD
+   w
+e                                             ABCD
 
 
-                                                                                              q
+q
 
 
-    q Use a commercially available code reader and read the code that contains marking characters, or file number or name.
+q Use a commercially available code reader and read the code that contains marking characters, or file number or name.
 
 
-    w The marking data or marking file are changed based on the read data
+w The marking data or marking file are changed based on the read data
 
 
-    e When the marking start trigger is input, marking is performed based on the data read by the code reader
+e When the marking start trigger is input, marking is performed based on the data read by the code reader
 
    ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
 • Characters that can be used for the code to read are alphanumeric characters and symbols in the range of ASCII code
@@ -7789,7 +7790,7 @@ If the bar code/2D code is set for the specified object number, change the input
 • The code reader linkage function can be used while the laser marker is under the remote control mode or run mode.
 
 
-                                                         ME-LPRF-SM-11                                                       153
+ME-LPRF-SM-11                                                       153
 
 ---
 
@@ -7798,36 +7799,36 @@ If the bar code/2D code is set for the specified object number, change the input
 6-2-2 Operation flow
   Example of operations to change the file
 
-                                      Start the code reader and laser marker
+Start the code reader and laser marker
 
 
-                              Start up and online connect the Laser Marker NAVI smart
+Start up and online connect the Laser Marker NAVI smart
 
 
-         During remote mode control                                               During RUN mode operation
+During remote mode control                                               During RUN mode operation
 
-                             Remote mode ON                            Laser pumping ON
-
-
-                            Laser pumping ON                            RUN mode ON
+Remote mode ON                            Laser pumping ON
 
 
-                               Shutter open                         Shutter open (automatic)
+Laser pumping ON                            RUN mode ON
 
 
-                              Read out the code that indicates the file number or name
+Shutter open                         Shutter open (automatic)
 
 
-                                        Check the marking ready output ON
-
-                                                                                               Repeat this procedure
-                                               Marking trigger input
+Read out the code that indicates the file number or name
 
 
-                                                  Laser radiation
+Check the marking ready output ON
+
+   Repeat this procedure
+Marking trigger input
 
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+Laser radiation
+
+
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • Confirm the laser marker and code reader communication settings in advance.
 
 
@@ -7839,36 +7840,36 @@ If the bar code/2D code is set for the specified object number, change the input
 
  Example of operations to change the character data to mark
 
-                                     Start the code reader and laser marker
+Start the code reader and laser marker
 
 
-                            Start up and online connect the Laser Marker NAVI smart
+Start up and online connect the Laser Marker NAVI smart
 
 
-     During remote mode control                                                  During RUN mode operation
+During remote mode control                                                  During RUN mode operation
 
-                           Remote mode ON                       Marking target file selection
-
-
-                              Select File                             Laser pumping ON
+Remote mode ON                       Marking target file selection
 
 
-                          Laser pumping ON                             RUN mode ON
+Select File                             Laser pumping ON
 
 
-                             Shutter open                          Shutter open (automatic)
+Laser pumping ON                             RUN mode ON
 
 
-                              Read out the code that indicates the marking characters
+Shutter open                          Shutter open (automatic)
 
 
-                                      Check the marking ready output ON
-
-                                                                                                Repeat this procedure
-                                              Marking trigger input
+Read out the code that indicates the marking characters
 
 
-                                                 Laser radiation
+Check the marking ready output ON
+
+   Repeat this procedure
+Marking trigger input
+
+
+Laser radiation
 
 
   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
@@ -7876,7 +7877,7 @@ If the bar code/2D code is set for the specified object number, change the input
 • Specify the object number to transfer the character data in the system settings screen in advance.
 
 
-                                                      ME-LPRF-SM-11                                                     155
+ME-LPRF-SM-11                                                     155
 
 ---
 
@@ -7886,30 +7887,30 @@ If the bar code/2D code is set for the specified object number, change the input
   Connection method
  Connect the code reader to the RS-232C port on the controller.
 
-                          Code reader                                        Rear of controller
+Code reader                                        Rear of controller
 
 
-                                          RS-232C port
-                                          Laser marker side
-                                          connector specifications:
-                                          D-sub 9-pin female
+RS-232C port
+Laser marker side
+connector specifications:
+D-sub 9-pin female
 
  • Do not connect to other than three lines RxD (RD), TxD (SD) and GND to the laser marker.
  • Use the RS-232C cross cable to connect the code reader and laser marker, referring to the example below.
 
  Connection example
-           Laser marker                                                                         Code reader side
-           RS-232C port                                                                      Example of RS-232C port
-                                              Example of connection cables
-        Terminal No.   Signal        Terminal No.                        Terminal No.        Terminal No.    Signal
-                                                       Cross cable
-             2         TxD                2                                   2                     2        TxD
-             3         RxD                3                                   3                     3        RxD
-             5         GND                5                                   5                     5        GND
-                                  D-sub 9-pin male                     D-sub 9-pin male
-         D-sub 9-pin female                                                                       D-sub 9-pin female
+   Laser marker                                                                         Code reader side
+   RS-232C port                                                                      Example of RS-232C port
+   Example of connection cables
+Terminal No.   Signal        Terminal No.                        Terminal No.        Terminal No.    Signal
+   Cross cable
+   2         TxD                2                                   2                     2        TxD
+   3         RxD                3                                   3                     3        RxD
+   5         GND                5                                   5                     5        GND
+   D-sub 9-pin male                     D-sub 9-pin male
+ D-sub 9-pin female                                                                       D-sub 9-pin female
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • For RS-232C port specifications, refer to “5-2 RS-232C” (P.128).
 
 
@@ -7940,7 +7941,7 @@ Specify the code reader communication settings according to this setting.
  End code                      CR (Fixed)
  Reception timer               Timeout monitoring ON (10 sec)
 
-        ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
 • This does not guarantee the communication with all code readers. Check the performance and operation before use.
 • To connect the RS-232C port with the code reader, the communication command control by RS-232C is disabled.
 • The control is enabled only when the laser marker is in the remote or run status.
@@ -7956,7 +7957,7 @@ conditions.
  • When two-byte “%” is used, replace the code data with the following characters.
 
   Characters you want to use      Characters to replace with
-                %                               %%
+%                               %%
 
 
    ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
@@ -7966,7 +7967,7 @@ conditions.
 • For the list of ASCII codes, refer to “Serial Communication Command Guide”.
 
 
-                                                           ME-LPRF-SM-11                                                 157
+ME-LPRF-SM-11                                                 157
 
 ---
 
@@ -7994,9 +7995,9 @@ conditions.
       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • For the code reader linkage function, the following items of communication settings are fixed values. Align the code
    reader side settings with this setting.
-    • Start code: None
-    • Checksum: OFF
-    • End code: CR
+• Start code: None
+• Checksum: OFF
+• End code: CR
 
 
  4.    In the “System settings” screen, select the “Linked device” tab.
@@ -8088,7 +8089,7 @@ conditions.
 7 Maintenance
 
 
-           ME-LPRF-SM-11
+ME-LPRF-SM-11
 
 ---
 
@@ -8103,44 +8104,44 @@ For purchasing replacement parts or requesting our service representative to rep
 agency.
 
 
-                                                                               Controller
-                                                                                            t
+Controller
+   t
 
-                                                                                                                            r
-                        Head
-                                                                        w
+   r
+Head
+   w
 
-                                                                                                                            i
-                                                                        w
-                                               u
-                                          y
-                                 q
-                                                                                            e                o
-                                                                                                     1)
+   i
+   w
+   u
+   y
+q
+   e                o
+   1)
 
 
-                                              Main cause for                                    Replacement when degraded or
+Main cause for                                    Replacement when degraded or
   No.      Parts name                                              Daily maintenance
-                                              degradation                                       defective
+degradation                                       defective
 
-      q    Protection glass of laser          Contamination        Cleaning                     Customer-replaceable
-           emission port
+q    Protection glass of laser          Contamination        Cleaning                     Customer-replaceable
+   emission port
 
-      w    Air filter                         Contamination        Cleaning                     Customer-replaceable
+w    Air filter                         Contamination        Cleaning                     Customer-replaceable
 
-      e    Air-cooling fan (Controller)       Contamination        Cleaning                     Customer-replaceable
+e    Air-cooling fan (Controller)       Contamination        Cleaning                     Customer-replaceable
 
-      r    Exhaust vent                       Contamination        Cleaning                     ―
+r    Exhaust vent                       Contamination        Cleaning                     ―
 
-      t    Laser oscillator                   Aging                Check output power           By our service representatives
+t    Laser oscillator                   Aging                Check output power           By our service representatives
 
-      y    Galvano scanner                    Aging                ―                            By our service representatives
+y    Galvano scanner                    Aging                ―                            By our service representatives
 
-      u    Internal shutter                   Aging                ―                            By our service representatives
+u    Internal shutter                   Aging                ―                            By our service representatives
 
-      i    Battery inside the controller      Aging                ―                            Customer-replaceable
+i    Battery inside the controller      Aging                ―                            Customer-replaceable
 
-      o    Contactor for interlock            Aging                ―                            Customer-replaceable
+o    Contactor for interlock            Aging                ―                            Customer-replaceable
 
       1)   Cable                              Broken               ―                            Customer-replaceable
 
@@ -8150,19 +8151,19 @@ agency.
    result.
 
 
-                                                               ME-LPRF-SM-11                                                     161
+ME-LPRF-SM-11                                                     161
 
 ---
 
 ## หน้า 162
 
 7-2 Maintenance Details of Parts
-                                              • Maintenance work must be conducted with the power to the laser marker
-                                                turned OFF, and the AC power cable disconnected. Doing so may cause
-                                                exposure to the laser beam or electrical shock.
-          WARNING                             • Do not insert your hands or objects to the exhaust port of each unit or the
-                                                gaps between units during the maintenance work. This may result in injuries,
-                                                electrical shock, or failure of the laser marker.
+   • Maintenance work must be conducted with the power to the laser marker
+   turned OFF, and the AC power cable disconnected. Doing so may cause
+   exposure to the laser beam or electrical shock.
+WARNING                             • Do not insert your hands or objects to the exhaust port of each unit or the
+   gaps between units during the maintenance work. This may result in injuries,
+   electrical shock, or failure of the laser marker.
 
 
  7-2-1 Protection glass of laser emission port
@@ -8273,7 +8274,7 @@ damage on the glass surface, replace the protection glass according to the follo
    • To prevent the deforming, do not hang the O-ring during storage.
 
 
-                                                         ME-LPRF-SM-11                                                      163
+ME-LPRF-SM-11                                                      163
 
 ---
 
@@ -8320,11 +8321,11 @@ Natural-cooling system is used in the head, thus the cooling effect will        
 significantly drop if dust or oil is adhered to the surface. Clean the head
 surface according to the operation environment.
 
-      ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
 • Do not clean the laser radiation indicator with alcohol.
   It may cause deformation, alteration or breakage of the indicator.
 
-                                                                                                      Rear of head
+Rear of head
 
 
 7-2-4 Intake/exhaust vent
@@ -8359,7 +8360,7 @@ vent and it may result in the failure of the laser marker. Clean them regularly 
 • Keep water from entering the laser marker inside.
 
 
-                                                         ME-LPRF-SM-11                                                          165
+ME-LPRF-SM-11                                                          165
 
 ---
 
@@ -8586,7 +8587,7 @@ oscillator may become defective and unable to irradiate the laser.
 Our service representative handles the maintenance and replacement. Contact our sales office.
 
 
-                                                          ME-LPRF-SM-11                                                         171
+ME-LPRF-SM-11                                                         171
 
 ---
 
@@ -8753,7 +8754,7 @@ operations.
 Our service representative handles the maintenance and replacement. Contact our sales office.
 
 
-                                                        ME-LPRF-SM-11                                                      175
+ME-LPRF-SM-11                                                      175
 
 ---
 
@@ -8772,7 +8773,7 @@ Our service representative handles the maintenance and replacement. Contact our 
   Replacement interval
   • Number of switching cycles of INTERLOCK contactor has exceeded one million. (B10d = 1,000,000 times)
   • The output status of INTERLOCK MONITOR terminals (Y16-Y17, Y18-Y19) does not correspond to the input status of
-    INTERLOCK terminals (X16-X17, X18-X19).
+INTERLOCK terminals (X16-X17, X18-X19).
   • Alarm for INTERLOCK open (E400, E401) cannot be released.
 
 
@@ -8787,9 +8788,9 @@ Our service representative handles the maintenance and replacement. Contact our 
 
    Part name                       Model             Remarks
    Contactor unit for Interlock    LP-AEC10          Model of the contactor: SK09L-E01
-                                                     (made by Fuji Electric FA Components & Systems Co., Ltd.)
-                                                     Mechanical life: 10 million times
-                                                     Electrical life: 1 million times
+(made by Fuji Electric FA Components & Systems Co., Ltd.)
+Mechanical life: 10 million times
+Electrical life: 1 million times
 
 
   Steps for replacement of contactor
@@ -8832,7 +8833,7 @@ Our service representative handles the maintenance and replacement. Contact our 
   you cut the cable tie.
 
 
-                                                                                    Cable tie
+Cable tie
 
 
 5.    Loosen the two bolts of the contactor with M4 hexagonal
@@ -8848,12 +8849,12 @@ Our service representative handles the maintenance and replacement. Contact our 
 
        ワㄐㄕㄊ㄄ㄆ
 • Be careful not to let the cable get caught while installing.
-                                                                             Washer
-     ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+   Washer
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
 • To the optional contactor unit, the cables are already connected at the delivery state.
 
 
-                                                           ME-LPRF-SM-11                                                             177
+ME-LPRF-SM-11                                                             177
 
 ---
 
@@ -8897,7 +8898,7 @@ Our service representative handles the maintenance and replacement. Contact our 
    failure.
 
 
-                                                                             Cable tie
+Cable tie
 
 
 178                                                       ME-LPRF-SM-11
@@ -9040,7 +9041,7 @@ For details of purchasing cables, contact our sales office.
  Steps for replacement
 See “2-5-1 Connection of head and controller” (P.47), and connect cables.
 
-      ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
 • To ensure the ingress protection (IP64) of the head, install the attached connector cover to the cable. Refer to “Installing
   connector cover to cable” (P.48).
 
@@ -9075,18 +9076,18 @@ replacing laser markers for repairing and maintaining purposes.
  The serial number of the laser marker is written on the area marked by a circle in the figure below.
 
 
-                                                       Model name LP-RF200P
-                                                       Serial No. XXXXXX
-                                                       Lot No. XXXX
-                                                       PRD.      MM/YYYY
-                                                       WORK DISTANCE XXX.X mm
-                                                     Panasonic Industrial Devices SUNX Co., Ltd.
-                                                                                   Made in China
+  Model name LP-RF200P
+  Serial No. XXXXXX
+  Lot No. XXXX
+  PRD.      MM/YYYY
+  WORK DISTANCE XXX.X mm
+Panasonic Industrial Devices SUNX Co., Ltd.
+   Made in China
 
 
-                               Head
+Head
 
-                                                                                                   Rear of controller
+Rear of controller
 
 
   Check it on Laser Marker NAVI smart
@@ -9108,7 +9109,7 @@ replacing laser markers for repairing and maintaining purposes.
 To dispose of the laser marker, in accordance with the regional regulation, please request the industrial waste disposer.
 Dispose of the laser marker as industrial waste, and never discard it with regular trash.
 
-        ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
  • Be sure to delete all registered data when transferring or discarding the laser marker. Retained data might result in illegal
    read out and leaking of information by a third-party with malicious intent.
 
@@ -9116,26 +9117,26 @@ Dispose of the laser marker as industrial waste, and never discard it with regul
 7-5-1 Disposal of old equipment and batteries
 Only for European Union and countries with recycling systems
 
-                  These symbols on the products, packaging, and/or accompanying documents mean that used electrical
-                  and electronic products and batteries must not be mixed with general household waste.
-                  For proper treatment, recovery and recycling of old products and batteries, please take them to
-                  applicable collection points in accordance with your national legislation.
-                  By disposing of them correctly, you will help to save valuable resources and prevent any potential
-                  negative effects on human health and the environment.
-                  For more information about collection and recycling, please contact your local municipality.
-                  Penalties may be applicable for incorrect disposal of this waste, in accordance with national legislation.
+These symbols on the products, packaging, and/or accompanying documents mean that used electrical
+and electronic products and batteries must not be mixed with general household waste.
+For proper treatment, recovery and recycling of old products and batteries, please take them to
+applicable collection points in accordance with your national legislation.
+By disposing of them correctly, you will help to save valuable resources and prevent any potential
+negative effects on human health and the environment.
+For more information about collection and recycling, please contact your local municipality.
+Penalties may be applicable for incorrect disposal of this waste, in accordance with national legislation.
 
 
-                  Note for the battery symbol (bottom symbol)
-                  This symbol might be used in combination with a chemical symbol. In this case it complies with the
-                  requirement set by the Directive for the chemical involved.
+Note for the battery symbol (bottom symbol)
+This symbol might be used in combination with a chemical symbol. In this case it complies with the
+requirement set by the Directive for the chemical involved.
 
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
  • For removing the battery, see “7-2-11 Replacement of battery inside the controller” (P.180).
 
 
-                                                         ME-LPRF-SM-11                                                      185
+ME-LPRF-SM-11                                                      185
 
 ---
 
@@ -9144,7 +9145,7 @@ Only for European Union and countries with recycling systems
 Troubleshooting
 
 
-            ME-LPRF-SM-11
+ME-LPRF-SM-11
 
 ---
 
@@ -9155,142 +9156,142 @@ If any operation errors occur, check items below.
 When the problems cannot be resolved, please contact our sales office or representatives.
 
  Start-up
-         Troubles                            Causes                                         Measures
+Troubles                            Causes                                         Measures
 
-                             Power cable is not connected.              Connect the power supply cable.
+Power cable is not connected.              Connect the power supply cable.
 
-                             Key switch is not turned on.               Turn on the key switch.
+Key switch is not turned on.               Turn on the key switch.
 
   • Power supply is not      Power is not supplied.                     Check the power supply.
-    turned on.
+turned on.
   • The system does not      For LP-GS series:                          Replace the fuse by following the procedures
-    start up.                Fuse is blown.                             described in the “Setup/Maintenance Guide”.
+start up.                Fuse is blown.                             described in the “Setup/Maintenance Guide”.
 
-                                                                        Turn on the circuit protector by following the
-                             For LP-RC/LP-RF/LP-RV series:
-                                                                        procedures described in the “Setup/Maintenance
-                             Circuit protector is OFF.
-                                                                        Guide”.
+   Turn on the circuit protector by following the
+For LP-RC/LP-RF/LP-RV series:
+   procedures described in the “Setup/Maintenance
+Circuit protector is OFF.
+   Guide”.
 
 
  Laser pumping
-      Troubles                               Causes                                               Measures
+Troubles                               Causes                                               Measures
 
-                      The connection of the following I/O terminals is
-                      released.
-                                                                               • Check the connection of each terminal
-                       • INTERLOCK 1(+) - INTERLOCK 1(-) (X16 - X17)
-                                                                                 on the I/O terminal block.
-                       • INTERLOCK 2(+) - INTERLOCK 2(-) (X18 - X19)
-                                                                               • If the safety equipment such as door
-                       • For LP-GS series:
-                                                                                 and switch is in released status, restore
-                         LASER STOP 2 IN (X11) - OUT COM. 1
-                                                                                 the original condition.
-                       • For LP-RC/LP-RF/LP-RV series:
+The connection of the following I/O terminals is
+released.
+   • Check the connection of each terminal
+ • INTERLOCK 1(+) - INTERLOCK 1(-) (X16 - X17)
+   on the I/O terminal block.
+ • INTERLOCK 2(+) - INTERLOCK 2(-) (X18 - X19)
+   • If the safety equipment such as door
+ • For LP-GS series:
+   and switch is in released status, restore
+   LASER STOP 2 IN (X11) - OUT COM. 1
+   the original condition.
+ • For LP-RC/LP-RF/LP-RV series:
  Laser pumping           REMOTE INTERLOCK IN (X20) - OUT COM. 1
  does not start.
-                                                                               Solve the safety problem. Then select
-                      The stop laser button of the Laser Marker NAVI smart
-                                                                               “Reset” in the error dialog in Laser Marker
-                      is pressed.
-                                                                               NAVI smart to finish the laser stop status.
+   Solve the safety problem. Then select
+The stop laser button of the Laser Marker NAVI smart
+   “Reset” in the error dialog in Laser Marker
+is pressed.
+   NAVI smart to finish the laser stop status.
 
-                                                                               Connect the internal or external power
-                      Power is not supplied to the common terminal of the
-                                                                               supply to IN COM.1 and OUT COM.1 in the
-                      I/O terminal block.
-                                                                               I/O terminal respectively.
+   Connect the internal or external power
+Power is not supplied to the common terminal of the
+   supply to IN COM.1 and OUT COM.1 in the
+I/O terminal block.
+   I/O terminal respectively.
 
-                                                                               Refer to “External Control” in
-                      Signals from the external control device are refused.
-                                                                               Troubleshooting.
+   Refer to “External Control” in
+Signals from the external control device are refused.
+   Troubleshooting.
 
-                                                                               • Check if the laser pumping control
+• Check if the laser pumping control
  Laser pumping                                                                   method set in the system settings
  does not start in                                                               screen (I/O or communication
-                      The setting of a laser pumping control method in
+The setting of a laser pumping control method in
  remote mode.                                                                    command) and the actual control
-                      the system settings screen is not consistent with the
-                                                                                 method are consistent.
-                      actual control method.
-                                                                               • If the laser pumping method is changed
-                                                                                 in the system settings screen, restart
-                                                                                 the laser marker.
+the system settings screen is not consistent with the
+   method are consistent.
+actual control method.
+   • If the laser pumping method is changed
+   in the system settings screen, restart
+   the laser marker.
 
 
-                                                       ME-LPRF-SM-11                                                     187
+ME-LPRF-SM-11                                                     187
 
 ---
 
 ## หน้า 188
 
  Connection with Laser Marker NAVI smart
-          Troubles                             Causes                                          Measures
+Troubles                             Causes                                          Measures
 
-                              Laser marker has not been started.          Refer to “Start-up” in Troubleshooting.
+Laser marker has not been started.          Refer to “Start-up” in Troubleshooting.
 
   Online connection fails.    PC and laser marker are not
-                                                                          Connect them with a USB cable or a LAN cable.
+Connect them with a USB cable or a LAN cable.
   (The laser marker is not    connected.
   indicated as an available
   laser marker.)                                                          Refer to the “Laser Marker NAVI smart Operation
-                              USB driver is not installed properly.       Manual” to install the USB driver to all the laser
-                                                                          markers to connect.
+USB driver is not installed properly.       Manual” to install the USB driver to all the laser
+   markers to connect.
 
-                                                                          To maintain the online connection, disable the
-                              PC is in the sleep or hibernate state.
-                                                                          sleep setting of the PC.
+   To maintain the online connection, disable the
+PC is in the sleep or hibernate state.
+   sleep setting of the PC.
 
   Online connection is
-                              The PC stayed no communication
+The PC stayed no communication
   disconnected.
-                              state with the laser marker for a certain   To maintain the online connection, terminate the
-                              period of time with the high load (high     high CPU usage application.
-                              CPU usage).
+state with the laser marker for a certain   To maintain the online connection, terminate the
+period of time with the high load (high     high CPU usage application.
+CPU usage).
 
-                                                                          Establish the USB online connection and confirm
-                              Ethernet communication settings are
-                                                                          the Ethernet communication settings in the
-                              incorrect.
-                                                                          system settings. Then, restart the laser marker.
+   Establish the USB online connection and confirm
+Ethernet communication settings are
+   the Ethernet communication settings in the
+incorrect.
+   system settings. Then, restart the laser marker.
 
-                                                                          In the dialog for online connection, select the
-                              Ethernet is not listed in the dialog for
+   In the dialog for online connection, select the
+Ethernet is not listed in the dialog for
   Ethernet online                                                         “Including Ethernet” checkbox and search for
-                              online connection.
+online connection.
   connection fails.                                                       laser markers.
 
-                              The connecting port of the LAN cable
-                              to the PC is wrong. (Connected to           Connect the cable to the port marked “LAN” on
-                              EtherNet/IP or PROFINET port by             the rear of the controller.
-                              mistake.)
+The connecting port of the LAN cable
+to the PC is wrong. (Connected to           Connect the cable to the port marked “LAN” on
+EtherNet/IP or PROFINET port by             the rear of the controller.
+mistake.)
 
-                                                                          Bluetooth function is available for the following
-                              A laser marker of the model not             laser markers.
-                              compatible with Bluetooth is used.          LP-GS051 / LP-GS051-E / LP-GS051-L /
-                                                                          LP-GS051-LE / LP-GS052 / LP-GS052-E
+   Bluetooth function is available for the following
+A laser marker of the model not             laser markers.
+compatible with Bluetooth is used.          LP-GS051 / LP-GS051-E / LP-GS051-L /
+   LP-GS051-LE / LP-GS052 / LP-GS052-E
 
-                                                                          Establish the USB online connection and enable
-                              Bluetooth communication setting is
-                                                                          the Bluetooth communication in the system
-                              disabled.
-                                                                          settings. Then, restart the laser marker.
+   Establish the USB online connection and enable
+Bluetooth communication setting is
+   the Bluetooth communication in the system
+disabled.
+   settings. Then, restart the laser marker.
 
   For LP-GS series:
-                              PC's Bluetooth module is apart from         Operate the product with the laser marker head
+PC's Bluetooth module is apart from         Operate the product with the laser marker head
   Bluetooth online
-                              the head of the laser marker.               within 5m from the PC.
+the head of the laser marker.               within 5m from the PC.
   connection fails.
 
-                              The ambient environment is not suited
-                              for Bluetooth communication.
-                               • Wireless LAN or other wireless
-                                 device is used around.                   Establish Bluetooth communication in an
-                               • There is an obstacle between the         environment suited for stable wireless connection.
-                                 laser marker head and the PC.
-                               • The environment is subject to
-                                 weaker radio wave signals.
+The ambient environment is not suited
+for Bluetooth communication.
+ • Wireless LAN or other wireless
+   device is used around.                   Establish Bluetooth communication in an
+ • There is an obstacle between the         environment suited for stable wireless connection.
+   laser marker head and the PC.
+ • The environment is subject to
+   weaker radio wave signals.
 
 
 188                                                      ME-LPRF-SM-11
@@ -9300,84 +9301,84 @@ When the problems cannot be resolved, please contact our sales office or represe
 ## หน้า 189
 
  Lasing operation
-         Troubles                             Causes                                         Measures
+Troubles                             Causes                                         Measures
 
-                                                                         • Remove obstacle between laser emission port
-                                                                           of laser marker head and work piece.
-                              Obstacle hinders laser beam.
-                                                                         • For LP-RF/LP-RV series, remove the
-                                                                           protection cap of the laser emission port.
+   • Remove obstacle between laser emission port
+   of laser marker head and work piece.
+Obstacle hinders laser beam.
+   • For LP-RF/LP-RV series, remove the
+   protection cap of the laser emission port.
 
-                                                                         Adjust distance between bottom surface of laser
-                              Distance to work piece is not
-                                                                         marker head and the work piece surface as
-                              appropriate.
-                                                                         specified.
+   Adjust distance between bottom surface of laser
+Distance to work piece is not
+   marker head and the work piece surface as
+appropriate.
+   specified.
 
-                              For LP-GS series:
-                              The set Z-position does not match the      Set the Z-position according to the work piece
-                              height of the actual target object.        height.
-                              (The LP-GSxxx-L type is excluded.)
+For LP-GS series:
+The set Z-position does not match the      Set the Z-position according to the work piece
+height of the actual target object.        height.
+(The LP-GSxxx-L type is excluded.)
 
-                                                                         • Check the marking position using the guide
+• Check the marking position using the guide
  Marking cannot be done.
-                                                                           laser or guide pointer to check if the work piece
+laser or guide pointer to check if the work piece
  (The laser emission
-                                                                           is out of the specified position.
+is out of the specified position.
  indicator blinks but
-                                                                         • For LP-RC/LP-RF/LP-RV series:
+• For LP-RC/LP-RF/LP-RV series:
  marking is not performed     The work piece is not in place.
-                                                                           Connecting a sensor to TARGET DETECTION
+Connecting a sensor to TARGET DETECTION
  on the work piece.)
-                                                                           IN (X7) of I/O terminal block, you can check
-                                                                           the presence of the work piece during laser
-                                                                           radiation.
+IN (X7) of I/O terminal block, you can check
+the presence of the work piece during laser
+radiation.
 
-                                                                         • Increase laser power (including correction
-                                                                           factor).
-                              Laser power is insufficient.
-                                                                         • Decrease scan speed (including correction
-                                                                           factor).
+   • Increase laser power (including correction
+   factor).
+Laser power is insufficient.
+   • Decrease scan speed (including correction
+   factor).
 
-                                                                         Materials can be marked differ depending on
-                                                                         wavelength and output power of laser marker.
-                              Laser type (wavelength, output power,
-                                                                         • LP-GS/LP-RC is not suitable for metal
-                              etc.) is not appropriate for material of
-                                                                           material.
-                              the work piece.
-                                                                         • LP-RF/LP-RV is not suitable for transparent
-                                                                           material.
+   Materials can be marked differ depending on
+   wavelength and output power of laser marker.
+Laser type (wavelength, output power,
+   • LP-GS/LP-RC is not suitable for metal
+etc.) is not appropriate for material of
+   material.
+the work piece.
+   • LP-RF/LP-RV is not suitable for transparent
+   material.
 
-                              In RUN mode:
-                                                                         Turn the RUN mode ON, and then input a signal
-                              The RUN Mode is not active or the
-                                                                         to TRIGGER IN of the I/O terminal block.
-                              marking start signal is not input.
+In RUN mode:
+   Turn the RUN mode ON, and then input a signal
+The RUN Mode is not active or the
+   to TRIGGER IN of the I/O terminal block.
+marking start signal is not input.
 
-                                                                         Check connections with external equipment for
+Check connections with external equipment for
  Marking is not performed
-                                                                         mis-connection, disconnection or contact failure
+mis-connection, disconnection or contact failure
  in RUN/REMOTE mode.
-                              The marking trigger signal of the I/O      due to any loose connector.
+The marking trigger signal of the I/O      due to any loose connector.
  (The laser emission
-                              terminal block is not input.
+terminal block is not input.
  indicator does not light.)
-                                                                         Confirm that TRIGGER IN is input by one-shot
-                                                                         signal of more than 2ms per marking cycle.
+Confirm that TRIGGER IN is input by one-shot
+signal of more than 2ms per marking cycle.
 
-                              The marking trigger is entered while
-                                                                         Refer to “External Control” in Troubleshooting.
-                              the marking ready is OFF.
+The marking trigger is entered while
+   Refer to “External Control” in Troubleshooting.
+the marking ready is OFF.
 
-                              Fumes causes malfunction of                • Install a dust collector to eliminate the fume
+Fumes causes malfunction of                • Install a dust collector to eliminate the fume
  Sometimes laser is
-                              photoelectric sensor for marking trigger     (gas) generated during lasing.
+photoelectric sensor for marking trigger     (gas) generated during lasing.
  emitted unintentionally.
-                              signal.                                    • Check that dust collector works well.
+signal.                                    • Check that dust collector works well.
 
 
-                                                        ME-LPRF-SM-11                                                       189
+ME-LPRF-SM-11                                                       189
 
 ---
 
@@ -9385,72 +9386,72 @@ When the problems cannot be resolved, please contact our sales office or represe
 
 Troubles                              Causes                                           Measures
 
-                               • The setting of the laser head
+• The setting of the laser head
   Marking position is            direction is not consistent with the       Check the setting direction of the laser head,
   deviated from the              actual install direction.                  X-axis/ Y-axis offset or rotation offset setting of
   expected setting position.   • System offset values are input on          the system settings screen.
-                                 the system settings screen.
+the system settings screen.
 
 
   Marking quality
-          Troubles                              Causes                                           Measures
+Troubles                              Causes                                           Measures
 
-                                                                             • Clean contaminants off the laser emission
-                                                                               port by following the procedures described in
-                                                                               “Setup/Maintenance Guide”.
-                               Laser emission port is not clean.
-                                                                             • For LP-RF/LP-RV series:
-                                                                               If contaminants persist, replace the protection
-                                                                               glass of the laser emission port.
+   • Clean contaminants off the laser emission
+   port by following the procedures described in
+   “Setup/Maintenance Guide”.
+Laser emission port is not clean.
+   • For LP-RF/LP-RV series:
+   If contaminants persist, replace the protection
+   glass of the laser emission port.
 
-                               Fumes occurring during lasing hinder          • Install dust collector.
-                               laser beam.                                   • Check that dust collector works well.
+Fumes occurring during lasing hinder          • Install dust collector.
+laser beam.                                   • Check that dust collector works well.
 
-                                                                            Adjust distance between bottom surface of laser
-                               Distance to the work piece is not
-                                                                            marker head and marking surface of the work
-                               appropriate.
-                                                                            piece.
+   Adjust distance between bottom surface of laser
+Distance to the work piece is not
+   marker head and marking surface of the work
+appropriate.
+   piece.
 
-                               For LP-GS series:
-                               The set Z-position does not match the        Set the Z-position according to the work piece
-                               height of the actual target work piece.      height.
-                               (The LP-GSxxx-L type is excluded.)
+For LP-GS series:
+The set Z-position does not match the        Set the Z-position according to the work piece
+height of the actual target work piece.      height.
+(The LP-GSxxx-L type is excluded.)
 
-                                                                            Make adjustment so that bottom surface of laser
-                               Marking surface of work piece is
-                                                                            marker head and marking surface of the work
-                               inclined.
-                                                                            piece are parallel with each other.
+   Make adjustment so that bottom surface of laser
+Marking surface of work piece is
+   marker head and marking surface of the work
+inclined.
+   piece are parallel with each other.
   Marking is totally faded/
   Marking is partially
-                               There are variations in properties of the
+There are variations in properties of the
   faded.
-                               work pieces.
-                                • Thickness varies.
-                                                                            Adjust the marking conditions and work distance
-                                • Surface roughness varies (including
-                                                                            according to respective work pieces.
-                                  those in gloss).
-                                • Material varies (including those in
-                                  chemical composition).
+work pieces.
+ • Thickness varies.
+   Adjust the marking conditions and work distance
+ • Surface roughness varies (including
+   according to respective work pieces.
+   those in gloss).
+ • Material varies (including those in
+   chemical composition).
 
-                                                                            Adjust work piece feeder so that work piece
-                               Work piece feeder is not stable.
-                                                                            position becomes stable.
+   Adjust work piece feeder so that work piece
+Work piece feeder is not stable.
+   position becomes stable.
 
-                                                                             • Increase setting value of laser power.
-                                                                             • Decrease scan speed.
-                               Performance of laser oscillator              If it is not possible to get the same marking quality
-                               deteriorates due to aging.                   as before even with the max. value of the laser
-                                                                            power setting, laser oscillator must be replaced.
-                                                                            Contact our sales office.
+   • Increase setting value of laser power.
+   • Decrease scan speed.
+Performance of laser oscillator              If it is not possible to get the same marking quality
+deteriorates due to aging.                   as before even with the max. value of the laser
+   power setting, laser oscillator must be replaced.
+   Contact our sales office.
 
-                                                                            Adjust the pulse duration according to the material
-                               For LP-RV series:                            of the work piece.
-                               The setting value of the pulse duration is   For plastic work pieces the pulse duration 4ns or
-                               not appropriate.                             8ns is a common setting, and for metal, 16ns or
-                                                                            30ns is often selected.
+   Adjust the pulse duration according to the material
+For LP-RV series:                            of the work piece.
+The setting value of the pulse duration is   For plastic work pieces the pulse duration 4ns or
+not appropriate.                             8ns is a common setting, and for metal, 16ns or
+   30ns is often selected.
 
 
 190                                                       ME-LPRF-SM-11
@@ -9461,79 +9462,79 @@ Troubles                              Causes                                    
 
 Troubles                            Causes                                          Measures
 
-                                                                       • For LP-GS/LP-RC series:
-                                                                         Set “Power optimization by marking position”
+• For LP-GS/LP-RC series:
+  Set “Power optimization by marking position”
 The marking around          Decrease of the laser energy density in
-                                                                         in “System offset” in System settings screen.
+in “System offset” in System settings screen.
 edge of the marking field   the edge of marking field may affect the
-                                                                       • For LP-RF/LP-RV series:
+• For LP-RF/LP-RV series:
 is faded or chipped.        marking quality.
-                                                                         Set the power correction to the marking
-                                                                         objects in the edge of the marking field.
+Set the power correction to the marking
+objects in the edge of the marking field.
 
-                                                                       Remove obstacle between laser emission port
-                            Obstacle hinders laser beam.
-                                                                       and work piece.
+   Remove obstacle between laser emission port
+Obstacle hinders laser beam.
+   and work piece.
 
-                                                                       • Clean contaminants off the laser emission
+• Clean contaminants off the laser emission
 Character is partially
-                                                                         port by following the procedures described in
+port by following the procedures described in
 chipped.
-                                                                         “Setup/Maintenance Guide”.
-                            Laser emission port is not clean.
-                                                                       • For LP-RF/LP-RV series:
-                                                                         If contaminants persist, replace the protection
-                                                                         glass of the laser emission port.
+   “Setup/Maintenance Guide”.
+Laser emission port is not clean.
+   • For LP-RF/LP-RV series:
+   If contaminants persist, replace the protection
+   glass of the laser emission port.
 
-                                                                       • Fix head with the specified torque.
-                            Head lacks fixation strength.
-                                                                       • Improve strength of head mounting.
+   • Fix head with the specified torque.
+Head lacks fixation strength.
+   • Improve strength of head mounting.
 
-                            Constant vibration from surrounding
-                            equipment (motor and press, etc.)
-                            influences.
+Constant vibration from surrounding
+equipment (motor and press, etc.)
+influences.
 
-                            There are irregular vibrations coming      Perform vibration prevention measures.
-                            from surrounding equipment (air
-                            cylinder and forklift, etc.).
-                            (Marking is disturbed at irregular
-                            intervals.)
+There are irregular vibrations coming      Perform vibration prevention measures.
+from surrounding equipment (air
+cylinder and forklift, etc.).
+(Marking is disturbed at irregular
+intervals.)
 
-                                                                       Disturbed at the beginning of marking:
-                                                                       Marking trigger signal is likely to be input
-                                                                       before work piece is fully stopped. Marking may
-                                                                       disturbed due to remaining vibration even if work
+Disturbed at the beginning of marking:
+Marking trigger signal is likely to be input
+before work piece is fully stopped. Marking may
+disturbed due to remaining vibration even if work
 Marking is disorder.                                                   piece is in full stop.Turn the marking trigger signal
 (Characters lose shape                                                 ON after vibrations are completely damped.
-                            Start and/or stop timing of feeder does
+Start and/or stop timing of feeder does
 or not formed.)
-                            not match with marking operation.
-                                                                       Disturbed at the end of marking:
-                                                                       Work piece is likely to start moving before
-                                                                       completion of marking.
-                                                                       Delay start timing of feeder or speed up scan
-                                                                       speed so that marking is finished before work
-                                                                       piece starts moving.
+not match with marking operation.
+   Disturbed at the end of marking:
+   Work piece is likely to start moving before
+   completion of marking.
+   Delay start timing of feeder or speed up scan
+   speed so that marking is finished before work
+   piece starts moving.
 
-                                                                       Protect laser marker against noises as follows:
-                                                                       • Securely ground the frame ground terminal of
-                                                                         laser marker or surrounding equipment.
-                                                                       • Isolate power and signal lines from each other
-                            There are noises coming from                 if they have been routed in parallel.
-                            surrounding equipment.                     • Shield signal line.
-                                                                       • Isolate power supply for laser marker from
-                                                                         other equipment.
-                                                                       • Use noise cut transformer to absorb noises
-                                                                         from power supply.
+   Protect laser marker against noises as follows:
+   • Securely ground the frame ground terminal of
+   laser marker or surrounding equipment.
+   • Isolate power and signal lines from each other
+There are noises coming from                 if they have been routed in parallel.
+surrounding equipment.                     • Shield signal line.
+   • Isolate power supply for laser marker from
+   other equipment.
+   • Use noise cut transformer to absorb noises
+   from power supply.
 
 Marking line runs over                                                 Adjustment the lasing quality parameters such as
-                            The setting in lasing quality parameters
+The setting in lasing quality parameters
 the intended start or end                                              starting point, ending point or wait value in laser
-                            does not match the other settings.
+does not match the other settings.
 points.                                                                settings of the “Marking settings” screen.
 
 
-                                                     ME-LPRF-SM-11                                                        191
+ME-LPRF-SM-11                                                        191
 
 ---
 
@@ -9542,22 +9543,22 @@ points.                                                                settings 
 Troubles                          Causes                                       Measures
 
  When the character size
-                                                                    • Use “Original 2” or “Original 5” font for the
+• Use “Original 2” or “Original 5” font for the
  is small, the marking     The setting conditions or font are
-                                                                      small size characters.
+small size characters.
  characters are not        inadequate for the character size.
-                                                                    • Adjust the laser power or scan speed.
+• Adjust the laser power or scan speed.
  readable.
 
-                           • For LP-GS series:
-                                                                    Decrease scan speed or increase laser
-                             Setting of laser frequency and scan
-                                                                    frequency.
-                             speed is inadequate.
+• For LP-GS series:
+   Decrease scan speed or increase laser
+  Setting of laser frequency and scan
+   frequency.
+  speed is inadequate.
  Marking is dotted.
-                           • For LP-RF/LP-RV series:
-                             Setting of pulse cycle and scan        Decrease scan speed or pulse cycle.
-                             speed is inadequate.
+• For LP-RF/LP-RV series:
+  Setting of pulse cycle and scan        Decrease scan speed or pulse cycle.
+  speed is inadequate.
 
 
 192                                                 ME-LPRF-SM-11
@@ -9572,65 +9573,65 @@ Troubles                          Causes                                       M
 • The on-the-fly marking is not available to LP-GS series.
 
 
-         Troubles                        Causes                                           Measures
+Troubles                        Causes                                           Measures
 
-                                                                   • Set the trigger mode to Multiple triggers if you want
-                                                                     to input next triggers while the trigger processing
-                                                                     operation.
-                                                                   • Place the trigger sensor closer to the laser marker and
+• Set the trigger mode to Multiple triggers if you want
+  to input next triggers while the trigger processing
+  operation.
+• Place the trigger sensor closer to the laser marker and
  Marking is sometimes        Marking trigger signal is entered
-                                                                     set the smaller value to Trigger detecting position.
+set the smaller value to Trigger detecting position.
  skipped.                    before current marking is
-                                                                   • Reduce the marking time with the measures such as
+• Reduce the marking time with the measures such as
  (E750 occurs.)              finished.
-                                                                     increasing the scan speed and etc.
-                                                                   • Reduce feeder speed.
-                                                                   • Increase marking interval (interval between objects on
-                                                                     feeder).
+  increasing the scan speed and etc.
+• Reduce feeder speed.
+• Increase marking interval (interval between objects on
+  feeder).
 
  The start lines of the      The timing of lasing does not
-                                                                  Input larger value to Overrun correction.
+Input larger value to Overrun correction.
  characters are distorted.   match with the line speed.
 
-                                                                   • Match feed direction with laser marker operation.
-                             The setting of the moving
-                                                                   • Check the setting direction of the laser head of the
-                             direction is wrong.
-                                                                     system settings screen.
+   • Match feed direction with laser marker operation.
+The setting of the moving
+   • Check the setting direction of the laser head of the
+direction is wrong.
+   system settings screen.
 
-                             Speed changes at conveyor            If conveyors are coupled, avoid marking near conveyor
-                             junction.                            junction.
+Speed changes at conveyor            If conveyors are coupled, avoid marking near conveyor
+junction.                            junction.
 
-                             Actual speed and preset speed
-                             for feeding objects are different    Remove cause of object slippage.
-                             due to slippage of objects.
+Actual speed and preset speed
+for feeding objects are different    Remove cause of object slippage.
+due to slippage of objects.
 
-                             Positional misalignment is likely
+Positional misalignment is likely
  Characters are distorted.
-                             to occur due to meandering           Secure objects to prevent misalignment.
+to occur due to meandering           Secure objects to prevent misalignment.
  Character pitch is
-                             motion of conveyor.
+motion of conveyor.
  unstable.
 
-                                                                   • Check the conveyor and remove the cause of the
-                             The moving speed of the                 speed change.
-                             conveyor is not stable.               • To keep up the conveyor speed, use encoder to
-                                                                     feedback the change of the speed.
+   • Check the conveyor and remove the cause of the
+The moving speed of the                 speed change.
+conveyor is not stable.               • To keep up the conveyor speed, use encoder to
+   feedback the change of the speed.
 
-                                                                  Adjust the setting value of the line speed by checking the
-                             When Line speed control is set
-                                                                  marking quality.
-                             to Fixed speed:
-                                                                  • When the Character Spacing is too wide:
-                             The setting speed is not
-                                                                    Increase the setting.
-                             consistent with the actual line
-                                                                  • When the character spacing is too narrow:
-                             speed.
-                                                                    Decrease the setting.
+   Adjust the setting value of the line speed by checking the
+When Line speed control is set
+   marking quality.
+to Fixed speed:
+   • When the Character Spacing is too wide:
+The setting speed is not
+   Increase the setting.
+consistent with the actual line
+   • When the character spacing is too narrow:
+speed.
+   Decrease the setting.
 
 
-                                                         ME-LPRF-SM-11                                                      193
+ME-LPRF-SM-11                                                      193
 
 ---
 
@@ -9638,56 +9639,56 @@ Troubles                          Causes                                       M
 
 Troubles                        Causes                                         Measures
 
-                                                                 • Make sure that the encoder operates properly.
-                                                                 • Make sure that the setting value of Encoder resolution
-                                                                   is correct.
-                             When Line speed control is set
-                                                                    • When using A phase only:
-                             to Encoder input:
-                                                                      Encoder resolution = Number of pulses/mm x 2
-                             The line speed could not be
-                                                                    • When using A and B phases:
-                             measured correctly by the
-                                                                      Encoder resolution = Number of pulses/mm x 4
-                             encoder.
-                                                                 • When only one phase of the encoder is used, connect
-                                                                   the encoder signal to ENCODER A IN (X13) and
-                                                                   connect ENCODER B IN (X14) to IN COM. 1 (X2).
+   • Make sure that the encoder operates properly.
+   • Make sure that the setting value of Encoder resolution
+   is correct.
+When Line speed control is set
+   • When using A phase only:
+to Encoder input:
+   Encoder resolution = Number of pulses/mm x 2
+The line speed could not be
+   • When using A and B phases:
+measured correctly by the
+   Encoder resolution = Number of pulses/mm x 4
+encoder.
+   • When only one phase of the encoder is used, connect
+   the encoder signal to ENCODER A IN (X13) and
+   connect ENCODER B IN (X14) to IN COM. 1 (X2).
 
-                                                                 • Place the encoder closer to the trigger sensor.
-                                                                 • Adjust the setting value of Encoder resolution by
-                                                                   checking the marking quality.
-                             When Line speed control is set         • When the character spacing is too wide:
-                             to Encoder input:                        Increase the setting.
-                             The input speed of the encoder         • When the character spacing is too narrow:
-                             is not consistent with the actual        Decrease the setting.
+   • Place the encoder closer to the trigger sensor.
+   • Adjust the setting value of Encoder resolution by
+   checking the marking quality.
+When Line speed control is set         • When the character spacing is too wide:
+to Encoder input:                        Increase the setting.
+The input speed of the encoder         • When the character spacing is too narrow:
+is not consistent with the actual        Decrease the setting.
  Characters are distorted.
-                             line speed at marking.              • In some cases, it may reduce the influence of the ups
+line speed at marking.              • In some cases, it may reduce the influence of the ups
  Character pitch is
-                                                                   and downs of the line speed to decrease the encoder
+and downs of the line speed to decrease the encoder
  unstable.
-                                                                   resolution. However, it is recommended to set more
-                                                                   than 25pulses/mm to Encoder resolution.
+resolution. However, it is recommended to set more
+than 25pulses/mm to Encoder resolution.
 
-                             When Line speed control is set
-                                                                 • Check the setting value of Distance line speed
-                             to 2 sensors input:
-                                                                   sensors.
-                             The line speed could not be
-                                                                 • Confirm the sensors for line speed detection operate
-                             measured correctly by the two
-                                                                   properly.
-                             sensors.
+When Line speed control is set
+   • Check the setting value of Distance line speed
+to 2 sensors input:
+   sensors.
+The line speed could not be
+   • Confirm the sensors for line speed detection operate
+measured correctly by the two
+   properly.
+sensors.
 
-                                                                 • Place the trigger sensor closer to the line speed
-                                                                   detection sensors so that the difference of the speed
-                             When Line speed control is set        at detection and at marking may reduce.
-                             to 2 sensors input:                 • Adjust the setting value of Distance line speed
-                             The input speed of the 2              sensors by checking the marking quality.
-                             sensors is not consistent with         • When the character spacing is too wide:
-                             the actual line speed at marking.        Increase the setting.
-                                                                    • When the character spacing is too narrow:
-                                                                      Decrease the setting.
+   • Place the trigger sensor closer to the line speed
+   detection sensors so that the difference of the speed
+When Line speed control is set        at detection and at marking may reduce.
+to 2 sensors input:                 • Adjust the setting value of Distance line speed
+The input speed of the 2              sensors by checking the marking quality.
+sensors is not consistent with         • When the character spacing is too wide:
+the actual line speed at marking.        Increase the setting.
+   • When the character spacing is too narrow:
+   Decrease the setting.
 
 
 194                                                    ME-LPRF-SM-11
@@ -9697,81 +9698,81 @@ Troubles                        Causes                                         M
 ## หน้า 195
 
  External control
-       Troubles                    Causes                                             Measures
+Troubles                    Causes                                             Measures
 
-                                                           • Select the remote mode by following the procedure indicated
-                                                             in “Setup/Maintenance Guide”.
-                                                           • Check if the entering method of the remote mode set in the
-                         Laser marker is not in remote
-                                                             system settings screen (I/O or PC software) and the actual
-                         mode.
-                                                             control method are consistent.
-                                                           • If the entering method of the remote mode is changed in the
-                                                             system settings screen, restart the laser marker.
+   • Select the remote mode by following the procedure indicated
+   in “Setup/Maintenance Guide”.
+   • Check if the entering method of the remote mode set in the
+Laser marker is not in remote
+   system settings screen (I/O or PC software) and the actual
+mode.
+   control method are consistent.
+   • If the entering method of the remote mode is changed in the
+   system settings screen, restart the laser marker.
 
-                                                           • Check connections with external equipment for mis-
-                                                             connection, disconnection or contact failure due to any loose
-                         The connection with external        connector.
-                         devices is inadequate.            • Check for continuity using tester or the like.
-                                                           • For RS-232C connection, confirm the wiring of the external
-                                                             device including the loop back connection.
+   • Check connections with external equipment for mis-
+   connection, disconnection or contact failure due to any loose
+The connection with external        connector.
+devices is inadequate.            • Check for continuity using tester or the like.
+   • For RS-232C connection, confirm the wiring of the external
+   device including the loop back connection.
 
-                                                           • Match communication parameter settings to external
-                                                             equipment.
-                                                           • If any of the communication settings (Ethernet settings,
-                                                             EtherNet/IP settings, or RS-232C usage) in System settings
+• Match communication parameter settings to external
+  equipment.
+• If any of the communication settings (Ethernet settings,
+  EtherNet/IP settings, or RS-232C usage) in System settings
  Communication with
-                         Communication parameter             screen are changed, restart the laser marker.
+Communication parameter             screen are changed, restart the laser marker.
  the external device
-                         settings are incorrect.           • If you use DHCP of EtherNet/IP settings, confirm the
+settings are incorrect.           • If you use DHCP of EtherNet/IP settings, confirm the
  cannot start.
-                                                             connection of the DHCP server of your network.
-                                                           • When using RS-232C, specify the “Flow control” to “None”
-                                                             at the communication port settings of the external control
-                                                             device.
+  connection of the DHCP server of your network.
+• When using RS-232C, specify the “Flow control” to “None”
+  at the communication port settings of the external control
+  device.
 
-                                                           Check the communication setting. If Ethernet or EtherNet/IP
-                         The communication setting
-                                                           is used, check the IP address, etc. When the backup file is
-                         was changed at the time of
-                                                           restored, the communication setting is overwritten by the backup
-                         backup file restoration.
-                                                           data.
+   Check the communication setting. If Ethernet or EtherNet/IP
+The communication setting
+   is used, check the IP address, etc. When the backup file is
+was changed at the time of
+   restored, the communication setting is overwritten by the backup
+backup file restoration.
+   data.
 
-                                                           Protect laser marker against noises as follows:
-                                                           • Securely ground the frame ground terminal of laser marker or
-                                                             surrounding equipment.
-                                                           • Isolate power and signal lines from each other if they have
-                         There are noises coming
-                                                             been routed in parallel.
-                         from surrounding equipment.
-                                                           • Shield signal line.
-                                                           • Isolate power supply for laser marker from other equipment.
-                                                           • Use noise cut transformer to absorb noises from power
-                                                             supply.
+   Protect laser marker against noises as follows:
+   • Securely ground the frame ground terminal of laser marker or
+   surrounding equipment.
+   • Isolate power and signal lines from each other if they have
+There are noises coming
+   been routed in parallel.
+from surrounding equipment.
+   • Shield signal line.
+   • Isolate power supply for laser marker from other equipment.
+   • Use noise cut transformer to absorb noises from power
+   supply.
 
-                                                           • Check the settings of the control method under “Operation/
-                                                             information” tab in System settings screen. If “command” is
-                                                             selected to the corresponding operation, change it to “I/O”.
-                         The settings in the system        • Check the I/O settings under “Inputs/outputs” tab in System
-                         settings screen are not             settings screen.
+   • Check the settings of the control method under “Operation/
+   information” tab in System settings screen. If “command” is
+   selected to the corresponding operation, change it to “I/O”.
+The settings in the system        • Check the I/O settings under “Inputs/outputs” tab in System
+settings screen are not             settings screen.
  Control by I/O fails.
-                         consistent with the actual        • If you use EtherNet/IP or PROFINET, check the “Control
-                         control method.                     method of input signals” under “Communication” tab in
-                                                             System settings screen.
-                                                           • If any of the above settings are changed in the system
-                                                             settings screen, restart the laser marker.
+consistent with the actual        • If you use EtherNet/IP or PROFINET, check the “Control
+control method.                     method of input signals” under “Communication” tab in
+   System settings screen.
+   • If any of the above settings are changed in the system
+   settings screen, restart the laser marker.
 
-                                                           • Check the command history in the “Maintenance” screen of
+• Check the command history in the “Maintenance” screen of
  Control by              Command data is not
-                                                             Laser Marker NAVI smart.
+Laser Marker NAVI smart.
  communication           received from external
-                                                           • Using commercially available line monitor or protocol
+• Using commercially available line monitor or protocol
  command fails.          equipment.
-                                                             analyzer, check if the external equipment transmits data.
+analyzer, check if the external equipment transmits data.
 
 
-                                                         ME-LPRF-SM-11                                                      195
+ME-LPRF-SM-11                                                      195
 
 ---
 
@@ -9779,75 +9780,75 @@ Troubles                        Causes                                         M
 
 Troubles                   Causes                                                Measures
 
-                                                           • For RS-232C or Ethernet, check if the start code specified
-                                                             in laser marker system settings screen and start code of the
-                      Communication data format
-                                                             transmitted data are consistent.
-                      (start code) is inadequate.
-                                                           • If you use EtherNet/IP or PROFINET, do not contain the start
-                                                             code in the command data.
+   • For RS-232C or Ethernet, check if the start code specified
+   in laser marker system settings screen and start code of the
+Communication data format
+   transmitted data are consistent.
+(start code) is inadequate.
+   • If you use EtherNet/IP or PROFINET, do not contain the start
+   code in the command data.
 
-                                                           • For RS-232C or Ethernet, check if an end code is placed at
-                                                             the end of the transmitted data.
-                      Communication data format            • For RS-232C, check if the end code is the value specified in
-                      (end code) is inadequate.              the laser marker system settings screen.
+   • For RS-232C or Ethernet, check if an end code is placed at
+   the end of the transmitted data.
+Communication data format            • For RS-232C, check if the end code is the value specified in
+(end code) is inadequate.              the laser marker system settings screen.
  Control by                                                • If you use EtherNet/IP or PROFINET, do not contain the end
  communication                                               code in the command data.
  command fails.
-                                                           • If you want to use the same command format with the
-                                                             former models of LP-400/LP-V series, enable “LP-400/V
-                                                             compatibility” in system settings of Laser Marker NAVI smart.
-                                                           • If you want to use the standard command format, switch the
-                      Command mode (LP-400/V                 mode by RSM command or disable “LP-400/V compatibility”
-                      compatibility setting) is wrong.       in system settings of Laser Marker NAVI smart.
-                                                           • If you use EtherNet/IP or PROFINET, deactivate “LP-400/
-                                                             V compatibility” in System settings screen. You cannot use
-                                                             the command format in LP-400/V compatible mode via
-                                                             EtherNet/IP or PROFINET.
+   • If you want to use the same command format with the
+   former models of LP-400/LP-V series, enable “LP-400/V
+   compatibility” in system settings of Laser Marker NAVI smart.
+   • If you want to use the standard command format, switch the
+Command mode (LP-400/V                 mode by RSM command or disable “LP-400/V compatibility”
+compatibility setting) is wrong.       in system settings of Laser Marker NAVI smart.
+   • If you use EtherNet/IP or PROFINET, deactivate “LP-400/
+   V compatibility” in System settings screen. You cannot use
+   the command format in LP-400/V compatible mode via
+   EtherNet/IP or PROFINET.
 
-                      An error occurs.                     Check the error code and cancel the alarm or warning.
+An error occurs.                     Check the error code and cancel the alarm or warning.
 
-                                                           • Do not input the next marking trigger until the trigger
-                                                             processing is completed.
-                      Marking trigger is in
-                                                           • When trigger mode is set to Multiple triggers at on-the-fly
-                      progress.
-                                                             marking, max. 16 triggers can be accepted while the trigger
-                                                             processing operation.
+   • Do not input the next marking trigger until the trigger
+   processing is completed.
+Marking trigger is in
+   • When trigger mode is set to Multiple triggers at on-the-fly
+progress.
+   marking, max. 16 triggers can be accepted while the trigger
+   processing operation.
 
-                                                           Turn ON the laser pumping.
-                      Laser pumping is turned
-                                                           If the laser pumping fails, refer to “Laser pumping” in
-                      OFF.
-                                                           Troubleshooting.
+   Turn ON the laser pumping.
+Laser pumping is turned
+   If the laser pumping fails, refer to “Laser pumping” in
+OFF.
+   Troubleshooting.
 
-                                                           • Open the internal shutter.
-                                                           • Check if the shutter open/close control method set in the
-                                                             system settings screen (I/O or communication command) and
+• Open the internal shutter.
+• Check if the shutter open/close control method set in the
+  system settings screen (I/O or communication command) and
  Marking ready does   Internal shutter is closed.
-                                                             the actual control method are consistent.
+the actual control method are consistent.
  not turn ON.
-                                                           • If the shutter open/close method is changed in the system
-                                                             settings screen, restart the laser marker.
+• If the shutter open/close method is changed in the system
+  settings screen, restart the laser marker.
 
-                                                           If the file number is changed, the marking ready is turned OFF
-                      File switching is not                for dozens of ms or seconds to create marking data. Input
-                      complete.                            marking trigger signal after making sure that READY output is
-                                                           ON if you changed the file.
+   If the file number is changed, the marking ready is turned OFF
+File switching is not                for dozens of ms or seconds to create marking data. Input
+complete.                            marking trigger signal after making sure that READY output is
+   ON if you changed the file.
 
-                      Either of registered
-                                                           • If “Registered characters via I/O”, “External offset” or
-                      characters via I/O, external
-                                                             “Characters specified by SIN command” are used, input
-                      offset or characters specified
-                                                             respective data at every marking.
-                      by SIN command are used
-                                                           • For LP-RC/LP-RF/LP-RV series:
-                      and marking data is not input
-                                                             Using DATA WAIT OUT (No.38) of I/O connector, you can
-                      from the external control
-                                                             confirm the laser marker becomes waiting status of input.
-                      device.
+Either of registered
+   • If “Registered characters via I/O”, “External offset” or
+characters via I/O, external
+   “Characters specified by SIN command” are used, input
+offset or characters specified
+   respective data at every marking.
+by SIN command are used
+   • For LP-RC/LP-RF/LP-RV series:
+and marking data is not input
+   Using DATA WAIT OUT (No.38) of I/O connector, you can
+from the external control
+   confirm the laser marker becomes waiting status of input.
+device.
 
 
 196                                                      ME-LPRF-SM-11
@@ -9858,73 +9859,73 @@ Troubles                   Causes                                               
 
 Troubles                    Causes                                             Measures
 
-                       For communication
-                       command control:
-                       “reception mode ON”                Set “reception mode OFF” for command reception permission
-                       is set for command                 (MKM command).
-                       reception permission (MKM
+For communication
+command control:
+“reception mode ON”                Set “reception mode OFF” for command reception permission
+is set for command                 (MKM command).
+reception permission (MKM
 Marking ready does     command).
 not turn ON.
-                       For LP-RC/LP-RF/LP-RV
-                       series:                            Once the counter is reset during On-the-fly marking operation,
-                       Counter has been reset             READY OUT becomes OFF temporarily and may not accept the
-                       during On-the-fly marking          trigger. Please check the counter reset timing.
-                       operation.
+For LP-RC/LP-RF/LP-RV
+series:                            Once the counter is reset during On-the-fly marking operation,
+Counter has been reset             READY OUT becomes OFF temporarily and may not accept the
+during On-the-fly marking          trigger. Please check the counter reset timing.
+operation.
 
-                                                          To use the following commands, specify the control method
-                                                          to the communication command in Laser Marker NAVI smart
-                                                          system settings and restart the laser marker.
-                                                           • Laser pumping (LSR)
-                       The requested operation can
-                                                           • Shutter open/close (SHT)
-                       be controlled only by I/O with
-                                                           • Guide Laser (GID) (except LP-GS052 type)
-                       the current system settings.
+   To use the following commands, specify the control method
+   to the communication command in Laser Marker NAVI smart
+   system settings and restart the laser marker.
+   • Laser pumping (LSR)
+The requested operation can
+   • Shutter open/close (SHT)
+be controlled only by I/O with
+   • Guide Laser (GID) (except LP-GS052 type)
+the current system settings.
 
-                                                          The following commands are available only when the shutter
-                                                          open/close control method is set to communication command.
-                                                           • Laser radiation for measurement (SPT)
+The following commands are available only when the shutter
+open/close control method is set to communication command.
+ • Laser radiation for measurement (SPT)
 
-                                                          Except the following commands *, the laser marker cannot
-                                                          accept the setting request commands unless it is in the “reception
-                                                          mode ON” status. For command transmission, set “reception
-                                                          mode ON” by MKM command.
-                                                           • File selection by number (FNO)
-                       “Reception mode ON”
-                                                           • File selection by name (FNN)
-                       is not set for command
-                                                           • Shutter open/close (SHT)
-                       reception permission (MKM
-                                                           • Command reception permission (MKM)
-                       command).
+   Except the following commands *, the laser marker cannot
+   accept the setting request commands unless it is in the “reception
+   mode ON” status. For command transmission, set “reception
+   mode ON” by MKM command.
+   • File selection by number (FNO)
+“Reception mode ON”
+   • File selection by name (FNN)
+is not set for command
+   • Shutter open/close (SHT)
+reception permission (MKM
+   • Command reception permission (MKM)
+command).
 The sending                                                • Laser pumping (LSR)
 command is not                                             • Counter reset (CTR)
 accepted and                                               • Marking trigger (MRK)
 negative response is                                       • Character entry per trigger (SIN)
 returned.                                                  • Marking position and laser power adjustment per trigger (SEO)
 
-                                                          All commands except the following commands * cannot be
-                                                          accepted while alarm or error is active.
-                                                          When alarm occurred:
-                                                           • Status checking (STS)
-                                                           • I/O monitor (IOM)
-                                                           • Operating data (RTD)
-                                                           • Error history (ERH)
-                                                           • Alarm reset (ARS)
-                                                           • Error code (ENO)
-                       Alarm or Warning occurred.
-                                                          When warning occurred:
-                                                           • Status checking (STS)
-                                                           • I/O monitor (IOM)
-                                                           • Operating data (RTD)
-                                                           • Error history (ERH)
-                                                           • Alarm reset (ARS)
-                                                           • Error code (ENO)
-                                                           • Shutter open/close (SHT) (Only closing and readout request)
-                                                           • Command reception permission (MKM) (readout only)
+   All commands except the following commands * cannot be
+   accepted while alarm or error is active.
+   When alarm occurred:
+   • Status checking (STS)
+   • I/O monitor (IOM)
+   • Operating data (RTD)
+   • Error history (ERH)
+   • Alarm reset (ARS)
+   • Error code (ENO)
+Alarm or Warning occurred.
+   When warning occurred:
+   • Status checking (STS)
+   • I/O monitor (IOM)
+   • Operating data (RTD)
+   • Error history (ERH)
+   • Alarm reset (ARS)
+   • Error code (ENO)
+   • Shutter open/close (SHT) (Only closing and readout request)
+   • Command reception permission (MKM) (readout only)
 
 
-                                                        ME-LPRF-SM-11                                                     197
+ME-LPRF-SM-11                                                     197
 
 ---
 
@@ -9932,26 +9933,26 @@ returned.                                                  • Marking position 
 
 Troubles                    Causes                                              Measures
 
-                        Two or more command data             After sending the command, confirm the response data from the
-                        are transmitted at the same          laser marker. Do not send the next command before receiving
-                        time.                                the response.
+Two or more command data             After sending the command, confirm the response data from the
+are transmitted at the same          laser marker. Do not send the next command before receiving
+time.                                the response.
 
-                                                             • If you want to use the same command format with the
-                                                               former models of LP-400/LP-V series, enable “LP-400/V
-                        Command mode (LP-400/V                 compatibility” in system settings of Laser Marker NAVI smart.
+   • If you want to use the same command format with the
+   former models of LP-400/LP-V series, enable “LP-400/V
+Command mode (LP-400/V                 compatibility” in system settings of Laser Marker NAVI smart.
  The sending            compatibility setting) is wrong.     • If you want to use the standard command format, switch the
  command is not                                                mode by RSM command or disable “LP-400/V compatibility”
  accepted and                                                  in system settings of Laser Marker NAVI smart.
  negative response is
  returned.                                                   • Check the setting for “Encoding for non-ASCII characters” in
-                                                               the “System settings”.
-                                                             • Check if characters in the readout strings can be encoded with
-                                                               ASCII code or the character code specified in “Encoding for
-                        The character code is wrong.
-                                                               non-ASCII characters”.
-                                                             • “Shift JIS”, “GB 2312” and “Latin-1” cannot be used together.
-                                                             • In LP-400/V compatible mode, only ASCII code and Shift JIS
-                                                               are available.
+   the “System settings”.
+   • Check if characters in the readout strings can be encoded with
+   ASCII code or the character code specified in “Encoding for
+The character code is wrong.
+   non-ASCII characters”.
+   • “Shift JIS”, “GB 2312” and “Latin-1” cannot be used together.
+   • In LP-400/V compatible mode, only ASCII code and Shift JIS
+   are available.
 
  * These commands are applicable with the standard command mode. For the LP-400/V compatible mode, refer to the “Serial
    Communication Command Guide: LP-400/V compatible mode”.
@@ -9964,80 +9965,80 @@ Troubles                    Causes                                              
 ## หน้า 199
 
  Link control with external devices
-       Troubles                      Causes                                             Measures
+Troubles                      Causes                                             Measures
 
-                          The connections with the
-                          image checker or code             • Refer to “Setup/Maintenance Guide” for the wiring and
-                          reader are inadequate.              communication settings.
-                                                            • If the Ethernet communication settings or RS-232C usage are
-                          Communication settings are          changed, restart the laser marker.
+The connections with the
+image checker or code             • Refer to “Setup/Maintenance Guide” for the wiring and
+reader are inadequate.              communication settings.
+   • If the Ethernet communication settings or RS-232C usage are
+Communication settings are          changed, restart the laser marker.
  Link control with
-                          inadequate.
+inadequate.
  image checker and
  code reader fails.
-                          The connecting port of
-                          the LAN cable to the
-                                                            Connect the cable to the port marked “LAN” on the rear of the
-                          image checker is wrong.
-                                                            controller.
-                          (Connected to EtherNet/IP or
-                          PROFINET port by mistake.)
+The connecting port of
+the LAN cable to the
+   Connect the cable to the port marked “LAN” on the rear of the
+image checker is wrong.
+   controller.
+(Connected to EtherNet/IP or
+PROFINET port by mistake.)
 
-                          The coordinates of the image
-                                                            Set the calibration of the image checker and match the
-                          checker are not consistent
-                                                            coordinate origin of the image checker to the center point of the
-                          with the marking position of
-                                                            marking field of the laser marker.
-                          the laser marker.
+The coordinates of the image
+   Set the calibration of the image checker and match the
+checker are not consistent
+   coordinate origin of the image checker to the center point of the
+with the marking position of
+   marking field of the laser marker.
+the laser marker.
  Marking cannot
  be done in an                                              Confirm the following settings of PV230/PV200.
  appropriate position                                       • Setting of Ethernet with the protocol General communication
-                          Settings of the image checker
+Settings of the image checker
  when the function of                                       • Calibration
-                          are inadequate.
+are inadequate.
  position correction is                                     • Settings of the positional correction
  used.                                                      • Expression of the numeric calculation
 
-                          The setting order of the
-                                                           The results of the numerical calculation should output to the laser
-                          expression table of PV230/
-                                                           marker in the order of X, Y, and theta.
-                          PV200 is inadequate.
+The setting order of the
+   The results of the numerical calculation should output to the laser
+expression table of PV230/
+   marker in the order of X, Y, and theta.
+PV200 is inadequate.
 
-                          Testing conditions of image       Set appropriate testing conditions of the image checker
-                          checker are inadequate.           according to marked code type or character settings.
+Testing conditions of image       Set appropriate testing conditions of the image checker
+checker are inadequate.           according to marked code type or character settings.
 
-                          Unnecessary objects are
-                                                            Do not place the code symbols or characters other than the
-                          included in the captured
-                                                            image checking target in the imaging range.
-                          image.
+Unnecessary objects are
+   Do not place the code symbols or characters other than the
+included in the captured
+   image checking target in the imaging range.
+image.
 
-                                                            • For code checking, confirm the settings of the code reader
-                                                              checker of PV230.
-                          When PV230 is used:
-                                                            • For character checking, confirm the settings of the OCR
+   • For code checking, confirm the settings of the code reader
+   checker of PV230.
+When PV230 is used:
+   • For character checking, confirm the settings of the OCR
  The results of the       Settings of the total
-                                                              checker of PV230.
+checker of PV230.
  code or character        judgement are inadequate.
-                                                            • Cofirm the expression of the numeric calculation in the total
+• Cofirm the expression of the numeric calculation in the total
  checking is NG.
-                                                              judgement.
+judgement.
 
-                          When PV230 is used:
-                                                            To use the character recognition function, set the dictionary of
-                          No settings in the character
-                                                            PV230 for each marking character beforehand.
-                          dictionary of PV230.
+When PV230 is used:
+   To use the character recognition function, set the dictionary of
+No settings in the character
+   PV230 for each marking character beforehand.
+dictionary of PV230.
 
-                          Ghost image of fumes
-                          (smoke) occurring during          • Install a dust collector to get rid of fumes (smoke).
-                          marking is taken in the           • Check that the dust collector works well.
-                          shooting range.
+Ghost image of fumes
+(smoke) occurring during          • Install a dust collector to get rid of fumes (smoke).
+marking is taken in the           • Check that the dust collector works well.
+shooting range.
 
 
-                                                          ME-LPRF-SM-11                                                          199
+ME-LPRF-SM-11                                                          199
 
 ---
 
@@ -10046,11 +10047,11 @@ Troubles                    Causes                                              
 Troubles                 Causes                                             Measures
 
 
-                     Since the work feeding and        Turn TIMING IN signal ON after work piece is fully stopped.
-                     marking start/end timing are
+Since the work feeding and        Turn TIMING IN signal ON after work piece is fully stopped.
+marking start/end timing are
  Marking disorder.   inadequate when TIMING IN
-                     signal is used, the vibration     To feed works after marking, check that TIMING WAIT OUT is
-                     affects marking.                  turned ON and start feeding works.
+signal is used, the vibration     To feed works after marking, check that TIMING WAIT OUT is
+affects marking.                  turned ON and start feeding works.
 
 
 200                                                  ME-LPRF-SM-11
@@ -10129,57 +10130,57 @@ lasing process.
 ## หน้า 202
 
 ERROR
-                                        Description                                       Measures *1
-       CODE
+   Description                                       Measures *1
+CODE
 
 
  E159 *4                                                               Check if the optional network unit is installed to
-                  Network unit error.
+Network unit error.
  E231 - E236 *4                                                        the controller correctly.
 
 
  E200 - E201
-                  INTERLOCK safety relay is out of order.              Contact our sales office or representatives.
+INTERLOCK safety relay is out of order.              Contact our sales office or representatives.
  *2
 
 
-                  • Abnormality occurs on the internal shutter.        Check the connection of the cable and various
+• Abnormality occurs on the internal shutter.        Check the connection of the cable and various
  E205 - E207
-                  • Signal cable is not connected properly.            signal lines, and then restart the laser marker.
+• Signal cable is not connected properly.            signal lines, and then restart the laser marker.
 
 
  E220             Laser head housing is open.                          Contact our sales office or representatives.
 
 
-                                                                       Install the fiber unit properly by following the
+Install the fiber unit properly by following the
  E225 *4          Fiber unit is detached.                              procedures described in the “Setup/Maintenance
-                                                                       Guide”.
+Guide”.
 
 
-                                                                       • Check and correct the power status.
-                                                                       • Check if the AC power line is effected by noise.
-                  • An error has occurred to the laser oscillator.
-                                                                       • Check the connection of the cable and various
+   • Check and correct the power status.
+   • Check if the AC power line is effected by noise.
+• An error has occurred to the laser oscillator.
+   • Check the connection of the cable and various
  E250 - E252      • A power supply voltage error was detected in
-                                                                         signal lines, and then restart the laser marker.
+signal lines, and then restart the laser marker.
  E260 - E261        the laser oscillator.
-                                                                       • For LP-RC series:
+• For LP-RC series:
  E264 - E265      • Incorrect connection of signal cable or unit
-                                                                         Check if the ambient temperature of the
-                    power cable.
-                                                                         laser marker is not exceeding the range of its
-                                                                         specification.
+   Check if the ambient temperature of the
+power cable.
+   laser marker is not exceeding the range of its
+   specification.
 
 
-                                                                       • Check if the ambient temperature of the
-                                                                         laser marker is not exceeding the range of its
-                                                                         specification.
-                                                                       • Make sure air-cooling fan operates.
+• Check if the ambient temperature of the
+  laser marker is not exceeding the range of its
+  specification.
+• Make sure air-cooling fan operates.
  E262 *4          Temperature error in laser oscillator.               • Remove the dust and contamination in the
-                                                                         air intake and exhaust port, and clean the air-
-                                                                         cooling part such as fan and filter.
-                                                                       • When not recovered, contact our sales office
-                                                                         or representatives.
+  air intake and exhaust port, and clean the air-
+  cooling part such as fan and filter.
+• When not recovered, contact our sales office
+  or representatives.
 
 
  E263 *4          Detected unintended-irradiation.                     Contact our sales office or representatives.
@@ -10192,7 +10193,7 @@ ERROR
 
 
  E276 *2, *3      Marking data are too detailed for the scan speed
-                                                                       Decrease the scan speed.
+Decrease the scan speed.
  E286 *2, *3      configured.
 
 
@@ -10207,135 +10208,135 @@ ERROR
 ## หน้า 203
 
 ERROR
-                                Description                                       Measures *1
-    CODE
+   Description                                       Measures *1
+CODE
 
 
-                                                                • Connect INTERLOCK terminals on the I/O
-                                                                  terminal block.
-              INTERLOCK 1 of the I/O terminal block was         • Check the status of the safety equipment
+   • Connect INTERLOCK terminals on the I/O
+   terminal block.
+INTERLOCK 1 of the I/O terminal block was         • Check the status of the safety equipment
 E400                                                              connected to INTERLOCK terminal.
-              released.
-                                                                • Confirm operation logic of connection device.
-                                                                • If you want to deactivate this alarm when the
-                                                                  shutter is closed, set “Deactivate while shutter
-                                                                  closed” in “System settings” > “Operation/
-                                                                  information” > “INTERLOCK alarm detection”.
-                                                                • For LP-RC/LP-RF/LP-RV series:
-                                                                  If the error cannot be solved even with the
-              INTERLOCK 2 of the I/O terminal block was           proper connection of INTERLOCK terminals,
+released.
+   • Confirm operation logic of connection device.
+   • If you want to deactivate this alarm when the
+   shutter is closed, set “Deactivate while shutter
+   closed” in “System settings” > “Operation/
+   information” > “INTERLOCK alarm detection”.
+   • For LP-RC/LP-RF/LP-RV series:
+   If the error cannot be solved even with the
+INTERLOCK 2 of the I/O terminal block was           proper connection of INTERLOCK terminals,
 E401
-              released.                                           replace the contactor for INTERLOCK by
-                                                                  following the procedures described in the
-                                                                  “Setup/Maintenance Guide”.
+released.                                           replace the contactor for INTERLOCK by
+   following the procedures described in the
+   “Setup/Maintenance Guide”.
 
 
-                                                                • Connect the LASER STOP IN terminals of the
-                                                                  I/O terminal block.
-                                                                • Check the status of the safety equipment
+• Connect the LASER STOP IN terminals of the
+  I/O terminal block.
+• Check the status of the safety equipment
 E402
-              LASER STOP IN of the I/O terminal block was         connected to the LASER STOP IN terminals.
+LASER STOP IN of the I/O terminal block was         connected to the LASER STOP IN terminals.
 E403
-              released.                                         • Confirm operation logic of connection device.
+released.                                         • Confirm operation logic of connection device.
 E501
-                                                                • Connect the internal or external power supply
-                                                                  to IN COM.1 and OUT COM.1 in the I/O
-                                                                  terminal respectively.
+• Connect the internal or external power supply
+  to IN COM.1 and OUT COM.1 in the I/O
+  terminal respectively.
 
 
-                                                                Solve the safety problem. Then select “Reset” in
+Solve the safety problem. Then select “Reset” in
 E404          The stop laser button of the Laser Marker NAVI
-                                                                the error dialog in Laser Marker NAVI smart to
+the error dialog in Laser Marker NAVI smart to
 E502          smart was pressed.
-                                                                finish the laser stop status.
+finish the laser stop status.
 
 
-                                                                • Connect REMOTE INTERLOCK IN of the I/O
-                                                                  terminal block.
-                                                                • Check the status of the safety equipment
-                                                                  connected to REMOTE INTERLOCK IN
-                                                                  terminal.
-                                                                • Confirm operation logic of connection device.
+• Connect REMOTE INTERLOCK IN of the I/O
+  terminal block.
+• Check the status of the safety equipment
+  connected to REMOTE INTERLOCK IN
+  terminal.
+• Confirm operation logic of connection device.
 E405 *3, *4
-              REMOTE INTERLOCK IN is open.                      • Connect the internal or external power supply
+REMOTE INTERLOCK IN is open.                      • Connect the internal or external power supply
 E503 *3, *4
-                                                                  to IN COM.1 and OUT COM.1 in the I/O
-                                                                  terminal respectively.
-                                                                • If you want to deactivate this alarm when the
-                                                                  shutter is closed, set “Deactivate while shutter
-                                                                  closed” in “System settings” > “Operation/
-                                                                  information” > “INTERLOCK alarm detection”.
+  to IN COM.1 and OUT COM.1 in the I/O
+  terminal respectively.
+• If you want to deactivate this alarm when the
+  shutter is closed, set “Deactivate while shutter
+  closed” in “System settings” > “Operation/
+  information” > “INTERLOCK alarm detection”.
 
 
-                                                                • Start marking after laser pumping has
-              Laser pumping was stopped during the marking        completed.
+   • Start marking after laser pumping has
+Laser pumping was stopped during the marking        completed.
 E410
-              process.                                          • Check the procedures and operation logic of
-                                                                  laser pumping and trigger input control.
-                                                                • Check wiring of I/O or communication port to
-                                                                  the external control devices.
-              The marking trigger signal or “Start marking”
+process.                                          • Check the procedures and operation logic of
+   laser pumping and trigger input control.
+   • Check wiring of I/O or communication port to
+   the external control devices.
+The marking trigger signal or “Start marking”
 E411                                                            • Check the switch or the sensor connected to
-              button was entered in the “laser pumping OFF”
+button was entered in the “laser pumping OFF”
 E500                                                              TRIGGER IN of I/O terminal operates properly
-              status.
-                                                                  without chattering.
+status.
+   without chattering.
 
 
-                                                ME-LPRF-SM-11                                                    203
+ME-LPRF-SM-11                                                    203
 
 ---
 
 ## หน้า 204
 
 ERROR
-                                         Description                                             Measures *1
-       CODE
+   Description                                             Measures *1
+CODE
 
 
-                                                                              • Check the system clock time and set it again.
-                      • The date and time of the system clock may be          • Replace the internal battery by following the
-                        out of synchronization.                                 “Replacement of Internal Controller Battery” in
-                      • The system clock battery power in the                   the “Setup/Maintenance Guide”.
+   • Check the system clock time and set it again.
+• The date and time of the system clock may be          • Replace the internal battery by following the
+  out of synchronization.                                 “Replacement of Internal Controller Battery” in
+• The system clock battery power in the                   the “Setup/Maintenance Guide”.
   E450 - E453
-                        controller died.                                      • While laser marker power is on, you can use
-                      • Abnormality has occurred on the system clock            it after setting the system clock on the system
-                        in the controller.                                      settings screen. When the power is off, set the
-                                                                                system clock again.
+  controller died.                                      • While laser marker power is on, you can use
+• Abnormality has occurred on the system clock            it after setting the system clock on the system
+  in the controller.                                      settings screen. When the power is off, set the
+   system clock again.
 
 
-                                                                              • Check if the ambient temperature of the
-                                                                                laser marker is not exceeding the range of its
-                                                                                specification.
-                                                                              • Make sure air-cooling fan operates.
+• Check if the ambient temperature of the
+  laser marker is not exceeding the range of its
+  specification.
+• Make sure air-cooling fan operates.
   E460 *2            Temperature error in laser oscillator.                   • Remove the dust and contamination in the
-                                                                                air intake and exhaust port, and clean the air-
-                                                                                cooling part such as fan and filter.
-                                                                              • When not recovered, contact our sales office
-                                                                                or representatives.
+  air intake and exhaust port, and clean the air-
+  cooling part such as fan and filter.
+• When not recovered, contact our sales office
+  or representatives.
 
 
-                                                                              • Reset the alarm for LASER STOP IN or
+• Reset the alarm for LASER STOP IN or
   E505 - E509                                                                   INTERLOCK of the I/O terminal block or Stop
-                     Safety functions (INTERLOCK, LASER STOP,
+Safety functions (INTERLOCK, LASER STOP,
   E550 - E560                                                                   laser button of Laser Marker NAVI smart
-                     etc.) were activated during marking preparation.
+etc.) were activated during marking preparation.
   E572                                                                          software.
-                                                                              • Check if the signal lines are effected by noise.
+• Check if the signal lines are effected by noise.
 
 
-                                                                              • Overwrite the data again to the selected file
+• Overwrite the data again to the selected file
   E520 - E522                                                                   number.
   E570                                                                        • Do not turn off the laser marker while saving
-                     File data or system data were not saved
-                                                                                the settings.
-                     successfully, because the laser marker was
-                     turned off while saving data.
-                                                                              • Restore the backup file saved before to the
-                     Unable to read the file data.
+File data or system data were not saved
+   the settings.
+successfully, because the laser marker was
+turned off while saving data.
+   • Restore the backup file saved before to the
+Unable to read the file data.
   E530 - E542                                                                   laser marker.
   E571                                                                        • Do not turn off the laser marker while saving
-                                                                                the settings.
+the settings.
 
 
  *1 : If the error persists after restart of the laser marker, contact our sales office or representatives.
@@ -10428,61 +10429,61 @@ warning.
 ## หน้า 206
 
 ERROR
-                                  Description                                            Measures *1
-       CODE
+   Description                                            Measures *1
+CODE
 
 
-               The counter value was reset to that prior to
+The counter value was reset to that prior to
  E608                                                                • Check the current value of counter.
-               marking because the power was cut off during
+marking because the power was cut off during
  E720                                                                • Do not turn off the power during marking.
-               data marking including the counter.
+data marking including the counter.
 
 
-                                                                     • Check the file and the setting values.
-               The laser marker is turned off during saving of
+   • Check the file and the setting values.
+The laser marker is turned off during saving of
  E609                                                                • Overwrite the file data.
-               file data and setting. The marking data were not
+file data and setting. The marking data were not
  E721                                                                • Do not turn off the laser marker while aving the
-               saved successfully.
-                                                                       settings.
+saved successfully.
+   settings.
 
-                                                                     • Check the image display screen and adjust the
-                                                                       data position and size located outside of the
-                                                                       marking field.
+• Check the image display screen and adjust the
+  data position and size located outside of the
+  marking field.
  E610 - E613
-               Marking data are out of range.                        • Adjust the X-/Y-axis offset value of the system
+Marking data are out of range.                        • Adjust the X-/Y-axis offset value of the system
  E650
-                                                                       offset (system settings screen). (When the
-                                                                       data located outside of the marking field is not
-                                                                       displayed on the image display screen.)
+offset (system settings screen). (When the
+data located outside of the marking field is not
+displayed on the image display screen.)
 
-                                                                     • Adjust the Z-movement of the object group
+• Adjust the Z-movement of the object group
  E614 - E615   Existed marking data with its Z-position outside        settings.
  *2            of marking field.                                     • Adjust the Z-movement of the file settings.
  E651 *2       (The LP-GSxxx-L type is excluded.)                    • Adjust the Z-axis offset value of the system offset
-                                                                       (system settings screen).
+(system settings screen).
 
-                                                                     • Confirm the correct input from the encoder to
-                                                                       ENCODER A IN and ENCODER B IN of I/O
-                                                                       terminal.
-               Unable to detect the line speed.                      • When only one phase of the encoder is used,
+   • Confirm the correct input from the encoder to
+   ENCODER A IN and ENCODER B IN of I/O
+   terminal.
+Unable to detect the line speed.                      • When only one phase of the encoder is used,
  E616 *3, *4   Input of the encoder for line speed detection was       connect the encoder signal to ENCODER A IN
-               wrong.                                                  (X13) and connect ENCODER B IN (X14) to IN
-                                                                       COM. 1 (X2).
-                                                                     • Confirm the encoder input is less than 100kHz per
-                                                                       phase.
+wrong.                                                  (X13) and connect ENCODER B IN (X14) to IN
+   COM. 1 (X2).
+   • Confirm the encoder input is less than 100kHz per
+   phase.
 
 
-                                                                     • Decrease the line speed.
-                                                                     • Set Lasing start boundary to the upward of the
-                                                                       moving direction.
-                                                                     • Reduce the marking time with the following
+• Decrease the line speed.
+• Set Lasing start boundary to the upward of the
+  moving direction.
+• Reduce the marking time with the following
  E617 *3, *4   Unable to follow the line speed.
-                                                                       measures.
-                                                                       • Increase the scan speed.
-                                                                       • Reduce the spacing between the characters.
-                                                                       • Reduce the character size, etc.
+measures.
+• Increase the scan speed.
+• Reduce the spacing between the characters.
+• Reduce the character size, etc.
 
 
 206                                                  ME-LPRF-SM-11
@@ -10492,156 +10493,156 @@ ERROR
 ## หน้า 207
 
 ERROR
-                                 Description                                             Measures *1
+Description                                             Measures *1
    CODE
 
 
-                                                                     • When Trigger mode is set to Marking at regular
-                                                                       intervals, set the larger value to Marking spacing.
-                                                                     • When Trigger mode is set to Multiple triggers, take
-                                                                       more time for the trigger input intervals.
-                                                                     • Decrease the line speed.
-                                                                     • Set Lasing start boundary to the upward of the
-                                                                       moving direction.
-                                                                     • When Trigger mode is set to Multiple triggers,
-                                                                       check the switch or the sensor connected to
+• When Trigger mode is set to Marking at regular
+  intervals, set the larger value to Marking spacing.
+• When Trigger mode is set to Multiple triggers, take
+  more time for the trigger input intervals.
+• Decrease the line speed.
+• Set Lasing start boundary to the upward of the
+  moving direction.
+• When Trigger mode is set to Multiple triggers,
+  check the switch or the sensor connected to
 E618 *3, *4   The marking spacing is too small.
-                                                                       TRIGGER IN of I/O terminal operates properly
-                                                                       without chattering.
-                                                                     • Reduce the marking time with the following
-                                                                       measures.
-                                                                        • Increase the scan speed.
-                                                                        • Reduce the spacing between the characters.
-                                                                        • Reduce the character size.
-                                                                        • Set smaller value to the one-shot pulse
-                                                                          duration of the I/O settings, etc.
+  TRIGGER IN of I/O terminal operates properly
+  without chattering.
+• Reduce the marking time with the following
+  measures.
+   • Increase the scan speed.
+   • Reduce the spacing between the characters.
+   • Reduce the character size.
+   • Set smaller value to the one-shot pulse
+   duration of the I/O settings, etc.
 
 
-                                                                     • Place the lasing start boundary downstream of the
-              On-the-fly marking is not possible with this
-                                                                       trigger detecting position.
+   • Place the lasing start boundary downstream of the
+On-the-fly marking is not possible with this
+   trigger detecting position.
 E619 *3, *4   trigger detecting position or lasing start
-                                                                     • Check the setting value of Workpiece reference
-              boundary.
-                                                                       boundary is correct.
+   • Check the setting value of Workpiece reference
+boundary.
+   boundary is correct.
 
 
-              The link control between the laser marker and
-              image checker has failed due to the error of the       Check the connection of the cable and various signal
+The link control between the laser marker and
+image checker has failed due to the error of the       Check the connection of the cable and various signal
 E620 - E621
-              laser marker. Trigger processing terminated            lines, and then restart the laser marker.
-              abnormally.
+laser marker. Trigger processing terminated            lines, and then restart the laser marker.
+abnormally.
 
 
-              I/O connector TIMING IN was not input within
-              the time specified using the link function with        • Input this to TIMING IN terminal within 60 seconds
+I/O connector TIMING IN was not input within
+the time specified using the link function with        • Input this to TIMING IN terminal within 60 seconds
 E622
-              external devices. Trigger processing terminated          after the I/O connector timing waiting output
-              abnormally.                                              (TIMING WAIT OUT) is turned ON.
-                                                                     • Check the connection of TIMING IN terminal of I/
-              Timing input is invalid.                                 O connector.
-              When the linkage function with external devices        • Check the connection with the external device.
+external devices. Trigger processing terminated          after the I/O connector timing waiting output
+abnormally.                                              (TIMING WAIT OUT) is turned ON.
+   • Check the connection of TIMING IN terminal of I/
+Timing input is invalid.                                 O connector.
+When the linkage function with external devices        • Check the connection with the external device.
 E623          is used, TIMING IN terminal was input while the        • Check the control procedure of the external
-              timing standby output (TIMING WAIT OUT) was              control.
-              OFF.
+timing standby output (TIMING WAIT OUT) was              control.
+OFF.
 
 
-                                                                     • Check the status of connection with the laser
-                                                                       marker and the Ethernet ports of external devices.
-                                                                     • Check the IP address, port number, connecting
-                                                                       status of the laser marking system and image
-                                                                       checker.
-                                                                     • Check the status of the laser marker and external
-              Unable to communicate with an image checker.             devices in link control.
+   • Check the status of connection with the laser
+   marker and the Ethernet ports of external devices.
+   • Check the IP address, port number, connecting
+   status of the laser marking system and image
+   checker.
+   • Check the status of the laser marker and external
+Unable to communicate with an image checker.             devices in link control.
 E624
-              Trigger processing terminated abnormally.              • Confirm if you set the type of the image checker
-                                                                       correctly in the system settings screen and file
-                                                                       settings of the marking settings screen of the laser
-                                                                       marker.
-                                                                     • While the laser marker and LP-ABR series are
-                                                                       connected for the linkage control, do not start-up
-                                                                       Configurator LP-ABR software.
+Trigger processing terminated abnormally.              • Confirm if you set the type of the image checker
+   correctly in the system settings screen and file
+   settings of the marking settings screen of the laser
+   marker.
+   • While the laser marker and LP-ABR series are
+   connected for the linkage control, do not start-up
+   Configurator LP-ABR software.
 
 
-                                                     ME-LPRF-SM-11                                                       207
+ME-LPRF-SM-11                                                       207
 
 ---
 
 ## หน้า 208
 
 ERROR
-                                  Description                                             Measures *1
-       CODE
+   Description                                             Measures *1
+CODE
 
-                                                                      • Check the connecting status of the laser marking
-                                                                        system and image checker.
-              No response from the image checker. Trigger
+   • Check the connecting status of the laser marking
+   system and image checker.
+No response from the image checker. Trigger
  E625                                                                 • Check if the reading process of the image checker
-              processing terminated abnormally.
-                                                                        was successful.
-                                                                      • If you use PV230/PV200, set the total judgement.
+processing terminated abnormally.
+   was successful.
+   • If you use PV230/PV200, set the total judgement.
 
-                                                                      • Check the settings of application, type number, and
-              Settings mismatch between image checker                   checker number.
+   • Check the settings of application, type number, and
+Settings mismatch between image checker                   checker number.
  E626         and laser marking system. Trigger processing            • Check the conformity of the Ethernet settings
-              terminated abnormally.                                    with the General communication of PV230/PV200
-                                                                        protocol.
+terminated abnormally.                                    with the General communication of PV230/PV200
+   protocol.
 
-                                                                      • Verify “Object number to check” in file settings,
-                                                                        and confirm if the number is the same with
-                                                                        the object number you set in barcode/2D code
-                                                                        settings or character settings.
-              The link control between the laser marker and
-                                                                      • For the code checking, confirm the code type and
-              image checker has failed.
+   • Verify “Object number to check” in file settings,
+   and confirm if the number is the same with
+   the object number you set in barcode/2D code
+   settings or character settings.
+The link control between the laser marker and
+   • For the code checking, confirm the code type and
+image checker has failed.
  E627                                                                   settings of barcode/2D code object in the marking
-              No settings for code or character checking
-                                                                        data are consistent with the settings of the code
-              available.
-                                                                        reader.
-                                                                      • For the character checking, check if the character
-                                                                        type and number of characters in the marking data
-                                                                        are supported by the image checker.
+No settings for code or character checking
+   data are consistent with the settings of the code
+available.
+   reader.
+   • For the character checking, check if the character
+   type and number of characters in the marking data
+   are supported by the image checker.
 
-                                                                      • Check the status of external devices.
-                                                                      • Improve the marking quality of the code.
-                                                                      • To send the marking strings or to switch the files
-                                                                        by using code reader, confirm the followings:
-                                                                         • Confirm no unavailable characters are in the
-              Code reading failed when the code reading
-                                                                           code data.
+   • Check the status of external devices.
+   • Improve the marking quality of the code.
+   • To send the marking strings or to switch the files
+   by using code reader, confirm the followings:
+   • Confirm no unavailable characters are in the
+Code reading failed when the code reading
+   code data.
  E628         function is used for the link control with external
-                                                                         • When using the data extraction function,
-              devices.
-                                                                           confirm the data length in the code data
-                                                                           matches the extraction settings.
-                                                                         • When you do not use the data extraction
-                                                                           function, set the code data less than 299
-                                                                           digits.
+   • When using the data extraction function,
+devices.
+   confirm the data length in the code data
+   matches the extraction settings.
+   • When you do not use the data extraction
+   function, set the code data less than 299
+   digits.
 
-                                                                      • Confirm the specified file number or name exactly
-                                                                        corresponded to the settings in the laser marker.
-                                                                      • To switch the file by the number, specify the
+• Confirm the specified file number or name exactly
+  corresponded to the settings in the laser marker.
+• To switch the file by the number, specify the
  E629         File switching by code reader has failed.
-                                                                        number always with 4-digits in the code data.
-                                                                      • If no settings in the specified file, set the marking
-                                                                        data and save that file to the laser marker.
+  number always with 4-digits in the code data.
+• If no settings in the specified file, set the marking
+  data and save that file to the laser marker.
 
-                                                                      • Confirm the on/off control of the TRIGGER IN on
-                                                                        the I/O terminal.
-              TRIGGER IN turned off before the minimum
+   • Confirm the on/off control of the TRIGGER IN on
+   the I/O terminal.
+TRIGGER IN turned off before the minimum
  E630                                                                 • If TRIGGER IN turns on/off properly, change the
-              number of scans was reached.
-                                                                        setting value of Minimum number of scans of
-                                                                        Trigger mode in File settings.
+number of scans was reached.
+   setting value of Minimum number of scans of
+   Trigger mode in File settings.
 
-                                                                      • Confirm the on/off control of the TRIGGER IN on
-                                                                        the I/O terminal.
-              Lasing stopped because the maximum number
+   • Confirm the on/off control of the TRIGGER IN on
+   the I/O terminal.
+Lasing stopped because the maximum number
  E631                                                                 • If TRIGGER IN turns on/off properly, change the
-              of scans was reached.
-                                                                        setting value of Maximum number of scans of
-                                                                        Trigger mode in File settings.
+of scans was reached.
+   setting value of Maximum number of scans of
+   Trigger mode in File settings.
 
 
 208                                                   ME-LPRF-SM-11
@@ -10651,170 +10652,170 @@ ERROR
 ## หน้า 209
 
 ERROR
-                              Description                                             Measures *1
+Description                                             Measures *1
   CODE
 
 
-          Lasing operation/shutter open operation was
-          cancelled due to a timeout after the laser start-
-          up check.
-                                                                   • When operating with Laser Marker NAVI smart,
-          Try again.
-                                                                     retry to start test marking/laser radiation for
-                                                                     measurement/run mode operation.
+Lasing operation/shutter open operation was
+cancelled due to a timeout after the laser start-
+up check.
+   • When operating with Laser Marker NAVI smart,
+Try again.
+   retry to start test marking/laser radiation for
+   measurement/run mode operation.
 E640 *3   (Details: For the first operation of opening shutter
-                                                                   • When operating in remote mode, close the shutter
+• When operating in remote mode, close the shutter
 E641 *3   or lasing after the laser pumping on, warning
-                                                                     or input the alarm reset to recover from the
-          E640/E641 may occur and the requested
-                                                                     warning status, and then retry opening the shutter
-          operation is canceled in case the laser pumping
-                                                                     or laser radiation for measurement.
-          has been off for more than several days and time
-          for laser start-up check (maximum 30 seconds)
-          is needed.)
+   or input the alarm reset to recover from the
+E640/E641 may occur and the requested
+   warning status, and then retry opening the shutter
+operation is canceled in case the laser pumping
+   or laser radiation for measurement.
+has been off for more than several days and time
+for laser start-up check (maximum 30 seconds)
+is needed.)
 
 
-                                                                   • Re-register font data on the data management
-          Font file data are incorrect. Unable to read the
+   • Re-register font data on the data management
+Font file data are incorrect. Unable to read the
 E652                                                                 screen.
-          font file.
-                                                                   • Check the font data file format.
+font file.
+   • Check the font data file format.
 
-                                                                   • Re-register graphic data on the data management
-          Graphic file data are incorrect. Unable to read
+   • Re-register graphic data on the data management
+Graphic file data are incorrect. Unable to read
 E653                                                                 screen.
-          the graphic file.
-                                                                   • Check the graphic data file format.
+the graphic file.
+   • Check the graphic data file format.
 
-                                                                   • Register the font file on the data management
-          Font file is not registered to the font No.                screen.
+   • Register the font file on the data management
+Font file is not registered to the font No.                screen.
 E654
-          specified.                                               • Using the character conditions, specify the font
-                                                                     No. in which the font file is registered.
+specified.                                               • Using the character conditions, specify the font
+   No. in which the font file is registered.
 
-                                                                   • Reduce the number of characters registered in the
-          Insufficient font memory. Font file data capacity
+   • Reduce the number of characters registered in the
+Insufficient font memory. Font file data capacity
 E655                                                                 font file.
-          is too large.
-                                                                   • Delete unnecessary font files.
+is too large.
+   • Delete unnecessary font files.
 
 
-                                                                   Register the graphic file in the data management
+Register the graphic file in the data management
 E656      The specified graphic file was not registered.
-                                                                   screen.
+screen.
 
 
-                                                                   • Change characters, or add the font data in use.
-          No font corresponding to set characters were             • To use Japanese or Simplified Chinese
+   • Change characters, or add the font data in use.
+No font corresponding to set characters were             • To use Japanese or Simplified Chinese
 E657
-          found.                                                     characters, set “East Asian characters” in file
-                                                                     settings.
+found.                                                     characters, set “East Asian characters” in file
+   settings.
 
 
-                                                                   • Decrease the number of characters.
+• Decrease the number of characters.
 E658      Too large number of characters.                          • Set the characters by separating them into several
-                                                                     objects.
+objects.
 
-                                                                   • Original4 font cannot be displayed in bold. Select
-                                                                     another font.
+• Original4 font cannot be displayed in bold. Select
+  another font.
 E659      Existed invalid character for bolding with setting.
-                                                                   • Use Font Maker software provided to create the
-                                                                     proper pattern font.
+• Use Font Maker software provided to create the
+  proper pattern font.
 
-                                                                   • Set the bold line width to half or less of the
-                                                                     character height or the character width, whichever
-          Bold characters cannot be created due to the
-                                                                     is smaller.
+   • Set the bold line width to half or less of the
+   character height or the character width, whichever
+Bold characters cannot be created due to the
+   is smaller.
 E660      combination of set bold line width, character
-                                                                   • When marking the bold character, set the
-          height, and character width.
-                                                                     comparison ratio between character height and
-                                                                     width at 1/10 to 10.
+   • When marking the bold character, set the
+height, and character width.
+   comparison ratio between character height and
+   width at 1/10 to 10.
 
 
-                                                   ME-LPRF-SM-11                                                        209
+ME-LPRF-SM-11                                                        209
 
 ---
 
 ## หน้า 210
 
 ERROR
-                                 Description                                             Measures *1
-       CODE
+   Description                                             Measures *1
+CODE
 
-                                                                     • Reduce the number of characters and segments
-                                                                       in the graphic data.
-              Insufficient marking memory. Marking data in the       • Reduce the number of characters and start/end
+   • Reduce the number of characters and segments
+   in the graphic data.
+Insufficient marking memory. Marking data in the       • Reduce the number of characters and start/end
  E661
-              file are too large.                                      points of the graphic data.
-                                                                     • Reduce the number of markings for Step & repeat.
-                                                                     • Separate the long segment into short data.
+file are too large.                                      points of the graphic data.
+   • Reduce the number of markings for Step & repeat.
+   • Separate the long segment into short data.
 
 
-              The number of Step & repeat marking exceeds
+The number of Step & repeat marking exceeds
  E662                                                                Reduce objects to be marked to 10000 or less.
-              the upper limit.
+the upper limit.
 
 
-              One or more functions that cannot be used
-              together are set.
-              The following combination of the functions are
-              not available in one file.
-               • Characters specified by SIN command and
-                 registered characters via I/O
-               • Characters specified by SIN command and
+One or more functions that cannot be used
+together are set.
+The following combination of the functions are
+not available in one file.
+ • Characters specified by SIN command and
+   registered characters via I/O
+ • Characters specified by SIN command and
  E664            external offset with I/O                            Delete any one of these functions from the file.
-               • Registered characters via I/O and external
-                 offset function with “Using SEO command”
-               • Link control with an image checker and
-                 “continuous trigger” of trigger mode
-               • For LP-RC/LP-RF/LP-RV series:
-                 Link control with an image checker and
-                 TARGET DETECTION IN
+• Registered characters via I/O and external
+  offset function with “Using SEO command”
+• Link control with an image checker and
+  “continuous trigger” of trigger mode
+• For LP-RC/LP-RF/LP-RV series:
+  Link control with an image checker and
+  TARGET DETECTION IN
 
 
-                                                                     • Set the character that can be converted into 2D
-              It contains character(s) that cannot be converted
+   • Set the character that can be converted into 2D
+It contains character(s) that cannot be converted
  E665                                                                  code.
-              to 2D code.
-                                                                     • Change the mode of the code settings.
+to 2D code.
+   • Change the mode of the code settings.
 
 
-              • Unable to generate 2D code in the condition
-                specified.                                           Check the code settings and the number of
+• Unable to generate 2D code in the condition
+  specified.                                           Check the code settings and the number of
  E666
-              • The number of 2D code characters is too              characters.
-                large relative to the set conditions.
+• The number of 2D code characters is too              characters.
+  large relative to the set conditions.
 
 
-              The specified 2D code filling pattern is not           • Change the 2D code filling pattern.
+The specified 2D code filling pattern is not           • Change the 2D code filling pattern.
  E667         registered for the 2D code font (font number:          • Add the font data of the pattern used in the data
-              2D).                                                     management screen.
+2D).                                                     management screen.
 
 
-              The data includes a character that cannot be bar       Set characters that can be bar-coded depending on
+The data includes a character that cannot be bar       Set characters that can be bar-coded depending on
  E668
-              coded.                                                 the code type.
+coded.                                                 the code type.
 
 
-              • Unable to generate bar code in the condition
-                specified.                                           Check the code settings and the number of
+• Unable to generate bar code in the condition
+  specified.                                           Check the code settings and the number of
  E669
-              • The number of bar code characters is                 characters.
-                incorrect relative to the set conditions.
+• The number of bar code characters is                 characters.
+  incorrect relative to the set conditions.
 
 
-                                                                     Specify the setting value for the narrow element or
-              The dimensions of the narrow element or the            the module width larger than that of the “line width
+   Specify the setting value for the narrow element or
+The dimensions of the narrow element or the            the module width larger than that of the “line width
  E670
-              module width for the bar code are too small.           (calculation value)” specified in the object group
-                                                                     settings.
+module width for the bar code are too small.           (calculation value)” specified in the object group
+   settings.
 
 
-              The quiet zone is not configured correctly at the
+The quiet zone is not configured correctly at the
  E671                                                                Set the proper value for “Quiet/Narrow Ratio”.
-              bar code inversion mode settings.
+bar code inversion mode settings.
 
 
 210                                                  ME-LPRF-SM-11
@@ -10824,157 +10825,157 @@ ERROR
 ## หน้า 211
 
 ERROR
-                                 Description                                              Measures *1
+Description                                              Measures *1
    CODE
 
-                                                                     • Correct the separator height ratio or the barcode
-                                                                       height ratio so that the height is larger than the “line
-              The settings for separator height ratio or row           width (calculation value)” specified in the object
+   • Correct the separator height ratio or the barcode
+   height ratio so that the height is larger than the “line
+The settings for separator height ratio or row           width (calculation value)” specified in the object
 E672
-              height ratio are too small.                              group settings.
-                                                                     • If you want to remove the separator, set 0 to the
-                                                                       separator height ratio.
+height ratio are too small.                              group settings.
+   • If you want to remove the separator, set 0 to the
+   separator height ratio.
 
 
-              Cannot create bar code due to the invalid
-                                                                     Enter the prescribed number of characters according
+Cannot create bar code due to the invalid
+   Enter the prescribed number of characters according
 E673          number of characters for EAN/UPC/JAN code or
-                                                                     to the code type.
-              GS1 DataBar.
+   to the code type.
+GS1 DataBar.
 
 
-                                                                     • If the functional characters such as a counter and
-                                                                       date/time are input, delete and re-enter characters
-                                                                       after “%”.
+• If the functional characters such as a counter and
+  date/time are input, delete and re-enter characters
+  after “%”.
 E674          The string containing “%” is not properly set.
-                                                                     • To enter “%” as a character to mark, enter “%%”.
-                                                                     • To enter “+” or “/” as a character to mark after the
-                                                                       counter, enter “%+” or “%/”.
+• To enter “%” as a character to mark, enter “%%”.
+• To enter “+” or “/” as a character to mark after the
+  counter, enter “%+” or “%/”.
 
 
-              The string No. specified by the SIN command is         Specify the same No. set in “characters specified by
+The string No. specified by the SIN command is         Specify the same No. set in “characters specified by
 E678          not acceptable because the No. has not been set        SIN command” setting in Laser Marker NAVI smart
-              in Laser Marker NAVI smart.                            to the string No. in SIN command data.
+in Laser Marker NAVI smart.                            to the string No. in SIN command data.
 
 
-                                                                     • Set the adjustment value of power optimization by
-                                                                       marking position and apply it to the laser marker
-              Communication was interrupted. The adjustment            again.
+   • Set the adjustment value of power optimization by
+   marking position and apply it to the laser marker
+Communication was interrupted. The adjustment            again.
 E679 *2, *3   value of power optimization by marking position        • Do not turn off the power during the application
-              could not apply to the laser marker.                     processing.
-                                                                     • Do not turn on the remote mode during the
-                                                                       application processing.
+could not apply to the laser marker.                     processing.
+   • Do not turn on the remote mode during the
+   application processing.
 
 
-              Any of the following functions that are not
-              available with the RUN mode ON are configured.         • To execute marking in the RUN mode, delete
-               • Registered characters via I/O                         these functions from the marking data.
+Any of the following functions that are not
+available with the RUN mode ON are configured.         • To execute marking in the RUN mode, delete
+ • Registered characters via I/O                         these functions from the marking data.
 E680
-               • External offset (via I/O and SEO command)           • When you use these functions, control the laser
-               • Characters specified by SIN command                   marker in the remote mode.
-               • Link control with external image checkers
+• External offset (via I/O and SEO command)           • When you use these functions, control the laser
+• Characters specified by SIN command                   marker in the remote mode.
+• Link control with external image checkers
 
 
-              Any of the following functions that are not
-              available with on-the-fly marking are configured.
-               • Link control with external image checkers
-               • Overwriting interval
-               • Skip marking of 2D code (module marking
-                                                                     • To use on-the-fly marking, delete these functions
-                 order)
-                                                                       from the marking file.
+Any of the following functions that are not
+available with on-the-fly marking are configured.
+ • Link control with external image checkers
+ • Overwriting interval
+ • Skip marking of 2D code (module marking
+   • To use on-the-fly marking, delete these functions
+   order)
+   from the marking file.
 E682 *3, *4   When the trigger mode is set to Marking at
-                                                                     • Some functions are available when Trigger mode
-              regular intervals or Multiple triggers, those
-                                                                       of the on-the-fly settings is set to Single trigger.
-              functions are also not available.
-               • Registered characters via I/O
-               • External offset (via I/O and SEO command)
-               • Characters specified by SIN command
-               • Counter reset at date change
+   • Some functions are available when Trigger mode
+regular intervals or Multiple triggers, those
+   of the on-the-fly settings is set to Single trigger.
+functions are also not available.
+ • Registered characters via I/O
+ • External offset (via I/O and SEO command)
+ • Characters specified by SIN command
+ • Counter reset at date change
 
 
-                                                     ME-LPRF-SM-11                                                           211
+ME-LPRF-SM-11                                                           211
 
 ---
 
 ## หน้า 212
 
 ERROR
-                                    Description                                              Measures *1
-       CODE
+   Description                                              Measures *1
+CODE
 
 
-                Any of the following functions that are not
-                available with the seamless loop setting are
-                                                                        • Deactivate the seamless loop in the laser settings.
-                configured.
-                                                                        • If you want to radiate laser continuously without
+Any of the following functions that are not
+available with the seamless loop setting are
+   • Deactivate the seamless loop in the laser settings.
+configured.
+   • If you want to radiate laser continuously without
   E686           • Multiple objects
-                                                                          any break, set the closed line by setting the start
-                 • Object consisting of unclosed line(s)
-                                                                          and end points in the same position.
-                 • Point radiation object
-                 • Step & repeat function
+   any break, set the closed line by setting the start
+• Object consisting of unclosed line(s)
+   and end points in the same position.
+• Point radiation object
+• Step & repeat function
 
 
-                                                                        • Reduce the graphic size. The graphic width or
-                                                                          height should be less than 999.999 mm.
-                                                                        • If the “Graphic presets” is off, set on for “Adjustment
+• Reduce the graphic size. The graphic width or
+  height should be less than 999.999 mm.
+• If the “Graphic presets” is off, set on for “Adjustment
  E687           Graphic object contains an invalid setting.
-                                                                          of size and filling” in the graphic object settings and
-                                                                          specify the graphic parameters in the “Marking
-                                                                          settings” screen.
+of size and filling” in the graphic object settings and
+specify the graphic parameters in the “Marking
+settings” screen.
 
-                                                                        • Overwrite the data again to the selected file
-                                                                          number.
+• Overwrite the data again to the selected file
+  number.
   E699          Some setting fields contain an improper value.
-                                                                        • If the problem persists, save the backup file and
-                                                                          contact our sales office or representatives.
+• If the problem persists, save the backup file and
+  contact our sales office or representatives.
 
-                                                                        • Refer to “Setup/Maintenance Guide” and clean the
-                                                                          fan.
+• Refer to “Setup/Maintenance Guide” and clean the
+  fan.
   E710 - E711                                                           • Check the connection status of the fan connector.
-                The head air-cooling fan has stopped.
+The head air-cooling fan has stopped.
   *2, *3                                                                • Replace the fan.
-                                                                        • For LP-RC series, confirm the side covers of the
-                                                                          head are installed properly.
+• For LP-RC series, confirm the side covers of the
+  head are installed properly.
 
-                                                                        • Check if the ambient temperature of the
-                                                                          laser marker is not exceeding the range of its
-                                                                          specification.
+• Check if the ambient temperature of the
+  laser marker is not exceeding the range of its
+  specification.
   E715 *3       The temperature of the laser oscillator is high.        • Make sure air-cooling fan operates.
-                                                                        • Remove the dust and contamination in the air
-                                                                          intake and exhaust port, and clean the air-cooling
-                                                                          part such as fan and filter.
+• Remove the dust and contamination in the air
+  intake and exhaust port, and clean the air-cooling
+  part such as fan and filter.
 
-                                                                        • Turn ON TRIGGER IN after confirming READY
-                Invalid trigger signal.
-                                                                          OUT is ON.
+   • Turn ON TRIGGER IN after confirming READY
+Invalid trigger signal.
+   OUT is ON.
   E750          TRIGGER IN was input during trigger
-                                                                        • Do not input the marking trigger while
-                processing.
-                                                                          PROCESSING OUT is ON.
-                                                                        • Check the switch or the sensor connected to
-                                                                          TRIGGER IN of I/O terminal operates properly
-                Invalid trigger signal.
-                                                                          without chattering.
+   • Do not input the marking trigger while
+processing.
+   PROCESSING OUT is ON.
+   • Check the switch or the sensor connected to
+   TRIGGER IN of I/O terminal operates properly
+Invalid trigger signal.
+   without chattering.
   E751          TRIGGER IN was input while READY OUT is
-                                                                        • Check wiring of I/O or communication port to the
-                OFF.
-                                                                          external control devices.
+   • Check wiring of I/O or communication port to the
+OFF.
+   external control devices.
 
-                                                                        • Check the marking results before and after the
-                                                                          error.
-                                                                        • Check the connection and control method of the
-                                                                          work detection sensor.
-                TARGET DETECTION IN did not turn ON during
+   • Check the marking results before and after the
+   error.
+   • Check the connection and control method of the
+   work detection sensor.
+TARGET DETECTION IN did not turn ON during
   E752 *3, *4                                                           • Set the work detection sensor position so that the
-                the lasing process.
-                                                                          sensor turns ON more than 1ms during marking.
-                                                                        • When you do not use this function, set “Disable” at
-                                                                          X7: TARGET DETECTION IN with Laser Marker
-                                                                          NAVI smart system settings.
+the lasing process.
+   sensor turns ON more than 1ms during marking.
+   • When you do not use this function, set “Disable” at
+   X7: TARGET DETECTION IN with Laser Marker
+   NAVI smart system settings.
 
 
 212                                                     ME-LPRF-SM-11
@@ -10984,63 +10985,63 @@ ERROR
 ## หน้า 213
 
 ERROR
-                                      Description                                             Measures *1
-       CODE
+   Description                                             Measures *1
+CODE
 
-                                                                          • Keep SET IN turned ON until SET OK OUT turns
-                  • I/O connector terminal No. input was not set            ON.
-                    successfully.                                         • To input the No. input again, close the shutter and
+   • Keep SET IN turned ON until SET OK OUT turns
+• I/O connector terminal No. input was not set            ON.
+  successfully.                                         • To input the No. input again, close the shutter and
   E760            • Before setting completion (SET OK OUT) was              reset the previous data.
-                    output, the set input (SET IN) was input at           • Check the connection with the external controller.
-                    least twice.                                          • Check the control procedure of the external
-                                                                            control.
+output, the set input (SET IN) was input at           • Check the connection with the external controller.
+least twice.                                          • Check the control procedure of the external
+   control.
 
-                                                                          • Check the Ethernet or USB connection status.
-                                                                          • For Bluetooth communication, check for any
-                  The connection between laser marker and your
-                                                                            obstacles and distance between that and the laser
-                  PC is disconnected.
+   • Check the Ethernet or USB connection status.
+   • For Bluetooth communication, check for any
+The connection between laser marker and your
+   obstacles and distance between that and the laser
+PC is disconnected.
   E770                                                                      marker.
-                  Unable to communicate with Laser Marker NAVI
-                                                                          • Save files onto your PC local folder, and overwrite
-                  smart.
-                                                                            and save them when the connection gets back
-                                                                            online.
+Unable to communicate with Laser Marker NAVI
+   • Save files onto your PC local folder, and overwrite
+smart.
+   and save them when the connection gets back
+   online.
 
-                                                                          • When the marking interval is too short for
-                                                                            transmission time of MST command, MST
-                  Unable to transmit the response data of MST               command is not available. In such case, check the
+   • When the marking interval is too short for
+   transmission time of MST command, MST
+Unable to transmit the response data of MST               command is not available. In such case, check the
   E775
-                  command.                                                  marking completion by I/O.
-                                                                          • Check the control procedure of the external
-                                                                            control.
+command.                                                  marking completion by I/O.
+   • Check the control procedure of the external
+   control.
 
-                                                                          • Make sure the connected laser marker
-                                                                            components have the correct serial numbers.
-                                                                          • For LP-GS/RC/RF series, it is recommended to
-                                                                            connect the head and controller that have the
+• Make sure the connected laser marker
+  components have the correct serial numbers.
+• For LP-GS/RC/RF series, it is recommended to
+  connect the head and controller that have the
   E780            Serial number mismatch.
-                                                                            same serial numbers.
-                                                                          • For LP-RV series, it is recommended to connect
-                                                                            the head, oscillator unit, and controller that have
-                                                                            the same serial numbers.
+  same serial numbers.
+• For LP-RV series, it is recommended to connect
+  the head, oscillator unit, and controller that have
+  the same serial numbers.
 
-                                                                          • Make sure the connected laser marker
-                                                                            components have the correct model numbers.
-                                                                          • For LP-GS series, it is recommended to connect
-                  • Model number mismatch.                                  the head and controller that have the same model
+   • Make sure the connected laser marker
+   components have the correct model numbers.
+   • For LP-GS series, it is recommended to connect
+• Model number mismatch.                                  the head and controller that have the same model
   E781            • Incorrect connection of signal cable or unit            numbers. If you combine the different models, the
-                    power cable.                                            model number of the laser head is applied to the
-                                                                            laser marking system.
-                                                                          • Check the connection of the cable and various
-                                                                            signal lines, and then restart the laser marker.
+power cable.                                            model number of the laser head is applied to the
+   laser marking system.
+   • Check the connection of the cable and various
+   signal lines, and then restart the laser marker.
 
 
-                                                                          To use PROFINET, download the GSD file (.XML file)
-                                                                          corresponding to the controller version of your laser
+To use PROFINET, download the GSD file (.XML file)
+corresponding to the controller version of your laser
   E782 *4        GSD file version error.                                  marking system. If the GSD file version is incorrect,
-                                                                          settings by your PLC cannot be imported to the laser
-                                                                          marking system correctly.
+settings by your PLC cannot be imported to the laser
+marking system correctly.
 
 
 *1 : If the error persists after restart of the laser marker, contact our sales office or representatives.
@@ -11049,7 +11050,7 @@ ERROR
 *4 : Error that may occur for LP-RF series and LP-RV series only.
 
 
-                                                          ME-LPRF-SM-11                                                           213
+ME-LPRF-SM-11                                                           213
 
 ---
 
@@ -11058,76 +11059,76 @@ ERROR
 Index
 
 
-        ME-LPRF-SM-11
+ME-LPRF-SM-11
 
 ---
 
 ## หน้า 215
 
 A                                                                                     L
-    AC power cable.................................................. 28                     Laser emission port......................................... 162
-    Air filter............................................................. 166             Laser Marker NAVI smart............................ 19, 54
-    Alarm................................................................ 201               Laser Marker Smart Utility........................... 19, 21
-                                                                                            Laser oscillator..................................................171
+AC power cable.................................................. 28                     Laser emission port......................................... 162
+Air filter............................................................. 166             Laser Marker NAVI smart............................ 19, 54
+Alarm................................................................ 201               Laser Marker Smart Utility........................... 19, 21
+   Laser oscillator..................................................171
 B                                                                                           Laser pointer emission port............................... 30
-                                                                                            Laser stop................................................ 103, 123
-    Backup............................................................. 183                 Link Control with Code Reader........................ 153
-    Battery............................................... 24, 180, 185                     Link Control with Image Checker..................... 136
+   Laser stop................................................ 103, 123
+Backup............................................................. 183                 Link Control with Code Reader........................ 153
+Battery............................................... 24, 180, 185                     Link Control with Image Checker..................... 136
 
 C                                                                                     M
-    Cable.......................................................... 28, 183                 Marking at regular intervals........................84, 113
-    Circuit protector........................................... 32, 53                     Marking center position..................................... 40
-    Communication Command Control................. 132                                      Marking field...................................................... 40
-    Communication settings.......................... 130, 132                               Marking trigger................................................. 109
-    Connecting......................................................... 47                  Model................................................................. 18
-    Contactor......................................................... 176                  Multiple triggers..........................................84, 114
-    Continuous trigger..................................... 84, 110
-    Controller......................................................27, 31
-    Controller display panel................................31, 61
-                                                                                      O
-    Counter.....................................................119, 121                    Offline................................................................ 63
-                                                                                            Online........................................................... 63, 67
+Cable.......................................................... 28, 183                 Marking at regular intervals........................84, 113
+Circuit protector........................................... 32, 53                     Marking center position..................................... 40
+Communication Command Control................. 132                                      Marking field...................................................... 40
+Communication settings.......................... 130, 132                               Marking trigger................................................. 109
+Connecting......................................................... 47                  Model................................................................. 18
+Contactor......................................................... 176                  Multiple triggers..........................................84, 114
+Continuous trigger..................................... 84, 110
+Controller......................................................27, 31
+Controller display panel................................31, 61
+   O
+Counter.....................................................119, 121                    Offline................................................................ 63
+   Online........................................................... 63, 67
 D                                                                                           Optional items.................................................... 20
-                                                                                            Outer Dimensional Drawing............................... 25
-    Data extraction................................................. 159                    Output circuit...................................................... 99
-    Disposal........................................................... 185                 Output rating...................................................... 99
+   Outer Dimensional Drawing............................... 25
+Data extraction................................................. 159                    Output circuit...................................................... 99
+Disposal........................................................... 185                 Output rating...................................................... 99
 
 E                                                                                     P
-    Earth.................................................................. 51              Package............................................................. 21
-    Ethernet......................................... 32, 55, 68, 131                       Password........................................................... 71
-    External control.................................................. 75                   PC configuration software..................... 54, 58, 63
-    External offset.................................................. 122                   Power connector.......................................... 29, 32
-    External power................................................. 102                     Power supply terminal....................................... 51
+Earth.................................................................. 51              Package............................................................. 21
+Ethernet......................................... 32, 55, 68, 131                       Password........................................................... 71
+External control.................................................. 75                   PC configuration software..................... 54, 58, 63
+External offset.................................................. 122                   Power connector.......................................... 29, 32
+External power................................................. 102                     Power supply terminal....................................... 51
 
 F                                                                                     R
-    Fan................................................................... 168              Registered characters...................................... 122
-    File....................................................................118             Related Regulations.......................................... 10
-    Frame ground terminal...................................... 30                          Remote control mode........................................ 58
-                                                                                            Remote mode.............................................. 75, 80
+Fan................................................................... 168              Registered characters...................................... 122
+File....................................................................118             Related Regulations.......................................... 10
+Frame ground terminal...................................... 30                          Remote control mode........................................ 58
+   Remote mode.............................................. 75, 80
 G                                                                                           RS-232C.................................................... 32, 128
-    Galvano scanner...............................................174                       RUN mode................................................... 58, 73
-    Guide laser.................................................. 41, 117
-                                                                                      S
+Galvano scanner...............................................174                       RUN mode................................................... 58, 73
+Guide laser.................................................. 41, 117
+   S
 H                                                                                           Safety measures...........................................11, 90
-    Head............................................................ 25, 29                 Serial Number.................................................. 184
-                                                                                            Shutter..................................................... 108, 175
-                                                                                            Signal cable....................................................... 28
+Head............................................................ 25, 29                 Serial Number.................................................. 184
+   Shutter..................................................... 108, 175
+   Signal cable....................................................... 28
 I                                                                                           Signal connector.......................................... 29, 32
-    Input circuit......................................................... 98               Single trigger.......................................84, 109, 112
-    Input rating......................................................... 98                Specification...................................................... 23
-    Installation.............................................. 37, 38, 46                   Standards........................................................... 10
-    Interface specifications.................................... 128
-    Interlock..................................... 90, 100, 103, 125                  T
-    Internal power.................................................. 102
-    I/O connector......................................... 33, 82, 91                       Test marking................................................ 58, 73
-    I/O terminal block................................... 33, 82, 83                        TIMING IN........................................................ 143
+Input circuit......................................................... 98               Single trigger.......................................84, 109, 112
+Input rating......................................................... 98                Specification...................................................... 23
+Installation.............................................. 37, 38, 46                   Standards........................................................... 10
+Interface specifications.................................... 128
+Interlock..................................... 90, 100, 103, 125                  T
+Internal power.................................................. 102
+I/O connector......................................... 33, 82, 91                       Test marking................................................ 58, 73
+I/O terminal block................................... 33, 82, 83                        TIMING IN........................................................ 143
 
 
 K                                                                                     U
-    Key switch.......................................................... 31                 Unit power cable................................................ 28
+Key switch.......................................................... 31                 Unit power cable................................................ 28
 
 
-                                                                            ME-LPRF-SM-11                                                                                215
+ME-LPRF-SM-11                                                                                215
 
 ---
 
@@ -11137,7 +11138,7 @@ USB.............................................................. 32, 55
 
 
   W
-      Warning............................................................ 205
+Warning............................................................ 205
 
 
 216                                                                        ME-LPRF-SM-11
@@ -11155,7 +11156,7 @@ _(หน้านี้ไม่มีข้อความ — เป็นร�
 Panasonic Industrial Devices SUNX Co., Ltd.
 https://panasonic.net/id/pidsx/global
 Please visit our website for inquiries and about our sales network.
-                             © Panasonic Industrial Devices SUNX Co., Ltd. 2017 - 2021
+© Panasonic Industrial Devices SUNX Co., Ltd. 2017 - 2021
 August, 2021
 
 ---

@@ -27,5 +27,9 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
-  }
+  },
+  // ฉาก Three.js ชุดเดิม (plant/, KitMachine*, vendor kit) ถูกย้ายไป
+  // components/views/liveFloor/_archive/ เพื่อเก็บไว้อ้างอิงตอนสร้างฉากใหม่.
+  // ไม่มีไฟล์ไหน import มันแล้ว จึงไม่ต้อง typecheck (import ข้างในพังตามการย้าย).
+  "exclude": ["**/_archive/**", "dist", "node_modules"]
 }

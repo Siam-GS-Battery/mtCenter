@@ -34,3 +34,6 @@ Desktop.ini
 *.sqlite
 *.sqlite3
 *.db
+
+# model
+Model_3D/

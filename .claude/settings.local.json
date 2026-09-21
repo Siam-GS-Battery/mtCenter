@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(sed -i '/badge:/d' shot5.mjs)",
-      "Bash(node shot5.mjs)"
+      "Bash(node shot5.mjs)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr create:*)"
     ]
   }
 }

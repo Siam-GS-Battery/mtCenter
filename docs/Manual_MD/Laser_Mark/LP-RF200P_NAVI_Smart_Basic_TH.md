@@ -7,26 +7,27 @@
 | **วิธีสกัดข้อความ** | text layer (embedded) |
 
 ---
+
 ## หน้า 1
 
 Laser Marking System
-                                            Laser Marker NAVI smart
-                                            Quick Reference
+Laser Marker NAVI smart
+Quick Reference
 
 
-                                                                            LP-GS series
-                                                                            LP-RC series
-                                                                            LP-RH series
-                                                                            LP-RF series
-                                                                            LP-RV series
-                                                                            LP-ZV series
+LP-GS series
+LP-RC series
+LP-RH series
+LP-RF series
+LP-RV series
+LP-ZV series
 
 
-                                            This guide describes the following basic procedures:
-                                             • How to start test marking
-                                             • How to create a marking data
-                                            For more information about the Laser Marker NAVI smart software,
-                                            refer to the “Laser Marker NAVI smart Operation Manual”.
+This guide describes the following basic procedures:
+ • How to start test marking
+ • How to create a marking data
+For more information about the Laser Marker NAVI smart software,
+refer to the “Laser Marker NAVI smart Operation Manual”.
 
 
 ME-NAVIS2-QR-3
@@ -39,16 +40,16 @@ ME-NAVIS2-QR-3
 ## หน้า 2
 
 Preface
-    Thank you for purchasing our product.
-    For full use of this product safely and properly, please read this document carefully.
-    This product has been strictly checked and tested prior to its delivery. However, please make sure that this product
-    operates properly before using it. In case that the product becomes damaged or does not operate as specified in this
-    document, contact the dealer you purchased from or our sales office.
+Thank you for purchasing our product.
+For full use of this product safely and properly, please read this document carefully.
+This product has been strictly checked and tested prior to its delivery. However, please make sure that this product
+operates properly before using it. In case that the product becomes damaged or does not operate as specified in this
+document, contact the dealer you purchased from or our sales office.
 
-    The English version of this document is the original instructions. All other languages are translations that are based on the
-    original documentation.
+The English version of this document is the original instructions. All other languages are translations that are based on the
+original documentation.
 
-    ⿎ General terms and conditions of this document
+⿎ General terms and conditions of this document
     1. Before using this product, or before every starting operation, please confirm the correct functioning and performance
        of this product.
     2. Contents of this document could be changed without notice.
@@ -57,21 +58,21 @@ Preface
        mistakes, or comments in this document, please notify us.
     5. Please remind that we assume no liability for any results arising out of operations regardless of the above clauses.
 
-    ⿎ Disclaimer
-    The applications described in this document are all intended for examples only. The purchase of our products described in
-    this document shall not be regarded as granting of a license to use our products in the described applications. We do NOT
-    warrant that we have obtained some intellectual properties, such as patent rights, with respect to such applications, or that
-    the described application may not infringe any intellectual property rights, such as patent rights, of a third party.
+⿎ Disclaimer
+The applications described in this document are all intended for examples only. The purchase of our products described in
+this document shall not be regarded as granting of a license to use our products in the described applications. We do NOT
+warrant that we have obtained some intellectual properties, such as patent rights, with respect to such applications, or that
+the described application may not infringe any intellectual property rights, such as patent rights, of a third party.
 
-    ⿎ Trademark
-    • Windows is a registered trademark or trademark of Microsoft Corporation in the United States and/or other countries.
-    • QR Code is a registered trademarks of DENSO WAVE INCORPORATED.
-    • Adobe, Adobe Logo, Adobe Reader, and Adobe Illustrator are either registered trademarks or trademarks of Adobe
-      Systems Incorporated in the United States and/or other countries.
-    • Bluetooth is a registered trademark of U.S.A. Bluetooth SIG Inc.
-    • EtherNet/IP is a trademark of ODVA, Inc.
-    • All other product names and companies provided in this document are trademarks or registered trademarks of their
-      respective companies.
+⿎ Trademark
+• Windows is a registered trademark or trademark of Microsoft Corporation in the United States and/or other countries.
+• QR Code is a registered trademarks of DENSO WAVE INCORPORATED.
+• Adobe, Adobe Logo, Adobe Reader, and Adobe Illustrator are either registered trademarks or trademarks of Adobe
+  Systems Incorporated in the United States and/or other countries.
+• Bluetooth is a registered trademark of U.S.A. Bluetooth SIG Inc.
+• EtherNet/IP is a trademark of ODVA, Inc.
+• All other product names and companies provided in this document are trademarks or registered trademarks of their
+  respective companies.
 
 
 2
@@ -83,12 +84,12 @@ Preface
 How to Read this Document
  Symbol description
 
-                      “Notice” denotes any instructions or precautions for using this product. To prevent the damage or
-        ワㄐㄕㄊ㄄ㄆ
-                      malfunction of the product, observe these precautions fully.
+   “Notice” denotes any instructions or precautions for using this product. To prevent the damage or
+ワㄐㄕㄊ㄄ㄆ
+   malfunction of the product, observe these precautions fully.
 
 
-      ンㄆㄇㄆㄓㄆㄏ㄄ㄆ       “Reference” denotes any hints for operation, detail explanations, or references.
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ       “Reference” denotes any hints for operation, detail explanations, or references.
 
 
  Target model
@@ -100,16 +101,16 @@ Please remind that the illustration and the screen image may vary with the model
 
  Target model                                                 Description in the text
  LP-GS051            LP-GS051-E                               LP-GS051             LP-GS051(-L)          LP-GS series
-                                                                                                         LP-GS
+LP-GS
  LP-GS051-F          LP-GS051-FE          LP-GS051-FN
  LP-GS051-L          LP-GS051-LE                              LP-GS051-L
  LP-GS051-LF         LP-GS051-LFE         LP-GS051-LFN
  LP-GS052            LP-GS052-E                               LP-GS052
  LP-GS052-F          LP-GS052-FE          LP-GS052-FN
  LP-RC350S                                                    LP-RC350S                                  LP-RC series
-                                                                                                         LP-RC
+LP-RC
  LP-RH300S                                                    LP-RH300                                   LP-RH series
-                                                                                                         LP-RH
+LP-RH
  LP-RH300T
  LP-RH301S                                                    LP-RH301
  LP-RH301T
@@ -122,11 +123,11 @@ Please remind that the illustration and the screen image may vary with the model
  LP-RH101S                                                    LP-RH101
  LP-RH101T
  LP-RF200P                                                    LP-RF200P                                  LP-RF series
-                                                                                                         LP-RF
+LP-RF
  LP-RV200P                                                    LP-RV200P                                  LP-RV series
-                                                                                                         LP-RV
+LP-RV
  LP-ZV200P                                                    LP-ZV200P                                  LP-ZV series
-                                                                                                         LP-ZV
+LP-ZV
  LP-ZV205P                                                    LP-ZV205P
  LP-ZV206P                                                    LP-ZV206P
  LP-ZV500P                                                    LP-ZV500P
@@ -134,57 +135,57 @@ Please remind that the illustration and the screen image may vary with the model
  LP-ZV506P                                                    LP-ZV506P
 
 
-                                                                                                                          3
+3
 
 ---
 
 ## หน้า 4
 
  Type of manuals
-    For this product, the following manuals are prepared. Read each manuals and operate this product correctly and safely.
-    Also, save the manuals for future use.
+For this product, the following manuals are prepared. Read each manuals and operate this product correctly and safely.
+Also, save the manuals for future use.
 
-    Laser Safety Guide
-      This manual describes the items required for using this product correctly and safely. All users shall be required for read-
-      ing this manual.
+Laser Safety Guide
+  This manual describes the items required for using this product correctly and safely. All users shall be required for read-
+  ing this manual.
 
-    Setup/Maintenance Guide
-      This manual describes the items required for introduction and installation of this product as well as for the maintenance
-      work.
-       • Product specifications, external dimensions
-       • Installation and connection method
-       • Signal details, I/O rating, and timing chart when I/O is used for control
-       • Maintenance details
+Setup/Maintenance Guide
+  This manual describes the items required for introduction and installation of this product as well as for the maintenance
+  work.
+   • Product specifications, external dimensions
+   • Installation and connection method
+   • Signal details, I/O rating, and timing chart when I/O is used for control
+   • Maintenance details
 
-    Laser Marker NAVI smart Quick Reference
-      This manual describes the basic operation procedure for the laser marker configuration software “Laser Marker NAVI
-      smart”. Please read this when using the laser marker for the first time.
+Laser Marker NAVI smart Quick Reference
+  This manual describes the basic operation procedure for the laser marker configuration software “Laser Marker NAVI
+  smart”. Please read this when using the laser marker for the first time.
 
-    Laser Marker NAVI smart Operation Manual
-      Instruction manual for the laser marker configuration software “Laser Marker NAVI smart”. This manual describes the
-      procedure and method to operate the laser marker, and the screen operations to set marking contents.
-      Mainly the users that operate this laser marker for actual marking procedure shall be required for reading this manual.
+Laser Marker NAVI smart Operation Manual
+  Instruction manual for the laser marker configuration software “Laser Marker NAVI smart”. This manual describes the
+  procedure and method to operate the laser marker, and the screen operations to set marking contents.
+  Mainly the users that operate this laser marker for actual marking procedure shall be required for reading this manual.
 
-    Serial Communication Command Guide
-      This manual describes the communication commands to control this product externally using the serial communication
-      (RS-232C/Ethernet). It describes the communication settings, communication data formats, communication commands,
-      and the control samples.
-      Mainly the machine builder and system integrator shall be required for reading this manual.
+Serial Communication Command Guide
+  This manual describes the communication commands to control this product externally using the serial communication
+  (RS-232C/Ethernet). It describes the communication settings, communication data formats, communication commands,
+  and the control samples.
+  Mainly the machine builder and system integrator shall be required for reading this manual.
 
-    Serial Communication Command Guide: LP-400/V compatible mode
-      This manual describes the communication commands to control LP-GS/LP-RC/LP-RH/LP-RF/LP-RV/LP-ZV externally
-      using the compatible command format with the previous models of LP-400/LP-V series.
-      Mainly the machine builder and system integrator shall be required for reading this manual.
+Serial Communication Command Guide: LP-400/V compatible mode
+  This manual describes the communication commands to control LP-GS/LP-RC/LP-RH/LP-RF/LP-RV/LP-ZV externally
+  using the compatible command format with the previous models of LP-400/LP-V series.
+  Mainly the machine builder and system integrator shall be required for reading this manual.
 
-    Serial Communication Command Guide: LP-M/S/Z compatible mode
-      This manual describes the communication commands to control LP-ZV externally using the compatible command format
-      with the previous models of LP-M/LP-S/LP-Z series.
-      Mainly the machine builder and system integrator shall be required for reading this manual.
+Serial Communication Command Guide: LP-M/S/Z compatible mode
+  This manual describes the communication commands to control LP-ZV externally using the compatible command format
+  with the previous models of LP-M/LP-S/LP-Z series.
+  Mainly the machine builder and system integrator shall be required for reading this manual.
 
 
-       ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
-    • The PDF data of each manual can be downloaded from our Internet website.
-    • To read the PDF manual, Adobe Reader (Version X or later) of Adobe Systems Incorporated is required.
+   ンㄆㄇㄆㄓㄆㄏ㄄ㄆ
+• The PDF data of each manual can be downloaded from our Internet website.
+• To read the PDF manual, Adobe Reader (Version X or later) of Adobe Systems Incorporated is required.
 
 
 4
@@ -194,43 +195,43 @@ Please remind that the illustration and the screen image may vary with the model
 ## หน้า 5
 
 Contents
-     Preface………………………………………………………………………………… 2
-     How to Read this Document………………………………………………………… 3
+Preface………………………………………………………………………………… 2
+How to Read this Document………………………………………………………… 3
 
 1 Laser Marker NAVI smart Basics…………………………………… 6
-     1-1 “Startup” screen…………………………………………………………………… 7
-     1-2 “Marking settings” screen………………………………………………………… 8
-     1-3 “Monitor” screen…………………………………………………………………… 11
-     1-4 “Maintenance” screen…………………………………………………………… 13
-     1-5 “Data management” screen………………………………………………………15
-     1-6 “System settings” screen………………………………………………………… 17
+1-1 “Startup” screen…………………………………………………………………… 7
+1-2 “Marking settings” screen………………………………………………………… 8
+1-3 “Monitor” screen…………………………………………………………………… 11
+1-4 “Maintenance” screen…………………………………………………………… 13
+1-5 “Data management” screen………………………………………………………15
+1-6 “System settings” screen………………………………………………………… 17
 
 2 Let's Use Laser Marker NAVI smart…………………………………19
-     2-1 Start Laser Marker NAVI smart…………………………………………………21
-           2-1-1 Start Laser Marker NAVI smart……………………………………………… 21
-           2-1-2 Open a marking file to edit…………………………………………………… 22
-     2-2 Create a marking file (offline mode)……………………………………………23
-           2-2-1 Create a marking object……………………………………………………… 23
-           2-2-2 Specify the layout of a marking object……………………………………… 24
-           2-2-3 Set laser parameters…………………………………………………………… 25
-     2-3 Save marking data to your PC……………………………………………………26
-     2-4 Connect your PC and the laser marking system………………………………27
-     2-5 Start the laser marking system…………………………………………………28
-     2-6 Establish an online connection…………………………………………………29
-     2-7 Transfer a marking file from your PC to the laser marking system……………30
-     2-8 Start laser radiation for marking…………………………………………………32
-           2-8-1 Check the marking position using the guide laser………………………… 32
-           2-8-2 Turn laser pumping on………………………………………………………… 34
-           2-8-3 Perform test marking…………………………………………………………… 35
-     2-9 Terminate the operation…………………………………………………………36
+2-1 Start Laser Marker NAVI smart…………………………………………………21
+   2-1-1 Start Laser Marker NAVI smart……………………………………………… 21
+   2-1-2 Open a marking file to edit…………………………………………………… 22
+2-2 Create a marking file (offline mode)……………………………………………23
+   2-2-1 Create a marking object……………………………………………………… 23
+   2-2-2 Specify the layout of a marking object……………………………………… 24
+   2-2-3 Set laser parameters…………………………………………………………… 25
+2-3 Save marking data to your PC……………………………………………………26
+2-4 Connect your PC and the laser marking system………………………………27
+2-5 Start the laser marking system…………………………………………………28
+2-6 Establish an online connection…………………………………………………29
+2-7 Transfer a marking file from your PC to the laser marking system……………30
+2-8 Start laser radiation for marking…………………………………………………32
+   2-8-1 Check the marking position using the guide laser………………………… 32
+   2-8-2 Turn laser pumping on………………………………………………………… 34
+   2-8-3 Perform test marking…………………………………………………………… 35
+2-9 Terminate the operation…………………………………………………………36
 
 3 Create Various Marking Data…………………………………………37
-     3-1 Mark date and time………………………………………………………………38
-     3-2 Mark 2D code……………………………………………………………………… 41
-     3-3 Mark a graphic……………………………………………………………………44
+3-1 Mark date and time………………………………………………………………38
+3-2 Mark 2D code……………………………………………………………………… 41
+3-3 Mark a graphic……………………………………………………………………44
 
 
-                                                                                    5
+5
 
 ---
 
@@ -250,85 +251,85 @@ You can select the software application among “Online”, “Offline”, or �
  User interface overview
 
 
-                                                                           2
+2
 
-        1
-                                                                           3
-
-
-                                                                               4
+1
+   3
 
 
-       Item                      Description
+4
+
+
+Item                      Description
 
  1     Menu                      With the menu tools, you can set the software preferences such as changing the user
-                                 interface language and customizing user interface elements.
+interface language and customizing user interface elements.
 
  2     Online                    You can establish an online connection between your PC and the laser marking system.
-                                 In online mode, you can configure the laser marking system and save the marking data
-                                 to the laser marking system.
+In online mode, you can configure the laser marking system and save the marking data
+to the laser marking system.
 
  3     Offline                   In offline mode, you can create and edit marking files saved on local or network drives.
 
  4     Convert                   You can convert a backup file or marking file used in the former models such as LP-M/
-                                 LP-S/LP-Z (to LP-ZV only) or LP-400/LP-V into the file format that can be opened with
-                                 Laser Marker NAVI smart.
+LP-S/LP-Z (to LP-ZV only) or LP-400/LP-V into the file format that can be opened with
+Laser Marker NAVI smart.
 
 
-                                                                                                                            7
+7
 
 ---
 
 ## หน้า 8
 
 1-2 “Marking settings” screen
-    In this screen, you can create and edit marking data such as character, graphic and bar code objects and save them in a
-    file. If you are logged in as “Restricted user”, only the parameters allowed to edit are available.
+In this screen, you can create and edit marking data such as character, graphic and bar code objects and save them in a
+file. If you are logged in as “Restricted user”, only the parameters allowed to edit are available.
 
-    You can do the following:
-    • Create new marking data.
-    • Edit a marking or backup file that is saved on a local or network drive (offline mode).
-    • Edit a marking file that is saved on the laser marking system (online mode).
-    • Execute test marking (online mode).
+You can do the following:
+• Create new marking data.
+• Edit a marking or backup file that is saved on a local or network drive (offline mode).
+• Edit a marking file that is saved on the laser marking system (online mode).
+• Execute test marking (online mode).
 
-     User interface overview
-
-
-                 1                                                                                                     5
-                 2
+ User interface overview
 
 
-                 3                                                                                                     6
+1                                                                                                     5
+2
 
 
-                 4
+3                                                                                                     6
 
 
-          Item                          Description
+4
 
-     1    Ribbon - setting tools        You can use the tools to execute file handling, create or edit marking data.
 
-     2    File number and file          The number and name of the selecting file are displayed in the tab.
-          name
+Item                          Description
 
-     3    Marking image editor          The image of marking data such as characters and graphics is displayed in this area.
+1    Ribbon - setting tools        You can use the tools to execute file handling, create or edit marking data.
 
-     4    Status bar                    In online mode, it displays any of the following information:
-                                         • Current operation mode (remote mode or RUN mode)
-                                         • Laser pumping status (on or off)
-                                         • Error number and error message if any error is occurred
+2    File number and file          The number and name of the selecting file are displayed in the tab.
+   name
 
-     5    Ribbon - control tools        You can use the tools to control the laser marking system in online mode.
+3    Marking image editor          The image of marking data such as characters and graphics is displayed in this area.
 
-     6    Marking settings              Set the marking data in the following tabs:
+4    Status bar                    In online mode, it displays any of the following information:
+   • Current operation mode (remote mode or RUN mode)
+   • Laser pumping status (on or off)
+   • Error number and error message if any error is occurred
 
-          • Object settings         :     Specify settings of the marking object such as character, graphic and bar code objects.
-          • Function settings       :     Configure the function such as counter, expiry time and lot.
-          • File settings           :     Specify the settings such as position, trigger parameters which are applied to all
-                                          objects in a marking file.
-          • Laser settings          :     Specify laser parameters such as laser power and scan speed.
-          • On-the-fly marking      :     Specify on-the-fly marking settings if you want to mark a workpiece in motion. (LP-RC/
-                                          LP-RH/LP-RF/LP-RV/LP-ZV)
+5    Ribbon - control tools        You can use the tools to control the laser marking system in online mode.
+
+6    Marking settings              Set the marking data in the following tabs:
+
+• Object settings         :     Specify settings of the marking object such as character, graphic and bar code objects.
+• Function settings       :     Configure the function such as counter, expiry time and lot.
+• File settings           :     Specify the settings such as position, trigger parameters which are applied to all
+   objects in a marking file.
+• Laser settings          :     Specify laser parameters such as laser power and scan speed.
+• On-the-fly marking      :     Specify on-the-fly marking settings if you want to mark a workpiece in motion. (LP-RC/
+   LP-RH/LP-RF/LP-RV/LP-ZV)
 
 
 8
@@ -339,65 +340,65 @@ You can select the software application among “Online”, “Offline”, or �
 
  Setting tools in the ribbon
 
-     1        2       3                      4                                    5          6         7         8
+1        2       3                      4                                    5          6         7         8
 
 
-     Item                  Description
+Item                  Description
 
  1   Open                  Select a marking file to open and edit in the “Marking settings” screen.
 
  2   Save                  Save the marking files to the connected laser marking system or to your PC.
 
  3   Undo / redo           You can use these editing tools to revert the most recent operation.
-                                Icon       Description          Keyboard shortcut
+Icon       Description          Keyboard shortcut
 
-                                              Undo                    Ctrl + Z
+Undo                    Ctrl + Z
 
-                                              Redo                    Ctrl + Y
+Redo                    Ctrl + Y
 
 
  4   Marking objects       Create marking objects (“Character”, “TrueType”, “Graphic”, “Shapes”, “Bar code”, “2D
-                           code”, “Point radiation”).
+code”, “Point radiation”).
 
  5   Align / adjust        To align or distribute selected objects, use the “Align” tool. To adjust a character object,
-                           use the “Adjust” tool.
+use the “Adjust” tool.
 
  6   Basic editing tools   To perform basic operations, use any of the following icons:
-                                Icon       Description          Keyboard shortcut
+Icon       Description          Keyboard shortcut
 
-                                                 Cut                  Ctrl + X
+Cut                  Ctrl + X
 
-                                                 Copy                Ctrl + C
+Copy                Ctrl + C
 
-                                              Delete                  Delete
+Delete                  Delete
 
-                                              Paste                   Ctrl + V
+Paste                   Ctrl + V
 
 
  7       3D                Edit the marking layout for 3D shaped workpieces such as cylinders and slopes. (LP-ZV
-                           series only)
+series only)
 
  8   Camera                Set or operate the internal camera in the head. (LP-ZV series only)
 
 
-                                                                                                                          9
+9
 
 ---
 
 ## หน้า 10
 
  Control tools in the ribbon
-                            1         2           3            4          5         6
+1         2           3            4          5         6
 
 
-      Item                  Description
+Item                  Description
 
   1   Test marking          Opens the “Test marking/guide laser” dialog to perform test marking, guide laser
-                            radiation, and marking time measurement.
+radiation, and marking time measurement.
   2   Guide laser
 
   3   Connection            Use this tool to establish or disconnect an online connection between the laser marking
-                            system and a PC.
+system and a PC.
 
   4   Operation             Use this tool to switch the laser marking system operation to remote or RUN mode.
 
@@ -423,20 +424,20 @@ You can do the following:
  User interface overview
 
 
-             1                                                                                                 4
-             2
+1                                                                                                 4
+2
 
-                                                                                                               5
+5
 
-             3
+3
 
 
-      Item                         Description
+Item                         Description
 
  1    Ribbon - setting tools       You can use the tools to open a marking file or show the I/O monitor.
 
  2    File number and file         The number and name of the selecting file are displayed in the tab.
-      name
+name
 
  3    Marking image editor         The image of marking data such as characters and graphics is displayed in this area.
 
@@ -444,57 +445,57 @@ You can do the following:
 
  5    Marking settings             You can check the marking data in the following tabs:
 
-      • Current settings       :     You can check some of the marking parameters that are enabled in “System settings”
-                                     > “Access permissions” in advance.
-      • On-the-fly             :     You can check the status of on-the-fly marking (“ON”/“OFF”) and the line speed. (LP-
-                                     RC/LP-RH/LP-RF/LP-RV series)
-      • Real-time data               Displays the state of the on-the-fly, the marking energy measurement result and the
-                                     workpiece displacement of the auto focus function. (LP-ZV series)
-      • Reference character    :     The specified reference character strings are listed.
-        strings
+• Current settings       :     You can check some of the marking parameters that are enabled in “System settings”
+   > “Access permissions” in advance.
+• On-the-fly             :     You can check the status of on-the-fly marking (“ON”/“OFF”) and the line speed. (LP-
+   RC/LP-RH/LP-RF/LP-RV series)
+• Real-time data               Displays the state of the on-the-fly, the marking energy measurement result and the
+   workpiece displacement of the auto focus function. (LP-ZV series)
+• Reference character    :     The specified reference character strings are listed.
+  strings
 
 
-                                                                                                                            11
+11
 
 ---
 
 ## หน้า 12
 
  Setting tools in the ribbon
-                                                1          2          3
+1          2          3
 
 
-         Item                  Description
+Item                  Description
 
-     1   Open                  You can select and open a marking file on the “Monitor” screen.
+1   Open                  You can select and open a marking file on the “Monitor” screen.
 
-     2   I/O monitor           The status (“ON”/“OFF”) of the I/O terminals on the laser marking system is displayed.
+2   I/O monitor           The status (“ON”/“OFF”) of the I/O terminals on the laser marking system is displayed.
 
-     3   Refresh screen        This button is available in the ribbon, if you select “Button “Refresh screen”” in “Startup”
-                               > “Preferences” > "Action setting" > “Screen refresh” > “Method”.
-                               Use the “Refresh screen” button to manually update the “Monitor” screen.
+3   Refresh screen        This button is available in the ribbon, if you select “Button “Refresh screen”” in “Startup”
+   > “Preferences” > "Action setting" > “Screen refresh” > “Method”.
+   Use the “Refresh screen” button to manually update the “Monitor” screen.
 
 
   Control tools in the ribbon
 
 
-                                1         2           3           4          5          6
+1         2           3           4          5          6
 
 
-         Item                  Description
+Item                  Description
 
-     1   Start marking         In RUN mode, you can use this button to trigger the laser radiation manually.
+1   Start marking         In RUN mode, you can use this button to trigger the laser radiation manually.
 
-     2   Lock                  Use this tool to unlock or lock the “Start marking” button.
+2   Lock                  Use this tool to unlock or lock the “Start marking” button.
 
-     3   Connection            Use this tool to establish or disconnect an online connection between the laser marking
-                               system and a PC.
+3   Connection            Use this tool to establish or disconnect an online connection between the laser marking
+   system and a PC.
 
-     4   Operation             Use this tool to switch the laser marking system operation to remote or RUN mode.
+4   Operation             Use this tool to switch the laser marking system operation to remote or RUN mode.
 
-     5   Laser pumping         Turns laser pumping on or off.
+5   Laser pumping         Turns laser pumping on or off.
 
-     6   “Stop laser” button   Terminates the laser radiation or disable the laser radiation temporarily.
+6   “Stop laser” button   Terminates the laser radiation or disable the laser radiation temporarily.
 
 
 12
@@ -516,76 +517,76 @@ You can do the following:
  User interface overview
 
 
-              1                                                                                                 3
+1                                                                                                 3
 
 
-              2
+2
 
 
-       Item                         Description
+Item                         Description
 
  1     Ribbon - setting tools       You can use the tools to perform output simulation, power check (LP-ZV), or save the
-                                    operating information.
+operating information.
 
  2     Maintenance data *1          You can check the operating information in the following tabs:
 
-       • Operating data         :     You can check the operating data of the laser marking system, such as the total
-                                      operating time of the each part.
-       • Error log              :     You can view the error log.
-       • Command history        :     The transmitted and received communication commands are displayed.
-       • Power check history    :     Displays the history of measurement and power correction executed by the power
-                                      check function. (LP-ZV500P/LP-ZV505P/LP-ZV506P only)
+• Operating data         :     You can check the operating data of the laser marking system, such as the total
+   operating time of the each part.
+• Error log              :     You can view the error log.
+• Command history        :     The transmitted and received communication commands are displayed.
+• Power check history    :     Displays the history of measurement and power correction executed by the power
+   check function. (LP-ZV500P/LP-ZV505P/LP-ZV506P only)
 
  3     Ribbon - control tools       You can use the tools to control the laser marking system in online mode.
 
 *1 : When you edit a backup file in offline mode, the data at the time of backup are displayed.
 
 
-                                                                                                                           13
+13
 
 ---
 
 ## หน้า 14
 
  Setting tools in the ribbon
-                                         1         2            3             4
+1         2            3             4
 
 
-         Item                  Description
+Item                  Description
 
-     1   Save as TSV           Manages the following history information.
-                               • Error log
-     2   Delete all            • Command history
-                               • Power check history (LP-ZV500P/LP-ZV505P/LP-ZV506P only)
-                               Select "Save as TSV" to export the logs listed in the displayed tab as a TSV file.
-                               Select "Delete all" to delete all logs listed in the displayed tab.
+1   Save as TSV           Manages the following history information.
+   • Error log
+2   Delete all            • Command history
+   • Power check history (LP-ZV500P/LP-ZV505P/LP-ZV506P only)
+   Select "Save as TSV" to export the logs listed in the displayed tab as a TSV file.
+   Select "Delete all" to delete all logs listed in the displayed tab.
 
-     3   Output simulation     Use the output simulation function to check the operation of external devices connected
-                               to the laser marking system by manually changing the status of an output.
+3   Output simulation     Use the output simulation function to check the operation of external devices connected
+   to the laser marking system by manually changing the status of an output.
 
-     4   Power check           You can measure the laser power by using the internal power monitor and correct the
-                               power setting value according to the measurement results. (LP-ZV500P/LP-ZV505P/LP-
-                               ZV506P only)
+4   Power check           You can measure the laser power by using the internal power monitor and correct the
+   power setting value according to the measurement results. (LP-ZV500P/LP-ZV505P/LP-
+   ZV506P only)
 
 
   Control tools in the ribbon
 
-                                   1                 2           3           4          5
+1                 2           3           4          5
 
 
-         Item                  Description
+Item                  Description
 
-     1   Laser radiation for   Use this function to check the laser power with a commercial power meter.
-         measurement
+1   Laser radiation for   Use this function to check the laser power with a commercial power meter.
+   measurement
 
-     2   Connection            Use this tool to establish or disconnect an online connection between the laser marking
-                               system and a PC.
+2   Connection            Use this tool to establish or disconnect an online connection between the laser marking
+   system and a PC.
 
-     3   Operation             Use this tool to switch the laser marking system operation to remote or RUN mode.
+3   Operation             Use this tool to switch the laser marking system operation to remote or RUN mode.
 
-     4   Laser pumping         Turns laser pumping on or off.
+4   Laser pumping         Turns laser pumping on or off.
 
-     5   “Stop laser” button   Terminates the laser radiation or disable the laser radiation temporarily.
+5   “Stop laser” button   Terminates the laser radiation or disable the laser radiation temporarily.
 
 
 14
@@ -606,32 +607,32 @@ You can do the following:
  User interface overview
 
 
-              1                                                              4                                   5
+1                                                              4                                   5
 
-              2
-              3
+2
+3
 
-                                                                                                                 6
+6
 
 
-       Item                       Description
+Item                       Description
 
  1     Ribbon - setting tools     You can add, delete or manage files in the laser marking system.
 
  2     Search for file number     You can search for a marking file by entering a file number.
 
  3     File list                  All files that are currently saved on the laser marking system, including marking files,
-                                  graphic files and font files are listed.
+graphic files and font files are listed.
 
  4     Search for file name       You can search for marking files, font files, or graphic files by entering a character string
-                                  in the search box.
+in the search box.
 
  5     Ribbon - control tools     You can use the tools to control the laser marking system in online mode.
 
  6     Preview                    Displays the image of the selected file.
 
 
-                                                                                                                                  15
+15
 
 ---
 
@@ -639,17 +640,17 @@ You can do the following:
 
  Setting tools in the ribbon
 
-                   1        2                      3                      4          5          6          7
+1        2                      3                      4          5          6          7
 
 
-      Item                      Description
+Item                      Description
 
   1   Add                       Adds a marking file, graphic file, or font file to use it in the laser marking system.
 
   2   Save to PC                Saves a selected file to your local or network drive.
 
   3   Copy, Paste, Delete       To manage marking files, graphic files and font files, use the copy, paste, and delete
-                                functions.
+functions.
 
   4   Edit graphic file         To edit a graphic file in the list, use this tool.
 
@@ -662,13 +663,13 @@ You can do the following:
 
   Control tools in the ribbon
 
-                                              1            2          3          4
+1            2          3          4
 
 
-      Item                      Description
+Item                      Description
 
   1   Connection                Use this tool to establish or disconnect an online connection between the laser marking
-                                system and a PC.
+system and a PC.
 
   2   Operation                 Use this tool to switch the laser marking system operation to remote or RUN mode.
 
@@ -696,61 +697,61 @@ You can do the following:
  User interface overview
 
 
-              1                                                                                                  3
+1                                                                                                  3
 
 
-              2
+2
 
 
-       Item                         Description
+Item                         Description
 
  1     Ribbon - setting tools       You can update the system settings and view information about the laser marking
-                                    system.
+system.
 
  2     System parameters            You can configure the system parameters in the following tabs:
 
-       • Operation/             :     Specify the date and time, remote mode settings and other operatinal preferences.
-         information
-       • System offset          :     Set the laser head direction, adjust the marking field position and laser settings.
-       • Inputs/outputs         :     Specify input and output settings.
-       • Communication          :     Specify communication settings for such as RS-232C, Ethernet and command format.
-       • Linked device          :     Specify the settings for the external device such as the imagechecker and code reader
-                                      connection.
-       • Access permission      :     Configure permissions for the “Restricted user” and customize the “Monitor” screen.
+• Operation/             :     Specify the date and time, remote mode settings and other operatinal preferences.
+  information
+• System offset          :     Set the laser head direction, adjust the marking field position and laser settings.
+• Inputs/outputs         :     Specify input and output settings.
+• Communication          :     Specify communication settings for such as RS-232C, Ethernet and command format.
+• Linked device          :     Specify the settings for the external device such as the imagechecker and code reader
+   connection.
+• Access permission      :     Configure permissions for the “Restricted user” and customize the “Monitor” screen.
 
  3     Ribbon - control tools       You can use the tools to control the laser marking system in online mode.
 
 
-                                                                                                                            17
+17
 
 ---
 
 ## หน้า 18
 
  Setting tools in the ribbon
-                                             1                  2            3
+1                  2            3
 
 
-      Item                     Description
+Item                     Description
 
   1   Apply to laser marking   Updates the system settings in the laser marking system. If any changes are made, “!”
-      system                   symbol is appeared on the icon.
+system                   symbol is appeared on the icon.
 
   2   System information       Displays information about the laser marking system, such as version or serial number.
 
   3   Marking field            You can adjust the marking field position when it is misaligned. It is available for LP-RF/
-      calibration              LP-RV/LP-ZV.
+calibration              LP-RV/LP-ZV.
 
 
   Control tools in the ribbon
 
-                                          1            2            3        4
+1            2            3        4
 
 
-      Item                     Description
+Item                     Description
 
   1   Connection               Use this tool to establish or disconnect an online connection between the laser marking
-                               system and a PC.
+system and a PC.
 
   2   Operation                Use this tool to switch the laser marking system operation to remote or RUN mode.
 
@@ -839,13 +840,13 @@ You can do the following:
 ## หน้า 22
 
 2-1-2 Open a marking file to edit
-     Select “New...” > “Marking file (.lms)” and select the
-     model of your laser marking system.
-     In this example, LP-RF200P is selected.
+Select “New...” > “Marking file (.lms)” and select the
+model of your laser marking system.
+In this example, LP-RF200P is selected.
 
 
-     The “Marking settings” screen opens with an empty
-     marking image editor.
+The “Marking settings” screen opens with an empty
+marking image editor.
 
 
 22
@@ -887,15 +888,15 @@ A typical procedures to set a marking object, for example character text “ABCD
 2-2-2 Specify the layout of a marking object
  Typical procedures to set a marking object, for example to set character text “ABCD”, are given below.
 
-                            Character spacing: 5 mm
+Character spacing: 5 mm
 
 
-        Character height:
-        4 mm
+Character height:
+4 mm
 
-                            Character width: 4 mm
-      X-position: -10 mm
-      Y-position: 5 mm
+   Character width: 4 mm
+X-position: -10 mm
+Y-position: 5 mm
 
 
  1.   Open the “Object settings” tab.
@@ -983,8 +984,8 @@ Specify laser parameters that apply to all objects in the marking file, such as 
   system is online.
 
 
-                                                                     PC                          Controller
-     ンㄆㄇㄆㄓㄆㄏ㄄ㄆ                                                                              (LP-RC/LP-RF/LP-RV)
+   PC                          Controller
+ンㄆㄇㄆㄓㄆㄏ㄄ㄆ                                                                              (LP-RC/LP-RF/LP-RV)
 
 • Before you can make an Ethernet connection, you must make the appropriate communication settings in Laser Marker
   NAVI smart. Connect the PC via USB to make these settings.
@@ -993,16 +994,16 @@ Specify laser parameters that apply to all objects in the marking file, such as 
 • For details of the connection, refer to the “Setup/Maintenance Guide” of your laser marker.
 
 
-                                                                                                                     27
+27
 
 ---
 
 ## หน้า 28
 
 2-5 Start the laser marking system
-                                            • In case of an emergency stop or an interlock, re-pumping of the laser marking
-         WARNING                              system will be necessary. For safety reasons, construct a laser re-pumping
-                                              system which must be operated by hand.
+   • In case of an emergency stop or an interlock, re-pumping of the laser marking
+WARNING                              system will be necessary. For safety reasons, construct a laser re-pumping
+   system which must be operated by hand.
 
 
  1.   Setup the laser marker connecting head, controller and interfaces. For LP-RV/LP-ZV the oscillator unit should be also
@@ -1087,7 +1088,7 @@ Specify laser parameters that apply to all objects in the marking file, such as 
 ## หน้า 30
 
 2-7 Transfer a marking file from your PC to the laser
-      marking system
+marking system
  1.   Go to the “Marking settings” screen and select “Open” > “From PC” in the ribbon.
 
 
@@ -1108,7 +1109,7 @@ Specify laser parameters that apply to all objects in the marking file, such as 
 The marking file is opened in the “Marking settings” screen.
 
 
-                                                               31
+31
 
 ---
 
@@ -1301,14 +1302,14 @@ The marking file is opened in the “Marking settings” screen.
 
   Example
 
-                              Item                          Setting
-         13 29                Number of characters          2
-          hour   minute
-                              Date/time type                Hour (24), Minute
-                              Zero indication               Zero fill
+   Item                          Setting
+13 29                Number of characters          2
+ hour   minute
+   Date/time type                Hour (24), Minute
+   Zero indication               Zero fill
 
 
-       ワㄐㄕㄊ㄄ㄆ
+ワㄐㄕㄊ㄄ㄆ
  • Functional characters such as current date and time or lot are based on the system clock of the laser marking system.
    It may happen that the system clock deviates from the accurate time due to errors of internal parts or low battery level.
    Therefore, check the system clock in the laser marking system regularly to ensure that the date and time are correct.
@@ -1391,14 +1392,14 @@ The procedures to set a QR Code are given below.
 
  Example
 
-                                                        Item                         Setting
-                                                        Code type                    QR Code, Model 2
-                                                        Code data                    ABCDEFGHIJKLMN12345
-                                                        Error correction level       M
-                                  Module height         Module height                0.500 mm
-                                                        Module width                 0.500 mm
-                                                        Human readable text          Disabled
-                  Module width
+   Item                         Setting
+   Code type                    QR Code, Model 2
+   Code data                    ABCDEFGHIJKLMN12345
+   Error correction level       M
+   Module height         Module height                0.500 mm
+   Module width                 0.500 mm
+   Human readable text          Disabled
+Module width
 
 
  Setting procedures
@@ -1547,7 +1548,7 @@ Panasonic Industrial Devices SUNX Co., Ltd.
 https://panasonic.net/id/pidsx/global
 Please visit our website for inquiries and about our sales network.
 
-                      © Panasonic Industrial Devices SUNX Co., Ltd. 2020 - 2023
+© Panasonic Industrial Devices SUNX Co., Ltd. 2020 - 2023
 November, 2023
 
 ---

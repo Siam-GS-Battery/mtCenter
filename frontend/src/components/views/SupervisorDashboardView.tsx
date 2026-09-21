@@ -1125,6 +1125,41 @@ export const SupervisorDashboardView: React.FC<SupervisorDashboardViewProps> = (
           </div>
         </div>
 
+        {/* Status filter chips — lets the supervisor filter this registry without
+            scrolling back up to the chart legend. Reuses the same `statusFilter`
+            state/setter as the legend (lines ~1080-1097), so both stay in sync. */}
+        <div className="flex flex-wrap gap-2" role="group" aria-label="กรองทะเบียนเครื่องจักรตามสถานะ">
+          {(
+            [
+              { value: "all", label: "ทั้งหมด", count: totalMachines },
+              { value: "normal", label: "ปกติ", count: normalMachines },
+              { value: "warning", label: "เฝ้าระวัง", count: warningMachines },
+              { value: "error", label: "ผิดปกติ", count: errorMachines },
+              { value: "maintenance", label: "ซ่อมบำรุง", count: maintenanceMachines },
+            ] as const satisfies readonly { value: MachineStatusFilter; label: string; count: number }[]
+          ).map((chip) => (
+            <button
+              key={chip.value}
+              type="button"
+              aria-pressed={statusFilter === chip.value}
+              onClick={() => {
+                // Reset to the first page: filtering while parked on a later
+                // page (973 machines / 24 per page) can otherwise land the
+                // user on an empty page.
+                setRegistryOffset(0);
+                setStatusFilter(chip.value);
+              }}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-full border cursor-pointer transition-colors ${
+                statusFilter === chip.value
+                  ? "bg-primary/10 border-primary/20 text-primary"
+                  : "bg-pearl border-divider text-ink-muted hover:bg-primary/5"
+              }`}
+            >
+              {chip.label} {chip.count}
+            </button>
+          ))}
+        </div>
+
         {/* Machine dropdown — same picker as the technician (ScanMachineView) page.
             Jumping to a machine here opens the same detail modal the cards below
             open, without needing to scroll/paginate through the registry. Fed the
